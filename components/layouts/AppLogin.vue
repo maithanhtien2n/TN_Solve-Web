@@ -28,6 +28,13 @@ const onClickLogin = async (type: string = "google") => {
   }
 };
 
+watch(
+  () => displayLogin.value,
+  (newVal: any) => {
+    if (newVal) loading.value = "Đăng nhập với Google";
+  }
+);
+
 useHead({
   script: [
     {
