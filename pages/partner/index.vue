@@ -9,8 +9,7 @@ const dashboard = computed(() => onGetterMasterData.value["dashboard"]);
 
 const onClickViewDashboardPartnerDetail = (id: string) => {
   if (userData.value?.role !== EnumAccountRole.ADMIN) return;
-  if (id) router.push(localePath(`/partner?id=${id}`));
-  window.location.reload();
+  window.location.href = `https://tnsolve.com/partner?id=${id}`;
 };
 
 definePageMeta({ layout: "partner" });
