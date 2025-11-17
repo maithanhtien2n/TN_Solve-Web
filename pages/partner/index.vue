@@ -158,11 +158,12 @@ definePageMeta({ layout: "partner" });
                 :title="item.name"
                 :class="{
                   'bg-grey-lighten-2':
-                    dashboard?.accountId && item?._id === dashboard?.accountId,
+                    dashboard?.accountId &&
+                    dashboard?.accountId === item?.partnerId,
                   'cursor-pointer': userData?.role === EnumAccountRole.ADMIN,
                 }"
                 :subtitle="`${item.count} lượt giới thiệu`"
-                @click="onClickViewDashboardPartnerDetail(item._id)"
+                @click="onClickViewDashboardPartnerDetail(item.partnerId)"
               >
                 <template #prepend>
                   <v-avatar :color="getRankColor(index + 1)">
