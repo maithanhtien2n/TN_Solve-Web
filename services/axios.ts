@@ -5,7 +5,7 @@ import axios, {
 
 const api = axios.create({
   timeout: 70000,
-  baseURL: "https://api.tnsolve.com/api",
+  baseURL: `${import.meta.env.VITE_API_URL}/api`,
   withCredentials: true,
 });
 

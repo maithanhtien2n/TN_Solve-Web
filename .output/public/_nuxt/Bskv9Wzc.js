@@ -1,1 +1,0 @@
-import{a1 as n,a as r,q as u}from"./CThe8rmN.js";import{u as p}from"./CQW_vi0x.js";const g=n((e,l)=>{const a=p(),{onGetterDisplayLogin:o,onGetterUserData:t}=a,s=r().$localePath;if(typeof t.value=="object"&&!Object.values(t.value||{}).length)return o.value=!0,u(s(`/?redirect=${e.fullPath}`))});export{g as default};

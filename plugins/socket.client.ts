@@ -1,7 +1,7 @@
 import { io } from "socket.io-client";
 
 export default defineNuxtPlugin(() => {
-  const socket = io("https://api.tnsolve.com", {
+  const socket = io(import.meta.env.VITE_API_URL, {
     transports: ["websocket"],
     reconnectionAttempts: 5,
     reconnectionDelay: 1000,

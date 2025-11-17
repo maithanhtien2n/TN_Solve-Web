@@ -11,9 +11,6 @@ module.exports = {
         NITRO_HOST: "0.0.0.0",
 
         VITE_API_URL: "https://api.tnsolve.com",
-
-        VITE_GOOGLE_CLIENT_ID:
-          "681037770554-al2b5mj25ch8amdjpirl6gti75sqc3kd.apps.googleusercontent.com",
       },
     },
   ],
