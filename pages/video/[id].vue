@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { productService } from "~/services/app";
+import { masterDataService } from "~/services/app";
 
 const route = useRoute();
 const router = useRouter();
@@ -13,6 +14,7 @@ const { onGetterUserData } = useAppStore();
 const { onGetterMasterData } = useMasterDataStore();
 
 const loading = ref("");
+const videoFlow = ref<any>({});
 const uploadImageRef = ref<any>(null);
 const myTimeline = ref<HTMLDivElement | null>(null);
 
@@ -157,6 +159,15 @@ const onFormatString = (value: string) => {
 };
 
 const onGetProductDetail = async (loadingType: string = "") => {
+  await masterDataService
+    .getVideoFlow()
+    .then((res) => {
+      console.log(res.data);
+
+      videoFlow.value = res?.data || {};
+    })
+    .catch(() => {});
+
   if (!productId.value) return;
 
   loading.value = loadingType;
@@ -579,6 +590,20 @@ definePageMeta({ middleware: "auth" });
     </v-col>
 
     <v-col lg="6" md="6" cols="12">
+      <div
+        v-if="videoFlow && Object.values(videoFlow || {})?.length"
+        class="mb-4"
+      >
+        <v-progress-linear
+          height="10"
+          :color="videoFlow.color"
+          :modelValue="videoFlow.value"
+        />
+        <div class="mt-2">
+          {{ videoFlow.title }}
+        </div>
+      </div>
+
       <div ref="myTimeline">
         <v-timeline
           side="end"

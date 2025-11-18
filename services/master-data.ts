@@ -40,4 +40,8 @@ export const masterDataService = {
       { ids: payload.ids }
     );
   },
+
+  async getVideoFlow() {
+    return await api.get(`/common//video/flow`);
+  },
 };
