@@ -72,11 +72,13 @@ onMounted(async () => {
     let params: any = {};
 
     if (route.query?.ref && typeof route.query?.ref === "string") {
-      const accountInfoRes = await accountService.checkPartner({
-        accountId: route.query?.ref,
-      });
+      const accountInfoRes = await accountService
+        .checkPartner({
+          accountId: route.query?.ref,
+        })
+        .catch(() => null);
 
-      if (accountInfoRes?.data?._id) {
+      if (accountInfoRes && accountInfoRes?.data?._id) {
         referralId.value = accountInfoRes?.data?._id;
         router.replace("/");
       }
@@ -96,6 +98,7 @@ onMounted(async () => {
           onActionAllMasterDataClient({ type: "video-mode" }),
           onActionAllMasterDataClient({ type: "video-style" }),
           onActionAllMasterDataClient({ type: "video-duration" }),
+          onActionAllMasterDataClient({ type: "rental-months" }),
         ]);
       })
       .catch(() => {

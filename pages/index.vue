@@ -107,7 +107,7 @@ useSeo({
     </div>
 
     <a target="_blank" href="https://zalo.me/g/tuhmrl934">
-      Bấm vào đây để tham gia nhóm Zalo
+      Bấm vào đây để tham gia nhóm Zalo TN Solve!
     </a>
   </div>
 </template>
