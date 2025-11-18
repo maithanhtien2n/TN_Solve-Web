@@ -78,7 +78,7 @@ useSeo({
       <div>
         📌 Đăng ký trực tiếp
         <a
-          :href="'https://tnsolve.com/vi/pricing'"
+          :href="'https://tnsolve.com/vi/payment'"
           target="_blank"
           class="text-primary font-semibold hover:underline"
         >
