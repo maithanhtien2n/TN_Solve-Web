@@ -39,7 +39,7 @@ export default defineNuxtConfig({
     locales: [
       { code: "vi", name: "VietNam" },
       { code: "lo", name: "Laos" },
-      { code: "en", name: "English" },
+      // { code: "en", name: "English" },
     ],
     vueI18n: fileURLToPath(new URL("./i18n/index.ts", import.meta.url)),
     bundle: { optimizeTranslationDirective: false },
