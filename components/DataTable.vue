@@ -430,7 +430,7 @@ defineExpose({ params, selected, loadItems, resetSelected });
             icon
             size="40"
             variant="text"
-            :disabled="Boolean((slotProps.item as any)?.isDelete || ['❌ Hình ảnh tải lên vi phạm chính sách, vui lòng chọn ảnh khác!','❌ Thước phim liên quan đến chủ đề nhạy cảm, vi phạm chính sách nội dung!'].includes((slotProps.item as any)?.lastMessage?.note))"
+            :disabled="Boolean((slotProps.item as any)?.isDelete || ['❌ Cookies flow (veo3) của bạn không hợp lệ!','❌ Cookies flow (veo3) của bạn đã hết hạn!','❌ Hình ảnh tải lên vi phạm chính sách, vui lòng chọn ảnh khác!','❌ Thước phim liên quan đến chủ đề nhạy cảm, vi phạm chính sách nội dung!'].includes((slotProps.item as any)?.lastMessage?.note))"
             @click="emits('action', { action: 'reload', item: slotProps.item })"
           >
             <v-icon size="20">mdi-reload</v-icon>

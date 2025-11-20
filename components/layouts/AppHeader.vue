@@ -153,7 +153,10 @@ const onClickMenuItem = (value: string) => {
                       </h3>
                     </template>
 
-                    <template #subtitle>
+                    <template
+                      v-if="userData?.role !== EnumAccountRole.ADMIN"
+                      #subtitle
+                    >
                       <div class="mt-2">
                         <v-icon size="15">mdi-assistant</v-icon>
                         {{

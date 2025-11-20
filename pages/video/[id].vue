@@ -654,6 +654,24 @@ definePageMeta({ middleware: "auth" });
                 <div v-if="item.note" class="text-caption">
                   {{ onFormatString(item.note) }}
                 </div>
+                <div
+                  v-if="
+                    [
+                      '❌ Cookies flow (veo3) của bạn không hợp lệ!',
+                      '❌ Cookies flow (veo3) của bạn đã hết hạn!',
+                    ].includes(item.note)
+                  "
+                  class="text-caption"
+                >
+                  {{ $t("Vui lòng cập nhật cookies mới") }}
+                  <a
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    href="https://tnsolve.com/setting"
+                  >
+                    {{ $t("tại đây") }}
+                  </a>
+                </div>
 
                 <div
                   v-if="
