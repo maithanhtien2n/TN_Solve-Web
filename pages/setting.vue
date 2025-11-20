@@ -60,7 +60,7 @@ definePageMeta({ middleware: "auth" });
       <v-text-field
         v-model="formData.flowCookies"
         hide-details
-        class="w-100"
+        class="w-100 mb-2"
         variant="outlined"
         :label="$t('Flow cookies (dùng tài khoản riêng)')"
         :readonly="Boolean(false)"
@@ -69,11 +69,16 @@ definePageMeta({ middleware: "auth" });
       <a
         target="_blank"
         rel="noopener noreferrer"
-        href="https://youtu.be/__iDjAhIPHc?si=5Nlz-1aHRggWlPXf"
+        href="https://youtu.be/p-SmfiBTorU?si=zHwUfNkVTAzrdbZM"
       >
         {{ $t("Cách lấy Flow cookies") }}
         <v-icon class="text-error ml-1">mdi-youtube</v-icon>
       </a>
+      <div>
+        {{
+          "Lưu ý: cookies chỉ có thời hạn 1 ngày kể từ lúc sao chép dán vào, nên mọi người nhớ thay thường xuyên để tránh bị lỗi nhé!"
+        }}
+      </div>
     </v-col>
 
     <!-- <v-col

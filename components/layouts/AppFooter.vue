@@ -55,7 +55,7 @@ const onClickNavigate = (value: string) => {
                     v-for="(item, index) in [
                       { title: 'Tính năng', value: 'features' },
                       { title: 'Hướng dẫn', value: 'tutorial' },
-                      { title: 'Đăng ký gói dịch vụ', value: 'payment' },
+                      // { title: 'Đăng ký gói dịch vụ', value: 'payment' },
                     ]"
                     :key="index"
                     class="cursor-pointer"
