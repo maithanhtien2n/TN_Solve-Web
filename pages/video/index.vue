@@ -14,6 +14,7 @@ const params = reactive<any>({
 const products = ref<any>({});
 const loading = ref<string>("");
 const loadMore = ref<any>(null);
+const commonDialogRef = ref<any>(null);
 const confirmDialogRef = ref<any>(null);
 
 const onGetProducts = async (loadingType: string = "") => {
@@ -63,6 +64,7 @@ const onClickDotMenuItem = (type: string, data: any) => {
 
 onMounted(() => {
   onGetProducts("list");
+  commonDialogRef.value?.onDisplay(true);
 });
 
 onMounted(() => {
@@ -91,6 +93,14 @@ definePageMeta({ middleware: "auth" });
 </script>
 
 <template>
+  <CommonDialog
+    ref="commonDialogRef"
+    title="🔔 Thông báo quan trọng!"
+    width="800"
+  >
+    <v-img src="/images/thong-bao.jpg" style="margin: 0 -1.5rem" />
+  </CommonDialog>
+
   <div
     v-if="Boolean(loading === 'list')"
     class="d-flex justify-center flex-column align-center ga-3 pt-10 pb-16"

@@ -76,7 +76,7 @@ definePageMeta({ middleware: "auth" });
       </a>
     </v-col>
 
-    <v-col
+    <!-- <v-col
       v-if="userData.role === 'admin' || userData?.settings?.flowCookies"
       cols="12"
     >
@@ -87,13 +87,13 @@ definePageMeta({ middleware: "auth" });
           :label="$t('Tạo video tốc độ cao')"
           style="margin-left: -10px; margin-top: -1rem; margin-bottom: -10px"
         />
-        <!-- <small>
+        <small>
           {{
             "Lưu ý: nếu tích vào chế độ này có thể gây ra lỗi: ❌ Đang có nhiều người tạo video vào lúc này, vui lòng đợi một chút rồi thử lại!"
           }}
-        </small> -->
+        </small>
       </div>
-    </v-col>
+    </v-col> -->
 
     <v-col cols="12" lg="3" md="4" class="mt-6">
       <div

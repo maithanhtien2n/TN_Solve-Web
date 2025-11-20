@@ -14,6 +14,7 @@ const headers = computed(() => {
     { title: "Họ và tên", key: "name", sortable: false },
     { title: "Email", key: "email", sortable: false },
     { title: "Thời hạn còn lại", key: "remainingTime", sortable: false },
+    { title: "Tín dụng", key: "settings.credit", sortable: false },
     { title: "Ngày tham gia", key: "createdAt", sortable: false },
     { title: "Người giới thiệu", key: "referral.name", sortable: false },
     { title: "Cập nhật", key: "updatedAt", sortable: false },

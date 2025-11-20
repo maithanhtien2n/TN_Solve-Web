@@ -153,9 +153,14 @@ const onClickMenuItem = (value: string) => {
                       </h3>
                     </template>
 
-                    <!-- <template #subtitle>
-                      <span>{{ userData.email }}</span>
-                    </template> -->
+                    <template #subtitle>
+                      <div class="mt-2">
+                        <v-icon size="15">mdi-assistant</v-icon>
+                        {{
+                          `${userData.settings?.credit || 0} ${$t("tín dụng")}`
+                        }}
+                      </div>
+                    </template>
                   </v-list-item>
                 </v-list>
 
