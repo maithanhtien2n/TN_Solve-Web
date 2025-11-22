@@ -101,7 +101,9 @@ const videoStyleOptions = computed(() => {
 const videoDurationOptions = computed(() => {
   const allOptions = onGetterMasterData.value["video-duration"] || [];
 
-  if (productId.value || formData.videoMode === "movie") return allOptions;
+  if (productId.value || formData.videoMode === "movie") {
+    return allOptions;
+  }
 
   if (["short_form_video", "my_subject"].includes(formData.videoMode)) {
     // Nếu là video ngắn, chỉ lấy các giá trị từ '1' đến '7'
@@ -162,8 +164,6 @@ const onGetProductDetail = async (loadingType: string = "") => {
   await masterDataService
     .getVideoFlow()
     .then((res) => {
-      console.log(res.data);
-
       videoFlow.value = res?.data || {};
     })
     .catch(() => {});
