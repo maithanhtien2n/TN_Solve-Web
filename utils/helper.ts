@@ -59,29 +59,41 @@ export function downloadBlobFile(blob: Blob, filename: string) {
 export async function downloadVideo(
   url: string,
   title: string,
-  callBack?: (e: string) => void
+  callBack?: (status: string) => void
 ) {
+  // Hàm format tên file giữ nguyên
   function formatFileName(title: string, originalUrl: string) {
-    // Lấy đuôi file từ URL
-    const extension = originalUrl.split(".").pop() || "mp4";
-
-    // Chuyển tên thành lowercase, bỏ dấu, thay khoảng trắng và ký tự đặc biệt bằng "-"
+    const extension = originalUrl.split(".").pop()?.split("?")[0] || "mp4"; // Fix thêm lỗi nếu url có query string (?v=...)
     const formatted = title
-      .normalize("NFD") // tách dấu
-      .replace(/[\u0300-\u036f]/g, "") // bỏ dấu
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
       .toLowerCase()
-      .replace(/[^a-z0-9]+/g, "-") // thay ký tự không phải chữ số/chữ cái bằng "-"
-      .replace(/^-+|-+$/g, ""); // xóa "-" thừa ở đầu/cuối
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "");
 
     return `${formatted}.${extension}`;
+  }
+
+  // Hàm tải trực tiếp (Fallback)
+  function forceDownloadFallback(url: string) {
+    console.warn("⚠️ Đang chuyển sang chế độ tải trực tiếp (Fallback)...");
+    const a = document.createElement("a");
+    a.href = url;
+    a.target = "_blank"; // Mở tab mới để tránh ảnh hưởng trang hiện tại
+    a.setAttribute("download", ""); // Gợi ý trình duyệt tải xuống thay vì play
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
   }
 
   try {
     if (callBack) callBack("download");
 
+    // Thử tải bằng fetch trước
     const response = await fetch(url);
-    if (!response.ok)
-      throw new Error(`Failed to fetch video: ${response.statusText}`);
+
+    // Nếu dính CORS hoặc lỗi server -> ném lỗi để nhảy xuống catch
+    if (!response.ok) throw new Error(`Fetch failed: ${response.status}`);
 
     const blob = await response.blob();
     const blobUrl = URL.createObjectURL(blob);
@@ -89,7 +101,7 @@ export async function downloadVideo(
 
     const a = document.createElement("a");
     a.href = blobUrl;
-    a.download = fileName;
+    a.download = fileName; // Chỉ fetch mới đổi được tên file
     document.body.appendChild(a);
     a.click();
     a.remove();
@@ -99,7 +111,16 @@ export async function downloadVideo(
 
     if (callBack) callBack("");
   } catch (err) {
-    console.error("❌ Lỗi khi tải video:", err);
+    console.error(
+      "❌ Không thể tải qua Fetch (khả năng do CORS hoặc File quá lớn).",
+      err
+    );
+
+    // THỰC HIỆN FALLBACK:
+    // Nếu fetch thất bại, mở trực tiếp link gốc
+    forceDownloadFallback(url);
+
+    if (callBack) callBack("");
   }
 }
 
