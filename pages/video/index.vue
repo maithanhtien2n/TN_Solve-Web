@@ -14,7 +14,6 @@ const params = reactive<any>({
 const products = ref<any>({});
 const loading = ref<string>("");
 const loadMore = ref<any>(null);
-const commonDialogRef = ref<any>(null);
 const confirmDialogRef = ref<any>(null);
 
 const onGetProducts = async (loadingType: string = "") => {
@@ -64,7 +63,6 @@ const onClickDotMenuItem = (type: string, data: any) => {
 
 onMounted(() => {
   onGetProducts("list");
-  commonDialogRef.value?.onDisplay(true);
 });
 
 onMounted(() => {
@@ -93,91 +91,6 @@ definePageMeta({ middleware: "auth" });
 </script>
 
 <template>
-  <CommonDialog
-    ref="commonDialogRef"
-    width="800"
-    title="🔔 Thông báo quan trọng!"
-  >
-    <div style="padding: 1rem">
-      <h2
-        style="
-          color: #ffc300;
-          border-bottom: 2px solid #ffc300;
-          margin-top: -5px;
-        "
-        class="mb-4 pb-4"
-      >
-        &#128226; Thông báo Nóng về Chi Phí Tín Dụng Veo 3 (Mọi người làm video
-        chú ý giúp Em nhé!)
-      </h2>
-
-      <p>Chào cả nhà mình,</p>
-
-      <p>
-        Cảm ơn mọi người rất nhiều vì đã ủng hộ công cụ tạo video tự động dùng
-        dịch vụ của <strong>Veo 3</strong> mà Em cung cấp!
-      </p>
-
-      <p>
-        Trước đây, Veo 3 Fast là <strong>miễn phí (0 tín dụng/video)</strong>,
-        giúp mọi người làm video thoải mái.
-      </p>
-
-      <p>
-        Tuy nhiên, do lượng người dùng tăng đột biến, bên cung cấp dịch vụ Veo 3
-        đang bị quá tải và họ vừa đưa ra một thông báo thay đổi chính sách:
-      </p>
-
-      <blockquote
-        style="
-          background-color: #f9f9f9;
-          border-left: 5px solid #007bff;
-          margin: 15px 0;
-          padding: 10px 15px;
-        "
-      >
-        <p style="margin: 0">
-          <strong
-            >Vì quá tải, Veo 3 Fast sẽ bắt đầu tính 10 tín dụng/video.</strong
-          >
-        </p>
-      </blockquote>
-
-      <p>
-        Em xin lỗi mọi người về sự thay đổi đột ngột và bất tiện này từ phía nhà
-        cung cấp Veo 3.
-      </p>
-
-      <h3 style="color: #28a745">&#127873; Phương án Hỗ trợ từ Em</h3>
-
-      <p>
-        Để mọi người vẫn tiếp tục tạo được video ổn thỏa, Em xin gửi tặng mọi
-        người chút hỗ trợ:
-      </p>
-
-      <ul style="list-style-type: none; padding-left: 0">
-        <li style="margin-bottom: 10px">
-          &#10003; <strong>Tặng ngay 4000 tín dụng</strong> vào mỗi tài khoản để
-          mọi người sử dụng cho dịch vụ Veo 3 Fast (tương đương
-          <strong>400 cảnh</strong>).
-        </li>
-        <li>
-          &#10003; Nếu mọi người dùng hết 4000 tín dụng này mà vẫn cần làm
-          video,
-          <strong
-            >tool đã tích hợp chế độ để mọi người liên kết tài khoản Veo 3 cá
-            nhân bên ngoài</strong
-          >
-          vào hệ thống để tiếp tục sử dụng.
-        </li>
-      </ul>
-
-      <p style="text-align: center; margin-top: 25px">
-        <strong>Mong mọi người</strong> thông cảm và tiếp tục ủng hộ Em nhé!
-      </p>
-    </div>
-  </CommonDialog>
-
   <div
     v-if="Boolean(loading === 'list')"
     class="d-flex justify-center flex-column align-center ga-3 pt-10 pb-16"
