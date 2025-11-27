@@ -76,7 +76,15 @@ const videoStyleOptions = computed(() => {
   switch (formData.videoMode) {
     case "movie": {
       return list.filter((x: any) =>
-        ["general", "monologue", "narration"].includes(x.value)
+        [
+          "general",
+          "cinematic",
+          "animation",
+          "news",
+          "documentary",
+          "advertising",
+          "storytelling",
+        ].includes(x.value)
       );
     }
     case "storytelling": {
