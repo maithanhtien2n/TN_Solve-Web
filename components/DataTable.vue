@@ -434,6 +434,7 @@ defineExpose({ params, selected, loadItems, resetSelected });
               '❌ Hình ảnh tải lên vi phạm chính sách!',
               '❌ Cookies flow (veo3) của bạn không hợp lệ!',
               '❌ Cookies flow (veo3) của bạn đã hết hạn!',
+              '❌ Tín dụng tài khoản flow (veo3) của bạn không đủ!',
               '❌ Hình ảnh tải lên vi phạm chính sách, vui lòng chọn ảnh khác!',
               // '❌ Thước phim liên quan đến chủ đề nhạy cảm, vi phạm chính sách nội dung!'
             ].includes((slotProps.item as any)?.lastMessage?.note))"
