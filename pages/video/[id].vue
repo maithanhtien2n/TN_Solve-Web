@@ -297,7 +297,7 @@ definePageMeta({ middleware: "auth" });
         </div>
 
         <div v-if="item.prompt">
-          <span class="font-bold">Prompt: </span>
+          <span class="font-bold">Prompt: </span><br />
           <span v-html="item.prompt" style="white-space: pre-line" />
         </div>
       </div>
