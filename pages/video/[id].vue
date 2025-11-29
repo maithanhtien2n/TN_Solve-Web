@@ -16,6 +16,7 @@ const { onGetterMasterData } = useMasterDataStore();
 const loading = ref("");
 const videoFlow = ref<any>({});
 const uploadImageRef = ref<any>(null);
+const commonDialogRef = ref<any>(null);
 const myTimeline = ref<HTMLDivElement | null>(null);
 
 const formData = reactive<any>({
@@ -33,6 +34,7 @@ const formData = reactive<any>({
   video: "",
   messages: [],
   account: {},
+  prompts: [],
 });
 
 const productId = computed(() =>
@@ -199,6 +201,7 @@ const onGetProductDetail = async (loadingType: string = "") => {
         formData.video = data.video;
         formData.messages = data.messages || [];
         formData.account = data.account || {};
+        formData.prompts = Array.isArray(data.prompts) ? data.prompts : [];
 
         setTimeout(() => {
           uploadImageRef.value?.setValue(data.images[0]);
@@ -239,6 +242,10 @@ const onSubmit = async () => {
     });
 };
 
+const onClickNoteMessage = (isClick: boolean) => {
+  if (isClick) commonDialogRef.value?.onDisplay(true);
+};
+
 onMounted(() => {
   onGetProductDetail("detail");
 });
@@ -272,6 +279,31 @@ definePageMeta({ middleware: "auth" });
 </script>
 
 <template>
+  <CommonDialog ref="commonDialogRef" title="Chi tiết cảnh quay" width="800">
+    <div class="d-flex flex-column ga-4">
+      <div
+        v-for="(item, index) in formData.prompts"
+        :key="index"
+        class="d-flex flex-column"
+      >
+        <div>
+          <span class="font-bold">{{ $t("Cảnh") }}: </span>
+          <span v-html="item.scene" />
+        </div>
+
+        <div>
+          <span class="font-bold">{{ $t("Mô tả") }}: </span>
+          <span v-html="item.description" />
+        </div>
+
+        <div v-if="item.prompt">
+          <span class="font-bold">Prompt: </span>
+          <span v-html="item.prompt" />
+        </div>
+      </div>
+    </div>
+  </CommonDialog>
+
   <div
     v-if="Boolean(loading === 'detail')"
     class="d-flex justify-center flex-column align-center ga-3 pt-10 pb-16"
@@ -659,7 +691,17 @@ definePageMeta({ middleware: "auth" });
                   {{ item.dateTime }}
                 </div>
 
-                <div v-if="item.note" class="text-caption">
+                <div
+                  v-if="item.note"
+                  class="text-caption"
+                  :class="{
+                    'cursor-pointer text-blue-darken-1':
+                      item.note?.includes('Tổng cộng có'),
+                  }"
+                  @click="
+                    onClickNoteMessage(item.note?.includes('Tổng cộng có'))
+                  "
+                >
                   {{ onFormatString(item.note) }}
                 </div>
                 <div
