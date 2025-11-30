@@ -103,7 +103,7 @@ definePageMeta({ layout: "partner" });
           <v-card-text>
             <v-row dense>
               <v-col
-                v-for="tier in commissionTier"
+                v-for="tier in dashboard.commissionTier"
                 :key="tier.name"
                 cols="12"
                 sm="3"

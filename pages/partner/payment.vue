@@ -187,86 +187,94 @@ definePageMeta({ layout: "partner", title: "Thanh toán" });
             </v-sheet>
           </v-card-text>
 
-          <v-card-text class="pb-7">
+          <v-card-text>
             <h3 class="mb-2 font-bold">
               {{ $t("LINK GỚI THIỆU CỦA BẠN") }}
             </h3>
 
             <v-text-field
-              v-model="onGetterUserData.referralLink"
               readonly
               hide-details
               variant="outlined"
               title="Sao chép mã"
               style="cursor: pointer"
               :color="isCopied ? 'success' : 'default'"
+              :model-value="onGetterUserData.referralLink"
               :append-inner-icon="isCopied ? 'mdi-check' : 'mdi-content-copy'"
               @click:append-inner="onCopyReferralLink()"
             />
           </v-card-text>
 
-          <v-divider class="my-3 mx-4" />
+          <v-card-text
+            class="pb-7 pt-2"
+            v-if="
+              Array.isArray(onGetterUserData?.settings?.paymentHistory) &&
+              onGetterUserData?.settings?.paymentHistory?.length
+            "
+          >
+            <h3 class="mb-2 font-bold">
+              {{ $t("LỊCH SỬ THANH TOÁN") }}
+            </h3>
 
-          <v-card-text class="text-center">
-            <div class="text-grey-darken-1">Số dư có thể rút</div>
-
-            <h1 class="font-bold text-success-darken-1 my-2">
-              {{ formatCurrency(onGetterUserData?.pendingBalance) }}
-            </h1>
-
-            <div
-              class="w-100 cta-button justify-center mt-6"
-              style="border-radius: 6px; margin: auto; max-width: 26rem"
-              :class="{
-                disabled: Boolean(
-                  onGetterUserData?.pendingBalance < MIN_PAYOUT_AMOUNT
-                ),
-              }"
+            <v-data-table
+              :headers="[
+                { title: 'Tháng', key: 'billingPeriod', sortable: false },
+                {
+                  title: 'Lượt thuê',
+                  key: 'transactionCount',
+                  align: 'center',
+                  sortable: false,
+                },
+                {
+                  title: 'Số tiền',
+                  key: 'amount',
+                  align: 'end',
+                  sortable: false,
+                },
+                { title: 'Ghi chú', key: 'note', sortable: false },
+              ]"
+              :items="onGetterUserData?.settings?.paymentHistory"
+              :items-per-page="-1"
+              hide-default-footer
             >
-              <!-- <v-progress-circular
-                width="2"
-                size="23"
-                color="white"
-                indeterminate
-              /> -->
-
-              <v-icon size="27">mdi-bank-transfer-out</v-icon>
-              <h3>{{ $t("Yêu cầu rút tiền") }}</h3>
-            </div>
-
-            <div
-              v-if="onGetterUserData?.pendingBalance < MIN_PAYOUT_AMOUNT"
-              class="text-caption text-error mt-2"
-            >
-              ({{
-                `${$t("Số dư tối thiểu để rút là")} ${formatCurrency(
-                  MIN_PAYOUT_AMOUNT
-                )}`
-              }}
-              )
-            </div>
+              <template #item.amount="{ item }">
+                <span class="text-red">
+                  {{ formatCurrency((item as any).amount) }}
+                </span>
+              </template>
+            </v-data-table>
           </v-card-text>
         </v-card>
 
         <v-card-text>
-          <h2 class="mb-2 font-bold">Lưu ý khi rút tiền</h2>
+          <h2 class="mb-2 font-bold">Quy trình thanh toán</h2>
           <ul class="pl-5 text-medium-emphasis">
             <li>
-              Số dư tối thiểu để thực hiện yêu cầu là
-              <b>{{ formatCurrency(MIN_PAYOUT_AMOUNT) }}</b
-              >.
+              Hệ thống sẽ tự tổng kết số tiền vào <b>ngày 1 hàng tháng</b> (tổng
+              kết của tháng trước).
             </li>
             <li>
-              Các yêu cầu rút tiền sẽ được xử lý và thanh toán vào
-              <b>ngày 15</b> hàng tháng.
+              Thanh toán sẽ được thực hiện từ
+              <b>ngày 2 đến chậm nhất là ngày 8</b> hàng tháng.
+            </li>
+            <li>
+              Nếu sau ngày 8 vẫn chưa nhận được tiền, vui lòng
+              <a
+                href="https://zalo.me/g/vvhrhc608"
+                target="_blank"
+                class="text-primary underline"
+              >
+                nhắn vào nhóm Zalo
+              </a>
+              để được kiểm tra lại.
+            </li>
+            <li>
+              Nếu sau ngày 20 không có phản hồi nào, mọi khiếu nại cho tháng đó
+              sẽ không được chấp nhận.
             </li>
             <li>
               Vui lòng đảm bảo thông tin ngân hàng chính xác. Chúng tôi không
               chịu trách nhiệm nếu bạn nhập sai thông tin.
-            </li>
-            <li>
-              Số dư chờ thanh toán (`PENDING`) mới được tính vào số dư có thể
-              rút. Các khoản "Chờ chốt %" sẽ được xử lý vào cuối tháng.
             </li>
           </ul>
         </v-card-text>
