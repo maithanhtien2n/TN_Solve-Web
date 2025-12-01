@@ -47,7 +47,7 @@ useSeo({
   title: t("Đăng kí gói dịch vụ"),
   description:
     "Nền tảng AI giúp bạn tạo video chuyên nghiệp chỉ trong vài phút",
-  image: "/images/page-video.png",
+  image: "/images/page-home.png",
 });
 
 definePageMeta({ middleware: "auth" });
