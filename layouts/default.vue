@@ -38,7 +38,7 @@ const onReturnTitle = (title: string) => {
       return "Chính sách";
     }
     case "payment": {
-      return "Đăng ký gói dịch vụ";
+      return "Đăng ký dịch vụ";
     }
     case "tutorial": {
       return "Hướng dẫn";
