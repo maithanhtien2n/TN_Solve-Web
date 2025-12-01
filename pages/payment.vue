@@ -54,7 +54,7 @@ definePageMeta({ middleware: "auth" });
 </script>
 
 <template>
-  <!-- <div class="max-w-xl mx-auto">
+  <div class="max-w-xl mx-auto">
     <h1 class="text-2xl font-bold text-center text-gray-800 mb-6">
       Thanh Toán Gói Dịch Vụ
     </h1>
@@ -113,7 +113,5 @@ definePageMeta({ middleware: "auth" });
         <h3>{{ $t("Thanh toán") }}</h3>
       </div>
     </div>
-  </div> -->
-
-  <div>Chưa phát triển</div>
+  </div>
 </template>

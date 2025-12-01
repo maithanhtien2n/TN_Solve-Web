@@ -76,7 +76,7 @@ useSeo({
       </p>
 
       <div>
-        📌 Đăng ký trực tiếp
+        📌 Đăng ký dịch vụ
         <a
           :href="'https://tnsolve.com/vi/payment'"
           target="_blank"
