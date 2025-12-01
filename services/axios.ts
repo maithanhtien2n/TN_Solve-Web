@@ -35,6 +35,13 @@ api.interceptors.response.use(
       !["ERR_CANCELED"].includes(error.code) &&
       ![401].includes(error.status)
     ) {
+      if (
+        typeof error.response?.data?.message === "string" &&
+        error.response?.data?.message.includes("đăng ký gói dịch vụ")
+      ) {
+        useRouter().push("/payment");
+      }
+
       useAppStore().onActionSetSystemPopup({
         type: "error",
         content: error.response?.data?.message || error.message,
