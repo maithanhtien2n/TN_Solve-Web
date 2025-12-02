@@ -87,6 +87,10 @@ onMounted(async () => {
     if (referralId.value) params.ref = referralId.value;
     if (!params.ref && route.query?.code) params.code = route.query.code;
 
+    if (params.query?.amount) {
+      await onActionGetUserData(params).catch(() => {});
+    }
+
     await onActionGetUserData(params)
       .then(async () => {
         const redirect = route.query.redirect as string;
