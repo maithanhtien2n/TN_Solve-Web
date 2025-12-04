@@ -121,6 +121,16 @@ definePageMeta({ middleware: "auth" });
         <span class="text-2xl text-primary">99.000đ/tháng</span>!
       </h1>
 
+      <p v-if="isMobile" class="text-center text-sm text-gray-600 mt-1 mb-3">
+        Nhận ưu đãi giảm giá sâu hơn khi đăng ký gói <br />
+        <span class="text-primary">3 tháng, 6 tháng hoặc 1 năm</span>
+      </p>
+
+      <p v-else class="text-gray-600 mt-2 mb-4">
+        Nhận ưu đãi giảm giá sâu hơn khi đăng ký gói
+        <span class="text-primary">3 tháng, 6 tháng hoặc 1 năm</span>
+      </p>
+
       <v-select
         v-model="formData.rentalMonths"
         class="w-100 mt-10"
