@@ -14,9 +14,57 @@ const formData = ref<any>({
   discountCode: "",
 });
 
-const totalPrice = computed(() =>
-  formatCurrency(99000 * formData.value.rentalMonths)
-);
+const totalPrice = computed(() => {
+  const rentalMonths = formData.value.rentalMonths;
+  const basePricePerMonth = 99000;
+
+  // 1. Tính giá gốc và giá cuối cùng
+  const originalPrice = basePricePerMonth * rentalMonths;
+  let finalPrice = originalPrice; // Khởi tạo finalPrice bằng giá gốc
+
+  // Biến cờ để kiểm tra có chiết khấu hay không
+  let hasDiscount = false;
+
+  switch (rentalMonths) {
+    case 3:
+      finalPrice = 275000; // Giá sau chiết khấu
+      hasDiscount = true;
+      break;
+    case 6:
+      finalPrice = 500000; // Giá sau chiết khấu
+      hasDiscount = true;
+      break;
+    case 12:
+      finalPrice = 890000; // Giá sau chiết khấu
+      hasDiscount = true;
+      break;
+    // case 1 và default sẽ giữ nguyên finalPrice = originalPrice
+  }
+
+  // Luôn đảm bảo giá tiền là số nguyên dương
+  if (finalPrice <= 0) {
+    return formatCurrency(0); // Trả về string 0 đồng
+  }
+
+  // --- LOGIC TRẢ VỀ DỰA TRÊN hasDiscount ---
+  if (hasDiscount) {
+    const amountSaved = originalPrice - finalPrice;
+    // Tính toán tỷ lệ giảm giá và làm tròn về số nguyên
+    const discountRate = Math.round((amountSaved / originalPrice) * 100);
+
+    // Trả về Object chi tiết khi có giảm giá
+    return {
+      originalPrice: formatCurrency(originalPrice),
+      finalPrice: formatCurrency(finalPrice),
+      discountRate: `${discountRate}%`,
+      amountSaved: formatCurrency(amountSaved), // Thêm số tiền tiết kiệm để hiển thị tiện hơn
+      isDiscounted: true,
+    };
+  } else {
+    // Trả về String giá tiền khi không có giảm giá
+    return formatCurrency(finalPrice);
+  }
+});
 
 const rentalMonthsOptions = computed(
   () =>
@@ -93,7 +141,28 @@ definePageMeta({ middleware: "auth" });
       />
 
       <h3 class="w-100" style="font-size: 1.4rem">
-        Tổng cộng: <span class="text-red">{{ totalPrice }}</span>
+        <template v-if="typeof totalPrice === 'object'">
+          Tổng cộng:
+          <span
+            style="font-size: 1rem; color: #999; text-decoration: line-through"
+          >
+            {{ totalPrice.originalPrice }}
+          </span>
+          <span class="text-red ms-2" style="font-size: 1.4rem">
+            {{ totalPrice.finalPrice }}
+          </span>
+
+          <v-chip color="success" size="small" class="ms-2">
+            Giảm {{ totalPrice.discountRate }}
+          </v-chip>
+        </template>
+
+        <template v-else>
+          Tổng cộng:
+          <span class="text-red" style="font-size: 1.4rem">
+            {{ totalPrice }}
+          </span>
+        </template>
       </h3>
 
       <div
