@@ -67,7 +67,7 @@ export default defineNuxtConfig({
         { name: "author", content: "TN Solve" },
         { property: "og:type", content: "website" },
       ],
-      link: [{ rel: "icon", type: "image/png", href: "/favicon.png" }],
+      link: [{ rel: "icon", type: "image/x-icon", href: "/favicon.ico" }],
 
       script: [
         {
