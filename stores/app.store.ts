@@ -8,9 +8,11 @@ export const useAppStore = defineStore("app", () => {
     content: "",
     display: false,
   });
+  const displayPopupBuyCredit = ref<boolean>(false);
   const displayLogin = ref<boolean>(false);
   const userData = ref<any>(undefined);
 
+  const onGetterDisplayPopupBuyCredit = computed(() => displayPopupBuyCredit);
   const onGetterLoading = computed(() => loading);
   const onGetterSystemPopup = computed(() => systemPopup);
   const onGetterDisplayLogin = computed(() => displayLogin);
@@ -36,6 +38,7 @@ export const useAppStore = defineStore("app", () => {
   };
 
   return {
+    onGetterDisplayPopupBuyCredit,
     onGetterLoading,
     onGetterSystemPopup,
     onGetterDisplayLogin,

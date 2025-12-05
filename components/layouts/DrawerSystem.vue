@@ -132,7 +132,7 @@ const menus = computed<any>(() => {
     },
     {
       role: [EnumAccountRole.ADMIN, EnumAccountRole.PARTNER],
-      title: "Tool Video TN Solve",
+      title: "TN Solve",
       icon: "mdi-video-stabilization",
       route: "home",
     },

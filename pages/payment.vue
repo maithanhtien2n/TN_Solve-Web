@@ -104,7 +104,7 @@ definePageMeta({ middleware: "auth" });
 <template>
   <div class="max-w-xl mx-auto">
     <h1 class="text-2xl font-bold text-center text-gray-800 mb-6">
-      Thanh Toán Gói Dịch Vụ
+      {{ $t("Đăng ký/Gia hạn gói dịch vụ") }}
     </h1>
 
     <div

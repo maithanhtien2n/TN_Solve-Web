@@ -42,6 +42,15 @@ api.interceptors.response.use(
         useRouter().push("/payment");
       }
 
+      if (
+        typeof error.response?.data?.message === "string" &&
+        error.response?.data?.message.includes(
+          "Tín dụng hiện tại của bạn không đủ"
+        )
+      ) {
+        useAppStore().onGetterDisplayPopupBuyCredit.value = true;
+      }
+
       useAppStore().onActionSetSystemPopup({
         type: "error",
         content: error.response?.data?.message || error.message,

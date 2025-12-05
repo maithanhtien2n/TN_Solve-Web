@@ -41,6 +41,10 @@ defineExpose({ onDisplay });
       <v-card-text class="pa-4 pt-3 mb-2">
         <slot />
       </v-card-text>
+
+      <v-card-actions class="px-4 pb-4">
+        <slot name="footer" />
+      </v-card-actions>
     </v-card>
   </v-dialog>
 </template>

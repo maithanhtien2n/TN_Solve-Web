@@ -12,10 +12,11 @@ const {
   onGetterUserData: userData,
   onGetterDisplayLogin: displayLogin,
   onActionSetSystemPopup,
+  onGetterDisplayPopupBuyCredit,
 } = useAppStore();
 
 const menus = computed(() => {
-  const items = [
+  let items = [
     {
       title: "Tài khoản",
       value: "account",
@@ -25,6 +26,20 @@ const menus = computed(() => {
       title: "Thư viện của tôi",
       value: "video",
       icon: "mdi-image-multiple-outline",
+    },
+    {
+      title: userData.value?.serviceExpiry
+        ? "Gia hạn dịch vụ"
+        : "Đăng ký dịch vụ",
+      value: "payment",
+      icon: userData.value?.serviceExpiry
+        ? "mdi-calendar-sync"
+        : "mdi-tag-plus-outline",
+    },
+    {
+      title: "Mua tín dụng",
+      value: "buy-credit",
+      icon: "mdi-credit-card-outline",
     },
     {
       title: "Cài đặt",
@@ -40,17 +55,21 @@ const menus = computed(() => {
   ];
 
   if (userData.value?.role === EnumAccountRole.ADMIN) {
-    items.splice(2, 0, {
+    items.splice(1, 0, {
       title: "Trang quản trị",
       value: "admin",
       icon: "mdi-shield-account-outline",
     });
+
+    items = items.filter((item) => item.value !== "account");
   } else if (userData.value?.role === "partner") {
-    items.splice(2, 0, {
+    items.splice(1, 0, {
       title: "Cộng tác viên",
       value: "partner",
       icon: "mdi-account-multiple-outline",
     });
+
+    items = items.filter((item) => item.value !== "account");
   }
 
   return items;
@@ -68,6 +87,8 @@ const onClickMenuItem = (value: string) => {
       content: "Tính năng đang được phát triển!",
     });
     return;
+  } else if (value === "buy-credit") {
+    onGetterDisplayPopupBuyCredit.value = true;
   } else {
     router.push(localePath(`/${value}`));
   }

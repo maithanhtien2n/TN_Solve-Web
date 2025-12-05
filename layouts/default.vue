@@ -126,6 +126,7 @@ onMounted(async () => {
   <AppLoading v-if="loading || !breadcrumbsItems || !breadcrumbsItems.length" />
 
   <v-app>
+    <PopupBuyCredit />
     <PopupMessage />
 
     <AppHeader />

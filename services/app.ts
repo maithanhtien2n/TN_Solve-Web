@@ -27,4 +27,8 @@ export const appService = {
   async createPaymentUrl(payload: any) {
     return await api.post("/common/create-payment-url", payload);
   },
+
+  async createPaymentUrlBuyCredit(payload: any) {
+    return await api.post("/common/create-payment-url/buy-credit", payload);
+  },
 };
