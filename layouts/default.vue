@@ -87,8 +87,12 @@ onMounted(async () => {
     if (referralId.value) params.ref = referralId.value;
     if (!params.ref && route.query?.code) params.code = route.query.code;
 
-    if (params.query?.amount) {
-      await onActionGetUserData(params).catch(() => {});
+    if (route.query?.message === "giao-dich-thanh-cong") {
+      await onActionGetUserData(params)
+        .then(() => {
+          router.replace(localePath("/"));
+        })
+        .catch(() => {});
     }
 
     await onActionGetUserData(params)
