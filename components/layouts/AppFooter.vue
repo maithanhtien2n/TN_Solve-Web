@@ -11,6 +11,8 @@ const onClickNavigate = (value: string) => {
       content: "Tính năng đang được phát triển!",
     });
     return;
+  } else if (value === "tnsolve_teacher") {
+    window.open("https://teacher.tnsolve.com", "_blank");
   } else {
     if (value === "contact") {
       window.open("https://zalo.me/0343027232", "_blank");
@@ -56,6 +58,7 @@ const onClickNavigate = (value: string) => {
                       { title: 'Tính năng', value: 'features' },
                       { title: 'Hướng dẫn', value: 'tutorial' },
                       { title: 'Đăng ký dịch vụ', value: 'payment' },
+                      { title: 'TN Solve Teacher', value: 'tnsolve_teacher' },
                     ]"
                     :key="index"
                     class="cursor-pointer"
