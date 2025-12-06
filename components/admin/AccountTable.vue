@@ -262,24 +262,26 @@ const onClickViewInfoPartner = (item: any) => {
     </template>
 
     <template #row-action="{ item }">
-      <v-btn
-        v-if="role === EnumAccountRole.PARTNER"
-        icon
-        size="40"
-        variant="text"
-        @click="onClickViewInfoPartner(item)"
-      >
-        <v-icon size="20">mdi-eye-outline</v-icon>
-      </v-btn>
+      <div class="d-flex justify-center">
+        <v-btn
+          v-if="role === EnumAccountRole.PARTNER"
+          icon
+          size="40"
+          variant="text"
+          @click="onClickViewInfoPartner(item)"
+        >
+          <v-icon size="20">mdi-eye-outline</v-icon>
+        </v-btn>
 
-      <v-btn
-        icon
-        size="40"
-        variant="text"
-        @click="onClickRegisterService(item)"
-      >
-        <v-icon size="20">mdi-account-plus-outline</v-icon>
-      </v-btn>
+        <v-btn
+          icon
+          size="40"
+          variant="text"
+          @click="onClickRegisterService(item)"
+        >
+          <v-icon size="20">mdi-account-plus-outline</v-icon>
+        </v-btn>
+      </div>
     </template>
   </DataTable>
 </template>

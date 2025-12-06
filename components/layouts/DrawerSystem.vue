@@ -71,6 +71,12 @@ const menus = computed<any>(() => {
       icon: "mdi-package-variant-closed",
       route: "/admin/service-rentals",
     },
+    {
+      role: [EnumAccountRole.ADMIN],
+      title: "Lịch sử giao dịch",
+      icon: "mdi-cash-clock",
+      route: "/admin/transaction-history",
+    },
     // {
     //   title: "Quản lý dữ liệu",
     //   icon: "mdi-database-outline",

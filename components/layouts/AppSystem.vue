@@ -81,6 +81,7 @@ onMounted(async () => {
             onActionAllMasterDataClient({ type: "video-style" }),
             onActionAllMasterDataClient({ type: "video-duration" }),
             onActionAllMasterDataClient({ type: "rental-months" }),
+            onActionAllMasterDataClient({ type: "my-partner" }),
           ]);
         }
       })
