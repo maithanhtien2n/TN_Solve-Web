@@ -92,7 +92,7 @@ const onClickPayment = async () => {
 };
 
 useSeo({
-  title: t("Đăng kí gói dịch vụ"),
+  title: t("Đăng ký dịch vụ"),
   description:
     "Nền tảng AI giúp bạn tạo video chuyên nghiệp chỉ trong vài phút",
   image: "/images/page-home.png",

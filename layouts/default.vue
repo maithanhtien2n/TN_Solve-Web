@@ -80,7 +80,7 @@ onMounted(async () => {
 
       if (accountInfoRes && accountInfoRes?.data?._id) {
         referralId.value = accountInfoRes?.data?._id;
-        router.replace("/");
+        router.replace({ path: route.path });
       }
     }
 
