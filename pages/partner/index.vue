@@ -62,7 +62,7 @@ definePageMeta({ layout: "partner" });
                   <v-icon size="large" class="mr-3">mdi-account-group</v-icon>
                   <div>
                     <div class="text-body-2 text-grey-darken-2">
-                      Tổng người đã giới thiệu đã thuê
+                      Tổng người giới thiệu đã thuê
                     </div>
                     <div class="text-h5 font-bold text-grey-darken-4">
                       {{ dashboard.totalReferrals }}
