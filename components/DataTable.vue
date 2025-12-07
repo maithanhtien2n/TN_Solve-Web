@@ -437,6 +437,7 @@ defineExpose({ params, selected, loadItems, resetSelected });
               '❌ Tín dụng tài khoản flow (veo3) của bạn không đủ!',
               '❌ Hình ảnh tải lên vi phạm chính sách, vui lòng chọn ảnh khác!',
               // '❌ Thước phim liên quan đến chủ đề nhạy cảm, vi phạm chính sách nội dung!'
+              '❌ Thước phim đã bị hỏng không thể sửa chữa, vui lòng xóa và tạo lại thước phim mới!',
             ].includes((slotProps.item as any)?.lastMessage?.note))"
             @click="emits('action', { action: 'reload', item: slotProps.item })"
           >
