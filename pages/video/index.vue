@@ -63,6 +63,12 @@ const onClickDotMenuItem = (type: string, data: any) => {
 
 onMounted(() => {
   onGetProducts("list");
+
+  useAppStore().onActionSetSystemPopup({
+    type: "warning",
+    content:
+      "Thời gian lưu trữ cho video đã tạo là 24 giờ.\nXin quý khách vui lòng tải xuống và lưu trữ để tránh mất mát dữ liệu.",
+  });
 });
 
 onMounted(() => {
@@ -101,13 +107,6 @@ definePageMeta({ middleware: "auth" });
 
   <div v-else>
     <ConfirmDialog ref="confirmDialogRef" />
-
-    <div class="mb-4">
-      <span class="text-error">
-        ⚠️ Lưu ý: Thời gian lưu trữ cho video đã tạo là 12 giờ. Xin quý khách
-        vui lòng tải xuống và lưu trữ để tránh mất mát dữ liệu.
-      </span>
-    </div>
 
     <v-row :dense="isMobile">
       <v-col
