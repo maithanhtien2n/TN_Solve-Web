@@ -5,6 +5,8 @@ import { useIntersectionObserver } from "@vueuse/core";
 const { t } = useI18n();
 const { width, isMobile } = useDevice();
 
+const { onGetterUserData } = useAppStore();
+
 const params = reactive<any>({
   search: "",
   page: 1,
@@ -61,14 +63,24 @@ const onClickDotMenuItem = (type: string, data: any) => {
   }
 };
 
-onMounted(() => {
-  onGetProducts("list");
+onMounted(async () => {
+  await onGetProducts("list");
 
-  useAppStore().onActionSetSystemPopup({
-    type: "warning",
-    content:
-      "Thời gian lưu trữ cho video đã tạo là 24 giờ.\nXin quý khách vui lòng tải xuống và lưu trữ để tránh mất mát dữ liệu.",
-  });
+  if (
+    onGetterUserData.value?.role &&
+    (![EnumAccountRole.ADMIN, EnumAccountRole.PARTNER].includes(
+      onGetterUserData.value?.role
+    ) ||
+      ["68f3433dac1378cfef58692e", "690639102a7022e6ec1e96f3"].includes(
+        onGetterUserData.value?._id
+      ))
+  ) {
+    useAppStore().onActionSetSystemPopup({
+      type: "warning",
+      content:
+        "Thời gian lưu trữ cho video đã tạo là 24 giờ.\nXin quý khách vui lòng tải xuống và lưu trữ để tránh mất mát dữ liệu.",
+    });
+  }
 });
 
 onMounted(() => {
