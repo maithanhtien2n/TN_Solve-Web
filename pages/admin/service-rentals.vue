@@ -82,13 +82,17 @@ definePageMeta({ layout: "admin", title: "Gói cho thuê" });
     @change="loadItems"
   >
     <template #row-basePrice="{ item }">
-      <div class="text-red">
+      <div class="text-red text-nowrap">
         {{ formatCurrency((item as any).basePrice) }}
       </div>
+
+      <small v-if="(item as any).discount" class="text-blue text-nowrap">
+        Mã giảm giá {{ formatCurrency((item as any).discount) }}
+      </small>
     </template>
 
     <template #row-price="{ item }">
-      <div class="text-error">
+      <div class="text-error text-nowrap">
         {{ formatCurrency((item as any).price) }}
       </div>
     </template>

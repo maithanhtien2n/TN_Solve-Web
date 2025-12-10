@@ -114,19 +114,23 @@ definePageMeta({ layout: "admin", title: "Lịch sử giao dịch" });
     @change="loadItems"
   >
     <template #row-basePrice="{ item }">
-      <div class="text-red">
+      <div class="text-red text-nowrap">
         {{ formatCurrency((item as any).basePrice) }}
       </div>
+
+      <small v-if="(item as any).note" class="text-blue text-nowrap">
+        Mã giảm giá {{ formatCurrency((item as any).note) }}
+      </small>
     </template>
 
     <template #row-paymentAmount="{ item }">
-      <div class="text-red">
+      <div class="text-red text-nowrap">
         {{ formatCurrency((item as any).paymentAmount) }}
       </div>
     </template>
 
     <template #row-commissionAmount="{ item }">
-      <div class="text-error">
+      <div class="text-error text-nowrap">
         {{ formatCurrency((item as any).commissionAmount) }}
       </div>
     </template>

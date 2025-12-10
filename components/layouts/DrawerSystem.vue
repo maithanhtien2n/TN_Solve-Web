@@ -67,6 +67,12 @@ const menus = computed<any>(() => {
     },
     {
       role: [EnumAccountRole.ADMIN],
+      title: "Mã giảm giá",
+      icon: "mdi-ticket-percent-outline",
+      route: "/admin/coupon",
+    },
+    {
+      role: [EnumAccountRole.ADMIN],
       title: "Gói cho thuê",
       icon: "mdi-package-variant-closed",
       route: "/admin/service-rentals",

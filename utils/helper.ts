@@ -135,3 +135,17 @@ export function getRankColor(rank: number) {
   if (rank === 3) return "brown-lighten-1";
   return "grey-lighten-2";
 }
+
+export function getNowInLocalFormat() {
+  const now = new Date();
+
+  const year = now.getFullYear();
+  // Tháng bắt đầu từ 0 nên cần +1
+  const month = String(now.getMonth() + 1).padStart(2, "0");
+  const day = String(now.getDate()).padStart(2, "0");
+
+  const hours = String(now.getHours()).padStart(2, "0");
+  const minutes = String(now.getMinutes()).padStart(2, "0");
+
+  return `${year}-${month}-${day}T${hours}:${minutes}`;
+}

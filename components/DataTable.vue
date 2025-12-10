@@ -272,7 +272,7 @@ defineExpose({ params, selected, loadItems, resetSelected });
     <template #top>
       <div v-if="!hideSearch" class="mb-3 d-flex flex-column ga-3">
         <v-row dense>
-          <v-col cols="12" lg="5">
+          <v-col v-if="!isMobile" cols="12" lg="5">
             <div class="d-flex ga-2">
               <v-text-field
                 v-model="params.search"
@@ -307,9 +307,8 @@ defineExpose({ params, selected, loadItems, resetSelected });
 
                 <v-col
                   v-if="props.actions.includes('add')"
-                  cols="6"
+                  :cols="props.actions.length === 1 ? 12 : 6"
                   xl="2"
-                  lg="2"
                   md="3"
                   sm="3"
                 >
@@ -327,7 +326,6 @@ defineExpose({ params, selected, loadItems, resetSelected });
                   v-if="props.actions.includes('active')"
                   cols="6"
                   xl="2"
-                  lg="2"
                   md="3"
                   sm="3"
                 >
@@ -345,7 +343,6 @@ defineExpose({ params, selected, loadItems, resetSelected });
                   v-if="props.actions.includes('inactive')"
                   cols="6"
                   xl="2"
-                  lg="2"
                   md="3"
                   sm="3"
                 >
@@ -363,7 +360,6 @@ defineExpose({ params, selected, loadItems, resetSelected });
                   v-if="props.actions.includes('delete')"
                   cols="6"
                   xl="2"
-                  lg="2"
                   md="3"
                   sm="3"
                 >
@@ -378,6 +374,34 @@ defineExpose({ params, selected, loadItems, resetSelected });
                 </v-col>
               </v-row>
             </slot>
+          </v-col>
+
+          <v-col v-if="isMobile" cols="12" lg="5">
+            <div class="d-flex ga-2">
+              <v-text-field
+                v-model="params.search"
+                hide-details
+                single-line
+                density="comfortable"
+                variant="outlined"
+                prepend-inner-icon="mdi-magnify"
+                :label="$t('Tìm kiếm')"
+                :placeholder="$t('Tìm kiếm')"
+                @keyup.enter="search('search')"
+                @click:prepend-inner="search('search')"
+              />
+
+              <v-btn
+                v-if="filters?.length"
+                variant="outlined"
+                color="primary"
+                style="height: 48px"
+                @click="display = true"
+              >
+                <v-icon size="19">mdi-filter-variant</v-icon>
+                <span class="ml-2">{{ $t("Bộ lọc") }}</span>
+              </v-btn>
+            </div>
           </v-col>
         </v-row>
       </div>

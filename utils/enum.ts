@@ -16,3 +16,13 @@ export enum EnumCommissionStatus {
   PAID = "paid",
   CANCELLED = "cancelled",
 }
+
+export enum EnumDiscountType {
+  PERCENTAGE = "percentage",
+  FIXED = "fixed",
+}
+
+export enum EnumConditionType {
+  USER_ONLY = "user_only",
+  CUSTOMER_ONLY = "customer_only",
+}
