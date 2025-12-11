@@ -19,18 +19,7 @@ const headers = [
   },
   { title: "Ngày và giờ bắt đầu", key: "startDateFormat", sortable: false },
   { title: "Ngày và giờ kết thúc", key: "endDateFormat", sortable: false },
-  {
-    title: "Giới hạn sử dụng",
-    key: "usageLimit",
-    align: "end",
-    sortable: false,
-  },
-  {
-    title: "Giới hạn với mỗi tài khoản",
-    key: "limitPerAccount",
-    align: "end",
-    sortable: false,
-  },
+  { title: "Giới hạn sử dụng", key: "usageLimit", sortable: false },
   { title: "Đối tượng áp dụng", key: "conditionType", sortable: false },
   { title: "Trạng thái", key: "status", align: "center", sortable: false },
   { title: "Cập nhật", key: "updatedAt", sortable: false },
@@ -443,6 +432,15 @@ definePageMeta({ layout: "admin", title: "Mã giảm giá" });
 
     <template #row-conditionType="{ item }">
       <span>{{ (item as any).conditionType || "Tất cả" }}</span>
+    </template>
+
+    <template #row-usageLimit="{ item }">
+      <div class="d-flex ga-1">
+        <span>{{ (item as any).usageLimit }}</span>
+        <span v-if="(item as any).limitPerAccount">
+          (Mỗi tài khoản được {{ (item as any).limitPerAccount }} lần)
+        </span>
+      </div>
     </template>
 
     <template #row-action="{ item }">

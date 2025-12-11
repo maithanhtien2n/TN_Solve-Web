@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { appService } from "~/services/app";
+import { couponService } from "~/services/app";
 
 const route = useRoute();
 
@@ -13,57 +14,79 @@ const formData = ref<any>({
   rentalMonths: 1,
   discountCode: "",
 });
+const couponDetail = ref<any>(null);
 
 const totalPrice = computed(() => {
   const rentalMonths = formData.value.rentalMonths;
   const basePricePerMonth = 99000;
 
-  // 1. Tính giá gốc và giá cuối cùng
-  const originalPrice = basePricePerMonth * rentalMonths;
-  let finalPrice = originalPrice; // Khởi tạo finalPrice bằng giá gốc
+  const coupon = couponDetail.value; // Có hoặc null
 
-  // Biến cờ để kiểm tra có chiết khấu hay không
-  let hasDiscount = false;
+  // 1. Tính giá gốc theo tháng
+  const originalPrice = basePricePerMonth * rentalMonths;
+
+  // 2. Giá sau giảm theo gói
+  let finalPrice = originalPrice;
+  let packageDiscountAmount = 0;
 
   switch (rentalMonths) {
     case 3:
-      finalPrice = 275000; // Giá sau chiết khấu
-      hasDiscount = true;
+      finalPrice = 275000;
+      packageDiscountAmount = originalPrice - finalPrice;
       break;
     case 6:
-      finalPrice = 500000; // Giá sau chiết khấu
-      hasDiscount = true;
+      finalPrice = 500000;
+      packageDiscountAmount = originalPrice - finalPrice;
       break;
     case 12:
-      finalPrice = 890000; // Giá sau chiết khấu
-      hasDiscount = true;
+      finalPrice = 890000;
+      packageDiscountAmount = originalPrice - finalPrice;
       break;
-    // case 1 và default sẽ giữ nguyên finalPrice = originalPrice
+    default:
+      finalPrice = originalPrice;
   }
 
-  // Luôn đảm bảo giá tiền là số nguyên dương
-  if (finalPrice <= 0) {
-    return formatCurrency(0); // Trả về string 0 đồng
-  }
+  // 3. Giảm bởi coupon
+  let couponDiscountAmount = 0;
 
-  // --- LOGIC TRẢ VỀ DỰA TRÊN hasDiscount ---
-  if (hasDiscount) {
-    const amountSaved = originalPrice - finalPrice;
-    // Tính toán tỷ lệ giảm giá và làm tròn về số nguyên
-    const discountRate = Math.round((amountSaved / originalPrice) * 100);
+  if (coupon) {
+    if (coupon.discountType === EnumDiscountType.PERCENTAGE) {
+      couponDiscountAmount = Math.round(
+        (finalPrice * coupon.discountValue) / 100
+      );
+    } else if (coupon.discountType === EnumDiscountType.FIXED) {
+      couponDiscountAmount = coupon.discountValue;
+    }
 
-    // Trả về Object chi tiết khi có giảm giá
-    return {
-      originalPrice: formatCurrency(originalPrice),
-      finalPrice: formatCurrency(finalPrice),
-      discountRate: `${discountRate}%`,
-      amountSaved: formatCurrency(amountSaved), // Thêm số tiền tiết kiệm để hiển thị tiện hơn
-      isDiscounted: true,
-    };
+    couponDiscountAmount = Math.ceil(couponDiscountAmount / 500) * 500;
   } else {
-    // Trả về String giá tiền khi không có giảm giá
+    packageDiscountAmount = Math.ceil(packageDiscountAmount / 500) * 500;
+  }
+
+  // Giảm tiếp
+  finalPrice = finalPrice - couponDiscountAmount;
+  if (finalPrice < 0) finalPrice = 0;
+
+  // 4. Xác định tổng số tiền đã giảm
+  const totalDiscount = packageDiscountAmount + couponDiscountAmount;
+
+  // ❗ Nếu KHÔNG có giảm giá nào → TRẢ STRING
+  if (totalDiscount === 0) {
     return formatCurrency(finalPrice);
   }
+
+  // 5. Nếu CÓ GIẢM → TRẢ OBJECT ĐÚNG KHUÔN LOGIC CŨ
+  const discountRatePercent = Math.round((totalDiscount / originalPrice) * 100);
+  const discountRateText =
+    coupon && coupon.discountType === EnumDiscountType.FIXED
+      ? formatCurrency(totalDiscount) // Nếu coupon dạng tiền → show số tiền
+      : `${discountRatePercent}%`; // Còn lại → %
+
+  return {
+    originalPrice: formatCurrency(originalPrice),
+    finalPrice: formatCurrency(finalPrice),
+    discountRate: discountRateText,
+  };
 });
 
 const rentalMonthsOptions = computed(
@@ -88,6 +111,19 @@ const onClickPayment = async () => {
     })
     .finally(() => {
       loading.value = "";
+    });
+};
+
+const onChangeDiscountCode = async (event: any) => {
+  const value = event.target.value || "";
+  await couponService
+    .getDetailCoupon({ code: value })
+    .then((res) => {
+      if (res.data) couponDetail.value = res.data;
+      else couponDetail.value = null;
+    })
+    .catch(() => {
+      couponDetail.value = null;
     });
 };
 
@@ -148,7 +184,30 @@ definePageMeta({ middleware: "auth" });
         item-title="title"
         item-value="value"
         :label="$t('Mã giảm giá (nếu có)')"
+        @change="onChangeDiscountCode"
       />
+
+      <div v-if="couponDetail" class="w-100 mb-3">
+        <v-alert type="success" variant="outlined" dense>
+          <strong>{{ couponDetail.name }}</strong>
+          <br />
+          <span>
+            Giảm
+            <span
+              v-if="couponDetail.discountType === EnumDiscountType.PERCENTAGE"
+            >
+              {{ couponDetail.discountValue }}%
+            </span>
+            <span v-else>{{ formatCurrency(couponDetail.discountValue) }}</span>
+            cho đơn hàng này!
+          </span>
+          <br />
+          <em class="text-black">
+            Hạn sử dụng: {{ couponDetail.startDateFormat }} -
+            {{ couponDetail.endDateFormat }}
+          </em>
+        </v-alert>
+      </div>
 
       <h3 class="w-100" style="font-size: 1.4rem">
         <template v-if="typeof totalPrice === 'object'">
@@ -158,11 +217,11 @@ definePageMeta({ middleware: "auth" });
           >
             {{ totalPrice.originalPrice }}
           </span>
-          <span class="text-red ms-2" style="font-size: 1.4rem">
+          <span class="text-red mx-2" style="font-size: 1.4rem">
             {{ totalPrice.finalPrice }}
           </span>
 
-          <v-chip color="success" size="small" class="ms-2">
+          <v-chip color="success" size="small">
             Giảm {{ totalPrice.discountRate }}
           </v-chip>
         </template>

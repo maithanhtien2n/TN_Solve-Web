@@ -5,6 +5,10 @@ export const couponService = {
     return await api.get(`/coupons`, { params });
   },
 
+  async getDetailCoupon(params: any) {
+    return await api.get(`/coupons/detail`, { params });
+  },
+
   async saveCoupon(payload: any) {
     return await api.post(`/coupons`, payload);
   },
