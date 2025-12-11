@@ -86,7 +86,10 @@ definePageMeta({ layout: "admin", title: "Gói cho thuê" });
         {{ formatCurrency((item as any).basePrice) }}
       </div>
 
-      <small v-if="(item as any).discount" class="text-blue text-nowrap">
+      <small
+        v-if="(item as any).discount && (item as any).discount !== '0'"
+        class="text-blue text-nowrap"
+      >
         Mã giảm giá {{ formatCurrency((item as any).discount) }}
       </small>
     </template>

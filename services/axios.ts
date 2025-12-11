@@ -36,6 +36,7 @@ api.interceptors.response.use(
       ![401].includes(error.status)
     ) {
       if (
+        !useRoute().path.includes("/admin") &&
         typeof error.response?.data?.message === "string" &&
         error.response?.data?.message.includes("đăng ký gói dịch vụ")
       ) {
@@ -43,6 +44,7 @@ api.interceptors.response.use(
       }
 
       if (
+        !useRoute().path.includes("/admin") &&
         typeof error.response?.data?.message === "string" &&
         error.response?.data?.message.includes(
           "Tín dụng hiện tại của bạn không đủ"
@@ -62,10 +64,8 @@ api.interceptors.response.use(
       !error.request.responseURL.includes("/accounts/me") &&
       [403].includes(error.status)
     ) {
-      const { $router } = useNuxtApp();
-
       useAppStore().onGetterUserData.value = undefined;
-      $router.replace("/");
+      useRouter().replace("/");
     }
 
     return Promise.reject(error);

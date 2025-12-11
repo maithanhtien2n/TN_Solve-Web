@@ -102,6 +102,13 @@ definePageMeta({ layout: "partner", title: "Lịch sử giao dịch" });
       <div class="text-red">
         {{ formatCurrency((item as any).basePrice) }}
       </div>
+
+      <small
+        v-if="(item as any).note && (item as any).note!=='0'"
+        class="text-blue text-nowrap"
+      >
+        Mã giảm giá {{ formatCurrency((item as any).note) }}
+      </small>
     </template>
 
     <template #row-paymentAmount="{ item }">

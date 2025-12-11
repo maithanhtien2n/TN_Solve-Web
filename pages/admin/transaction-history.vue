@@ -118,7 +118,10 @@ definePageMeta({ layout: "admin", title: "Lịch sử giao dịch" });
         {{ formatCurrency((item as any).basePrice) }}
       </div>
 
-      <small v-if="(item as any).note" class="text-blue text-nowrap">
+      <small
+        v-if="(item as any).note && (item as any).note!=='0'"
+        class="text-blue text-nowrap"
+      >
         Mã giảm giá {{ formatCurrency((item as any).note) }}
       </small>
     </template>

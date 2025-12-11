@@ -67,6 +67,7 @@ onMounted(async () => {
   await onGetProducts("list");
 
   if (
+    onGetterUserData.value?._id !== "68fdcb8002e4f0f894bc201e" &&
     onGetterUserData.value?.role &&
     (![EnumAccountRole.ADMIN, EnumAccountRole.PARTNER].includes(
       onGetterUserData.value?.role
@@ -78,7 +79,7 @@ onMounted(async () => {
     useAppStore().onActionSetSystemPopup({
       type: "warning",
       content:
-        "Thời gian lưu trữ cho video đã tạo là 24 giờ.\nXin quý khách vui lòng tải xuống và lưu trữ để tránh mất mát dữ liệu.",
+        "Thời gian lưu trữ cho video đã tạo là 24h.\nXin quý khách vui lòng tải xuống và lưu trữ để tránh mất mát dữ liệu.",
     });
   }
 });
