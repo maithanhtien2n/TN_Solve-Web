@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { appService } from "~/services/app";
 
+const route = useRoute();
+const router = useRouter();
+
 const { onGetterDisplayPopupBuyCredit } = useAppStore();
 
 const loading = ref<boolean>(false);
@@ -47,6 +50,13 @@ const onClickPayment = async () => {
 
 watch(onGetterDisplayPopupBuyCredit, (newVal) => {
   commonDialogRef.value.onDisplay(newVal);
+});
+
+onMounted(() => {
+  if (route.query.action === "buy-credit") {
+    onGetterDisplayPopupBuyCredit.value = true;
+    router.replace({ query: { action: undefined } });
+  }
 });
 </script>
 
