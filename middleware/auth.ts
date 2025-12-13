@@ -12,6 +12,8 @@ export default defineNuxtRouteMiddleware((to, from) => {
 
   if (isNotLoggedIn) {
     displayLogin.value = true;
-    return navigateTo(localePath(`/?redirect=${to.fullPath}`));
+    return navigateTo(
+      localePath(`/?redirect=${removeLocalePrefixStrict(to.fullPath)}`)
+    );
   }
 });

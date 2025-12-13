@@ -149,3 +149,19 @@ export function getNowInLocalFormat() {
 
   return `${year}-${month}-${day}T${hours}:${minutes}`;
 }
+
+export function removeLocalePrefixStrict(fullPath: string): string {
+  const localePrefixRegex = /^\/([a-z]{2,3})(\/|$)/i;
+
+  if (localePrefixRegex.test(fullPath)) {
+    const cleanPath = fullPath.replace(localePrefixRegex, "/");
+
+    if (cleanPath === "//" || cleanPath === "") {
+      return "/";
+    }
+
+    return cleanPath.startsWith("/") ? cleanPath : "/" + cleanPath;
+  }
+
+  return fullPath;
+}

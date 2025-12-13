@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { accountService } from "~/services/app";
+import { accountService, authService } from "~/services/app";
 
 import AppHeader from "~/components/layouts/AppHeader.vue";
 import AppFooter from "~/components/layouts/AppFooter.vue";
@@ -13,6 +13,7 @@ const { isMobile } = useDevice();
 
 const {
   onActionGetUserData,
+  onGetterUserData: userData,
   onGetterDisplayPopupBuyCredit,
   onGetterDisplayLogin: displayLogin,
 } = useAppStore();
@@ -71,6 +72,24 @@ const breadcrumbsItems = computed(() => {
 });
 
 onMounted(async () => {
+  if (
+    !userData.value?.name &&
+    route.query?.state &&
+    route.query?.code &&
+    route.query?.scope &&
+    route.query?.authuser
+  ) {
+    let payload: any = { type: "google", credential: route.query?.code };
+
+    if (referralId.value) payload.ref = referralId.value;
+    if (!payload.ref && route.query?.code) payload.code = route.query.code;
+
+    await authService.login(payload).then(() => {
+      const redirect = atob(route.query?.state as string);
+      router.replace(redirect);
+    });
+  }
+
   try {
     let params: any = {};
 
@@ -121,7 +140,9 @@ onMounted(async () => {
         const isAuth = Boolean(route.meta?.middleware === "auth");
         if (isAuth || route.query.action === "buy-credit") {
           displayLogin.value = true;
-          router.replace(localePath(`/?redirect=${route.fullPath}`));
+          router.replace(
+            localePath(`/?redirect=${removeLocalePrefixStrict(route.fullPath)}`)
+          );
         }
       });
   } catch (error) {

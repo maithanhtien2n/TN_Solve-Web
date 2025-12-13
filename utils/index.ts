@@ -2,6 +2,10 @@ import { useWindowSize, useLocalStorage } from "@vueuse/core";
 
 export const referralId = useLocalStorage<string>("referralId", "");
 
+const GOOGLE_CLIENT_ID =
+  "396019793466-q7fs9crp5bop6ui642elijh8hpf8f7ck.apps.googleusercontent.com";
+const GOOGLE_REDIRECT_URI = "http://localhost:5173";
+
 export function useDevice() {
   const width = ref(0);
   const height = ref(0);
@@ -23,8 +27,7 @@ export function useDevice() {
 export function loginGoogle(): Promise<string> {
   return new Promise((resolve, reject) => {
     const client = (window as any).google.accounts.oauth2.initTokenClient({
-      client_id:
-        "681037770554-al2b5mj25ch8amdjpirl6gti75sqc3kd.apps.googleusercontent.com",
+      client_id: GOOGLE_CLIENT_ID,
       scope: "openid profile email",
       callback: (tokenResponse: any) => {
         if (tokenResponse?.access_token) {
@@ -40,6 +43,29 @@ export function loginGoogle(): Promise<string> {
 
     client.requestAccessToken({ prompt: "select_account" });
   });
+}
+
+export function redirectToGoogleAuth(path: string) {
+  const encodedState = btoa(`${path}`);
+
+  // Các tham số cố định
+  const response_type = "code";
+  const scope = "openid%20profile%20email";
+  const access_type = "offline";
+  const prompt = "select_account";
+
+  // Xây dựng URL
+  const googleAuthUrl =
+    `https://accounts.google.com/o/oauth2/v2/auth?` +
+    `client_id=${GOOGLE_CLIENT_ID}` +
+    `&redirect_uri=${GOOGLE_REDIRECT_URI}` +
+    `&response_type=${response_type}` +
+    `&scope=${scope}` +
+    `&access_type=${access_type}` +
+    `&prompt=${prompt}` +
+    `&state=${encodedState}`;
+
+  window.location.href = googleAuthUrl;
 }
 
 export function useSeo({

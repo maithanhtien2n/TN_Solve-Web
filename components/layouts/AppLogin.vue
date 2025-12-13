@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { authService } from "~/services/app";
-
 const route = useRoute();
 
 const { onGetterDisplayLogin: displayLogin } = useAppStore();
@@ -8,24 +6,8 @@ const { onGetterDisplayLogin: displayLogin } = useAppStore();
 const loading = ref<string>("Đăng nhập với Google");
 
 const onClickLogin = async (type: string = "google") => {
-  if (loading.value === "Đang đăng nhập...") return;
-
-  try {
-    const token = await loginGoogle();
-
-    loading.value = "Đang đăng nhập...";
-    let payload: any = { type, credential: token };
-
-    if (referralId.value) payload.ref = referralId.value;
-    if (!payload.ref && route.query?.code) payload.code = route.query.code;
-
-    await authService.login(payload).then(() => {
-      const redirect = route.query.redirect as string;
-      window.location.href = redirect || "/";
-    });
-  } catch (error) {
-    console.error(error);
-  }
+  loading.value = "Chuẩn bị chuyển hướng...";
+  redirectToGoogleAuth((route.query?.redirect as string) || "/");
 };
 
 watch(
