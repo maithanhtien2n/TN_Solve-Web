@@ -2,12 +2,12 @@ import { useWindowSize, useLocalStorage } from "@vueuse/core";
 
 export const referralId = useLocalStorage<string>("referralId", "");
 
-const GOOGLE_CLIENT_ID =
+export const GOOGLE_CLIENT_ID =
   "396019793466-q7fs9crp5bop6ui642elijh8hpf8f7ck.apps.googleusercontent.com";
-const GOOGLE_REDIRECT_URI =
+export const GOOGLE_REDIRECT_URI =
   import.meta.env.VITE_API_URL === "http://localhost:3000"
     ? "http://localhost:5173"
-    : "https://teacher.tnsolve.com";
+    : "https://tnsolve.com";
 
 export function useDevice() {
   const width = ref(0);

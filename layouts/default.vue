@@ -72,25 +72,29 @@ const breadcrumbsItems = computed(() => {
 });
 
 onMounted(async () => {
-  if (
-    !userData.value?.name &&
-    route.query?.state &&
-    route.query?.code &&
-    route.query?.scope &&
-    route.query?.authuser
-  ) {
-    let payload: any = { type: "google", credential: route.query?.code };
-
-    if (referralId.value) payload.ref = referralId.value;
-    if (!payload.ref && route.query?.code) payload.code = route.query.code;
-
-    await authService.login(payload).then(() => {
-      const redirect = atob(route.query?.state as string);
-      router.replace(redirect);
-    });
-  }
-
   try {
+    if (
+      !userData.value?.name &&
+      route.query?.state &&
+      route.query?.code &&
+      route.query?.scope &&
+      route.query?.authuser
+    ) {
+      let payload: any = {
+        type: "google",
+        credential: route.query?.code,
+        redirectUri: GOOGLE_REDIRECT_URI,
+      };
+
+      if (referralId.value) payload.ref = referralId.value;
+      if (!payload.ref && route.query?.code) payload.code = route.query.code;
+
+      await authService.login(payload).then(() => {
+        const redirect = atob(route.query?.state as string);
+        router.replace(redirect);
+      });
+    }
+
     let params: any = {};
 
     if (route.query?.ref && typeof route.query?.ref === "string") {
