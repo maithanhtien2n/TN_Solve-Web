@@ -103,7 +103,7 @@ const {
 
       const start = new Date(value);
 
-      if (start < today) {
+      if (!_id.value.value && start < today) {
         return t("Ngày bắt đầu không được nhỏ hơn ngày hiện tại");
       }
 
