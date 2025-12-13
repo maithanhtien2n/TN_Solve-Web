@@ -11,8 +11,11 @@ const localePath = useLocalePath();
 const { t } = useI18n();
 const { isMobile } = useDevice();
 
-const { onActionGetUserData, onGetterDisplayLogin: displayLogin } =
-  useAppStore();
+const {
+  onActionGetUserData,
+  onGetterDisplayPopupBuyCredit,
+  onGetterDisplayLogin: displayLogin,
+} = useAppStore();
 const { onActionAllMasterDataClient } = useMasterDataStore();
 
 const loading = ref(true);
@@ -97,6 +100,11 @@ onMounted(async () => {
 
     await onActionGetUserData(params)
       .then(async () => {
+        if (route.query?.action === "buy-credit") {
+          onGetterDisplayPopupBuyCredit.value = true;
+          router.replace({ query: { action: undefined } });
+        }
+
         const redirect = route.query.redirect as string;
         if (redirect) router.replace(redirect);
 
@@ -111,7 +119,7 @@ onMounted(async () => {
       })
       .catch(() => {
         const isAuth = Boolean(route.meta?.middleware === "auth");
-        if (isAuth) {
+        if (isAuth || route.query.action === "buy-credit") {
           displayLogin.value = true;
           router.replace(localePath(`/?redirect=${route.fullPath}`));
         }
