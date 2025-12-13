@@ -4,7 +4,10 @@ export const referralId = useLocalStorage<string>("referralId", "");
 
 const GOOGLE_CLIENT_ID =
   "396019793466-q7fs9crp5bop6ui642elijh8hpf8f7ck.apps.googleusercontent.com";
-const GOOGLE_REDIRECT_URI = "http://localhost:5173";
+const GOOGLE_REDIRECT_URI =
+  import.meta.env.VITE_API_URL === "http://localhost:3000"
+    ? "http://localhost:5173"
+    : "https://teacher.tnsolve.com";
 
 export function useDevice() {
   const width = ref(0);
