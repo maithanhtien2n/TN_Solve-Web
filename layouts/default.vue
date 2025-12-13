@@ -83,7 +83,7 @@ onMounted(async () => {
       let payload: any = {
         type: "google",
         credential: route.query?.code,
-        redirectUri: GOOGLE_REDIRECT_URI,
+        // redirectUri: GOOGLE_REDIRECT_URI,
       };
 
       if (referralId.value) payload.ref = referralId.value;
