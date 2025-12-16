@@ -6,8 +6,12 @@ const { onGetterDisplayLogin: displayLogin } = useAppStore();
 const loading = ref<string>("Đăng nhập với Google");
 
 const onClickLogin = async (type: string = "google") => {
-  loading.value = "Chuẩn bị chuyển hướng...";
+  loading.value = "Đang chuyển hướng...";
   redirectToGoogleAuth((route.query?.redirect as string) || "/");
+
+  setTimeout(() => {
+    loading.value = "Đăng nhập với Google";
+  }, 3000);
 };
 
 watch(

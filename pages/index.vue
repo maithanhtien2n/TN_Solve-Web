@@ -99,9 +99,11 @@ useSeo({
     </div>
   </template>
 
-  <ButtonCreateVideo style="margin-top: 2rem" />
-
-  <div v-if="userData?.serviceExpiry" class="text-center">
+  <div
+    v-if="userData?.serviceExpiry"
+    class="text-center"
+    style="margin-top: -2rem"
+  >
     <div class="d-flex justify-center mt-6">
       <v-img src="/images/qr-zalo-group.jpg" class="h-20rem" />
     </div>
@@ -110,4 +112,6 @@ useSeo({
       Bấm vào đây để tham gia nhóm Zalo TN Solve!
     </a>
   </div>
+
+  <ButtonCreateVideo style="margin-top: 2rem" />
 </template>
