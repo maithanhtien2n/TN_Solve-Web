@@ -2,6 +2,9 @@ const { app, BrowserWindow } = require("electron");
 const path = require("path");
 const { exec } = require("child_process");
 
+// Nạp file .env (Nếu bạn đã cài dotenv: npm install dotenv)
+require("dotenv").config({ path: path.join(app.getAppPath(), ".env") });
+
 let nitroServer;
 
 function createWindow() {
@@ -12,8 +15,10 @@ function createWindow() {
     autoHideMenuBar: true,
   });
 
-  // XÁC ĐỊNH ĐƯỜNG DẪN CHUẨN:
-  // Nếu đang chạy app (.exe), app.getAppPath() sẽ trỏ vào thư mục chứa code
+  // ƯU TIÊN LẤY PORT TỪ .ENV, NẾU KHÔNG CÓ THÌ DÙNG 5173
+  const PORT = process.env.NITRO_PORT || 5173;
+  const HOST = process.env.NITRO_HOST || "localhost";
+
   const serverPath = path.join(
     app.getAppPath(),
     ".output",
@@ -21,32 +26,31 @@ function createWindow() {
     "index.mjs"
   );
 
-  // Log ra để bạn kiểm tra trong DevTools xem đường dẫn đúng chưa
-  console.log("Khởi động server tại:", serverPath);
-
+  // Khởi động server với biến môi trường chuẩn
   nitroServer = exec(`node "${serverPath}"`, {
     env: {
-      NITRO_PORT: 5173,
-      NITRO_HOST: "localhost",
-      VITE_API_URL: "http://localhost:3000",
+      ...process.env,
+      PORT: PORT,
+      HOST: HOST,
+      NODE_ENV: "production",
     },
   });
 
-  // Lắng nghe lỗi từ server nếu có
   nitroServer.stderr.on("data", (data) => {
     console.error(`Server Error: ${data}`);
   });
 
   win.webContents.openDevTools();
 
-  const loadURL = () => {
-    win.loadURL("http://localhost:5173").catch(() => {
-      console.log("Server chưa sẵn sàng, đang thử lại...");
-      setTimeout(loadURL, 1000);
+  const loadApp = () => {
+    win.loadURL(`http://${HOST}:${PORT}`).catch(() => {
+      console.log("Đang kết nối lại...");
+      setTimeout(loadApp, 1000);
     });
   };
 
-  loadURL();
+  loadApp();
+  win.webContents.openDevTools();
 
   win.on("closed", () => {
     if (nitroServer) nitroServer.kill();
