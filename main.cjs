@@ -18,6 +18,7 @@ function createWindow() {
   // ƯU TIÊN LẤY PORT TỪ .ENV, NẾU KHÔNG CÓ THÌ DÙNG 5173
   const PORT = process.env.NITRO_PORT || 5173;
   const HOST = process.env.NITRO_HOST || "localhost";
+  const VITE_API_URL = "http://localhost:3000";
 
   const serverPath = path.join(
     app.getAppPath(),
@@ -33,6 +34,7 @@ function createWindow() {
       PORT: PORT,
       HOST: HOST,
       NODE_ENV: "production",
+      VITE_API_URL,
     },
   });
 
