@@ -52,6 +52,7 @@
     "vuetify": "^3.8.12"
   },
   "devDependencies": {
+    "electron": "^39.2.7",
     "nuxt-simple-robots": "^3.1.10"
   }
 }
