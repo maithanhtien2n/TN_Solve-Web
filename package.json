@@ -1,34 +1,12 @@
 {
   "name": "tn-solve-web",
-  "version": "1.0.0",
-  "description": "TN Solve",
-  "author": "Tien Thanh",
-  "main": "main.cjs",
   "private": true,
   "type": "module",
   "scripts": {
     "dev": "nuxt dev",
     "build": "nuxt build",
     "start": "nuxt start",
-    "generate": "nuxt generate",
-    "app:build": "nuxt build",
-    "app:dist": "electron-builder"
-  },
-  "build": {
-    "appId": "com.tn.solve",
-    "productName": "TNSolve",
-    "npmRebuild": false,
-    "directories": {
-      "output": "dist_electron"
-    },
-    "files": [
-      ".output/**/*",
-      "main.cjs",
-      "package.json"
-    ],
-    "win": {
-      "target": "portable"
-    }
+    "generate": "nuxt generate"
   },
   "dependencies": {
     "@mdi/font": "^7.4.47",
@@ -52,7 +30,6 @@
     "vuetify": "^3.8.12"
   },
   "devDependencies": {
-    "electron": "^39.2.7",
     "nuxt-simple-robots": "^3.1.10"
   }
 }
