@@ -148,11 +148,16 @@ onMounted(async () => {
         if (client.value) {
           // await appService.restartProcess().catch(() => null);
 
-          if ((window as any).electronAPI) {
-            const email = userData.value?.email || "";
-            if (email) {
-              (window as any).electronAPI.sendEmailToSocket(email);
-            }
+          if (
+            (window as any).electronAPI &&
+            (window as any).electronAPI.sendEmailToSocket &&
+            userData.value?.email
+          ) {
+            (window as any).electronAPI.sendEmailToSocket(
+              userData.value?.email
+            );
+          } else {
+            console.error("Không tìm thấy electronAPI hoặc sendEmailToSocket");
           }
         }
       })
