@@ -151,8 +151,6 @@ onMounted(async () => {
           if ((window as any).electronAPI) {
             const email = userData.value?.email || "";
             if (email) {
-              console.log(email);
-
               (window as any).electronAPI.sendEmailToSocket(email);
             }
           }
