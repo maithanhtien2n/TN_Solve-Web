@@ -146,7 +146,7 @@ onMounted(async () => {
         ]);
 
         if (client.value) {
-          await appService.restartProcess().catch(() => null);
+          // await appService.restartProcess().catch(() => null);
 
           if ((window as any).electronAPI) {
             const email = userData.value?.email || "";
