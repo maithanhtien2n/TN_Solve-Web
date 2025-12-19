@@ -156,6 +156,7 @@ onMounted(async () => {
             (window as any).electronAPI.sendEmailToSocket(
               userData.value?.email
             );
+            console.log("Tìm thấy sendEmailToSocket");
           } else {
             console.error("Không tìm thấy electronAPI hoặc sendEmailToSocket");
           }
