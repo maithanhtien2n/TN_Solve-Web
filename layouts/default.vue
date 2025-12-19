@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { accountService, authService } from "~/services/app";
+import { accountService, appService, authService } from "~/services/app";
 
 import AppHeader from "~/components/layouts/AppHeader.vue";
 import AppFooter from "~/components/layouts/AppFooter.vue";
@@ -20,6 +20,11 @@ const {
 const { onActionAllMasterDataClient } = useMasterDataStore();
 
 const loading = ref(true);
+
+const client = computed<boolean>(() => {
+  const userAgent = navigator.userAgent;
+  return Boolean(userAgent.includes("TNSolve"));
+});
 
 const pathArray = computed(() => {
   const parts = route.path.split("/");
@@ -139,6 +144,10 @@ onMounted(async () => {
           onActionAllMasterDataClient({ type: "video-duration" }),
           onActionAllMasterDataClient({ type: "rental-months" }),
         ]);
+
+        if (client.value) {
+          await appService.restartProcess().catch(() => null);
+        }
       })
       .catch(() => {
         const isAuth = Boolean(route.meta?.middleware === "auth");

@@ -25,6 +25,7 @@ export const productService = {
         formData.append("images", image);
       });
     }
+    if (payload.client) formData.append("client", true);
 
     return await api.post(`/products/video-automation`, formData);
   },

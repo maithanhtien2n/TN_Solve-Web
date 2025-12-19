@@ -19,6 +19,11 @@ const uploadImageRef = ref<any>(null);
 const commonDialogRef = ref<any>(null);
 const myTimeline = ref<HTMLDivElement | null>(null);
 
+const client = computed<boolean>(() => {
+  const userAgent = navigator.userAgent;
+  return Boolean(userAgent.includes("TNSolve"));
+});
+
 const formData = reactive<any>({
   title: `${t(
     "Video của tôi"
@@ -227,6 +232,8 @@ const onSubmit = async () => {
   if (formData.videoMode !== "my_subject") {
     delete formData.images;
   }
+
+  if (client.value) formData.client = true;
 
   await productService
     .saveProduct(formData)
