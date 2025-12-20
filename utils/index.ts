@@ -48,8 +48,15 @@ export function loginGoogle(): Promise<string> {
   });
 }
 
-export function redirectToGoogleAuth(path: string) {
-  const encodedState = btoa(`${path}`);
+export function getGoogleAuthUrl(path: string, isApp: boolean = false): string {
+  // Tạo object chứa thông tin cần thiết
+  const stateObj = {
+    redirect: path || "/",
+    target: isApp ? "app" : "web",
+  };
+
+  // Chuyển object thành string JSON rồi mới mã hóa Base64
+  const encodedState = btoa(JSON.stringify(stateObj));
 
   // Các tham số cố định
   const response_type = "code";
@@ -68,30 +75,22 @@ export function redirectToGoogleAuth(path: string) {
     `&prompt=${prompt}` +
     `&state=${encodedState}`;
 
-  // 1. Kiểm tra User Agent để xem có phải Webview không
+  // 1. Kiểm tra User Agent
   const userAgent =
     navigator.userAgent || navigator.vendor || (window as any).opera;
 
-  // Regex kiểm tra các Webview phổ biến (Facebook, Zalo, Instagram, Android Webview gốc)
   const isWebView = /wv|Android.*Version\/|Instagram|FBAN|FBAV|Zalo|Line/i.test(
     userAgent
   );
   const isAndroid = /Android/i.test(userAgent);
 
-  // 2. Xử lý logic chuyển hướng
+  // 2. Trả về URL phù hợp
   if (isWebView && isAndroid) {
-    // Kỹ thuật dùng Intent để buộc Android mở Chrome
-    // Cấu trúc: intent://<url_bỏ_https>#Intent;scheme=https;package=com.android.chrome;end;
     const urlWithoutProtocol = googleAuthUrl.replace("https://", "");
-    const intentUrl = `intent://${urlWithoutProtocol}#Intent;scheme=https;package=com.android.chrome;end`;
-
-    window.location.href = intentUrl;
-  } else {
-    // Các trường hợp còn lại (PC, iOS, hoặc trình duyệt mobile thường)
-    // Lưu ý: iOS Webview không cho phép force mở Safari bằng code,
-    // bạn nên hiển thị popup hướng dẫn user bấm "Open in Browser" nếu ở trên iOS.
-    window.location.href = googleAuthUrl;
+    return `intent://${urlWithoutProtocol}#Intent;scheme=https;package=com.android.chrome;end`;
   }
+
+  return googleAuthUrl;
 }
 
 export function useSeo({

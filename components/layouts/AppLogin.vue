@@ -6,12 +6,25 @@ const { onGetterDisplayLogin: displayLogin } = useAppStore();
 const loading = ref<string>("Đăng nhập với Google");
 
 const onClickLogin = async (type: string = "google") => {
-  loading.value = "Đang chuyển hướng...";
-  redirectToGoogleAuth((route.query?.redirect as string) || "/");
+  if (loading.value !== "Đăng nhập với Google") return;
 
-  setTimeout(() => {
-    loading.value = "Đăng nhập với Google";
-  }, 3000);
+  const isApp = !!(window as any).electronAPI?.isElectron;
+  const targetPath = (route.query?.redirect as string) || "/";
+
+  if (isApp) {
+    loading.value = "Đang mở trình duyệt...";
+    // Mở bằng trình duyệt mặc định của hệ thống (Chrome/Edge/Safari)
+    const authUrl = getGoogleAuthUrl(targetPath, true);
+    (window as any).electronAPI.openExternal(authUrl);
+  } else {
+    loading.value = "Đang chuyển hướng...";
+    const authUrl = getGoogleAuthUrl(targetPath);
+    window.location.href = authUrl;
+
+    setTimeout(() => {
+      loading.value = "Đăng nhập với Google";
+    }, 3000);
+  }
 };
 
 watch(
@@ -75,7 +88,11 @@ useHead({
             </h2>
           </div>
 
-          <div class="ripple-effect py-3 ga-2" @click="onClickLogin('google')">
+          <div
+            class="ripple-effect py-3 ga-2"
+            :class="{ disabled: Boolean(loading !== 'Đăng nhập với Google') }"
+            @click="onClickLogin('google')"
+          >
             <v-icon size="23">mdi-google</v-icon>
             <h3>
               {{ $t(loading) }}

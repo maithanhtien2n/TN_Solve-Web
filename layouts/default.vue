@@ -79,13 +79,20 @@ const breadcrumbsItems = computed(() => {
 
 onMounted(async () => {
   try {
-    if (
-      !userData.value?.name &&
-      route.query?.state &&
-      route.query?.code &&
-      route.query?.scope &&
-      route.query?.authuser
-    ) {
+    const { state, code, scope, authuser } = route.query;
+
+    if (!userData.value?.name && state && code && scope && authuser) {
+      const decodedState = JSON.parse(atob(state as string));
+
+      if (!client.value && decodedState.target === "app") {
+        window.location.href = `tnsolve://?state=${state}&code=${code}&scope=${scope}&authuser=${authuser}`;
+        setTimeout(() => {
+          window.location.href = "/";
+          window.close();
+        }, 3000);
+        return;
+      }
+
       let payload: any = {
         type: "google",
         credential: route.query?.code,
@@ -96,8 +103,7 @@ onMounted(async () => {
       if (!payload.ref && route.query?.code) payload.code = route.query.code;
 
       await authService.login(payload).then(() => {
-        const redirect = atob(route.query?.state as string);
-        router.replace(redirect);
+        router.replace(decodedState.redirect);
       });
     }
 
