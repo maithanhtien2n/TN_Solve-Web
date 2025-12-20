@@ -20,8 +20,8 @@ const commonDialogRef = ref<any>(null);
 const myTimeline = ref<HTMLDivElement | null>(null);
 
 const client = computed<boolean>(() => {
-  const userAgent = navigator.userAgent;
-  return Boolean(userAgent.includes("TNSolve"));
+  const win = window as any;
+  return !!(win.electronAPI && win.electronAPI.isElectron);
 });
 
 const formData = reactive<any>({

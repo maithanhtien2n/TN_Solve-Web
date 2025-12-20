@@ -11,8 +11,13 @@ const onClickNavigate = (value: string) => {
       content: "Tính năng đang được phát triển!",
     });
     return;
-  } else if (value === "tnsolve_teacher") {
+  } else if (value === "tnsolve-teacher") {
     window.open("https://teacher.tnsolve.com", "_blank");
+  } else if (value === "download-tool") {
+    window.open(
+      "https://github.com/maithanhtien2n/tnsolve_release/releases",
+      "_blank"
+    );
   } else {
     if (value === "contact") {
       window.open("https://zalo.me/0343027232", "_blank");
@@ -58,7 +63,7 @@ const onClickNavigate = (value: string) => {
                       { title: 'Tính năng', value: 'features' },
                       { title: 'Hướng dẫn', value: 'tutorial' },
                       { title: 'Đăng ký dịch vụ', value: 'payment' },
-                      { title: 'TN Solve Teacher', value: 'tnsolve_teacher' },
+                      { title: 'TN Solve Teacher', value: 'tnsolve-teacher' },
                     ]"
                     :key="index"
                     class="cursor-pointer"
@@ -79,6 +84,7 @@ const onClickNavigate = (value: string) => {
                       { title: 'Liên hệ Zalo', value: 'contact' },
                       { title: 'Tham gia nhóm Zalo', value: 'zalo-group' },
                       { title: 'Chính sách', value: 'terms' },
+                      { title: 'Tải công cụ về máy', value: 'download-tool' },
                     ]"
                     :key="index"
                     class="cursor-pointer"

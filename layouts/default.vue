@@ -20,10 +20,11 @@ const {
 const { onActionAllMasterDataClient } = useMasterDataStore();
 
 const loading = ref(true);
+const commonDialogRef = ref<any>(null);
 
 const client = computed<boolean>(() => {
-  const userAgent = navigator.userAgent;
-  return Boolean(userAgent.includes("TNSolve"));
+  const win = window as any;
+  return !!(win.electronAPI && win.electronAPI.isElectron);
 });
 
 const pathArray = computed(() => {
@@ -178,12 +179,89 @@ onMounted(async () => {
     }, 300);
   }
 });
+
+onMounted(() => {
+  commonDialogRef.value?.onDisplay(!client.value);
+});
 </script>
 
 <template>
   <AppLoading v-if="loading || !breadcrumbsItems || !breadcrumbsItems.length" />
 
   <v-app>
+    <CommonDialog
+      ref="commonDialogRef"
+      title="Thông báo từ TN SOLVE"
+      width="530"
+    >
+      <v-card-text>
+        <div class="d-flex flex-column align-center mb-6">
+          <v-icon color="warning" size="64" class="mb-2">
+            mdi-shield-alert-outline
+          </v-icon>
+          <h3 class="text-h5 font-weight-bold text-center">
+            THÔNG BÁO QUAN TRỌNG
+          </h3>
+        </div>
+
+        <div class="text-body-1 line-height-relaxed text-grey-darken-3">
+          <p class="mb-4">
+            Để tối ưu hóa việc <strong>tạo Video AI tự động</strong> và vượt qua
+            cơ chế quét IP nghiêm ngặt của hệ thống <strong>VEO3</strong>, chúng
+            tôi đã phát hành phiên bản ứng dụng cài đặt trực tiếp trên máy tính.
+          </p>
+
+          <v-alert type="info" variant="tonal" border="start" class="mb-4">
+            <strong>Giải pháp:</strong> Sử dụng công cụ chạy trên máy cá nhân
+            giúp tạo định danh IP riêng biệt, đảm bảo an toàn tuyệt đối cho tài
+            khoản và duy trì tính ổn định cao nhất khi xử lý video.
+          </v-alert>
+
+          <p class="text-body-2 text-grey-darken-1 mb-4 text-center">
+            <i>
+              (Hỗ trợ định dạng <strong>.exe</strong> cho Windows và
+              <strong>.dmg</strong> cho MacBook)
+            </i>
+          </p>
+        </div>
+
+        <v-divider class="my-6"></v-divider>
+
+        <div class="d-flex flex-column gap-3">
+          <v-btn
+            color="primary"
+            size="large"
+            prepend-icon="mdi-download"
+            block
+            variant="flat"
+            class="text-none mb-3"
+            href="https://github.com/maithanhtien2n/tnsolve_release/releases"
+            target="_blank"
+          >
+            Tải Công Cụ TN SOLVE
+          </v-btn>
+
+          <v-btn
+            variant="outlined"
+            color="secondary"
+            size="large"
+            prepend-icon="mdi-book-open-variant"
+            block
+            class="text-none"
+            href="https://youtube.com/shorts/NasjgxOiTXY?si=EvCKjKwMthEC73Zv"
+            target="_blank"
+          >
+            Xem Hướng Dẫn Cài Đặt
+          </v-btn>
+        </div>
+
+        <p class="text-caption text-center text-grey mt-4">
+          * Vui lòng cài đặt phiên bản Local để tránh bị gián đoạn do quét IP
+          máy chủ.
+        </p>
+      </v-card-text>
+    </CommonDialog>
+
     <PopupBuyCredit />
     <PopupMessage />
 

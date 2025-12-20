@@ -42,7 +42,7 @@ defineExpose({ onDisplay });
         <slot />
       </v-card-text>
 
-      <v-card-actions class="px-4 pb-4">
+      <v-card-actions v-if="$slots.footer" class="px-4 pb-4">
         <slot name="footer" />
       </v-card-actions>
     </v-card>
