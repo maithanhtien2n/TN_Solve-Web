@@ -10,8 +10,9 @@ const loading = ref<boolean>(false);
 const userData = computed(() => onGetterUserData.value || {});
 
 const formData = reactive<any>({
-  geminiCookies: userData.value.settings?.geminiCookies || "",
+  safeMode: userData.value.settings?.safeMode || false,
   flowCookies: userData.value.settings?.flowCookies || "",
+  geminiCookies: userData.value.settings?.geminiCookies || "",
   isCreateSpeed: userData.value.settings?.isCreateSpeed || false,
 });
 
@@ -28,8 +29,9 @@ const onSubmit = async () => {
 };
 
 watch(userData, (newValue) => {
-  formData.geminiCookies = newValue.settings?.geminiCookies || "";
+  formData.safeMode = newValue.settings?.safeMode || false;
   formData.flowCookies = newValue.settings?.flowCookies || "";
+  formData.geminiCookies = newValue.settings?.geminiCookies || "";
   formData.isCreateSpeed = newValue.settings?.isCreateSpeed || false;
 });
 
@@ -55,6 +57,17 @@ definePageMeta({ middleware: "auth" });
         :readonly="Boolean(false)"
       />
     </v-col> -->
+
+    <v-col cols="12">
+      <div>
+        <v-checkbox
+          v-model="formData.safeMode"
+          hide-details
+          :label="$t('Chế độ tạo video an toàn')"
+          style="margin-left: -10px; margin-top: -1rem; margin-bottom: -10px"
+        />
+      </div>
+    </v-col>
 
     <v-col cols="12">
       <v-text-field
