@@ -82,14 +82,17 @@ definePageMeta({ middleware: "auth" });
       </div>
     </v-col>
 
-    <v-col cols="12">
+    <v-col
+      cols="12"
+      :class="{ disabled: Boolean(formData.useMyAccount || formData.safeMode) }"
+    >
       <v-text-field
         v-model="formData.flowCookies"
         hide-details
         class="w-100 mb-2"
         variant="outlined"
         :label="$t('Flow cookies (dùng tài khoản riêng)')"
-        :readonly="Boolean(false)"
+        :readonly="Boolean(formData.useMyAccount || formData.safeMode)"
       />
 
       <a
