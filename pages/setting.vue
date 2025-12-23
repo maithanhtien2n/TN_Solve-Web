@@ -10,6 +10,7 @@ const loading = ref<boolean>(false);
 const userData = computed(() => onGetterUserData.value || {});
 
 const formData = reactive<any>({
+  useMyAccount: userData.value.settings?.useMyAccount || false,
   safeMode: userData.value.settings?.safeMode || false,
   flowCookies: userData.value.settings?.flowCookies || "",
   geminiCookies: userData.value.settings?.geminiCookies || "",
@@ -29,6 +30,7 @@ const onSubmit = async () => {
 };
 
 watch(userData, (newValue) => {
+  formData.useMyAccount = newValue.settings?.useMyAccount || false;
   formData.safeMode = newValue.settings?.safeMode || false;
   formData.flowCookies = newValue.settings?.flowCookies || "";
   formData.geminiCookies = newValue.settings?.geminiCookies || "";
@@ -57,6 +59,17 @@ definePageMeta({ middleware: "auth" });
         :readonly="Boolean(false)"
       />
     </v-col> -->
+
+    <v-col cols="12">
+      <div>
+        <v-checkbox
+          v-model="formData.useMyAccount"
+          hide-details
+          :label="$t('Sử dụng tài khoản Veo3 của tôi')"
+          style="margin-left: -10px; margin-top: -1rem; margin-bottom: -10px"
+        />
+      </div>
+    </v-col>
 
     <v-col cols="12">
       <div>

@@ -4,6 +4,8 @@ const localePath = useLocalePath();
 
 const currentYear = new Date().getFullYear();
 
+const version = ref<string | null>(null);
+
 const onClickNavigate = (value: string) => {
   if (!value) {
     useAppStore().onActionSetSystemPopup({
@@ -28,6 +30,15 @@ const onClickNavigate = (value: string) => {
     }
   }
 };
+
+onMounted(async () => {
+  try {
+    const ver = await (window as any).electronAPI?.getAppVersion();
+    version.value = ver;
+  } catch (error) {
+    console.error("Lỗi lấy version:", error);
+  }
+});
 </script>
 
 <template>
@@ -50,6 +61,8 @@ const onClickNavigate = (value: string) => {
               )
             }}
           </p>
+
+          <span v-if="version">{{ $t("Phiên bản") }} {{ version }}</span>
         </v-col>
 
         <v-col cols="12" lg="6">
