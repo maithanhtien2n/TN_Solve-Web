@@ -166,6 +166,13 @@ onMounted(async () => {
           } else {
             console.error("Không tìm thấy electronAPI hoặc sendEmailToSocket");
           }
+
+          if (
+            (window as any).electronAPI &&
+            (window as any).electronAPI.sendVeo3InfoToSocket
+          ) {
+            (window as any).electronAPI.sendVeo3InfoToSocket(veo3Info.value);
+          }
         }
       })
       .catch(() => {

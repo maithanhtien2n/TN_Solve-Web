@@ -9,12 +9,19 @@ const loading = ref<boolean>(false);
 
 const userData = computed(() => onGetterUserData.value || {});
 
+const client = computed<boolean>(() => {
+  const win = window as any;
+  return !!(win?.electronAPI && win?.electronAPI?.isElectron);
+});
+
 const formData = reactive<any>({
   useMyAccount: userData.value.settings?.useMyAccount || false,
   safeMode: userData.value.settings?.safeMode || false,
   flowCookies: userData.value.settings?.flowCookies || "",
   geminiCookies: userData.value.settings?.geminiCookies || "",
   isCreateSpeed: userData.value.settings?.isCreateSpeed || false,
+
+  veo3Info: client.value && veo3Info.value ? veo3Info.value : "",
 });
 
 const onSubmit = async () => {
@@ -22,6 +29,14 @@ const onSubmit = async () => {
   await appService
     .saveSetting(formData)
     .then(async () => {
+      if (
+        client.value &&
+        (window as any).electronAPI &&
+        (window as any).electronAPI.sendVeo3InfoToSocket
+      ) {
+        veo3Info.value = formData.veo3Info;
+        (window as any).electronAPI.sendVeo3InfoToSocket(veo3Info.value);
+      }
       await onActionGetUserData();
     })
     .finally(() => {
@@ -67,6 +82,16 @@ definePageMeta({ middleware: "auth" });
           hide-details
           :label="$t('Sử dụng tài khoản Veo3 của tôi')"
           style="margin-left: -10px; margin-top: -1rem; margin-bottom: -10px"
+        />
+
+        <v-textarea
+          v-if="client && formData.useMyAccount"
+          v-model="formData.veo3Info"
+          rows="2"
+          auto-grow
+          hide-details
+          class="w-100"
+          variant="outlined"
         />
       </div>
     </v-col>
