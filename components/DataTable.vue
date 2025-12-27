@@ -306,19 +306,34 @@ defineExpose({ params, selected, loadItems, resetSelected });
                 <div class="flex-1" />
 
                 <v-col
-                  v-if="props.actions.includes('add')"
+                  v-if="
+                    props.actions.includes('add') ||
+                    props.actions.includes('update')
+                  "
                   :cols="props.actions.length === 1 ? 12 : 6"
                   xl="2"
                   md="3"
                   sm="3"
                 >
                   <v-btn
-                    :text="$t('Thêm mới')"
+                    :text="
+                      $t(
+                        props.actions.includes('update')
+                          ? 'Cập nhật'
+                          : 'Thêm mới'
+                      )
+                    "
                     style="height: 48px"
                     variant="flat"
                     color="primary"
                     class="w-100"
-                    @click="emits('action', { action: 'add' })"
+                    @click="
+                      emits('action', {
+                        action: props.actions.includes('update')
+                          ? 'update'
+                          : 'add',
+                      })
+                    "
                   />
                 </v-col>
 

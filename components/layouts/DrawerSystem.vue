@@ -83,27 +83,28 @@ const menus = computed<any>(() => {
       icon: "mdi-cash-clock",
       route: "/admin/transaction-history",
     },
-    // {
-    //   title: "Quản lý dữ liệu",
-    //   icon: "mdi-database-outline",
-    //   route: "master-data",
-    //   children: [
-    //     {
-    //       title: "Loại dịch vụ",
-    //       route: "/admin/services/travels",
-    //     },
-    //   ],
-    // },
+    {
+      role: [EnumAccountRole.ADMIN],
+      title: "Quản lý dữ liệu",
+      icon: "mdi-database-outline",
+      route: "master-data",
+      children: [
+        {
+          title: "Tài khoản Veo3",
+          route: "/admin/master-data/account-veo3",
+        },
+      ],
+    },
     {
       role: [EnumAccountRole.ADMIN],
       title: "Cài đặt",
       icon: "mdi-cog-outline",
       route: "settings",
       children: [
-        // {
-        //   title: "Loại dịch vụ",
-        //   route: "/admin/services/travels",
-        // },
+        {
+          title: "Thông tin chung",
+          route: "/admin/settings/general",
+        },
       ],
     },
 

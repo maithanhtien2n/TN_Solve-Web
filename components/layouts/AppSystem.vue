@@ -34,6 +34,20 @@ const breadcrumbs = computed<any>(() => {
     } as unknown as any);
   }
 
+  if (matched.length === 1 && matched[0].path.includes("/admin/master-data")) {
+    matched.unshift({
+      path: "/admin/master-data",
+      meta: { title: t("Quản lý dữ liệu") },
+    } as unknown as any);
+  }
+
+  if (matched.length === 1 && matched[0].path.includes("/admin/settings")) {
+    matched.unshift({
+      path: "/admin/settings",
+      meta: { title: t("Cài đặt") },
+    } as unknown as any);
+  }
+
   if (
     matched.length === 1 &&
     matched[0].path.includes("/partner/my-referral")

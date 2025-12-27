@@ -16,13 +16,11 @@ export const masterDataService = {
 
   async saveMasterData(payload: any) {
     const formData = new FormData();
-    formData.append("name", payload.name);
+    formData.append("title", payload.title);
+    formData.append("value", payload.value || "");
     formData.append("note", payload.note || "");
-    formData.append("content", payload.content || "");
     if (payload._id) formData.append("_id", payload._id);
     if (payload.status) formData.append("status", payload.status);
-    if (payload.parentId) formData.append("parentId", payload.parentId);
-
     if (payload.image && typeof payload.image == "object") {
       formData.append("image", payload.image);
     }
@@ -43,5 +41,9 @@ export const masterDataService = {
 
   async getVideoFlow() {
     return await api.get(`/common//video/flow`);
+  },
+
+  async updateAccountInfo(payload: any) {
+    return await api.post(`/common/update-account-info`, payload);
   },
 };
