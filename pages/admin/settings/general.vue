@@ -1,7 +1,165 @@
 <script setup lang="ts">
+import { masterDataService } from "~/services/app";
+
+const headers = [
+  { title: "Tên cài đặt", key: "title", sortable: false },
+  { title: "Trạng thái", key: "value", sortable: false },
+  { title: "Cập nhật", key: "updatedAt", sortable: false },
+  { title: "Thao tác", align: "center", key: "action", sortable: false },
+];
+
+const data = ref<any>({});
+const loading = ref<string>("");
+const dataTableRef = ref<any>(null);
+
+async function loadItems(event: any) {
+  const params = { ...event };
+
+  loading.value = "load-table";
+  await masterDataService
+    .getSettingGeneral(params)
+    .then((res) => {
+      if (res.data) data.value = res.data;
+    })
+    .finally(() => {
+      loading.value = "";
+    });
+}
+
+const onClickAction = async (action: string, data?: any | null) => {
+  console.log(action, data);
+
+  try {
+    switch (action) {
+      case "update_account": {
+        await fetch(
+          `${
+            import.meta.env.VITE_API_URL === "http://localhost:3000"
+              ? "http://localhost:3000/api/common/cookies/refresh?secret=0573725920Tien&action=yes&force=true"
+              : "https://common.tnsolve.com/api/common/cookies/refresh?secret=0573725920Tien&action=yes&force=true"
+          }`,
+          {
+            method: "GET",
+            headers: { "Content-Type": "application/json" },
+          }
+        );
+
+        break;
+      }
+
+      case "show_browser": {
+        await masterDataService.settingAction({ _id: data._id });
+        break;
+      }
+
+      case "scene_creation_mode": {
+        await masterDataService.settingAction({ _id: data._id });
+        break;
+      }
+    }
+
+    dataTableRef.value?.loadItems();
+  } catch (error) {
+    console.log("Đã xảy ra lỗi khi thực hiện cài đặt!", error);
+  }
+};
+
 definePageMeta({ layout: "admin", title: "Thông tin chung" });
 </script>
 
 <template>
-  <div>Cài đặt</div>
+  <DataTable
+    ref="dataTableRef"
+    :filters="[]"
+    :showSelect="false"
+    :actions="[]"
+    :rowActions="[]"
+    :headers="headers"
+    :data="data"
+    :loading="Boolean(loading == 'load-table')"
+    @change="loadItems"
+  >
+    <template #row-value="{ item }">
+      <template v-if="(item as any).title === 'Cập nhật tài khoản'">
+        <span v-if="(item as any).value" class="text-blue text-nowrap">
+          {{ (item as any).value }}
+        </span>
+
+        <span v-else class="text-nowrap">
+          Vừa cập nhật xong
+          <v-icon size="17" color="green" class="mb-1">mdi-check</v-icon>
+        </span>
+      </template>
+
+      <template
+        v-else-if="(item as any).title === 'Cho phép quan sát quá trình thực thi'"
+      >
+        <span v-if="(item as any).value" class="text-green text-nowrap">
+          Cho phép
+        </span>
+
+        <span v-else class="text-red text-nowrap">Không cho phép</span>
+      </template>
+
+      <template v-else-if="(item as any).title === 'Chế độ tạo bối cảnh'">
+        <span v-if="(item as any).value === 'gemini-auto'" class="text-nowrap">
+          Trình duyệt
+        </span>
+        <span
+          v-else-if="(item as any).value === 'gemini-api'"
+          class="text-nowrap"
+        >
+          API Gemini
+        </span>
+      </template>
+
+      <span v-else>{{ (item as any).value }}</span>
+    </template>
+
+    <template #row-action="{ item }">
+      <div class="d-flex justify-center">
+        <template v-if="(item as any).title === 'Cập nhật tài khoản'">
+          <div class="my-3">
+            <v-btn
+              icon
+              size="40"
+              variant="text"
+              @click="onClickAction('update_account', item)"
+            >
+              <v-icon size="20">mdi-reload</v-icon>
+            </v-btn>
+          </div>
+        </template>
+
+        <template
+          v-else-if="(item as any).title === 'Cho phép quan sát quá trình thực thi'"
+        >
+          <v-checkbox
+            readonly
+            hide-details
+            class="my-1"
+            :model-value="Boolean((item as any).value)"
+            @click="onClickAction('show_browser', item)"
+          />
+        </template>
+
+        <template v-else-if="(item as any).title === 'Chế độ tạo bối cảnh'">
+          <div>
+            <v-select
+              v-model="(item as any).value"
+              hide-details
+              density="compact"
+              variant="outlined"
+              class="my-4 w-10rem"
+              :items="[
+                { title: 'Trình duyệt', value: 'gemini-auto' },
+                { title: 'API Gemini', value: 'gemini-api' },
+              ]"
+              @update:model-value="onClickAction('scene_creation_mode', item)"
+            />
+          </div>
+        </template>
+      </div>
+    </template>
+  </DataTable>
 </template>

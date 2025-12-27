@@ -46,4 +46,12 @@ export const masterDataService = {
   async updateAccountInfo(payload: any) {
     return await api.post(`/common/update-account-info`, payload);
   },
+
+  async getSettingGeneral(params: any) {
+    return await api.get(`/common/setting-general`, { params });
+  },
+
+  async settingAction(payload: any) {
+    return await api.put(`/common/setting-action`, payload);
+  },
 };

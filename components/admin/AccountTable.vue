@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { accountService } from "~/services/app";
+import { accountService, appService } from "~/services/app";
 
 import ConfirmDialog from "~/components/ConfirmDialog.vue";
 
@@ -35,6 +35,7 @@ const loading = ref<string>("");
 const dataTableRef = ref<any>(null);
 const commonDialogRef = ref<any>(null);
 const confirmDialogRef = ref<any>(null);
+const settingCommonDialogRef = ref<any>(null);
 
 const role = computed(() => route.path?.split("/")?.pop() || "user");
 
@@ -44,6 +45,16 @@ const formData = reactive<any>({
   referral: { _id: null },
   price: 69000,
   rentalMonths: 1,
+});
+
+const settingAccountDetail = ref<any>({
+  name: "",
+  flowCookies: "",
+  geminiCookies: "",
+  safeMode: false,
+  showBrowser: false,
+  useMyAccount: false,
+  isCreateSpeed: false,
 });
 
 const statusItems = computed(() =>
@@ -127,8 +138,32 @@ const onConfirmRegisterService = async () => {
   });
 };
 
+const onClickSettingAccount = (item: any) => {
+  settingAccountDetail.value = item.settings;
+  settingAccountDetail.value._id = item._id;
+  settingAccountDetail.value.name = item.name;
+  settingCommonDialogRef.value?.onDisplay(true);
+};
+
 const onClickViewInfoPartner = (item: any) => {
   window.open(`https://tnsolve.com/partner?id=${item?._id}`, "_blank");
+};
+
+const onClickSaveSetting = async () => {
+  loading.value = "setting";
+  await appService
+    .saveSetting({
+      accountId: settingAccountDetail.value._id,
+      safeMode: settingAccountDetail.value.safeMode,
+      showBrowser: settingAccountDetail.value.showBrowser,
+    })
+    .then(async () => {
+      settingCommonDialogRef.value?.onDisplay(false);
+      dataTableRef.value?.loadItems();
+    })
+    .finally(() => {
+      loading.value = "";
+    });
 };
 </script>
 
@@ -236,6 +271,51 @@ const onClickViewInfoPartner = (item: any) => {
     </div>
   </CommonDialog>
 
+  <CommonDialog
+    ref="settingCommonDialogRef"
+    :title="`Cài đặt tài khoản | ${settingAccountDetail.name}`"
+    width="500"
+  >
+    <div class="d-flex flex-column">
+      <div style="margin-left: -0.6rem">
+        <v-checkbox
+          v-model="settingAccountDetail.showBrowser"
+          hide-details
+          :label="$t('Hiển thị quá trình thực thi')"
+        />
+      </div>
+
+      <div style="margin-left: -0.6rem">
+        <v-checkbox
+          v-model="settingAccountDetail.safeMode"
+          hide-details
+          :label="$t('Chế độ tạo video an toàn')"
+        />
+      </div>
+
+      <div class="d-flex ga-3 mt-6">
+        <v-btn
+          text="Hủy bỏ"
+          class="flex-1"
+          variant="tonal"
+          color="primary"
+          style="height: 48px"
+          @click="commonDialogRef?.onDisplay(false)"
+        />
+
+        <v-btn
+          text="Lưu cài đặt"
+          class="flex-1"
+          variant="flat"
+          color="primary"
+          style="height: 48px"
+          :loading="Boolean(loading === 'setting')"
+          @click="onClickSaveSetting"
+        />
+      </div>
+    </div>
+  </CommonDialog>
+
   <DataTable
     ref="dataTableRef"
     :filters="[
@@ -256,8 +336,20 @@ const onClickViewInfoPartner = (item: any) => {
     @action="onAction"
   >
     <template #row-name="{ item }">
-      <div style="min-width: 14rem">
-        {{ (item as any).name }}
+      <div class="d-flex align-center">
+        <v-btn
+          v-if="role !== EnumAccountRole.ADMIN"
+          icon
+          size="40"
+          variant="text"
+          @click="onClickSettingAccount(item)"
+        >
+          <v-icon size="20">mdi-cog-outline</v-icon>
+        </v-btn>
+
+        <span class="text-nowrap">
+          {{ (item as any).name }}
+        </span>
       </div>
     </template>
 
