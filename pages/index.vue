@@ -99,11 +99,7 @@ useSeo({
     </div>
   </template>
 
-  <div
-    v-if="userData?.serviceExpiry"
-    class="text-center"
-    style="margin-top: -2rem"
-  >
+  <div v-if="userData?.serviceExpiry" class="text-center">
     <div class="d-flex justify-center mt-6">
       <v-img src="/images/qr-zalo-group.jpg" class="h-20rem" />
     </div>
@@ -113,5 +109,5 @@ useSeo({
     </a>
   </div>
 
-  <ButtonCreateVideo style="margin-top: 2rem" />
+  <ButtonCreateVideo class="mt-10" />
 </template>
