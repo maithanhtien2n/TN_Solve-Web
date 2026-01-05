@@ -179,10 +179,7 @@ const onClickMenuItem = (value: string) => {
                       #subtitle
                     >
                       <div class="mt-2">
-                        <v-icon size="15">mdi-assistant</v-icon>
-                        {{
-                          `${userData.settings?.credit || 0} ${$t("tín dụng")}`
-                        }}
+                        {{ `Tín dụng: ${userData.settings?.credit || 0}💎` }}
                       </div>
                     </template>
                   </v-list-item>
