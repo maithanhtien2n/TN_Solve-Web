@@ -91,9 +91,7 @@ definePageMeta({ layout: "admin", title: "Thông tin chung" });
         </span>
       </template>
 
-      <template
-        v-else-if="(item as any).title === 'Cho phép quan sát quá trình thực thi'"
-      >
+      <template v-else-if="(item as any).title === 'Hiển thị trình duyệt'">
         <span v-if="(item as any).value" class="text-green text-nowrap">
           Cho phép
         </span>
@@ -131,9 +129,7 @@ definePageMeta({ layout: "admin", title: "Thông tin chung" });
           </div>
         </template>
 
-        <template
-          v-else-if="(item as any).title === 'Cho phép quan sát quá trình thực thi'"
-        >
+        <template v-else-if="(item as any).title === 'Hiển thị trình duyệt'">
           <v-checkbox
             readonly
             hide-details
