@@ -75,7 +75,7 @@ definePageMeta({ middleware: "auth" });
       />
     </v-col> -->
 
-    <v-col cols="12">
+    <v-col v-if="client" cols="12">
       <div>
         <v-checkbox
           v-model="formData.useMyAccount"
@@ -107,7 +107,7 @@ definePageMeta({ middleware: "auth" });
       </div>
     </v-col>
 
-    <v-col
+    <!-- <v-col
       cols="12"
       :class="{ disabled: Boolean(formData.useMyAccount || formData.safeMode) }"
     >
@@ -133,7 +133,7 @@ definePageMeta({ middleware: "auth" });
           "Lưu ý: cookies chỉ có thời hạn 1 ngày kể từ lúc sao chép dán vào, nên mọi người nhớ thay thường xuyên để tránh bị lỗi nhé!"
         }}
       </div>
-    </v-col>
+    </v-col> -->
 
     <!-- <v-col
       v-if="userData.role === 'admin' || userData?.settings?.flowCookies"
