@@ -36,7 +36,7 @@ const onClickAction = async (action: string, data?: any | null) => {
           `${
             import.meta.env.VITE_API_URL === "http://localhost:3000"
               ? "http://localhost:3000/api/common/cookies/refresh?secret=0573725920Tien&action=yes&force=true"
-              : "https://common.tnsolve.com/api/common/cookies/refresh?secret=0573725920Tien&action=yes&force=true"
+              : "https://api.tnsolve.com/api/common/cookies/refresh?secret=0573725920Tien&action=yes&force=true"
           }`,
           {
             method: "GET",
