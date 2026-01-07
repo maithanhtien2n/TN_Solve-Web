@@ -21,7 +21,7 @@ const myTimeline = ref<HTMLDivElement | null>(null);
 
 const client = computed<boolean>(() => {
   const win = window as any;
-  return !!(win.electronAPI && win.electronAPI.isElectron);
+  return !!(win?.electronAPI && win?.electronAPI?.isElectron);
 });
 
 const formData = reactive<any>({
@@ -40,6 +40,7 @@ const formData = reactive<any>({
   messages: [],
   account: {},
   prompts: [],
+  client: client.value,
 });
 
 const productId = computed(() =>
@@ -207,6 +208,7 @@ const onGetProductDetail = async (loadingType: string = "") => {
         formData.messages = data.messages || [];
         formData.account = data.account || {};
         formData.prompts = Array.isArray(data.prompts) ? data.prompts : [];
+        formData.client = data.client || client.value;
 
         setTimeout(() => {
           uploadImageRef.value?.setValue(data.images[0]);
@@ -647,7 +649,7 @@ definePageMeta({ middleware: "auth" });
           :modelValue="videoFlow.value"
         />
         <div class="mt-2">
-          {{ videoFlow.title }}
+          {{ `${formData.client ? "💻" : "🌐"} ${videoFlow.title}` }}
         </div>
       </div>
 

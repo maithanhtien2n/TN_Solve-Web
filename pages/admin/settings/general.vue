@@ -27,8 +27,6 @@ async function loadItems(event: any) {
 }
 
 const onClickAction = async (action: string, data?: any | null) => {
-  console.log(action, data);
-
   try {
     switch (action) {
       case "update_account": {
@@ -44,6 +42,11 @@ const onClickAction = async (action: string, data?: any | null) => {
           }
         );
 
+        break;
+      }
+
+      case "video_to_website": {
+        await masterDataService.settingAction({ _id: data._id });
         break;
       }
 
@@ -91,6 +94,14 @@ definePageMeta({ layout: "admin", title: "Thông tin chung" });
         </span>
       </template>
 
+      <template v-else-if="(item as any).title === 'Tạo thước phim ở website'">
+        <span v-if="(item as any).value" class="text-green text-nowrap">
+          Cho phép
+        </span>
+
+        <span v-else class="text-red text-nowrap">Không cho phép</span>
+      </template>
+
       <template v-else-if="(item as any).title === 'Hiển thị trình duyệt'">
         <span v-if="(item as any).value" class="text-green text-nowrap">
           Cho phép
@@ -127,6 +138,18 @@ definePageMeta({ layout: "admin", title: "Thông tin chung" });
               <v-icon size="20">mdi-reload</v-icon>
             </v-btn>
           </div>
+        </template>
+
+        <template
+          v-else-if="(item as any).title === 'Tạo thước phim ở website'"
+        >
+          <v-checkbox
+            readonly
+            hide-details
+            class="my-1"
+            :model-value="Boolean((item as any).value)"
+            @click="onClickAction('video_to_website', item)"
+          />
         </template>
 
         <template v-else-if="(item as any).title === 'Hiển thị trình duyệt'">

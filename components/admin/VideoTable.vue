@@ -292,6 +292,16 @@ const onChangeFilter = (event: any) => {
         </div>
       </div>
     </template>
+
+    <template #row-account.name="{ item }">
+      <span class="text-nowrap">
+        {{
+          `${(item as any)?.client ? "💻" : "🌐"} ${
+            (item as any)?.account?.name
+          }`
+        }}
+      </span>
+    </template>
   </DataTable>
 </template>
 
