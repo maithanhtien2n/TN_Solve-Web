@@ -244,7 +244,9 @@ const onChangeFilter = (event: any) => {
   >
     <template #row-title="{ item }">
       <div class="d-flex flex-column ga-1 py-4">
-        <span style="min-width: 14rem">{{ (item as any).title }}</span>
+        <span style="min-width: 14rem">
+          {{ `${(item as any)?.client ? "💻" : "🌐"} ${(item as any).title}` }}
+        </span>
 
         <div
           v-if="(item as any).state === 'primary'"
@@ -294,12 +296,8 @@ const onChangeFilter = (event: any) => {
     </template>
 
     <template #row-account.name="{ item }">
-      <span class="text-nowrap">
-        {{
-          `${(item as any)?.client ? "💻" : "🌐"} ${
-            (item as any)?.account?.name
-          }`
-        }}
+      <span class="text-nowrap line-clamp-1" style="max-width: 170px">
+        {{ `${(item as any)?.account?.name}` }}
       </span>
     </template>
   </DataTable>
