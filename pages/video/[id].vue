@@ -705,10 +705,14 @@ definePageMeta({ middleware: "auth" });
                   class="text-caption"
                   :class="{
                     'cursor-pointer text-blue-darken-1':
-                      item.note?.includes('Tổng cộng có'),
+                      item.note?.includes('Tổng cộng có') &&
+                      onGetterUserData?.role === EnumAccountRole.ADMIN,
                   }"
                   @click="
-                    onClickNoteMessage(item.note?.includes('Tổng cộng có'))
+                    onClickNoteMessage(
+                      item.note?.includes('Tổng cộng có') &&
+                        onGetterUserData?.role === EnumAccountRole.ADMIN
+                    )
                   "
                 >
                   {{ onFormatString(item.note) }}
