@@ -55,13 +55,19 @@ const isError = computed(() =>
   )
 );
 
-const videoModeOptions = computed(
-  () =>
+const videoModeOptions = computed(() => {
+  const list =
     onGetterMasterData.value["video-mode"]?.map((x: any) => ({
       title: t(x.title),
       value: x.value,
-    })) || []
-);
+    })) || [];
+
+  if (!client.value) {
+    return list.filter((x: any) => x.value !== "character_preservation");
+  }
+
+  return list;
+});
 
 const frameRateOptions = computed(
   () =>
@@ -82,7 +88,8 @@ const videoStyleOptions = computed(() => {
     })) || [];
 
   switch (formData.videoMode) {
-    case "movie": {
+    case "movie":
+    case "character_preservation": {
       return list.filter((x: any) =>
         [
           "general",
@@ -127,8 +134,25 @@ const videoDurationOptions = computed(() => {
     return allOptions.filter((option: any) =>
       shortVideoValues.includes(option.value)
     );
-  } else if (["storytelling"].includes(formData.videoMode)) {
-    const shortVideoValues = ["8", "12", "16", "20", "24"];
+  } else if (["character_preservation"].includes(formData.videoMode)) {
+    const shortVideoValues = [
+      "1",
+      "2",
+      "3",
+      "4",
+      "5",
+      "6",
+      "7",
+      "8",
+      "9",
+      "10",
+      "11",
+      "12",
+      "13",
+      "14",
+      "15",
+      "16",
+    ];
     return allOptions.filter((option: any) =>
       shortVideoValues.includes(option.value)
     );
