@@ -62,7 +62,7 @@ const videoModeOptions = computed(() => {
       value: x.value,
     })) || [];
 
-  if (!client.value) {
+  if (!client.value && !productId.value) {
     return list.filter((x: any) => x.value !== "character_preservation");
   }
 
@@ -88,8 +88,7 @@ const videoStyleOptions = computed(() => {
     })) || [];
 
   switch (formData.videoMode) {
-    case "movie":
-    case "character_preservation": {
+    case "movie": {
       return list.filter((x: any) =>
         [
           "general",
@@ -102,12 +101,16 @@ const videoStyleOptions = computed(() => {
         ].includes(x.value)
       );
     }
-    case "storytelling": {
-      return list.filter((x: any) => ["general"].includes(x.value));
-    }
-    case "short_form_video": {
+    case "character_preservation": {
       return list.filter((x: any) =>
-        ["general", "satisfying", "asmr"].includes(x.value)
+        [
+          "general",
+          "educational",
+          "confession",
+          "interview",
+          "walk_and_talk",
+          "conversational",
+        ].includes(x.value)
       );
     }
     case "my_subject": {
@@ -128,36 +131,12 @@ const videoDurationOptions = computed(() => {
     return allOptions;
   }
 
-  if (["short_form_video", "my_subject"].includes(formData.videoMode)) {
-    // Nếu là video ngắn, chỉ lấy các giá trị từ '1' đến '7'
+  if (["character_preservation", "my_subject"].includes(formData.videoMode)) {
     const shortVideoValues = ["1", "2", "3", "4", "5", "6", "7"];
     return allOptions.filter((option: any) =>
       shortVideoValues.includes(option.value)
     );
-  } else if (["character_preservation"].includes(formData.videoMode)) {
-    const shortVideoValues = [
-      "1",
-      "2",
-      "3",
-      "4",
-      "5",
-      "6",
-      "7",
-      "8",
-      "9",
-      "10",
-      "11",
-      "12",
-      "13",
-      "14",
-      "15",
-      "16",
-    ];
-    return allOptions.filter((option: any) =>
-      shortVideoValues.includes(option.value)
-    );
   } else {
-    // Ngược lại thì, loại bỏ các giá trị '1', '2', '3'
     const excludedValues = ["1", "2", "3", "4", "5", "6", "7"];
     return allOptions.filter(
       (option: any) => !excludedValues.includes(option.value)
