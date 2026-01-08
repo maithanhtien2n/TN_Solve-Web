@@ -111,14 +111,12 @@ definePageMeta({ layout: "admin", title: "Thông tin chung" });
       </template>
 
       <template v-else-if="(item as any).title === 'Chế độ tạo bối cảnh'">
-        <span v-if="(item as any).value === 'gemini-auto'" class="text-nowrap">
-          Trình duyệt
+        <span v-if="(item as any).value === 'api'" class="text-nowrap">
+          API
         </span>
-        <span
-          v-else-if="(item as any).value === 'gemini-api'"
-          class="text-nowrap"
-        >
-          API Gemini
+
+        <span v-else-if="(item as any).value === 'browser'" class="text-nowrap">
+          Trình duyệt
         </span>
       </template>
 
@@ -171,8 +169,8 @@ definePageMeta({ layout: "admin", title: "Thông tin chung" });
               variant="outlined"
               class="my-4 w-10rem"
               :items="[
-                { title: 'Trình duyệt', value: 'gemini-auto' },
-                { title: 'API Gemini', value: 'gemini-api' },
+                { title: 'API', value: 'api' },
+                { title: 'Trình duyệt', value: 'browser' },
               ]"
               @update:model-value="onClickAction('scene_creation_mode', item)"
             />
