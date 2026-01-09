@@ -680,11 +680,12 @@ definePageMeta({ middleware: "auth" });
               style="border-radius: 6px"
               :class="{
                 disabled:
+                  loading === 'submit' ||
                   !formData.title ||
                   !formData.value ||
-                  loading === 'submit' ||
-                  (formData.videoMode === 'my_subject' &&
-                    !uploadImageRef?.base64),
+                  (formData.videoMode === 'my_subject' && !uploadImageRef?.base64) ||
+                  (formData.videoMode === 'custom_scenes' && uploadImageRefs.filter((item: any) => item)
+                    .some((ref: any) => !ref?.base64)),
               }"
               @click="onSubmit()"
             >
