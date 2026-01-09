@@ -17,6 +17,7 @@ const loading = ref("");
 const videoFlow = ref<any>({});
 const uploadImageRef = ref<any>(null);
 const commonDialogRef = ref<any>(null);
+const uploadImageRefs = ref<any[]>([]);
 const myTimeline = ref<HTMLDivElement | null>(null);
 
 const client = computed<boolean>(() => {
@@ -63,7 +64,9 @@ const videoModeOptions = computed(() => {
     })) || [];
 
   if (!client.value && !productId.value) {
-    return list.filter((x: any) => x.value !== "character_preservation");
+    return list.filter(
+      (x: any) => !["character_preservation", "custom_scenes"].includes(x.value)
+    );
   }
 
   return list;
@@ -118,6 +121,17 @@ const videoStyleOptions = computed(() => {
         ["general", "testimonial"].includes(x.value)
       );
     }
+    case "custom_scenes": {
+      return list.filter((x: any) =>
+        [
+          "general",
+          "subtle_motion",
+          "pan_horizontal",
+          "pan_vertical",
+          "dynamic",
+        ].includes(x.value)
+      );
+    }
     default: {
       return list;
     }
@@ -131,8 +145,12 @@ const videoDurationOptions = computed(() => {
     return allOptions;
   }
 
-  if (["character_preservation", "my_subject"].includes(formData.videoMode)) {
-    const shortVideoValues = ["1", "2", "3", "4", "5", "6", "7"];
+  if (
+    ["character_preservation", "my_subject", "custom_scenes"].includes(
+      formData.videoMode
+    )
+  ) {
+    const shortVideoValues = ["1", "2", "3", "4", "5", "6", "7", "8"];
     return allOptions.filter((option: any) =>
       shortVideoValues.includes(option.value)
     );
@@ -214,7 +232,13 @@ const onGetProductDetail = async (loadingType: string = "") => {
         formData.client = data.client || client.value;
 
         setTimeout(() => {
-          uploadImageRef.value?.setValue(data.images[0]);
+          if (formData.videoMode === "custom_scenes") {
+            uploadImageRefs.value.forEach((ref, index) => {
+              ref?.setValue(data.images[index]);
+            });
+          } else {
+            uploadImageRef.value?.setValue(data.images[0]);
+          }
         }, 100);
       } else {
         router.replace(localePath("/video/create"));
@@ -234,7 +258,7 @@ const onSubmit = async () => {
   loading.value = "submit";
   if (productId.value) formData._id = productId.value;
 
-  if (formData.videoMode !== "my_subject") {
+  if (!["my_subject", "custom_scenes"].includes(formData.videoMode)) {
     delete formData.images;
   }
 
@@ -436,20 +460,44 @@ definePageMeta({ middleware: "auth" });
 
           <v-divider class="my-2" />
 
-          <v-col v-if="formData.hasImage" cols="12">
-            <div>
-              <span class="font-bold">{{ $t("Ảnh chủ thể") }}:</span>
-              <br />
-              <UploadImage
-                ref="uploadImageRef"
-                :readonly="true"
-                :height="width > 550 ? '10rem' : '8rem'"
-                iconUpload="mdi-image-outline"
-                textUpload="Chọn ảnh"
-                class="mt-2 mb-1"
-              />
-            </div>
-          </v-col>
+          <template v-if="formData.hasImage">
+            <v-col v-if="formData.videoMode === 'my_subject'" cols="12">
+              <div>
+                <span class="font-bold">{{ $t("Ảnh chủ thể") }}:</span>
+                <br />
+                <UploadImage
+                  ref="uploadImageRef"
+                  :readonly="true"
+                  :height="width > 550 ? '10rem' : '8rem'"
+                  class="mt-2 mb-1"
+                />
+              </div>
+            </v-col>
+
+            <v-col v-else-if="formData.videoMode === 'custom_scenes'" cols="12">
+              <v-row dense>
+                <v-col
+                  v-for="(item, index) in +formData.videoDuration"
+                  :key="index"
+                  cols="6"
+                >
+                  <div>
+                    <span class="font-bold"
+                      >{{ `${$t("Ảnh bối cảnh")} ${index + 1}` }}:</span
+                    >
+                    <br />
+                    <UploadImage
+                      :readonly="true"
+                      :ref="(el) => (uploadImageRefs[index] = el)"
+                      :class="{ disabled: Boolean(productId) }"
+                      :height="width > 550 ? '10rem' : '8rem'"
+                      class="mt-2 mb-1"
+                    />
+                  </div>
+                </v-col>
+              </v-row>
+            </v-col>
+          </template>
 
           <v-col cols="12">
             <div>
@@ -581,14 +629,28 @@ definePageMeta({ middleware: "auth" });
               iconUpload="mdi-image-outline"
               textUpload="Chọn ảnh"
               @on-select-file="(event) => (formData.images = [event?.file])"
-            >
-              <div
-                v-if="Boolean(loading == 'Đang xử lý thông tin...')"
-                class="scan-overlay"
+            />
+          </v-col>
+
+          <v-col v-if="formData.videoMode === 'custom_scenes'" cols="12">
+            <v-row dense>
+              <v-col
+                v-for="(item, index) in +formData.videoDuration"
+                :key="index"
+                cols="6"
               >
-                <div class="scan-line" />
-              </div>
-            </UploadImage>
+                <UploadImage
+                  :ref="(el) => (uploadImageRefs[index] = el)"
+                  :class="{ disabled: Boolean(productId) }"
+                  :height="width > 550 ? '10rem' : '8rem'"
+                  iconUpload="mdi-image-outline"
+                  :textUpload="`${t('Chọn ảnh')} ${index + 1}`"
+                  @on-select-file="
+                    (event) => (formData.images[index] = event?.file)
+                  "
+                />
+              </v-col>
+            </v-row>
           </v-col>
 
           <v-col cols="12">
