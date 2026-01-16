@@ -1,7 +1,6 @@
 <script setup lang="ts">
 const { t } = useI18n();
 
-// Nội dung trang Tính năng
 const content = ref<string>(`
   <div>
     <h1 class="text-h5 text-md-h4 font-weight-bold mb-1">Tính năng Nổi bật</h1>
