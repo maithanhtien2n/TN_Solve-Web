@@ -115,6 +115,11 @@ const videoStyleOptions = computed(() => {
         ["general", "testimonial"].includes(x.value)
       );
     }
+    case "custom_character": {
+      return list.filter((x: any) =>
+        ["general", "advertising"].includes(x.value)
+      );
+    }
     case "custom_scenes": {
       return list.filter((x: any) =>
         [
@@ -146,9 +151,12 @@ const videoDurationOptions = computed(() => {
   }
 
   if (
-    ["character_preservation", "my_subject", "custom_scenes"].includes(
-      formData.videoMode
-    )
+    [
+      "character_preservation",
+      "my_subject",
+      "custom_character",
+      "custom_scenes",
+    ].includes(formData.videoMode)
   ) {
     const shortVideoValues = ["1", "2", "3", "4", "5", "6", "7", "8"];
     return allOptions.filter((option: any) =>
@@ -229,7 +237,9 @@ const onGetProductDetail = async (loadingType: string = "") => {
         formData.client = data.client || client.value;
 
         setTimeout(() => {
-          if (formData.videoMode === "custom_scenes") {
+          if (
+            ["custom_character", "custom_scenes"].includes(formData.videoMode)
+          ) {
             uploadImageRefs.value.forEach((ref, index) => {
               ref?.setValue(data.images[index]);
             });
@@ -255,7 +265,11 @@ const onSubmit = async () => {
   loading.value = "submit";
   if (productId.value) formData._id = productId.value;
 
-  if (!["my_subject", "custom_scenes"].includes(formData.videoMode)) {
+  if (
+    !["my_subject", "custom_character", "custom_scenes"].includes(
+      formData.videoMode
+    )
+  ) {
     delete formData.images;
   }
 
@@ -471,17 +485,33 @@ definePageMeta({ middleware: "auth" });
               </div>
             </v-col>
 
-            <v-col v-else-if="formData.videoMode === 'custom_scenes'" cols="12">
+            <v-col
+              v-else-if="
+                ['custom_character', 'custom_scenes'].includes(
+                  formData.videoMode
+                )
+              "
+              cols="12"
+            >
               <v-row dense>
                 <v-col
-                  v-for="(item, index) in +formData.videoDuration"
+                  v-for="(item, index) in formData.videoMode ===
+                  'custom_character'
+                    ? 2
+                    : +formData.videoDuration"
                   :key="index"
                   cols="6"
                 >
                   <div>
-                    <span class="font-bold"
-                      >{{ `${$t("Ảnh bối cảnh")} ${index + 1}` }}:</span
-                    >
+                    <span class="font-bold">
+                      {{
+                        `${
+                          formData.videoMode === "custom_character"
+                            ? $t("Ảnh nhân vật")
+                            : $t("Ảnh bối cảnh")
+                        } ${index + 1}`
+                      }}:
+                    </span>
                     <br />
                     <UploadImage
                       :readonly="true"
@@ -629,10 +659,18 @@ definePageMeta({ middleware: "auth" });
             />
           </v-col>
 
-          <v-col v-if="formData.videoMode === 'custom_scenes'" cols="12">
+          <v-col
+            v-else-if="
+              ['custom_character', 'custom_scenes'].includes(formData.videoMode)
+            "
+            cols="12"
+          >
             <v-row dense>
               <v-col
-                v-for="(item, index) in +formData.videoDuration"
+                v-for="(item, index) in formData.videoMode ===
+                'custom_character'
+                  ? 2
+                  : +formData.videoDuration"
                 :key="index"
                 cols="6"
               >
@@ -681,6 +719,8 @@ definePageMeta({ middleware: "auth" });
                   !formData.title ||
                   !formData.value ||
                   (formData.videoMode === 'my_subject' && !uploadImageRef?.base64) ||
+                  (formData.videoMode === 'custom_character' && uploadImageRefs.filter((item: any) => item)
+                    .some((ref: any) => !ref?.base64)) ||
                   (formData.videoMode === 'custom_scenes' && uploadImageRefs.filter((item: any) => item)
                     .some((ref: any) => !ref?.base64)),
               }"
