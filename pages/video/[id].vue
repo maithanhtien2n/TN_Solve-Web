@@ -161,10 +161,7 @@ const videoDurationOptions = computed(() => {
       shortVideoValues.includes(option.value)
     );
   } else {
-    const excludedValues = ["1", "2", "3", "4", "5", "6", "7"];
-    return allOptions.filter(
-      (option: any) => !excludedValues.includes(option.value)
-    );
+    return allOptions;
   }
 });
 
