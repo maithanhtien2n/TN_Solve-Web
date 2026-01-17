@@ -139,7 +139,13 @@ const videoStyleOptions = computed(() => {
 });
 
 const videoDurationOptions = computed(() => {
-  const allOptions = onGetterMasterData.value["video-duration"] || [];
+  const allOptions =
+    onGetterMasterData.value["video-duration"].filter(
+      (option: any) =>
+        !["76", "72", "68", "64", "60", "56", "52", "48", "44"].includes(
+          option.value
+        )
+    ) || [];
 
   if (productId.value || formData.videoMode === "movie") {
     return allOptions;
