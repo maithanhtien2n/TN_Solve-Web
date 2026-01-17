@@ -63,12 +63,6 @@ const videoModeOptions = computed(() => {
       value: x.value,
     })) || [];
 
-  if (!client.value && !productId.value) {
-    return list.filter(
-      (x: any) => !["character_preservation", "custom_scenes"].includes(x.value)
-    );
-  }
-
   return list;
 });
 
