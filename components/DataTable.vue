@@ -477,8 +477,13 @@ defineExpose({ params, selected, loadItems, resetSelected });
               '❌ Hình ảnh tải lên vi phạm chính sách, vui lòng chọn ảnh khác!',
               // '❌ Thước phim liên quan đến chủ đề nhạy cảm, vi phạm chính sách nội dung!'
               '❌ Thước phim đã bị hỏng không thể sửa chữa, vui lòng xóa và tạo lại thước phim mới!',
-            ].includes((slotProps.item as any)?.lastMessage?.note))"
-            @click="emits('action', { action: 'reload', item: slotProps.item })"
+            ].includes((slotProps.item as any)?.lastMessage?.note)) || (slotProps.item as any).loading"
+            @click="
+              () => {
+                (slotProps.item as any).loading = true;
+                emits('action', { action: 'reload', item: slotProps.item });
+              }
+            "
           >
             <v-icon size="20">mdi-reload</v-icon>
           </v-btn>
