@@ -17,6 +17,7 @@ const headers = computed(() => {
     { title: "Tín dụng", key: "settings.credit", sortable: false },
     { title: "Ngày tham gia", key: "createdAt", sortable: false },
     { title: "Người giới thiệu", key: "referral.name", sortable: false },
+    { title: "Phiên bản", key: "version", sortable: false },
     { title: "Cập nhật", key: "updatedAt", sortable: false },
     { title: "Trạng thái", key: "status", align: "center", sortable: false },
     { title: "Thao tác", key: "action", align: "center", sortable: false },
