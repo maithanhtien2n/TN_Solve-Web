@@ -13,6 +13,8 @@ const onClickNavigate = (value: string) => {
       content: "Tính năng đang được phát triển!",
     });
     return;
+  } else if (value === "tutorial") {
+    window.open("https://youtu.be/8nDGZrRLx_I", "_blank");
   } else if (value === "tnsolve-teacher") {
     window.open("https://teacher.tnsolve.com", "_blank");
   } else if (value === "download-tool") {
@@ -61,13 +63,11 @@ onMounted(async () => {
               )
             }}
           </p>
-
-          <span v-if="version">{{ $t("Phiên bản") }} {{ version }}</span>
         </v-col>
 
         <v-col cols="12" lg="6">
           <v-row>
-            <v-col cols="6" lg="4">
+            <v-col cols="6" lg="4" md="4" sm="4">
               <div class="footer-section footer-links">
                 <h4>Sản phẩm</h4>
                 <nav>
@@ -76,7 +76,14 @@ onMounted(async () => {
                       { title: 'Tính năng', value: 'features' },
                       { title: 'Hướng dẫn', value: 'tutorial' },
                       { title: 'Đăng ký dịch vụ', value: 'payment' },
-                      { title: 'TN Solve Teacher', value: 'tnsolve-teacher' },
+                      ...(version
+                        ? []
+                        : [
+                            {
+                              title: 'TN Solve Teacher',
+                              value: 'tnsolve-teacher',
+                            },
+                          ]),
                     ]"
                     :key="index"
                     class="cursor-pointer"
@@ -88,7 +95,7 @@ onMounted(async () => {
               </div>
             </v-col>
 
-            <v-col cols="6" lg="4">
+            <v-col cols="6" lg="4" md="4" sm="4">
               <div class="footer-section footer-links">
                 <h4>Tài nguyên</h4>
                 <nav>
@@ -97,7 +104,14 @@ onMounted(async () => {
                       { title: 'Liên hệ Zalo', value: 'contact' },
                       { title: 'Tham gia nhóm Zalo', value: 'zalo-group' },
                       { title: 'Chính sách', value: 'terms' },
-                      { title: 'Tải công cụ về máy', value: 'download-tool' },
+                      ...(version
+                        ? []
+                        : [
+                            {
+                              title: 'Tải công cụ về máy',
+                              value: 'download-tool',
+                            },
+                          ]),
                     ]"
                     :key="index"
                     class="cursor-pointer"
@@ -109,7 +123,7 @@ onMounted(async () => {
               </div>
             </v-col>
 
-            <v-col cols="6" lg="4">
+            <v-col cols="6" lg="4" md="4" sm="4">
               <div class="footer-section footer-links">
                 <h4>Kết nối</h4>
 
@@ -139,9 +153,12 @@ onMounted(async () => {
       </v-row>
 
       <div class="footer-bottom">
+        <div v-if="version" class="font-bold text-black">
+          {{ $t("Phiên bản") }} {{ version }}
+        </div>
         <span>
-          &copy; {{ currentYear }} TN Solve. Cảm ơn bạn đã tin tưởng và sử dụng
-          dịch vụ của chúng tôi.
+          &copy; <span class="font-bold">{{ currentYear }} TN Solve</span>. Cảm
+          ơn bạn đã tin tưởng và sử dụng dịch vụ của chúng tôi.
         </span>
       </div>
     </v-container>
@@ -194,7 +211,7 @@ onMounted(async () => {
   margin-top: 2rem;
   text-align: center;
   font-size: 0.85rem;
-  color: #6b7280;
+  color: #323336;
   border-top: 1px solid #e5e7eb;
 }
 </style>

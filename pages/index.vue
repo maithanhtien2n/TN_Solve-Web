@@ -1,4 +1,7 @@
 <script setup lang="ts">
+const router = useRouter();
+const localePath = useLocalePath();
+
 const { t, locale } = useI18n();
 const { width, isMobile } = useDevice();
 
@@ -77,13 +80,13 @@ useSeo({
 
       <div>
         📌 Đăng ký dịch vụ
-        <a
-          :href="'https://tnsolve.com/vi/payment'"
-          target="_blank"
-          class="text-primary font-semibold hover:underline"
+        <span
+          class="text-primary font-semibold cursor-pointer"
+          style="text-decoration: underline"
+          @click="router.push(localePath('/payment'))"
         >
           tại đây
-        </a>
+        </span>
         hoặc liên hệ <br v-if="width < 560" />
         Zalo
         <a
@@ -107,6 +110,21 @@ useSeo({
     <a target="_blank" href="https://zalo.me/g/tuhmrl934">
       Bấm vào đây để tham gia nhóm Zalo TN Solve!
     </a>
+
+    <div class="mt-3">
+      <a
+        target="_blank"
+        href="https://youtu.be/8nDGZrRLx_I"
+        class="text-red"
+        style="text-decoration: none"
+      >
+        <v-icon>mdi-chevron-double-right</v-icon>
+        <span class="mr-1">
+          Bấm vào đây để xem video hướng dẫn sử dụng công cụ TN Solve
+        </span>
+        <v-icon>mdi-youtube</v-icon>
+      </a>
+    </div>
   </div>
 
   <ButtonCreateVideo class="mt-10" />
