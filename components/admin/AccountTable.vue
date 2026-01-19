@@ -81,6 +81,10 @@ const totalPrice = computed(() =>
   formatCurrency(formData.price * formData.rentalMonths)
 );
 
+const appVersion = computed(
+  () => onGetterMasterData.value["app-version"] || null
+);
+
 async function loadItems(event: any) {
   const params = { ...event, role: role.value };
 
@@ -352,6 +356,14 @@ const onClickSaveSetting = async () => {
           {{ (item as any).name }}
         </span>
       </div>
+    </template>
+
+    <template #row-version="{ item }">
+      <span
+        :class="{ 'text-success': appVersion && appVersion ===(item as any).version  }"
+      >
+        {{ (item as any).version }}
+      </span>
     </template>
 
     <template #row-action="{ item }">
