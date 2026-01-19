@@ -50,9 +50,11 @@ const productId = computed(() =>
 
 const isError = computed(() =>
   Boolean(
-    productId.value &&
+    (productId.value &&
       formData.messages.length &&
-      formData.messages[formData.messages.length - 1]?.color === "error"
+      formData.messages[formData.messages.length - 1]?.color === "error") ||
+      (formData.messages[formData.messages.length - 1]?.color === "success" &&
+        !formData.video)
   )
 );
 
