@@ -85,7 +85,8 @@ const videoStyleOptions = computed(() => {
     })) || [];
 
   switch (formData.videoMode) {
-    case "movie": {
+    case "movie":
+    case "character_preservation": {
       return list.filter((x: any) =>
         [
           "general",
@@ -98,7 +99,7 @@ const videoStyleOptions = computed(() => {
         ].includes(x.value)
       );
     }
-    case "character_preservation": {
+    case "scene_consistency": {
       return list.filter((x: any) =>
         [
           "general",
@@ -153,6 +154,7 @@ const videoDurationOptions = computed(() => {
   if (
     [
       "character_preservation",
+      "scene_consistency",
       "my_subject",
       "custom_character",
       "custom_scenes",
