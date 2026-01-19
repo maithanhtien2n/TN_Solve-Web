@@ -32,7 +32,7 @@ const formData = reactive<any>({
   value: "",
   frameRate: "horizontal",
   modelVideo: "veo3_fast",
-  videoMode: "character_preservation",
+  videoMode: "movie",
   videoStyle: "general",
   videoDuration: "8",
   author: "",
