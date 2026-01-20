@@ -112,7 +112,7 @@ useSeo({
     </a>
   </div>
 
-  <div v-if="userData?.role !== EnumAccountRole.ADMIN" class="mt-3 text-center">
+  <!-- <div v-if="userData?.role !== EnumAccountRole.ADMIN" class="mt-3 text-center">
     <a
       target="_blank"
       href="https://youtu.be/dCb8hL7wLAM"
@@ -129,6 +129,22 @@ useSeo({
       </span>
       <v-icon>mdi-youtube</v-icon>
     </a>
+  </div> -->
+
+  <div
+    v-if="userData?.role !== EnumAccountRole.ADMIN"
+    class="d-flex justify-center mt-10"
+  >
+    <iframe
+      width="706"
+      height="400"
+      src="https://www.youtube.com/embed/dCb8hL7wLAM"
+      frameborder="0"
+      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+      referrerpolicy="strict-origin-when-cross-origin"
+      allowfullscreen
+      style="border: 2px solid black"
+    />
   </div>
 
   <ButtonCreateVideo class="mt-10" />
