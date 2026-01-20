@@ -110,21 +110,25 @@ useSeo({
     <a target="_blank" href="https://zalo.me/g/tuhmrl934">
       Bấm vào đây để tham gia nhóm Zalo TN Solve!
     </a>
+  </div>
 
-    <div class="mt-3">
-      <a
-        target="_blank"
-        href="https://youtu.be/dCb8hL7wLAM"
-        class="text-red"
-        style="text-decoration: none"
-      >
-        <v-icon>mdi-chevron-double-right</v-icon>
-        <span class="mr-1">
-          Bấm vào đây để xem video hướng dẫn sử dụng công cụ TN Solve
+  <div v-if="userData?.role !== EnumAccountRole.ADMIN" class="mt-3 text-center">
+    <a
+      target="_blank"
+      href="https://youtu.be/dCb8hL7wLAM"
+      class="text-red"
+      style="text-decoration: none"
+    >
+      <v-icon>mdi-chevron-double-right</v-icon>
+      <span class="mr-1">
+        Bấm
+        <span class="text-blue" style="text-decoration: underline">
+          vào đây
         </span>
-        <v-icon>mdi-youtube</v-icon>
-      </a>
-    </div>
+        để xem video hướng dẫn sử dụng công cụ TN Solve
+      </span>
+      <v-icon>mdi-youtube</v-icon>
+    </a>
   </div>
 
   <ButtonCreateVideo class="mt-10" />
