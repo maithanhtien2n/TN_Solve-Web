@@ -79,6 +79,13 @@ const onClickMenuItem = (value: string) => {
   if (value === "logout") {
     authService.logout().then(() => {
       window.location.href = "/";
+
+      if (
+        (window as any)?.electronAPI &&
+        (window as any)?.electronAPI?.logout
+      ) {
+        (window as any).electronAPI.logout({});
+      }
     });
     return;
   } else if (value === "account") {
