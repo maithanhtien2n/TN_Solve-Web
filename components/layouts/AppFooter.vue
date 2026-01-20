@@ -14,7 +14,7 @@ const onClickNavigate = (value: string) => {
     });
     return;
   } else if (value === "tutorial") {
-    window.open("https://youtu.be/8nDGZrRLx_I", "_blank");
+    window.open("https://youtu.be/dCb8hL7wLAM", "_blank");
   } else if (value === "tnsolve-teacher") {
     window.open("https://teacher.tnsolve.com", "_blank");
   } else if (value === "download-tool") {

@@ -114,7 +114,7 @@ useSeo({
     <div class="mt-3">
       <a
         target="_blank"
-        href="https://youtu.be/8nDGZrRLx_I"
+        href="https://youtu.be/dCb8hL7wLAM"
         class="text-red"
         style="text-decoration: none"
       >
