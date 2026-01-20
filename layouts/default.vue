@@ -193,9 +193,9 @@ onMounted(async () => {
   }
 });
 
-onMounted(() => {
-  commonDialogRef.value?.onDisplay(!client.value);
-});
+// onMounted(() => {
+//   commonDialogRef.value?.onDisplay(!client.value);
+// });
 </script>
 
 <template>
