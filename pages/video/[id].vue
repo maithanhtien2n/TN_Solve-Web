@@ -74,10 +74,7 @@ const frameRateOptions = computed(
     })) || []
 );
 const modelVideoOptions = computed(
-  () =>
-    onGetterMasterData.value["model-video"]?.filter(
-      (x: any) => x.value !== "tn_solve_1"
-    ) || []
+  () => onGetterMasterData.value["model-video"] || []
 );
 
 const videoStyleOptions = computed(() => {
