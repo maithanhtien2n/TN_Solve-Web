@@ -518,7 +518,6 @@ definePageMeta({ middleware: "auth" });
                     <UploadImage
                       :readonly="true"
                       :ref="(el) => (uploadImageRefs[index] = el)"
-                      :class="{ disabled: Boolean(productId) }"
                       :height="width > 550 ? '10rem' : '8rem'"
                       class="mt-2 mb-1"
                     />
