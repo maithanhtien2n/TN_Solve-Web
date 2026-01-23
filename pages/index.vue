@@ -38,8 +38,8 @@ useSeo({
       class="mt-10 mb-3 d-flex flex-column align-center text-center ga-2"
     >
       <h3 v-if="isMobile" class="font-bold text-red" style="font-size: 1.2rem">
-        💥 <span class="text-primary text-2xl font-bold">GIÁ ƯU ĐÃI</span> — Chỉ
-        <span class="text-2xl text-primary font-bold">99.000đ/tháng</span>!
+        💥 <span class="text-primary text-2xl">GIÁ ƯU ĐÃI</span> — Chỉ
+        <span class="text-2xl text-primary">99.000đ/tháng</span>!
       </h3>
 
       <h1 v-else class="font-bold text-red">
