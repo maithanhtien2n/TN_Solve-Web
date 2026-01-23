@@ -8,6 +8,11 @@ const { width, isMobile } = useDevice();
 const { onGetterUserData: userData } = useAppStore();
 const { onGetterMasterData } = useMasterDataStore();
 
+const client = computed<boolean>(() => {
+  const win = window as any;
+  return !!(win?.electronAPI && win?.electronAPI?.isElectron);
+});
+
 const appVersionDownload = computed(
   () => onGetterMasterData.value["app-version"] || ""
 );
@@ -101,7 +106,7 @@ useSeo({
       </div>
     </div>
 
-    <div class="section my-10">
+    <div v-if="!client" class="section my-10">
       <div class="download-wrap">
         <div class="download-left">
           <div
