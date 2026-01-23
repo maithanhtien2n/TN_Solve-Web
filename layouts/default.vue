@@ -184,6 +184,8 @@ onMounted(async () => {
           );
         }
       });
+
+    await onActionAllMasterDataClient({ type: "app-version", download: true });
   } catch (error) {
     console.error(error);
   } finally {

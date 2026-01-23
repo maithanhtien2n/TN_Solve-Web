@@ -6,6 +6,15 @@ const { t, locale } = useI18n();
 const { width, isMobile } = useDevice();
 
 const { onGetterUserData: userData } = useAppStore();
+const { onGetterMasterData } = useMasterDataStore();
+
+const appVersionDownload = computed(
+  () => onGetterMasterData.value["app-version"] || ""
+);
+const appVersion = computed(() => {
+  let result = appVersionDownload.value?.split("/")?.pop();
+  return result;
+});
 
 useSeo({
   title: t("Trang chủ"),
@@ -16,69 +25,32 @@ useSeo({
 </script>
 
 <template>
-  <TabView
-    v-if="false"
-    :tabs="[
-      { title: 'Khổ ngang (16:9)', value: 'horizontal' },
-      { title: 'Khổ dọc (9:16)', value: 'vertical' },
-    ]"
-    @change="(value) => console.log(value)"
-  >
-    <v-row :dense="isMobile">
-      <v-col
-        v-for="(item, index) in 12"
-        :key="index"
-        lg="4"
-        md="6"
-        sm="6"
-        cols="12"
-        class="cursor-pointer"
-      >
-        <div
-          class="d-flex justify-center rem bg-black"
-          style="border-radius: 6px; overflow: hidden; pointer-events: none"
-        >
-          <VideoPlayer
-            :src="`/videos/11.mp4`"
-            :frameRate="'horizontal'"
-            :removeControls="[
-              'play',
-              'mute',
-              'volume',
-              'progress',
-              'settings',
-              'fullscreen',
-              'current-time',
-            ]"
-          />
-        </div>
-      </v-col>
-    </v-row>
-  </TabView>
-
-  <template
+  <div
     v-if="!userData || (userData.role !== 'admin' && !userData.remainingTime)"
   >
     <div
       v-if="locale === 'vi'"
-      class="my-10 d-flex flex-column align-center text-center ga-2"
+      class="mt-10 mb-3 d-flex flex-column align-center text-center ga-2"
     >
-      <h3 v-if="isMobile" class="font-bold text-red">
-        💥 <span class="text-primary text-2xl">GIÁ ƯU ĐÃI</span> — Chỉ
-        <span class="text-2xl text-primary">99.000đ/tháng</span>!
+      <h3 v-if="isMobile" class="font-bold text-red" style="font-size: 1.2rem">
+        💥 <span class="text-primary text-2xl font-bold">GIÁ ƯU ĐÃI</span> — Chỉ
+        <span class="text-2xl text-primary font-bold">99.000đ/tháng</span>!
       </h3>
 
       <h1 v-else class="font-bold text-red">
-        💥 <span class="text-primary text-2xl">GIÁ ƯU ĐÃI</span> — Chỉ
-        <span class="text-2xl text-primary">99.000đ/tháng</span>!
+        💥 <span class="text-primary text-2xl font-bold">GIÁ ƯU ĐÃI</span> — Chỉ
+        <span class="text-2xl text-primary font-bold">99.000đ/tháng</span>!
       </h1>
 
-      <p class="text-gray-600 max-w-md">
+      <p
+        class="text-gray-600 max-w-md"
+        :style="{ 'font-size': isMobile ? '1rem' : '1.2rem' }"
+      >
         Trải nghiệm không giới hạn toàn bộ tính năng cao cấp, còn chần chờ gì
         nữa!
       </p>
 
-      <div>
+      <div :style="{ 'font-size': isMobile ? '1rem' : '1.2rem' }">
         📌 Đăng ký dịch vụ
         <span
           class="text-primary font-semibold cursor-pointer"
@@ -100,52 +72,182 @@ useSeo({
         để được hỗ trợ.
       </div>
     </div>
-  </template>
 
-  <div v-if="userData?.serviceExpiry" class="text-center">
-    <div class="d-flex justify-center mt-6">
-      <v-img src="/images/qr-zalo-group.jpg" class="h-20rem" />
+    <div v-if="userData?.serviceExpiry" class="text-center">
+      <div class="d-flex justify-center">
+        <v-img src="/images/qr-zalo-group.jpg" class="h-20rem" />
+      </div>
+
+      <a target="_blank" href="https://zalo.me/g/tuhmrl934">
+        Bấm vào đây để tham gia nhóm Zalo TN Solve!
+      </a>
+    </div>
+  </div>
+
+  <template v-if="userData?.role !== EnumAccountRole.ADMIN">
+    <div class="my-10 d-flex justify-center">
+      <div class="video-wrap">
+        <div class="video-frame">
+          <iframe
+            width="706"
+            height="400"
+            src="https://www.youtube.com/embed/dCb8hL7wLAM"
+            frameborder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            referrerpolicy="strict-origin-when-cross-origin"
+            allowfullscreen
+          />
+        </div>
+      </div>
     </div>
 
-    <a target="_blank" href="https://zalo.me/g/tuhmrl934">
-      Bấm vào đây để tham gia nhóm Zalo TN Solve!
-    </a>
-  </div>
+    <div class="section my-10">
+      <div class="download-wrap">
+        <div class="download-left">
+          <div
+            class="download-title"
+            :style="{ 'font-size': isMobile ? '1rem' : '1.2rem' }"
+          >
+            Tải công cụ TN Solve bản mới nhất
+            <span class="text-primary font-bold">
+              {{ appVersion }}
+            </span>
+            về máy tính
+          </div>
+          <div
+            class="download-desc"
+            :style="{ 'font-size': isMobile ? '1rem' : '1.2rem' }"
+          >
+            Cài đặt trên Windows để sử dụng nhanh và ổn định hơn.
+          </div>
+        </div>
 
-  <!-- <div v-if="userData?.role !== EnumAccountRole.ADMIN" class="mt-3 text-center">
-    <a
-      target="_blank"
-      href="https://youtu.be/dCb8hL7wLAM"
-      class="text-red"
-      style="text-decoration: none"
-    >
-      <v-icon>mdi-chevron-double-right</v-icon>
-      <span class="mr-1">
-        Bấm
-        <span class="text-blue" style="text-decoration: underline">
-          vào đây
-        </span>
-        để xem video hướng dẫn sử dụng công cụ TN Solve
-      </span>
-      <v-icon>mdi-youtube</v-icon>
-    </a>
-  </div> -->
-
-  <div
-    v-if="userData?.role !== EnumAccountRole.ADMIN"
-    class="d-flex justify-center mt-10"
-  >
-    <iframe
-      width="706"
-      height="400"
-      src="https://www.youtube.com/embed/dCb8hL7wLAM"
-      frameborder="0"
-      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-      referrerpolicy="strict-origin-when-cross-origin"
-      allowfullscreen
-      style="border: 2px solid black"
-    />
-  </div>
+        <a
+          class="download-btn"
+          :href="appVersionDownload"
+          target="_blank"
+          rel="noopener"
+        >
+          <v-icon size="22" class="icon-win">mdi-microsoft-windows</v-icon>
+          <span :style="{ 'font-size': isMobile ? '1rem' : '1.2rem' }">
+            Tải cho Windows
+          </span>
+        </a>
+      </div>
+    </div>
+  </template>
 
   <ButtonCreateVideo class="mt-10" />
 </template>
+
+<style scoped>
+/* ====== Video ====== */
+.video-wrap {
+  width: 100%;
+  max-width: 980px;
+}
+.video-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+.video-title {
+  font-weight: 900;
+  color: #0f172a;
+  letter-spacing: -0.2px;
+}
+.video-frame {
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.1);
+}
+.video-frame iframe {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16/9;
+  height: auto;
+  border: 0;
+}
+
+/* Tải xuống */
+.download-wrap {
+  max-width: 980px;
+  margin: 0 auto;
+  width: 100%;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+
+  padding: 18px 20px;
+
+  /* 👇 rõ hơn */
+  border: 1.5px solid rgba(0, 0, 0, 0.14);
+  border-radius: 14px;
+  background: #ffffff;
+}
+
+/* Text */
+.download-title {
+  font-size: 17px;
+  font-weight: 600;
+  color: #0f172a; /* đậm hơn chút */
+}
+
+.download-desc {
+  margin-top: 6px;
+  font-size: 14.5px;
+  color: #475569; /* đỡ mờ */
+  line-height: 1.6;
+}
+
+/* Button */
+.download-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+
+  padding: 11px 16px;
+  border-radius: 12px;
+
+  font-size: 15px;
+  font-weight: 500;
+
+  border: 1.5px solid #0984e3;
+  background: #f8fafc;
+  color: #0984e3;
+
+  text-decoration: none;
+  cursor: pointer;
+
+  transition: all 0.15s ease;
+}
+
+.download-btn:hover {
+  background: #eff6ff;
+  border-color: #0984e3;
+}
+
+/* Windows icon */
+.icon-win {
+  color: #0984e3;
+}
+
+/* Mobile */
+@media (max-width: 640px) {
+  .download-wrap {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .download-btn {
+    justify-content: center;
+    width: 100%;
+  }
+}
+</style>
