@@ -106,7 +106,7 @@ useSeo({
       </div>
     </div>
 
-    <div v-if="!client" class="section my-10">
+    <div v-if="!client && appVersionDownload" class="section my-10">
       <div class="download-wrap">
         <div class="download-left">
           <div
