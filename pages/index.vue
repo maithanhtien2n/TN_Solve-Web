@@ -83,16 +83,16 @@ useSeo({
         để được hỗ trợ.
       </div>
     </div>
+  </div>
 
-    <div v-if="userData?.serviceExpiry" class="text-center">
-      <div class="d-flex justify-center">
-        <v-img src="/images/qr-zalo-group.jpg" class="h-20rem" />
-      </div>
-
-      <a target="_blank" href="https://zalo.me/g/tuhmrl934">
-        Bấm vào đây để tham gia nhóm Zalo TN Solve!
-      </a>
+  <div v-if="userData?.serviceExpiry" class="text-center">
+    <div class="d-flex justify-center">
+      <v-img src="/images/qr-zalo-group.jpg" class="h-20rem" />
     </div>
+
+    <a target="_blank" href="https://zalo.me/g/tuhmrl934">
+      Bấm vào đây để tham gia nhóm Zalo TN Solve!
+    </a>
   </div>
 
   <template v-if="userData?.role !== EnumAccountRole.ADMIN">
