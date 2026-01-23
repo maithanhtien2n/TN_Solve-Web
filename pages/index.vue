@@ -43,8 +43,14 @@ useSeo({
       </h3>
 
       <h1 v-else class="font-bold text-red">
-        💥 <span class="text-primary text-2xl font-bold">GIÁ ƯU ĐÃI</span> — Chỉ
-        <span class="text-2xl text-primary font-bold">99.000đ/tháng</span>!
+        💥
+        <span class="text-primary font-bold" style="font-size: 2rem">
+          GIÁ ƯU ĐÃI
+        </span>
+        — Chỉ
+        <span class="text-primary font-bold" style="font-size: 2rem">
+          99.000đ/tháng </span
+        >!
       </h1>
 
       <p
