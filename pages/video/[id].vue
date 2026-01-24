@@ -282,8 +282,8 @@ const onSubmit = async () => {
     .then(async (res) => {
       const productId = res?.data?.productId;
       if (productId) {
+        await onGetProductDetail();
         router.replace(localePath(`/video/${productId}`));
-        onGetProductDetail();
       }
     })
     .catch(() => {
@@ -296,7 +296,11 @@ const onClickNoteMessage = (isClick: boolean) => {
 };
 
 onMounted(() => {
-  onGetProductDetail("detail");
+  onGetProductDetail(
+    Array.isArray(formData.messages) && formData.messages?.length
+      ? "detail"
+      : ""
+  );
 });
 
 onMounted(() => {
