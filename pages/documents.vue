@@ -38,6 +38,7 @@ definePageMeta({ middleware: "auth" });
         <a
           v-if="!item.notDisplay || userData?.role === EnumAccountRole.ADMIN"
           :href="item.value"
+          target="blank"
         >
           {{ item.title }}
         </a>
