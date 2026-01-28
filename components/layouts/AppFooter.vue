@@ -73,7 +73,7 @@ onMounted(async () => {
                 <nav>
                   <a
                     v-for="(item, index) in [
-                      { title: 'Tính năng', value: 'features' },
+                      { title: 'Tài liệu', value: 'features' },
                       { title: 'Hướng dẫn', value: 'tutorial' },
                       { title: 'Đăng ký dịch vụ', value: 'payment' },
                       ...(version

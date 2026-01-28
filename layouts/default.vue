@@ -54,7 +54,7 @@ const onReturnTitle = (title: string) => {
       return "Hướng dẫn";
     }
     case "features": {
-      return "Tính năng";
+      return "Tài liệu";
     }
     default: {
       return "Chi tiết";
