@@ -12,7 +12,7 @@ const documents = [
       "https://gemini.google.com/gem/1N5gq8noXc4PoHYznA4vSmItVqGbn_hPQ?usp=sharing",
   },
   {
-    title: "Xây dựng video nhân hóa nhân vật về sức khỏe",
+    title: "Xây dựng video nhân hóa nhân vật về sức khỏe (💎)",
     value:
       "https://gemini.google.com/gem/1-IBDvyXN9FZpRF9eBy9w1GePlMbnVuGS?usp=sharing",
     required: true,
