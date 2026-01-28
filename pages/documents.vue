@@ -3,7 +3,7 @@ const { t } = useI18n();
 
 const { onGetterUserData: userData } = useAppStore();
 
-const notDisplay = computed(() => Boolean(!userData.value?.serviceExpiry));
+const registered = computed(() => Boolean(userData.value?.serviceExpiry));
 
 const documents = [
   {
@@ -15,9 +15,20 @@ const documents = [
     title: "Xây dựng video nhân hóa nhân vật về sức khỏe",
     value:
       "https://gemini.google.com/gem/1-IBDvyXN9FZpRF9eBy9w1GePlMbnVuGS?usp=sharing",
-    notDisplay: notDisplay.value,
+    required: true,
   },
 ];
+
+const onClickDocument = (item: any) => {
+  if (item.required && !registered.value) {
+    useAppStore().onActionSetSystemPopup({
+      type: "info",
+      content: "Vui lòng đăng ký dịch vụ để sử dụng trợ lý!",
+    });
+  } else {
+    window.open(item.value, "_blank");
+  }
+};
 
 useSeo({
   title: t("Tài liệu"),
@@ -35,13 +46,13 @@ definePageMeta({ middleware: "auth" });
 
     <div class="mt-4 d-flex flex-column ga-2">
       <template v-for="(item, index) in documents" :key="index">
-        <a
-          v-if="!item.notDisplay || userData?.role === EnumAccountRole.ADMIN"
-          :href="item.value"
-          target="blank"
+        <span
+          class="text-blue cursor-pointer"
+          style="text-decoration: underline"
+          @click="onClickDocument(item)"
         >
           {{ item.title }}
-        </a>
+        </span>
       </template>
     </div>
   </div>
