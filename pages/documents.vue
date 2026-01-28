@@ -20,7 +20,11 @@ const documents = [
 ];
 
 const onClickDocument = (item: any) => {
-  if (item.required && !registered.value) {
+  if (
+    userData.value?.role !== EnumAccountRole.ADMIN &&
+    item.required &&
+    !registered.value
+  ) {
     useAppStore().onActionSetSystemPopup({
       type: "info",
       content: "Vui lòng đăng ký dịch vụ để sử dụng trợ lý!",
