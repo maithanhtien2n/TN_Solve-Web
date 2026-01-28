@@ -95,6 +95,36 @@ useSeo({
     </a>
   </div>
 
+  <div class="mt-8 mb-6 text-center mx-auto" style="max-width: 700px">
+    <div
+      class="py-3 px-4 rounded-lg d-inline-flex align-center justify-center flex-wrap ga-3"
+      style="
+        background-color: #fff3e0;
+        border: 2px solid #ffb74d;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      "
+    >
+      <span
+        :style="{ 'font-size': isMobile ? '1rem' : '1.15rem' }"
+        class="font-bold"
+        style="line-height: 1rem"
+      >
+        <v-icon color="red" size="large" class="mb-1">mdi-youtube</v-icon>
+        Xem video hướng dẫn đăng ký/gia hạn giá sốc
+        <span class="text-red font-bold mr-1">69K</span>
+      </span>
+      <a
+        href="https://youtu.be/XyHbjH2myy8"
+        target="_blank"
+        class="v-btn bg-red-darken-1 v-btn--density-default v-btn--size-default px-6 font-bold text-white"
+        style="text-decoration: none; letter-spacing: 0.5px"
+      >
+        XEM NGAY
+        <v-icon right class="ml-1">mdi-open-in-new</v-icon>
+      </a>
+    </div>
+  </div>
+
   <template v-if="userData?.role !== EnumAccountRole.ADMIN">
     <div class="my-10 d-flex justify-center">
       <div class="video-wrap">
