@@ -95,7 +95,11 @@ useSeo({
     </a>
   </div>
 
-  <div class="mt-8 mb-6 text-center mx-auto" style="max-width: 700px">
+  <div
+    v-if="userData?.role !== EnumAccountRole.ADMIN"
+    class="mt-8 mb-6 text-center mx-auto"
+    style="max-width: 700px"
+  >
     <div
       class="py-3 px-4 rounded-lg d-inline-flex align-center justify-center flex-wrap ga-3"
       style="
