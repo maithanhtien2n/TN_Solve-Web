@@ -130,11 +130,11 @@ onMounted(async () => {
                 <nav>
                   <a
                     target="_blank"
-                    href="https://www.tiktok.com/@tiencodeweb"
+                    href="https://www.tiktok.com/@tnsolve"
                     class="d-flex align-center ga-2"
                   >
                     <img src="/images/icon-tiktok.png" style="width: 1.3rem" />
-                    <span style="margin-bottom: 2.6px">@tiencodeweb</span>
+                    <span style="margin-bottom: 2.6px">@tnsolve</span>
                   </a>
 
                   <a
