@@ -25,6 +25,8 @@ useSeo({
     "Nền tảng AI giúp bạn tạo video chuyên nghiệp chỉ trong vài phút",
   image: "/images/page-home.png",
 });
+
+definePageMeta({ middleware: "auth" });
 </script>
 
 <template>

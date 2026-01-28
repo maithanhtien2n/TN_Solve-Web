@@ -53,7 +53,7 @@ const onReturnTitle = (title: string) => {
     case "tutorial": {
       return "Hướng dẫn";
     }
-    case "features": {
+    case "documents": {
       return "Tài liệu";
     }
     default: {
