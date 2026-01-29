@@ -7,15 +7,15 @@ const registered = computed(() => Boolean(userData.value?.serviceExpiry));
 
 const documents = [
   {
-    title: "Xây dựng prompt làm phim",
+    title: 'Trợ lý viết prompt "Làm phim"',
     value:
-      "https://gemini.google.com/gem/1N5gq8noXc4PoHYznA4vSmItVqGbn_hPQ?usp=sharing",
+      "https://gemini.google.com/gem/1sSwbpAhdzLev11WVRxMLiDGrXkmJSDrt?usp=sharing",
   },
   {
-    title: "Xây dựng video nhân hóa nhân vật về sức khỏe (💎)",
+    title: "Xây dựng video nhân hóa nhân vật về sức khỏe",
     value:
       "https://gemini.google.com/gem/1-IBDvyXN9FZpRF9eBy9w1GePlMbnVuGS?usp=sharing",
-    required: true,
+    // required: true,
   },
 ];
 
