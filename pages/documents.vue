@@ -46,7 +46,7 @@ definePageMeta({ middleware: "auth" });
 
 <template>
   <div>
-    <h2 class="font-bold">{{ $t("Chatbot trợ lý tạo video") }}</h2>
+    <h2 class="font-bold">{{ $t("Chatbot hỗ trợ viết prompt") }}</h2>
 
     <div class="mt-4 d-flex flex-column ga-2">
       <template v-for="(item, index) in documents" :key="index">
