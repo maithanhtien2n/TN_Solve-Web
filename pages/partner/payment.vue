@@ -27,7 +27,7 @@ const loading = ref<string>("");
 
 function onGetBankName(code: string) {
   const bank = banks.value.find((x: any) => x.code === code);
-  return bank.short_name;
+  return bank?.short_name;
 }
 
 const onResetForm = () => {

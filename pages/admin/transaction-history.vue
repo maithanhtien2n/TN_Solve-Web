@@ -66,7 +66,7 @@ const transactionMonthsItems = computed(
 
 function onGetBankName(code: string) {
   const bank = banks.value.find((x: any) => x.code === code);
-  return bank.short_name;
+  return bank?.short_name;
 }
 
 async function loadItems(event: any) {
