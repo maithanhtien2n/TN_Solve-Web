@@ -12,10 +12,15 @@ const documents = [
       "https://gemini.google.com/gem/1sSwbpAhdzLev11WVRxMLiDGrXkmJSDrt?usp=sharing",
   },
   {
-    title: "Xây dựng video nhân hóa nhân vật về sức khỏe",
+    title: "💚 Xây dựng video nhân hoá nhân vật về sức khỏe",
     value:
       "https://gemini.google.com/gem/1-IBDvyXN9FZpRF9eBy9w1GePlMbnVuGS?usp=sharing",
     // required: true,
+  },
+  {
+    title: "🎵 MV AI Pro – Tạo MV Ca Nhạc Chuẩn Ảnh → Video",
+    value:
+      "https://gemini.google.com/gem/1k-GUzKKA-pB_Xrc0sqAWRqLdtVKMvbFJ?usp=sharing",
   },
 ];
 
