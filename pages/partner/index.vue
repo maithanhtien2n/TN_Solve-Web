@@ -159,7 +159,6 @@ definePageMeta({ layout: "partner" });
                 v-for="(item, index) in dashboard.leaderboard"
                 class="mt-3 py-2"
                 :key="item.id"
-                :title="item.name"
                 :class="{
                   'bg-grey-lighten-2':
                     dashboard?.accountId &&
@@ -178,6 +177,10 @@ definePageMeta({ layout: "partner" });
 
                 <template #append v-if="index === 0">
                   <v-icon color="amber-darken-2">mdi-crown</v-icon>
+                </template>
+
+                <template #title>
+                  <span>{{ item.name }}</span>
                 </template>
 
                 <template #subtitle>
