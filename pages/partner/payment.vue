@@ -3,12 +3,15 @@ import { appService } from "~/services/app";
 
 const { width } = useDevice();
 
+const { onGetterMasterData } = useMasterDataStore();
 const { onGetterUserData, onActionGetUserData } = useAppStore();
 
 const MIN_PAYOUT_AMOUNT = 100000;
 
 const isCopied = ref<boolean>(false);
 const commonDialogRef = ref<any>(null);
+
+const banks = computed(() => onGetterMasterData.value["banks"] || []);
 
 const paymentInfo = computed(
   () => onGetterUserData.value?.settings?.paymentInfo || {}
@@ -21,6 +24,11 @@ const formData = reactive<any>({
 });
 
 const loading = ref<string>("");
+
+function onGetBankName(code: string) {
+  const bank = banks.value.find((x: any) => x.code === code);
+  return bank.short_name;
+}
 
 const onResetForm = () => {
   formData.bankName = paymentInfo.value?.bankName || "";
@@ -66,12 +74,49 @@ definePageMeta({ layout: "partner", title: "Thanh toán" });
       width="500"
     >
       <div class="mt-3">
-        <v-text-field
+        <!-- <v-text-field
           v-model="formData.bankName"
           class="w-100"
           variant="outlined"
           :label="$t('Tên ngân hàng (Ví dụ: ACB, Vietcombank...)')"
-        />
+        /> -->
+
+        <v-autocomplete
+          v-model="formData.bankName"
+          :items="banks"
+          item-title="shortName"
+          item-value="code"
+          label="Ngân hàng"
+          placeholder="Tìm ngân hàng..."
+          clearable
+          variant="outlined"
+          :menu-props="{
+            maxWidth: '100%',
+          }"
+        >
+          <template #item="{ props, item }">
+            <v-list-item v-bind="props">
+              <template #prepend>
+                <v-avatar size="24">
+                  <v-img :src="(item as any)?.raw?.logo" />
+                </v-avatar>
+              </template>
+
+              <small>
+                {{ (item as any)?.raw?.name }}
+              </small>
+            </v-list-item>
+          </template>
+
+          <template #selection="{ item }">
+            <div class="d-flex align-center ga-2">
+              <v-avatar size="20">
+                <v-img :src="(item as any)?.raw?.logo" />
+              </v-avatar>
+              <span>{{ (item as any)?.raw?.shortName }}</span>
+            </div>
+          </template>
+        </v-autocomplete>
 
         <v-text-field
           v-model="formData.accountName"
@@ -170,7 +215,7 @@ definePageMeta({ layout: "partner", title: "Thanh toán" });
                 </h3>
 
                 <h3>
-                  {{ paymentInfo?.bankName }}
+                  {{ onGetBankName(paymentInfo?.bankName) }}
                 </h3>
 
                 <template #append>

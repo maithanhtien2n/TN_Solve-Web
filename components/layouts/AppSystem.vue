@@ -85,6 +85,8 @@ onMounted(async () => {
                 : null,
           }),
           onActionAllMasterDataClient({ type: "transaction-months" }),
+
+          onActionAllMasterDataClient({ type: "banks" }).catch(() => {}),
         ]);
 
         if (userData.value?.role === EnumAccountRole.ADMIN) {

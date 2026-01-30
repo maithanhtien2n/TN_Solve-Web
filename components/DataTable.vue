@@ -372,19 +372,19 @@ defineExpose({ params, selected, loadItems, resetSelected });
                 </v-col>
 
                 <v-col
-                  v-if="props.actions.includes('delete')"
-                  cols="6"
+                  v-if="props.actions.includes('detail')"
+                  :cols="props.actions.length === 1 ? 12 : 6"
                   xl="2"
                   md="3"
                   sm="3"
                 >
                   <v-btn
-                    :text="$t('Xoá')"
+                    :text="$t('Chi tiết')"
                     style="height: 48px"
                     variant="flat"
-                    color="error"
+                    color="green"
                     class="w-100"
-                    @click="onConfirmAction('delete')"
+                    @click="emits('action', { action: 'detail' })"
                   />
                 </v-col>
               </v-row>

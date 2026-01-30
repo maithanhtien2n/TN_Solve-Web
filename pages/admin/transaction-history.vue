@@ -40,8 +40,9 @@ const headers = [
 
 const data = ref<any>({});
 const loading = ref<string>("");
-const dataTableRef = ref<any>(null);
-const confirmDialogRef = ref<any>(null);
+const commonDialogRef = ref<any>(null);
+
+const banks = computed(() => onGetterMasterData.value["banks"] || []);
 
 const partnerItems = computed(
   () =>
@@ -63,6 +64,11 @@ const transactionMonthsItems = computed(
     })) || []
 );
 
+function onGetBankName(code: string) {
+  const bank = banks.value.find((x: any) => x.code === code);
+  return bank.short_name;
+}
+
 async function loadItems(event: any) {
   const params = { ...event };
 
@@ -77,11 +83,84 @@ async function loadItems(event: any) {
     });
 }
 
+const onAction = (event: any) => {
+  commonDialogRef.value?.onDisplay(true);
+};
+
 definePageMeta({ layout: "admin", title: "Lịch sử giao dịch" });
 </script>
 
 <template>
   <ConfirmDialog ref="confirmDialogRef" />
+
+  <CommonDialog ref="commonDialogRef" title="Chi tiết" width="500">
+    <div class="d-flex flex-column ga-3" style="min-height: 24rem">
+      <!-- Bank info -->
+      <div class="d-flex flex-column ga-2">
+        <h3 class="font-bold">Thông tin nhận tiền</h3>
+
+        <div class="d-flex align-center justify-space-between">
+          <span class="text-medium-emphasis">Ngân hàng</span>
+          <span class="font-weight-medium">
+            {{ onGetBankName(data?.partnerInfo?.paymentInfo?.bankName) }}
+          </span>
+        </div>
+
+        <div class="d-flex align-center justify-space-between">
+          <span class="text-medium-emphasis">Chủ tài khoản</span>
+          <span class="font-weight-medium">
+            {{ data?.partnerInfo?.paymentInfo?.accountName }}
+          </span>
+        </div>
+
+        <div class="d-flex align-center justify-space-between">
+          <span class="text-medium-emphasis">Số tài khoản</span>
+          <span class="font-weight-medium">
+            {{ data?.partnerInfo?.paymentInfo?.accountNumber }}
+          </span>
+        </div>
+
+        <div class="d-flex align-center justify-space-between">
+          <span class="text-medium-emphasis">Doanh thu</span>
+          <span class="font-weight-medium text-red">
+            {{ formatCurrency(data?.totalCommissionAmount) }}
+          </span>
+        </div>
+      </div>
+
+      <v-divider />
+
+      <!-- QR -->
+      <div class="d-flex flex-column ga-2 align-center">
+        <h3 class="font-bold align-self-start">Mã QR thanh toán</h3>
+
+        <v-sheet
+          rounded="lg"
+          border
+          class="pa-3 d-flex align-center justify-center"
+          style="width: 100%"
+        >
+          <v-img
+            :src="data?.partnerInfo?.imageQR"
+            max-width="260"
+            aspect-ratio="1"
+            cover
+          >
+            <template #placeholder>
+              <div class="d-flex align-center justify-center fill-height">
+                <v-progress-circular
+                  indeterminate
+                  color="primary"
+                  width="1"
+                  size="40"
+                />
+              </div>
+            </template>
+          </v-img>
+        </v-sheet>
+      </div>
+    </div>
+  </CommonDialog>
 
   <DataTable
     ref="dataTableRef"
@@ -106,12 +185,13 @@ definePageMeta({ layout: "admin", title: "Lịch sử giao dịch" });
       },
     ]"
     :showSelect="false"
-    :actions="[]"
+    :actions="data?.partnerInfo ? ['detail'] : []"
     :rowActions="['register']"
     :headers="headers"
     :data="data"
     :loading="Boolean(loading == 'load-table')"
     @change="loadItems"
+    @action="onAction"
   >
     <template #row-basePrice="{ item }">
       <div class="text-red text-nowrap">
