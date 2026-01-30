@@ -33,6 +33,11 @@ definePageMeta({ layout: "partner" });
             <div class="text-body-2 opacity-80 mt-1">
               Sẽ được thanh toán vào kỳ tới
             </div>
+
+            <span v-if="dashboard.lastMonthPayment">
+              {{ formatCurrency(dashboard.lastMonthPayment) }} (Doanh thu tháng
+              trước)
+            </span>
           </v-card-text>
         </v-card>
       </v-col>
@@ -161,19 +166,22 @@ definePageMeta({ layout: "partner" });
                     dashboard?.accountId === item?.partnerId,
                   'cursor-pointer': userData?.role === EnumAccountRole.ADMIN,
                 }"
-                :subtitle="`${item.count} lượt giới thiệu`"
                 @click="onClickViewDashboardPartnerDetail(item.partnerId)"
               >
                 <template #prepend>
-                  <v-avatar :color="getRankColor(index + 1)">
+                  <v-avatar :color="getRankColor(+index + 1)">
                     <span class="text-white font-bold">
-                      {{ index + 1 }}
+                      {{ +index + 1 }}
                     </span>
                   </v-avatar>
                 </template>
 
                 <template #append v-if="index === 0">
                   <v-icon color="amber-darken-2">mdi-crown</v-icon>
+                </template>
+
+                <template #subtitle>
+                  <span>{{ `${item.count} lượt giới thiệu` }}</span>
                 </template>
               </v-list-item>
             </v-list>
