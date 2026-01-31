@@ -69,7 +69,7 @@ onMounted(async () => {
           <v-row>
             <v-col cols="6" lg="4" md="4" sm="4">
               <div class="footer-section footer-links">
-                <h4>Sản phẩm</h4>
+                <h4>{{ $t("Bắt đầu sử dụng") }}</h4>
                 <nav>
                   <a
                     v-for="(item, index) in [
@@ -80,7 +80,7 @@ onMounted(async () => {
                         ? []
                         : [
                             {
-                              title: 'TN Solve Teacher',
+                              title: 'Tạo trò chơi dạy học',
                               value: 'tnsolve-teacher',
                             },
                           ]),
@@ -97,12 +97,10 @@ onMounted(async () => {
 
             <v-col cols="6" lg="4" md="4" sm="4">
               <div class="footer-section footer-links">
-                <h4>Tài nguyên</h4>
+                <h4>{{ $t("Trợ giúp") }}</h4>
                 <nav>
                   <a
                     v-for="(item, index) in [
-                      { title: 'Liên hệ Zalo', value: 'contact' },
-                      { title: 'Tham gia nhóm Zalo', value: 'zalo-group' },
                       { title: 'Chính sách', value: 'terms' },
                       ...(version
                         ? []
@@ -112,6 +110,8 @@ onMounted(async () => {
                               value: 'download-tool',
                             },
                           ]),
+                      { title: 'Liên hệ admin (zalo)', value: 'contact' },
+                      { title: 'Tham gia nhóm (zalo)', value: 'zalo-group' },
                     ]"
                     :key="index"
                     class="cursor-pointer"
@@ -125,7 +125,7 @@ onMounted(async () => {
 
             <v-col cols="6" lg="4" md="4" sm="4">
               <div class="footer-section footer-links">
-                <h4>Kết nối</h4>
+                <h4>{{ $t("Theo dõi chúng tôi") }}</h4>
 
                 <nav>
                   <a

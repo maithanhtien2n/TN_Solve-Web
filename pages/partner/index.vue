@@ -181,11 +181,12 @@ definePageMeta({ layout: "partner" });
 
                 <template #title>
                   <span>{{ item.name }}</span>
+                  <small>{{ `${item.count} lượt giới thiệu` }}</small>
                 </template>
 
-                <template #subtitle>
+                <!-- <template #subtitle>
                   <span>{{ `${item.count} lượt giới thiệu` }}</span>
-                </template>
+                </template> -->
               </v-list-item>
             </v-list>
           </v-card-text>

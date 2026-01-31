@@ -4,10 +4,10 @@ const { t } = useI18n();
 const content = ref<string>(`
   <div>
     <h1 class="text-h5 text-md-h4 font-bold mb-1">Chính sách & Điều khoản</h1>
-    <p class="text-grey-darken-1 mb-6">Cập nhật lần cuối: [Ngày 5 tháng 11 năm 2025]</p>
+    <p class="text-grey-darken-1 mb-6">Cập nhật lần cuối: [Ngày 31 tháng 01 năm 2026]</p>
     
     <p class="mb-6">
-      Chào mừng bạn đến với <b>Tool Video TN Solve</b>! Cảm ơn bạn đã tin dùng. Khi bạn chuyển khoản thanh toán và sử dụng tool, bạn đồng ý với các quy định đơn giản và rõ ràng dưới đây.
+      Chào mừng bạn đến với <b>Tool Video TN Solve</b>! Cảm ơn bạn đã tin dùng. Khi bạn <strong>thanh toán online</strong> và sử dụng tool, bạn đồng ý với các quy định đơn giản và rõ ràng dưới đây.
     </p>
 
     <div id="tom-tat" class="section-anchor"></div>
@@ -21,38 +21,43 @@ const content = ref<string>(`
       </h4>
       <ul class="pl-10">
         <li><strong>Video của bạn là của bạn:</strong> Bạn toàn quyền sở hữu và sử dụng video (kể cả mục đích thương mại).</li>
-        <li><strong>Thanh toán thủ công (99k/tháng):</strong> Bạn chuyển khoản trực tiếp, chúng tôi kích hoạt tài khoản theo số tháng bạn trả.</li>
-        <li><strong>Gia hạn:</strong> Hết hạn tool sẽ tự khóa. Bạn cần liên hệ lại chúng tôi để gia hạn.</li>
+        <li><strong>Thanh toán online (99k/tháng):</strong> Thanh toán trực tiếp qua hệ thống, kích hoạt tự động theo số tháng bạn chọn.</li>
+        <li><strong>Gia hạn:</strong> Hết hạn tool sẽ tự khóa. Bạn có thể gia hạn online bất cứ lúc nào.</li>
         <li><strong>Bảo mật & Chơi đẹp:</strong> Chúng tôi không bán dữ liệu của bạn và mong bạn không dùng tool để làm việc xấu.</li>
       </ul>
     </div>
 
     <div id="thanh-toan" class="section-anchor"></div>
     <h2 class="text-h5 font-weight-bold mt-10 mb-4">1. Đăng ký & Thanh toán (Gói 99k/tháng)</h2>
-    <p class="mb-4">Mô hình của chúng tôi rất đơn giản và dựa trên sự tin tưởng:</p>
+    <p class="mb-4">Quy trình thanh toán online rất đơn giản:</p>
     
     <ul style="list-style: none; padding-left: 0;">
       <li class="d-flex align-start mb-4">
-        <i class="mdi mdi-numeric-1-circle text-primary mr-4" style="font-size: 26px; line-height: 1.5;"></i>
-        <span><strong>Liên hệ:</strong> Bạn liên hệ với chúng tôi (qua Zalo/Fanpage) để nhận thông tin thanh toán.</span>
+        <span><strong>Chọn gói:</strong> Bạn chọn số tháng cần đăng ký (99.000 VNĐ/tháng).</span>
       </li>
       <li class="d-flex align-start mb-4">
-        <i class="mdi mdi-numeric-2-circle text-primary mr-4" style="font-size: 26px; line-height: 1.5;"></i>
-        <span><strong>Thanh toán:</strong> Bạn chuyển khoản trực tiếp 99.000 VNĐ/tháng. (VD: 3 tháng là 297.000 VNĐ).</span>
+        <span><strong>Thanh toán online:</strong> Bạn thanh toán trực tiếp qua hệ thống (ví dụ: 3 tháng = 297.000 VNĐ).</span>
       </li>
       <li class="d-flex align-start mb-4">
-        <i class="mdi mdi-numeric-3-circle text-primary mr-4" style="font-size: 26px; line-height: 1.5;"></i>
-        <span><strong>Kích hoạt:</strong> Chúng tôi sẽ kích hoạt gói thuê cho tài khoản của bạn ngay khi nhận được thanh toán.</span>
+        <span><strong>Kích hoạt tự động:</strong> Sau khi thanh toán thành công, tài khoản sẽ được kích hoạt/gia hạn tự động theo thời gian bạn đã mua.</span>
       </li>
       <li class="d-flex align-start mb-4">
-        <i class="mdi mdi-numeric-4-circle text-primary mr-4" style="font-size: 26px; line-height: 1.5;"></i>
-        <span><strong>Hết hạn:</strong> Khi hết thời gian, tài khoản sẽ tự động không thể tạo video mới.</span>
+        <span><strong>Hết hạn:</strong> Khi hết thời gian, tài khoản sẽ tự động không thể tạo video mới cho đến khi bạn gia hạn.</span>
       </li>
       <li class="d-flex align-start mb-4">
-        <i class="mdi mdi-numeric-5-circle text-primary mr-4" style="font-size: 26px; line-height: 1.5;"></i>
-        <span><strong>Gia hạn:</strong> Bạn chỉ cần liên hệ lại với chúng tôi và thanh toán cho chu kỳ tiếp theo.</span>
+        <span><strong>Gia hạn online:</strong> Bạn có thể gia hạn bất cứ lúc nào bằng cách thanh toán lại cho chu kỳ tiếp theo.</span>
       </li>
     </ul>
+
+    <div 
+      class="pa-4 mt-7" 
+      style="border: 1px solid #90CAF9; background-color: #E3F2FD; border-radius: 4px;"
+    >
+      <p class="d-flex align-center text-primary" style="margin: 0;">
+        <i class="mdi mdi-credit-card-check-outline mr-3" style="font-size: 24px;"></i>
+        <strong>Xác nhận thanh toán:</strong> Nếu bạn đã thanh toán thành công nhưng tài khoản chưa được kích hoạt, vui lòng liên hệ hỗ trợ và cung cấp email/số điện thoại đăng ký + mã giao dịch (nếu có) để chúng tôi kiểm tra.
+      </p>
+    </div>
     
     <div 
       class="pa-4 mt-6" 
@@ -60,10 +65,9 @@ const content = ref<string>(`
     >
       <p class="d-flex align-center text-warning-darken-3" style="margin: 0;">
         <i class="mdi mdi-cash-remove mr-3" style="font-size: 24px;"></i>
-        Lưu ý về Hoàn tiền: Vì chi phí máy chủ AI rất tốn kém, chúng tôi không hỗ trợ hoàn tiền sau khi tài khoản đã được kích hoạt.
+        Lưu ý về Hoàn tiền: Vì chi phí máy chủ AI rất tốn kém, chúng tôi không hỗ trợ hoàn tiền sau khi gói đã được kích hoạt hoặc đã phát sinh lượt xử lý.
       </p>
     </div>
-
 
     <div id="quyen-so-huu" class="section-anchor"></div>
     <h2 class="text-h5 font-weight-bold mt-10 mb-4">2. Quyền Sở hữu Video</h2>
@@ -93,54 +97,6 @@ const content = ref<string>(`
       <li>Tạo thông tin sai lệch (deepfake) có mục đích gây hại.</li>
     </ul>
     <p>Chúng tôi có quyền khóa tài khoản của bạn (kể cả khi còn hạn) nếu phát hiện vi phạm nghiêm trọng.</p>
-
-    <div id="lien-he" class="section-anchor"></div>
-    <h2 class="text-h5 font-weight-bold mt-10 mb-4">5. Liên hệ để Đăng ký & Hỗ trợ</h2>
-    <p class="mb-4">Đây là kênh chính thức để bạn đăng ký, gia hạn và nhận hỗ trợ khi cần:</p>
-    
-    <div class="mt-4" style="border: 1px solid #e0e0e0; border-radius: 4px;">
-      <ul style="list-style: none; padding: 8px 0;">
-        <li class="pa-4 d-flex align-center">
-          <i class="mdi mdi-zalo mr-4" style="font-size: 28px; color: #0068FF;"></i>
-          <div>
-            <strong class="text-body-1">Kênh ưu tiên (Zalo)</strong><br>
-            <span class="text-grey-darken-1">034 302 7232</span>
-          </div>
-        </li>
-        <hr style="border: 0; border-top: 1px solid #e0e0e0; margin: 0 16px;">
-        <li class="pa-4 d-flex align-center">
-          <i class="mdi mdi-facebook mr-4" style="font-size: 28px; color: #1877F2;"></i>
-          <div>
-            <strong class="text-body-1">Fanpage Facebook</strong><br>
-            <span class="text-grey-darken-1">Tien Code Web</span>
-          </div>
-        </li>
-        <hr style="border: 0; border-top: 1px solid #e0e0e0; margin: 0 16px;">
-        <li class="pa-4 d-flex align-center">
-          <i class="mdi mdi-email-outline mr-4" style="font-size: 28px;"></i>
-          <div>
-            <strong class="text-body-1">Email Hỗ trợ</strong><br>
-            <span class="text-grey-darken-1">maithanhtien2n@gmail.com</span>
-          </div>
-        </li>
-      </ul>
-    </div>
-
-     <div id="cta" class="section-anchor"></div>
-    <h2 class="text-h5 font-weight-bold mt-10 mb-4">Bạn đã sẵn sàng?</h2>
-    <p class="mb-4">
-      Tất cả các tính năng này đều có trong gói 99.000 VNĐ/tháng.
-    </p>
-    
-    <a href="/" style="text-decoration: none;">
-      <div 
-        class="d-inline-flex align-center justify-center pa-3 px-6" 
-        style="background-color: #29B6F6; color: white; border-radius: 8px; font-weight: 500;"
-      >
-        <i class="mdi mdi-creation mr-2" style="font-size: 20px;"></i>
-        Tạo video ngay
-      </div>
-    </a>
 
     <style>
       .section-anchor {
