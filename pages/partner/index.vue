@@ -35,8 +35,7 @@ definePageMeta({ layout: "partner" });
             </div>
 
             <span v-if="dashboard.lastMonthPayment">
-              {{ formatCurrency(dashboard.lastMonthPayment) }} (Doanh thu tháng
-              trước)
+              {{ formatCurrency(dashboard.lastMonthPayment) }} (tháng trước)
             </span>
           </v-card-text>
         </v-card>
