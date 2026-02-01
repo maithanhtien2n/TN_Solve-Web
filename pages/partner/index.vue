@@ -33,10 +33,6 @@ definePageMeta({ layout: "partner" });
             <div class="text-body-2 opacity-80 mt-1">
               Sẽ được thanh toán vào kỳ tới
             </div>
-
-            <span v-if="dashboard.lastMonthPayment">
-              {{ formatCurrency(dashboard.lastMonthPayment) }} (tháng trước)
-            </span>
           </v-card-text>
         </v-card>
       </v-col>
@@ -53,6 +49,10 @@ definePageMeta({ layout: "partner" });
             <div class="text-h4 font-bold text-grey-darken-4 mt-4">
               {{ formatCurrency(dashboard.paidBalance) }}
             </div>
+
+            <span v-if="dashboard.lastMonthPayment" class="mt-3">
+              {{ formatCurrency(dashboard.lastMonthPayment) }} (tháng trước)
+            </span>
           </v-card-text>
         </v-card>
       </v-col>
