@@ -10,7 +10,7 @@ const { t } = useI18n();
 const { onGetterMasterData } = useMasterDataStore();
 
 const headers = computed(() => {
-  const item = [
+  let item = [
     { title: "Họ và tên", key: "name", sortable: false },
     { title: "Email", key: "email", sortable: false },
     { title: "Tín dụng", key: "settings.credit", sortable: false },
@@ -26,6 +26,11 @@ const headers = computed(() => {
   if (role.value === EnumAccountRole.ADMIN) {
     item.splice(4, 1);
     item.pop();
+
+    item = item.filter(
+      (x: any) =>
+        !["settings.credit", "remainingTime", "referral.name"].includes(x.key)
+    );
   }
 
   return item;
@@ -362,7 +367,7 @@ const onClickSaveSetting = async () => {
       <span
         :class="{ 'text-success': appVersion && appVersion ===(item as any).version  }"
       >
-        {{ (item as any).version }}
+        {{ (item as any).version || "Chưa tải" }}
       </span>
     </template>
 
