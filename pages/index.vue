@@ -31,7 +31,10 @@ useSeo({
 
 <template>
   <div
-    v-if="!userData || (userData.role !== 'admin' && !userData.remainingTime)"
+    v-if="
+      !userData ||
+      (userData?.role !== EnumAccountRole.ADMIN && !userData?.remainingTime)
+    "
   >
     <div
       v-if="locale === 'vi'"
@@ -49,8 +52,9 @@ useSeo({
         </span>
         — Chỉ
         <span class="text-primary font-bold" style="font-size: 2rem">
-          99.000đ/tháng </span
-        >!
+          99.000đ/tháng
+        </span>
+        !
       </h1>
 
       <p
@@ -82,24 +86,51 @@ useSeo({
         </a>
         để được hỗ trợ.
       </div>
-    </div>
-  </div>
 
-  <div v-if="userData?.serviceExpiry" class="text-center">
-    <div class="d-flex justify-center">
-      <v-img src="/images/qr-zalo-group.jpg" class="h-20rem" />
-    </div>
+      👇
 
-    <a target="_blank" href="https://zalo.me/g/tuhmrl934">
-      Bấm vào đây để tham gia nhóm Zalo TN Solve!
-    </a>
+      <div class="d-flex flex-column">
+        <span :style="{ 'font-size': isMobile ? '1rem' : '1.2rem' }">
+          📢 Cập nhật tin tức, tính năng mới mỗi ngày
+        </span>
+
+        <a target="_blank" href="https://zalo.me/g/tuhmrl934">
+          Tham gia nhóm Zalo Tool AI TN Solve
+        </a>
+      </div>
+    </div>
   </div>
 
   <div
-    v-if="userData?.role !== EnumAccountRole.ADMIN"
-    class="mt-8 mb-6 text-center mx-auto"
-    style="max-width: 700px"
+    v-if="userData?.role === EnumAccountRole.ADMIN || userData?.remainingTime"
+    class="text-center mt-10"
   >
+    <h3
+      v-if="isMobile"
+      class="font-bold text-primary"
+      style="font-size: 1.2rem"
+    >
+      🎉 CHÀO MỪNG BẠN ĐẾN TN SOLVE
+    </h3>
+
+    <h1 v-else class="font-bold text-primary" style="font-size: 2rem">
+      🎉 CHÀO MỪNG BẠN ĐẾN VỚI TN SOLVE
+    </h1>
+
+    👇
+
+    <div class="d-flex flex-column">
+      <span :style="{ 'font-size': isMobile ? '1rem' : '1.2rem' }">
+        📢 Cập nhật tin tức, tính năng mới mỗi ngày
+      </span>
+
+      <a target="_blank" href="https://zalo.me/g/tuhmrl934">
+        Tham gia nhóm Zalo Tool AI TN Solve
+      </a>
+    </div>
+  </div>
+
+  <div class="mt-8 mb-6 text-center mx-auto" style="max-width: 700px">
     <div
       class="py-3 px-4 rounded-lg d-inline-flex align-center justify-center flex-wrap ga-3"
       style="
@@ -129,61 +160,56 @@ useSeo({
     </div>
   </div>
 
-  <template v-if="userData?.role !== EnumAccountRole.ADMIN">
-    <div class="my-10 d-flex justify-center">
-      <div class="video-wrap">
-        <div class="video-frame">
-          <iframe
-            width="706"
-            height="400"
-            src="https://www.youtube.com/embed/dCb8hL7wLAM"
-            frameborder="0"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-            referrerpolicy="strict-origin-when-cross-origin"
-            allowfullscreen
-          />
-        </div>
+  <div class="my-10 d-flex justify-center">
+    <div class="video-wrap">
+      <div class="video-frame">
+        <iframe
+          width="706"
+          height="400"
+          src="https://www.youtube.com/embed/dCb8hL7wLAM"
+          frameborder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          referrerpolicy="strict-origin-when-cross-origin"
+          allowfullscreen
+        />
       </div>
     </div>
+  </div>
 
-    <div
-      v-if="!client && !isMobile && appVersionDownload"
-      class="section my-10"
-    >
-      <div class="download-wrap">
-        <div class="download-left">
-          <div
-            class="download-title"
-            :style="{ 'font-size': isMobile ? '1rem' : '1.2rem' }"
-          >
-            Tải công cụ TN Solve bản mới nhất
-            <span class="text-primary font-bold">
-              {{ appVersion }}
-            </span>
-            về máy tính
-          </div>
-          <div
-            class="download-desc"
-            :style="{ 'font-size': isMobile ? '1rem' : '1.2rem' }"
-          >
-            Cài đặt trên Windows để sử dụng nhanh và ổn định hơn.
-          </div>
-        </div>
-
-        <a
-          class="download-btn"
-          :href="appVersionDownload"
-          target="_blank"
-          rel="noopener"
+  <div v-if="!client && !isMobile && appVersionDownload" class="section my-10">
+    <div class="download-wrap">
+      <div class="download-left">
+        <div
+          class="download-title"
+          :style="{ 'font-size': isMobile ? '1rem' : '1.2rem' }"
         >
-          <v-icon size="22" class="icon-win">mdi-microsoft-windows</v-icon>
-          <span :style="{ 'font-size': isMobile ? '1rem' : '1.2rem' }">
-            Tải cho Windows
+          Tải công cụ TN Solve bản mới nhất
+          <span class="text-primary font-bold">
+            {{ appVersion }}
           </span>
-        </a>
+          về máy tính
+        </div>
+        <div
+          class="download-desc"
+          :style="{ 'font-size': isMobile ? '1rem' : '1.2rem' }"
+        >
+          Cài đặt trên Windows để sử dụng nhanh và ổn định hơn.
+        </div>
       </div>
+
+      <a
+        class="download-btn"
+        :href="appVersionDownload"
+        target="_blank"
+        rel="noopener"
+      >
+        <v-icon size="22" class="icon-win">mdi-microsoft-windows</v-icon>
+        <span :style="{ 'font-size': isMobile ? '1rem' : '1.2rem' }">
+          Tải cho Windows
+        </span>
+      </a>
     </div>
-  </template>
+  </div>
 
   <ButtonCreateVideo class="mt-10" />
 </template>

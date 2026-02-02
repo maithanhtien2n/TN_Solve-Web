@@ -129,13 +129,15 @@ const onClickMenuItem = (value: string) => {
         <div class="d-flex align-center ga-4">
           <v-chip
             v-if="
-              userData?.name &&
-              (userData?.settings?.testAmount !== null ||
-                userData?.serviceExpiry)
+              userData?.role === EnumAccountRole.ADMIN ||
+              (userData?.name &&
+                (userData?.settings?.testAmount !== null ||
+                  userData?.serviceExpiry))
             "
             variant="tonal"
             class="font-bold"
             :color="
+              userData?.role === EnumAccountRole.ADMIN ||
               userData?.remainingTime
                 ? 'green' // 1. Trả phí & Còn hạn: Màu xanh lá
                 : userData?.settings?.testAmount
@@ -144,17 +146,23 @@ const onClickMenuItem = (value: string) => {
             "
             :size="isMobile ? 'small' : 'default'"
           >
-            <span v-if="userData?.serviceExpiry">
-              {{
-                userData?.remainingTime
-                  ? `${$t("Còn")} ${userData?.remainingTime}`
-                  : $t("Đã hết hạn")
-              }}
+            <span v-if="userData?.role === EnumAccountRole.ADMIN">
+              Quản trị viên
             </span>
 
-            <span v-else>
-              Còn {{ userData?.settings.testAmount }} lượt dùng thử
-            </span>
+            <template v-else>
+              <span v-if="userData?.serviceExpiry">
+                {{
+                  userData?.remainingTime
+                    ? `${$t("Còn")} ${userData?.remainingTime}`
+                    : $t("Đã hết hạn")
+                }}
+              </span>
+
+              <span v-else>
+                Còn {{ userData?.settings.testAmount }} lượt dùng thử
+              </span>
+            </template>
           </v-chip>
 
           <template v-if="Object.values(userData || {})?.length">
