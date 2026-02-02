@@ -298,8 +298,8 @@ const onClickNoteMessage = (isClick: boolean) => {
 onMounted(() => {
   onGetProductDetail(
     Array.isArray(formData.messages) && formData.messages?.length
-      ? "detail"
-      : ""
+      ? ""
+      : "detail"
   );
 });
 
