@@ -56,6 +56,12 @@ const isError = computed(() =>
   )
 );
 
+const modelVideoOptions = computed(() => {
+  let list = onGetterMasterData.value["model-video"] || [];
+  if (!client.value) list = list?.filter((x: any) => x.value !== "tn_solve_1");
+  return list;
+});
+
 const videoModeOptions = computed(() => {
   const list =
     onGetterMasterData.value["video-mode"]?.map((x: any) => ({
@@ -72,10 +78,6 @@ const frameRateOptions = computed(
       title: t(x.title),
       value: x.value,
     })) || []
-);
-
-const modelVideoOptions = computed(
-  () => onGetterMasterData.value["model-video"] || []
 );
 
 const videoStyleOptions = computed(() => {
