@@ -437,7 +437,7 @@ definePageMeta({ layout: "admin", title: "Mã giảm giá" });
     <template #row-usageLimit="{ item }">
       <div class="d-flex ga-1">
         <span>{{ (item as any).usageLimit }}</span>
-        <span v-if="(item as any).limitPerAccount">
+        <span v-if="(item as any).limitPerAccount" class="text-nowrap">
           (Mỗi tài khoản được {{ (item as any).limitPerAccount }} lần)
         </span>
       </div>
