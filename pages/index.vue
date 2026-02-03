@@ -156,22 +156,6 @@ useSeo({
     </div>
   </div>
 
-  <div class="my-10 d-flex justify-center">
-    <div class="video-wrap">
-      <div class="video-frame">
-        <iframe
-          width="706"
-          height="400"
-          src="https://www.youtube.com/embed/dCb8hL7wLAM"
-          frameborder="0"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-          referrerpolicy="strict-origin-when-cross-origin"
-          allowfullscreen
-        />
-      </div>
-    </div>
-  </div>
-
   <div v-if="!client && !isMobile && appVersionDownload" class="section my-10">
     <div class="download-wrap">
       <div class="download-left">
@@ -204,6 +188,22 @@ useSeo({
           Tải cho Windows
         </span>
       </a>
+    </div>
+  </div>
+
+  <div class="my-10 d-flex justify-center">
+    <div class="video-wrap">
+      <div class="video-frame">
+        <iframe
+          width="706"
+          height="400"
+          src="https://www.youtube.com/embed/dCb8hL7wLAM"
+          frameborder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          referrerpolicy="strict-origin-when-cross-origin"
+          allowfullscreen
+        />
+      </div>
     </div>
   </div>
 
