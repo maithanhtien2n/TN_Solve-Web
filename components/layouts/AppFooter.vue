@@ -138,6 +138,16 @@ onMounted(async () => {
                     <img src="/images/icon-youtube.png" style="width: 1.3rem" />
                     <span style="margin-bottom: 2.6px">@tiencodeweb</span>
                   </a>
+
+                  <a
+                    class="cursor-pointer d-flex align-center ga-2"
+                    @click="router.push(localePath('/video/public'))"
+                  >
+                    <img src="/images/icon-video.png" style="width: 1.2rem" />
+                    <span style="margin-bottom: 1px">
+                      Thước phim công khai
+                    </span>
+                  </a>
                 </nav>
               </div>
             </v-col>

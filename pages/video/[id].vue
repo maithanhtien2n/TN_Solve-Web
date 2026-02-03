@@ -407,7 +407,9 @@ definePageMeta({ middleware: "auth" });
           <h3>{{ $t("Tải video") }}</h3>
         </div>
 
-        <h2 class="font-bold mt-2">{{ formData.title }}</h2>
+        <h2 class="font-bold mt-2">
+          {{ formData.client ? "💻" : "🌐" }} {{ formData.title }}
+        </h2>
 
         <v-row dense>
           <v-col cols="6">
@@ -760,7 +762,7 @@ definePageMeta({ middleware: "auth" });
           :modelValue="videoFlow.value"
         />
         <div class="mt-2">
-          {{ `${formData.client ? "💻" : "🌐"} ${videoFlow.title}` }}
+          {{ videoFlow.title }}
         </div>
       </div>
 

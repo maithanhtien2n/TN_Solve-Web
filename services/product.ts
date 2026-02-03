@@ -2,6 +2,10 @@ import api from "./axios";
 import FormData from "form-data";
 
 export const productService = {
+  async getAllProductPublic(params: any) {
+    return await api.get("/products/video-public", { params });
+  },
+
   async getAllProductClient(payload: any) {
     return await api.post(`/products/product-list`, payload);
   },

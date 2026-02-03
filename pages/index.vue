@@ -107,11 +107,11 @@ useSeo({
     v-if="userData?.role === EnumAccountRole.ADMIN || userData?.remainingTime"
     class="text-center mt-10"
   >
-    <h3 v-if="isMobile" class="text-primary" style="font-size: 1.2rem">
+    <!-- <h3 v-if="isMobile" class="text-primary" style="font-size: 1.2rem">
       🎉 CHÀO MỪNG BẠN ĐẾN TN SOLVE
-    </h3>
+    </h3> -->
 
-    <h1 v-else class="font-bold text-primary" style="font-size: 2rem">
+    <h1 v-if="!isMobile" class="font-bold text-primary" style="font-size: 2rem">
       🎉 CHÀO MỪNG BẠN ĐẾN VỚI TN SOLVE
     </h1>
 

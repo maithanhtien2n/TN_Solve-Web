@@ -3,6 +3,7 @@ import { authService } from "~/services/app";
 
 import AppLogin from "./AppLogin.vue";
 
+const route = useRoute();
 const router = useRouter();
 const localePath = useLocalePath();
 
@@ -115,7 +116,7 @@ const onClickMenuItem = (value: string) => {
   >
     <v-container max-width="1400">
       <div class="d-flex align-center justify-space-between ga-3">
-        <div>
+        <div class="d-flex align-center">
           <v-img
             src="/images/tn-solve-logo.png"
             lazy-src="/images/tn-solve-logo.png"
@@ -124,6 +125,26 @@ const onClickMenuItem = (value: string) => {
             } h-3rem b-radius-1 cursor-pointer`"
             @click="router.push(localePath('/'))"
           />
+        </div>
+
+        <div v-if="!isMobile" class="flex-1">
+          <div class="ml-14 d-flex align-center ga-6">
+            <span
+              v-for="(item, index) in [
+                { title: 'Trang chủ', path: '/' },
+                { title: 'Thước phim công khai', path: '/video/public' },
+              ]"
+              :key="index"
+              :class="{
+                'text-primary':
+                  localePath(route.path) === localePath(item.path),
+                'cursor-pointer': true,
+              }"
+              @click="router.push(localePath(item.path))"
+            >
+              {{ $t(item.title) }}
+            </span>
+          </div>
         </div>
 
         <div class="d-flex align-center ga-4">

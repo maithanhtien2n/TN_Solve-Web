@@ -287,7 +287,10 @@ onMounted(async () => {
         <div :class="{ 'mx-4': isMobile }">
           <v-breadcrumbs
             v-show="
-              ![`${localePath('/')}`].includes(route.path) &&
+              ![
+                `${localePath('/')}`,
+                `${localePath('/video/public')}`,
+              ].includes(route.path) &&
               breadcrumbsItems &&
               breadcrumbsItems.length
             "

@@ -41,15 +41,25 @@ const onClickDotMenuItem = (type: string, data: any) => {
   if (type === "download-video") {
     downloadVideo(data.video, data.title);
     return;
-  } else if (type === "delete-video") {
+  } else if (["public", "private"].includes(type) || type === "delete-video") {
+    let message = "";
+
+    if (type === "public") {
+      message = t("Bạn có chắc chắn muốn công khai video này không?");
+    } else if (type === "private") {
+      message = t("Bạn có chắc chắn muốn riêng tư video này không?");
+    } else if (type === "delete-video") {
+      message = t("Bạn có chắc chắn muốn xoá video này không?");
+    }
+
     confirmDialogRef.value.show({
+      message,
       noTransMsg: true,
-      message: t("Bạn có chắc chắn muốn xoá video này không?"),
       onConfirm: async () => {
         try {
           await productService.actionProduct({
             ids: [data._id],
-            action: "delete",
+            action: type === "delete-video" ? "delete" : type,
           });
 
           params.page = 1;
@@ -121,7 +131,10 @@ definePageMeta({ middleware: "auth" });
   <div v-else>
     <ConfirmDialog ref="confirmDialogRef" />
 
-    <v-row :dense="isMobile">
+    <v-row
+      v-if="Array.isArray(products.docs) && products.docs.length"
+      :dense="isMobile"
+    >
       <v-col
         v-for="(item, index) in products.docs"
         :key="index"
@@ -196,22 +209,34 @@ definePageMeta({ middleware: "auth" });
               class="video-card-title font-bold line-clamp-2 cursor-pointer mb-1"
               style="line-height: 1.4rem"
             >
-              {{ item.title }}
+              {{ item.client ? "💻" : "🌐" }} {{ item.title }}
             </h4>
 
             <!-- <small>{{ item.frameRate }}</small> -->
 
             <!-- <small>{{ item.modelVideo }}</small> -->
 
-            <small>{{ item.createdAt }}</small>
+            <small v-if="item.visibility === 'public'">
+              <v-icon size="16" color="primary" style="margin-bottom: 2px">
+                mdi-star-four-points-outline
+              </v-icon>
+              {{ item.createdAt }}
+            </small>
+
+            <small v-else>
+              <v-icon size="16" style="margin-bottom: 2px">
+                mdi-lock-outline
+              </v-icon>
+              {{ item.createdAt }}
+            </small>
 
             <!-- <small v-if="item.state === 'primary'" class="text-primary mt-1">
-            {{ $t("Đang tạo video...") }}
-          </small>
+              {{ $t("Đang tạo video...") }}
+            </small>
 
-          <small v-else-if="item.state === 'error'" class="text-error mt-1">
-            {{ $t("Tạo video thất bại") }}
-          </small> -->
+            <small v-else-if="item.state === 'error'" class="text-error mt-1">
+              {{ $t("Tạo video thất bại") }}
+            </small> -->
           </div>
 
           <v-menu location="bottom right">
@@ -230,6 +255,16 @@ definePageMeta({ middleware: "auth" });
                 <v-list-item
                   v-for="(menu, index) in [
                     {
+                      title:
+                        item.visibility === 'public' ? 'Riêng tư' : 'Công khai',
+                      value:
+                        item.visibility === 'public' ? 'private' : 'public',
+                      icon:
+                        item.visibility === 'public'
+                          ? 'mdi-lock-outline'
+                          : 'mdi-star-four-points-outline',
+                    },
+                    {
                       title: 'Tải video',
                       value: 'download-video',
                       icon: 'mdi-tray-arrow-down',
@@ -245,7 +280,9 @@ definePageMeta({ middleware: "auth" });
                   :class="{
                     disabled:
                       item.state === 'primary' ||
-                      (menu.value === 'download-video' &&
+                      (['download-video', 'public', 'private'].includes(
+                        menu.value
+                      ) &&
                         item.state === 'error'),
                   }"
                   @click="onClickDotMenuItem(menu.value, item)"
@@ -271,6 +308,12 @@ definePageMeta({ middleware: "auth" });
 
       <div ref="loadMore" />
     </v-row>
+
+    <div v-else class="mx-auto my-10 text-center">
+      <v-icon icon="mdi-movie-open-outline" size="40" class="mb-1" />
+
+      <div>{{ $t("Chưa có thước phim nào của bạn") }}.</div>
+    </div>
 
     <ButtonCreateVideo style="margin-top: 2rem" />
   </div>
