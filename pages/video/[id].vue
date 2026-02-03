@@ -58,7 +58,7 @@ const isError = computed(() =>
 
 const modelVideoOptions = computed(() => {
   let list = onGetterMasterData.value["model-video"] || [];
-  if (!client.value) list = list?.filter((x: any) => x.value !== "tn_solve_1");
+  list = list?.filter((x: any) => x.value !== "tn_solve_1");
   return list;
 });
 
