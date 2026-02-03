@@ -94,9 +94,11 @@ useSeo({
           📢 Cập nhật tin tức, tính năng mới mỗi ngày
         </span>
 
-        <a target="_blank" href="https://zalo.me/g/tuhmrl934">
-          Tham gia nhóm Zalo Tool AI TN Solve
-        </a>
+        <div>
+          <a target="_blank" href="https://zalo.me/g/tuhmrl934">
+            Tham gia nhóm Zalo Tool AI TN Solve
+          </a>
+        </div>
       </div>
     </div>
   </div>
@@ -120,9 +122,11 @@ useSeo({
         📢 Cập nhật tin tức, tính năng mới mỗi ngày
       </span>
 
-      <a target="_blank" href="https://zalo.me/g/tuhmrl934">
-        Tham gia nhóm Zalo Tool AI TN Solve
-      </a>
+      <div>
+        <a target="_blank" href="https://zalo.me/g/tuhmrl934">
+          Tham gia nhóm Zalo Tool AI TN Solve
+        </a>
+      </div>
     </div>
   </div>
 
