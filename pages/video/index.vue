@@ -235,8 +235,9 @@ definePageMeta({ middleware: "auth" });
 
           <div class="d-flex flex-column flex-1 pa-3 pt-2">
             <h4
-              class="video-card-title font-bold line-clamp-2 cursor-pointer mb-1"
+              class="video-card-title font-bold cursor-pointer mb-1"
               style="line-height: 1.4rem"
+              :class="`line-clamp-${isMobile ? 1 : 1}`"
             >
               {{ item.client ? "💻" : "🌐" }} {{ item.title }}
             </h4>
@@ -259,13 +260,20 @@ definePageMeta({ middleware: "auth" });
               {{ item.createdAt }}
             </small>
 
-            <!-- <small v-if="item.state === 'primary'" class="text-primary mt-1">
-              {{ $t("Đang tạo video...") }}
-            </small>
+            <div
+              v-if="item.visibility === 'public'"
+              class="d-flex align-center"
+            >
+              <small class="text-nowrap text-grey-darken-2">
+                {{ item?.viewsCount }} {{ $t("lượt xem") }}
+              </small>
 
-            <small v-else-if="item.state === 'error'" class="text-error mt-1">
-              {{ $t("Tạo video thất bại") }}
-            </small> -->
+              <v-icon>mdi-circle-small</v-icon>
+
+              <small class="text-nowrap text-grey-darken-2">
+                {{ item?.likesCount }} {{ $t("lượt thích") }}
+              </small>
+            </div>
           </div>
 
           <v-menu location="bottom right">

@@ -48,4 +48,8 @@ export const productService = {
   async getProductMyLibrary(params: any) {
     return await api.get(`/products/my-library`, { params });
   },
+
+  async likeProductVideo(payload: any) {
+    return await api.put(`/products/like-action`, payload);
+  },
 };

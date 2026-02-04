@@ -188,8 +188,9 @@ useSeo({
 
           <div class="d-flex flex-column flex-1 pa-3 pt-2">
             <h4
-              class="video-card-title font-bold line-clamp-2 cursor-pointer mb-1"
+              class="video-card-title font-bold cursor-pointer mb-1"
               style="line-height: 1.4rem"
+              :class="`line-clamp-${isMobile ? 1 : 1}`"
             >
               {{ item.title }}
             </h4>
@@ -201,15 +202,20 @@ useSeo({
                 </v-icon>
                 {{ item?.account?.name }}
               </small>
+            </div>
 
-              <small
-                class="ml-2 text-nowrap text-grey-darken-2"
-                style="margin-bottom: 2px"
-              >
-                <v-icon size="14" style="margin-bottom: 1.2px">
-                  mdi-update
-                </v-icon>
-                {{ timeAgoVi(item?.updatedAt) }}
+            <div
+              v-if="item.visibility === 'public'"
+              class="d-flex align-center"
+            >
+              <small class="text-nowrap text-grey-darken-2">
+                {{ item?.viewsCount }} {{ $t("lượt xem") }}
+              </small>
+
+              <v-icon>mdi-circle-small</v-icon>
+
+              <small class="text-nowrap text-grey-darken-2">
+                {{ timeAgoVi(item?.createdAt) }}
               </small>
             </div>
           </div>

@@ -244,6 +244,11 @@ const onGetProductDetail = async (loadingType: string = "") => {
         formData.prompts = Array.isArray(data.prompts) ? data.prompts : [];
         formData.client = data.client || client.value;
         formData.createdAt = data.createdAt;
+        formData.updatedAt = data.updatedAt;
+        formData.viewsCount = data.viewsCount || 0;
+        formData.likesCount = data.likesCount || 0;
+        formData.visibility = data.visibility || "private";
+        formData.isLiked = data.isLiked || false;
 
         setTimeout(() => {
           if (
@@ -300,6 +305,12 @@ const onSubmit = async () => {
 
 const onClickNoteMessage = (isClick: boolean) => {
   if (isClick) commonDialogRef.value?.onDisplay(true);
+};
+
+const onClickLikeVideo = () => {
+  productService.likeProductVideo({ _id: productId.value }).then(async () => {
+    await onGetProductDetail();
+  });
 };
 
 onMounted(() => {
@@ -418,6 +429,40 @@ definePageMeta({ middleware: "auth" });
         <h2 v-else class="font-bold mt-2">
           {{ formData.client ? "💻" : "🌐" }} {{ formData.title }}
         </h2>
+
+        <div
+          v-if="formData.visibility === 'public'"
+          class="d-flex align-center ga-3"
+        >
+          <div class="d-flex align-center ga-3">
+            <v-btn
+              icon
+              size="40"
+              variant="tonal"
+              :class="{ 'text-primary': formData?.isLiked }"
+              @click="onClickLikeVideo()"
+            >
+              <v-icon size="18">mdi-thumb-up-outline</v-icon>
+            </v-btn>
+            <span class="text-grey-darken-2">
+              {{ formData?.likesCount }} {{ $t("lượt thích") }}
+            </span>
+          </div>
+
+          |
+
+          <div class="d-flex align-center">
+            <span class="text-nowrap text-grey-darken-2">
+              {{ formData?.viewsCount }} {{ $t("lượt xem") }}
+            </span>
+
+            <v-icon>mdi-circle-small</v-icon>
+
+            <span class="text-nowrap text-grey-darken-2">
+              {{ timeAgoVi(formData?.createdAt) }}
+            </span>
+          </div>
+        </div>
 
         <v-row dense>
           <v-col cols="6">
