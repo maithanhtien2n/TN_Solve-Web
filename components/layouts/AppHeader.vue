@@ -141,6 +141,7 @@ const onClickMenuItem = (value: string) => {
               v-for="(item, index) in navItems"
               :key="index"
               class="nav-item"
+              style="font-size: 1.02rem"
               :class="{ active: isActive(item.path) }"
               @click="router.push(localePath(item.path))"
             >
