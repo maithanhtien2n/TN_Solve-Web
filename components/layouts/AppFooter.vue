@@ -75,7 +75,15 @@ onMounted(async () => {
                     v-for="(item, index) in [
                       { title: 'Tài liệu', value: 'documents' },
                       { title: 'Hướng dẫn', value: 'tutorial' },
-                      { title: 'Công cụ đa năng', value: 'tnsolve-teacher' },
+                      ...(version
+                        ? []
+                        : [
+                            {
+                              title: 'Công cụ đa năng',
+                              value: 'tnsolve-teacher',
+                            },
+                          ]),
+
                       { title: 'Đăng ký/gia hạn dịch vụ', value: 'payment' },
                     ]"
                     :key="index"
