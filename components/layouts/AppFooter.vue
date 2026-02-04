@@ -153,7 +153,7 @@ onMounted(async () => {
                   >
                     <img src="/images/icon-video.png" style="width: 1.2rem" />
                     <span style="margin-bottom: 1px">
-                      Thước phim công khai
+                      {{ $t("Thước phim cộng đồng") }}
                     </span>
                   </a>
                 </nav>

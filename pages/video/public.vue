@@ -54,7 +54,7 @@ onMounted(() => {
 });
 
 useSeo({
-  title: t("Thước phim công khai"),
+  title: t("Thước phim cộng đồng"),
   description:
     "Nền tảng AI giúp bạn tạo video chuyên nghiệp chỉ trong vài phút",
   image: "/images/page-video.png",
@@ -73,7 +73,7 @@ useSeo({
   <div v-else>
     <div class="mb-4 d-flex flex-column">
       <h2 class="font-bold" style="margin-top: -7px">
-        {{ $t("Thước phim công khai") }}
+        {{ $t("Thước phim cộng đồng") }}
       </h2>
       <span>
         {{

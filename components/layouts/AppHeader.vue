@@ -16,6 +16,13 @@ const {
   onGetterDisplayPopupBuyCredit,
 } = useAppStore();
 
+const navItems = [
+  { title: "Trang chủ", path: "/" },
+  { title: "Thước phim cộng đồng", path: "/video/public" },
+];
+
+const isActive = (path: string) => localePath(route.path) === localePath(path);
+
 const menus = computed(() => {
   let items = [
     {
@@ -127,23 +134,17 @@ const onClickMenuItem = (value: string) => {
           />
         </div>
 
-        <div v-if="!isMobile" class="flex-1">
-          <div class="ml-14 d-flex align-center ga-6">
-            <span
-              v-for="(item, index) in [
-                { title: 'Trang chủ', path: '/' },
-                { title: 'Thước phim công khai', path: '/video/public' },
-              ]"
+        <div v-if="!isMobile">
+          <div class="ml-14 header-nav">
+            <div
+              v-for="(item, index) in navItems"
               :key="index"
-              :class="{
-                'text-primary':
-                  localePath(route.path) === localePath(item.path),
-                'cursor-pointer': true,
-              }"
+              class="nav-item"
+              :class="{ active: isActive(item.path) }"
               @click="router.push(localePath(item.path))"
             >
               {{ $t(item.title) }}
-            </span>
+            </div>
           </div>
         </div>
 
@@ -281,6 +282,31 @@ const onClickMenuItem = (value: string) => {
 
 .cta-button:hover {
   opacity: 0.9;
+}
+
+.header-nav {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.nav-item {
+  position: relative;
+  padding: 8px 2px;
+  font-size: 15px;
+  font-weight: 500;
+  color: #4b5563; /* xám đậm */
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.nav-item:hover {
+  color: #0984e3; /* primary */
+}
+
+.nav-item.active {
+  color: #0984e3;
+  font-weight: 600;
 }
 
 @media (max-width: 600px) {
