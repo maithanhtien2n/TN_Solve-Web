@@ -116,7 +116,7 @@ onMounted(async () => {
               </div>
             </v-col>
 
-            <v-col cols="6" lg="4" md="4" sm="4">
+            <v-col cols="12" lg="4" md="4" sm="4">
               <div class="footer-section footer-links">
                 <h4>{{ $t("Theo dõi chúng tôi") }}</h4>
 

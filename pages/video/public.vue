@@ -165,14 +165,24 @@ useSeo({
               {{ item.title }}
             </h4>
 
-            <small>
-              <v-icon size="15" style="margin-bottom: 3px">
-                mdi-account-tie
-              </v-icon>
-              {{ item?.account?.name }}
-            </small>
+            <div class="d-flex align-center">
+              <small class="line-clamp-1">
+                <v-icon size="15" style="margin-bottom: 3px">
+                  mdi-account-tie
+                </v-icon>
+                {{ item?.account?.name }}
+              </small>
 
-            <small>{{ item.updatedAt }}</small>
+              <small
+                class="ml-2 text-nowrap text-grey-darken-2"
+                style="margin-bottom: 2px"
+              >
+                <v-icon size="14" style="margin-bottom: 1.2px">
+                  mdi-update
+                </v-icon>
+                {{ timeAgoVi(item?.updatedAt) }}
+              </small>
+            </div>
           </div>
         </router-link>
       </v-col>

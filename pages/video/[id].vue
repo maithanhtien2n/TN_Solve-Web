@@ -6,6 +6,8 @@ const route = useRoute();
 const router = useRouter();
 const localePath = useLocalePath();
 
+const { isMobile } = useDevice();
+
 const { t } = useI18n();
 const { width } = useDevice();
 const { $socket } = useNuxtApp();
@@ -42,6 +44,7 @@ const formData = reactive<any>({
   account: {},
   prompts: [],
   client: client.value,
+  createdAt: "",
 });
 
 const productId = computed(() =>
@@ -240,6 +243,7 @@ const onGetProductDetail = async (loadingType: string = "") => {
         formData.account = data.account || {};
         formData.prompts = Array.isArray(data.prompts) ? data.prompts : [];
         formData.client = data.client || client.value;
+        formData.createdAt = data.createdAt;
 
         setTimeout(() => {
           if (
@@ -407,7 +411,11 @@ definePageMeta({ middleware: "auth" });
           <h3>{{ $t("Tải video") }}</h3>
         </div>
 
-        <h2 class="font-bold mt-2">
+        <h3 v-if="isMobile" class="font-bold mt-2" style="line-height: 1.6rem">
+          {{ formData.client ? "💻" : "🌐" }} {{ formData.title }}
+        </h3>
+
+        <h2 v-else class="font-bold mt-2">
           {{ formData.client ? "💻" : "🌐" }} {{ formData.title }}
         </h2>
 

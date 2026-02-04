@@ -165,3 +165,68 @@ export function removeLocalePrefixStrict(fullPath: string): string {
 
   return fullPath;
 }
+
+/**
+ * input: "HH:mm DD/MM/YYYY" (vd: "00:17 04/02/2026")
+ * now:   Date tuỳ chọn để test (mặc định = thời điểm hiện tại)
+ */
+export function timeAgoVi(input: string, now: Date = new Date()): string {
+  // Parse "HH:mm DD/MM/YYYY"
+  const m = input
+    .trim()
+    .match(/^(\d{1,2}):(\d{2})\s+(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+  if (!m) return "không rõ thời gian";
+
+  const [, hhStr, mmStr, ddStr, MMStr, yyyyStr] = m;
+  const hh = Number(hhStr);
+  const mi = Number(mmStr);
+  const dd = Number(ddStr);
+  const MM = Number(MMStr);
+  const yyyy = Number(yyyyStr);
+
+  // Date(year, monthIndex, day, hour, minute)
+  const dt = new Date(yyyy, MM - 1, dd, hh, mi, 0, 0);
+  if (Number.isNaN(dt.getTime())) return "không rõ thời gian";
+
+  const diffMs = now.getTime() - dt.getTime();
+  const isFuture = diffMs < 0;
+  const absSec = Math.floor(Math.abs(diffMs) / 1000);
+
+  const suffix = isFuture ? "nữa" : "trước";
+
+  // Ngưỡng "vừa xong"
+  if (!isFuture && absSec < 10) return "vừa xong";
+
+  if (absSec < 60) {
+    const s = absSec;
+    return `${s} giây ${suffix}`;
+  }
+
+  const absMin = Math.floor(absSec / 60);
+  if (absMin < 60) {
+    return `${absMin} phút ${suffix}`;
+  }
+
+  const absHour = Math.floor(absMin / 60);
+  if (absHour < 24) {
+    return `${absHour} giờ ${suffix}`;
+  }
+
+  const absDay = Math.floor(absHour / 24);
+  if (absDay < 7) {
+    return `${absDay} ngày ${suffix}`;
+  }
+
+  const absWeek = Math.floor(absDay / 7);
+  if (absDay < 30) {
+    return `${absWeek} tuần ${suffix}`;
+  }
+
+  const absMonth = Math.floor(absDay / 30);
+  if (absDay < 365) {
+    return `${absMonth} tháng ${suffix}`;
+  }
+
+  const absYear = Math.floor(absDay / 365);
+  return `${absYear} năm ${suffix}`;
+}
