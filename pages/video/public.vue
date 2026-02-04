@@ -155,6 +155,18 @@ useSeo({
             <span class="video-duration">
               {{ item.videoDuration }}
             </span>
+
+            <span
+              v-if="[1, 2, 3].includes(+index + 1)"
+              class="video-top"
+              :class="{
+                'top-1': index === 0,
+                'top-2': index === 1,
+                'top-3': index === 2,
+              }"
+            >
+              {{ +index + 1 }}
+            </span>
           </div>
 
           <div v-else-if="item.state === 'primary'" class="relative">
@@ -252,6 +264,48 @@ useSeo({
   border-radius: 6px;
   padding: 0 6px;
   background-color: rgba(0, 0, 0, 0.533);
+}
+
+.video-top {
+  position: absolute;
+  top: 5px;
+  left: 5px;
+  z-index: 9;
+
+  min-width: 32px;
+  height: 32px;
+  padding: 0 8px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 1;
+
+  color: #111;
+  background: #e5e7eb; /* default */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* TOP 1 */
+.video-top.top-1 {
+  background: linear-gradient(135deg, #facc15, #f59e0b);
+  color: #111;
+}
+
+/* TOP 2 */
+.video-top.top-2 {
+  background: linear-gradient(135deg, #e5e7eb, #9ca3af);
+  color: #111;
+}
+
+/* TOP 3 */
+.video-top.top-3 {
+  background: linear-gradient(135deg, #fbbf24, #92400e);
+  color: #fff;
 }
 
 .video-card {
