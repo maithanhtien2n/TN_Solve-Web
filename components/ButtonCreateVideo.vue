@@ -4,7 +4,7 @@ const localePath = useLocalePath();
 </script>
 
 <template>
-  <div class="sticky d-flex justify-center" style="bottom: 2rem">
+  <div class="sticky d-flex justify-center" style="bottom: 2rem; z-index: 9">
     <div
       class="cta-button"
       style="border-radius: 6px"

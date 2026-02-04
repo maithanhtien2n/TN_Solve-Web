@@ -1,5 +1,6 @@
 <script setup lang="ts">
 const route = useRoute();
+const router = useRouter();
 
 const { onGetterDisplayLogin: displayLogin } = useAppStore();
 
@@ -31,6 +32,9 @@ watch(
   () => displayLogin.value,
   (newVal: any) => {
     if (newVal) loading.value = "Đăng nhập với Google";
+    else {
+      router.replace({ query: {} });
+    }
   }
 );
 
