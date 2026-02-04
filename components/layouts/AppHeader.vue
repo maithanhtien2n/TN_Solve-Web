@@ -19,6 +19,7 @@ const {
 const navItems = [
   { title: "Trang chủ", path: "/" },
   { title: "Thước phim cộng đồng", path: "/video/public" },
+  { title: "Đăng ký dịch vụ", path: "/payment" },
 ];
 
 const isActive = (path: string) => localePath(route.path) === localePath(path);
