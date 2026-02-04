@@ -224,7 +224,7 @@ definePageMeta({ middleware: "auth" });
             </small>
 
             <small v-else>
-              <v-icon size="16" style="margin-bottom: 2px">
+              <v-icon size="15" style="margin-bottom: 2.8px">
                 mdi-lock-outline
               </v-icon>
               {{ item.createdAt }}
