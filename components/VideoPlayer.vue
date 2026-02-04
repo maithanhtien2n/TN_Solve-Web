@@ -111,12 +111,24 @@ onBeforeUnmount(() => {
 <template>
   <div
     class="video-wrapper"
-    :style="{ 'padding-top': frameRate === 'vertical' ? '177.78%' : '56.25%' }"
+    :class="{
+      portrait: frameRate === 'vertical',
+    }"
+    :style="{
+      // Luôn giữ chiều cao theo 16:9 để không bị dài khi dọc
+      'padding-top': '56.25%',
+      // Nếu dọc và có poster thì dùng poster làm nền (blur)
+      'background-image':
+        frameRate === 'vertical' && poster ? `url(${poster})` : '',
+    }"
   >
+    <!-- Lớp nền blur (chỉ khi dọc + có poster) -->
+    <div v-if="frameRate === 'vertical' && poster" class="bg-blur" />
+
     <div class="video-content">
       <v-skeleton-loader v-if="loading" style="width: 100%; height: 100%" />
 
-      <div :style="{ opacity: loading ? 0 : 1 }">
+      <div :style="{ opacity: loading ? 0 : 1, width: '100%', height: '100%' }">
         <video
           ref="videoPlayerRef"
           playsinline
@@ -134,6 +146,20 @@ onBeforeUnmount(() => {
   width: 100%;
   height: 0;
   overflow: hidden;
+  border-radius: 13px;
+  background: #000; /* fallback */
+  background-size: cover;
+  background-position: center;
+}
+
+.bg-blur {
+  position: absolute;
+  inset: 0;
+  background-image: inherit; /* lấy background-image từ video-wrapper */
+  background-size: cover;
+  background-position: center;
+  filter: blur(16px) brightness(0.75);
+  transform: scale(1.15);
 }
 
 .video-content {
@@ -142,5 +168,44 @@ onBeforeUnmount(() => {
   left: 0;
   width: 100%;
   height: 100%;
+}
+
+/* ✅ ép Plyr full size */
+.video-wrapper :deep(.plyr) {
+  width: 100%;
+  height: 100%;
+}
+
+.video-wrapper :deep(.plyr__video-wrapper) {
+  width: 100%;
+  height: 100%;
+}
+
+/* ✅ ép thẻ video luôn full khung */
+.video-wrapper :deep(video) {
+  width: 100% !important;
+  height: 100% !important;
+  display: block;
+}
+
+/* ✅ ngang = cover */
+.video-wrapper:not(.portrait) :deep(video) {
+  object-fit: cover !important;
+}
+
+/* ✅ dọc = contain để lộ nền blur */
+.video-wrapper.portrait :deep(video) {
+  object-fit: contain !important;
+  background: transparent !important;
+}
+
+/* bỏ nền đen mặc định của plyr wrapper */
+.video-wrapper :deep(.plyr__video-wrapper) {
+  background: transparent !important;
+}
+
+/* nếu plyr có poster overlay thì cũng để transparent */
+.video-wrapper :deep(.plyr__poster) {
+  background-color: transparent !important;
 }
 </style>

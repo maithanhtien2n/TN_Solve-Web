@@ -155,20 +155,49 @@ definePageMeta({ middleware: "auth" });
             v-if="item.state === 'success' && item.video"
             class="relative d-flex"
           >
-            <video
+            <!-- KHỔ DỌC -->
+            <div
+              class="video-wrapper cursor-pointer"
+              :style="{
+                width: width > 650 ? '160px' : '140px',
+                height: width > 650 ? '101.25px' : '90px',
+              }"
+            >
+              <!-- Video nền mờ -->
+              <video class="video-bg" preload="metadata" muted playsinline>
+                <source :src="item.video" type="video/mp4" />
+              </video>
+
+              <!-- Video chính -->
+              <video
+                :style="
+                  item.frameRate === 'Khổ ngang (16:9)'
+                    ? { 'object-fit': 'cover' }
+                    : {}
+                "
+                class="video-main"
+                preload="metadata"
+                muted
+                playsinline
+              >
+                <source :src="item.video" type="video/mp4" />
+              </video>
+            </div>
+
+            <!-- KHỔ NGANG -->
+            <!-- <video
               class="cursor-pointer bg-black"
               style="border-radius: 6px 0 0 6px"
               :key="item.video"
               :width="width > 650 ? 160 : 140"
               :height="width > 650 ? 101.25 : 90"
-              :style="
-                item.frameRate === 'Khổ ngang (16:9)'
-                  ? { 'object-fit': 'cover' }
-                  : {}
-              "
+              preload="metadata"
+              muted
+              playsinline
+              :style="{ objectFit: 'cover' }"
             >
               <source :src="item.video" type="video/mp4" />
-            </video>
+            </video> -->
 
             <span class="video-duration">
               {{ item.videoDuration }}
@@ -328,6 +357,7 @@ definePageMeta({ middleware: "auth" });
 
 .video-duration {
   right: 5px;
+  z-index: 9;
   bottom: 5px;
   color: #fff;
   font-size: 0.8rem;
@@ -340,5 +370,32 @@ definePageMeta({ middleware: "auth" });
 .video-card {
   color: inherit; /* Giữ nguyên màu chữ */
   text-decoration: none; /* Bỏ gạch chân */
+}
+
+.video-wrapper {
+  position: relative;
+  overflow: hidden;
+  border-radius: 6px 0 0 6px;
+  background: #000;
+}
+
+/* Video nền mờ */
+.video-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: blur(10px) brightness(0.75);
+  transform: scale(1.2); /* tránh viền mờ */
+}
+
+/* Video chính */
+.video-main {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  z-index: 1;
 }
 </style>

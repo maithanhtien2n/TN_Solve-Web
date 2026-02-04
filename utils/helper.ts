@@ -230,3 +230,63 @@ export function timeAgoVi(input: string, now: Date = new Date()): string {
   const absYear = Math.floor(absDay / 365);
   return `${absYear} năm ${suffix}`;
 }
+
+export async function getPosterFromVideoUrl(
+  videoUrl: string,
+  atSeconds = 0.1
+): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const video = document.createElement("video");
+    video.crossOrigin = "anonymous"; // chỉ có tác dụng nếu server video cho phép CORS
+    video.muted = true;
+    video.playsInline = true;
+    video.preload = "metadata";
+    video.src = videoUrl;
+
+    const cleanup = () => {
+      video.removeAttribute("src");
+      video.load();
+    };
+
+    video.addEventListener("error", () => {
+      cleanup();
+      reject(new Error("Không tải được video để tạo poster"));
+    });
+
+    video.addEventListener("loadedmetadata", () => {
+      // seek đến thời điểm cần chụp
+      const t = Math.min(
+        Math.max(atSeconds, 0),
+        Math.max(video.duration - 0.05, 0)
+      );
+      video.currentTime = t;
+    });
+
+    video.addEventListener("seeked", () => {
+      try {
+        const canvas = document.createElement("canvas");
+        const w = video.videoWidth;
+        const h = video.videoHeight;
+
+        // scale nhỏ cho nhẹ
+        const targetW = 480;
+        const targetH = Math.round((h / w) * targetW);
+
+        canvas.width = targetW;
+        canvas.height = targetH;
+
+        const ctx = canvas.getContext("2d");
+        if (!ctx) throw new Error("Không lấy được canvas context");
+
+        ctx.drawImage(video, 0, 0, targetW, targetH);
+
+        const dataUrl = canvas.toDataURL("image/jpeg", 0.85);
+        cleanup();
+        resolve(dataUrl);
+      } catch (e) {
+        cleanup();
+        reject(e);
+      }
+    });
+  });
+}
