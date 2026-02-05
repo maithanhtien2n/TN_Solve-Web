@@ -41,6 +41,7 @@ async function loadItems(event: any) {
     ...event,
     type: EnumMasterDataType.ACCOUNT_INFO,
     note: type.value,
+    limit: 100,
   };
 
   loading.value = "load-table";
