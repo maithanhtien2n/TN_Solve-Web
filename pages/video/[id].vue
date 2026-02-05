@@ -423,11 +423,11 @@ definePageMeta({ middleware: "auth" });
         </div>
 
         <h3 v-if="isMobile" class="font-bold mt-2" style="line-height: 1.6rem">
-          {{ formData.client ? "💻" : "🌐" }} {{ formData.title }}
+          {{ formData.title }}
         </h3>
 
         <h2 v-else class="font-bold mt-2">
-          {{ formData.client ? "💻" : "🌐" }} {{ formData.title }}
+          {{ formData.title }}
         </h2>
 
         <div
@@ -815,7 +815,7 @@ definePageMeta({ middleware: "auth" });
           :modelValue="videoFlow.value"
         />
         <div class="mt-2">
-          {{ videoFlow.title }}
+          {{ formData.client ? "💻" : "🌐" }} {{ videoFlow.title }}
         </div>
       </div>
 
