@@ -93,7 +93,11 @@ definePageMeta({ layout: "admin", title: "Lịch sử giao dịch" });
 <template>
   <ConfirmDialog ref="confirmDialogRef" />
 
-  <CommonDialog ref="commonDialogRef" title="Chi tiết" width="500">
+  <CommonDialog
+    ref="commonDialogRef"
+    :title="`Chi tiết doanh thu - ${data?.partnerInfo?.name}`"
+    width="500"
+  >
     <div class="d-flex flex-column ga-3" style="min-height: 24rem">
       <!-- Bank info -->
       <div class="d-flex flex-column ga-2">
@@ -102,21 +106,23 @@ definePageMeta({ layout: "admin", title: "Lịch sử giao dịch" });
         <div class="d-flex align-center justify-space-between">
           <span class="text-medium-emphasis">Ngân hàng</span>
           <span class="font-weight-medium">
-            {{ onGetBankName(data?.partnerInfo?.paymentInfo?.bankName) }}
+            {{
+              onGetBankName(data?.partnerInfo?.paymentInfo?.bankName) || "---"
+            }}
           </span>
         </div>
 
         <div class="d-flex align-center justify-space-between">
           <span class="text-medium-emphasis">Chủ tài khoản</span>
           <span class="font-weight-medium">
-            {{ data?.partnerInfo?.paymentInfo?.accountName }}
+            {{ data?.partnerInfo?.paymentInfo?.accountName || "---" }}
           </span>
         </div>
 
         <div class="d-flex align-center justify-space-between">
           <span class="text-medium-emphasis">Số tài khoản</span>
           <span class="font-weight-medium">
-            {{ data?.partnerInfo?.paymentInfo?.accountNumber }}
+            {{ data?.partnerInfo?.paymentInfo?.accountNumber || "---" }}
           </span>
         </div>
 
@@ -142,12 +148,15 @@ definePageMeta({ layout: "admin", title: "Lịch sử giao dịch" });
         >
           <v-img
             :src="data?.partnerInfo?.imageQR"
-            max-width="260"
+            max-width="300"
             aspect-ratio="1"
             cover
           >
             <template #placeholder>
-              <div class="d-flex align-center justify-center fill-height">
+              <div
+                v-if="data?.partnerInfo?.imageQR"
+                class="d-flex align-center justify-center fill-height"
+              >
                 <v-progress-circular
                   indeterminate
                   color="primary"
@@ -155,6 +164,8 @@ definePageMeta({ layout: "admin", title: "Lịch sử giao dịch" });
                   size="40"
                 />
               </div>
+
+              <v-img src="/images/no-image.jpg" aspect-ratio="1" cover />
             </template>
           </v-img>
         </v-sheet>

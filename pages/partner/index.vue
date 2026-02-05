@@ -9,7 +9,8 @@ const dashboard = computed(() => onGetterMasterData.value["dashboard"]);
 
 const onClickViewDashboardPartnerDetail = (id: string) => {
   if (userData.value?.role !== EnumAccountRole.ADMIN) return;
-  window.location.href = `https://tnsolve.com/partner?id=${id}`;
+  router.push(localePath(`/partner?id=${id}`));
+  // window.location.href = `https://tnsolve.com/partner?id=${id}`;
 };
 
 definePageMeta({ layout: "partner" });
@@ -180,7 +181,10 @@ definePageMeta({ layout: "partner" });
 
                 <template #title>
                   <span>{{ item.name }}</span>
-                  <small>{{ `${item.count} lượt giới thiệu` }}</small>
+                  <br />
+                  <small class="text-grey-darken-2">
+                    {{ `${item.count} lượt giới thiệu` }}
+                  </small>
                 </template>
 
                 <!-- <template #subtitle>

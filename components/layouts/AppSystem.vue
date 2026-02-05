@@ -72,6 +72,19 @@ const breadcrumbs = computed<any>(() => {
   ];
 });
 
+watch(
+  () => route.query.id,
+  (newValue) => {
+    if (newValue) {
+      onActionAllMasterDataClient({
+        type: "dashboard",
+        accountId:
+          userData.value?.role === EnumAccountRole.ADMIN ? newValue : null,
+      });
+    }
+  }
+);
+
 onMounted(async () => {
   try {
     await onActionGetUserData()
