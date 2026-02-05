@@ -33,7 +33,7 @@ const formData = reactive<any>({
   )} ${new Date().toLocaleTimeString()} ${new Date().toLocaleDateString()}`,
   value: "",
   frameRate: "horizontal",
-  modelVideo: "veo3_fast",
+  modelVideo: "veo3_fast_lower",
   videoMode: "movie",
   videoStyle: "general",
   videoDuration: "8",
