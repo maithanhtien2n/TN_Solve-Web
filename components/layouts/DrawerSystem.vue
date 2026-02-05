@@ -90,8 +90,16 @@ const menus = computed<any>(() => {
       route: "master-data",
       children: [
         {
-          title: "Tài khoản Veo3",
-          route: "/admin/master-data/account-veo3",
+          title: "Tài khoản Veo3 (Basic)",
+          route: "/admin/master-data/account-create-video-basic",
+        },
+        {
+          title: "Tài khoản Veo3 (Advanced)",
+          route: "/admin/master-data/account-create-video-advanced",
+        },
+        {
+          title: "Tài khoản Nano banana",
+          route: "/admin/master-data/account-create-image",
         },
       ],
     },

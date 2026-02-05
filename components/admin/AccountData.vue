@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { masterDataService } from "~/services/app";
 
+const route = useRoute();
+
 const headers = [
   { title: "Tên tài khoản", key: "title", sortable: false },
   { title: "Mật khẩu", key: "value", sortable: false },
@@ -19,13 +21,26 @@ const dataTableRef = ref<any>(null);
 const commonDialogRef = ref<any>(null);
 
 const formData = reactive({
-  accountVeo3: "",
+  accountInfo: "",
+});
+
+const type = computed(() => route.path?.split("/")?.pop() || "");
+
+const accountTitle = computed(() => {
+  if (type.value === "account-create-image") {
+    return "Tài khoản Nano banana";
+  } else if (type.value === "account-create-video-advanced") {
+    return "Tài khoản Veo3 (Advanced)";
+  } else {
+    return "Tài khoản Veo3 (Basic)";
+  }
 });
 
 async function loadItems(event: any) {
   const params = {
     ...event,
     type: EnumMasterDataType.ACCOUNT_INFO,
+    note: type.value,
   };
 
   loading.value = "load-table";
@@ -33,7 +48,7 @@ async function loadItems(event: any) {
     .getAllMasterData(params)
     .then((res) => {
       if (res.data) data.value = res.data;
-      formData.accountVeo3 = Array.isArray(data.value?.docs)
+      formData.accountInfo = Array.isArray(data.value?.docs)
         ? data.value.docs
             .map((doc: any) => {
               return `${doc.title}\n${doc.value}`;
@@ -56,7 +71,8 @@ const onClickUpdateData = async () => {
   loading.value = "submit";
   await masterDataService
     .updateAccountInfo({
-      accountVeo3: formData.accountVeo3,
+      accountInfo: formData.accountInfo,
+      note: type.value,
     })
     .then(() => {
       dataTableRef.value?.loadItems();
@@ -66,15 +82,13 @@ const onClickUpdateData = async () => {
       loading.value = "";
     });
 };
-
-definePageMeta({ layout: "admin", title: "Tài khoản Veo3" });
 </script>
 
 <template>
-  <CommonDialog ref="commonDialogRef" title="Tài khoản Veo3" width="500">
+  <CommonDialog ref="commonDialogRef" :title="accountTitle" width="500">
     <div class="d-flex flex-column ga-3" style="min-height: 24rem">
       <v-textarea
-        v-model="formData.accountVeo3"
+        v-model="formData.accountInfo"
         rows="2"
         auto-grow
         hide-details
