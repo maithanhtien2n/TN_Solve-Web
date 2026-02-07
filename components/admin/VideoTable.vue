@@ -243,7 +243,7 @@ const onChangeFilter = (event: any) => {
     @change-filter="onChangeFilter"
   >
     <template #row-title="{ item }">
-      <div class="d-flex flex-column ga-1 py-4" style="max-width: 30rem">
+      <div class="d-flex flex-column ga-1 py-4" style="max-width: 20rem">
         <span style="min-width: 14rem">
           {{ `${(item as any)?.client ? "💻" : "🌐"} ${(item as any).title}` }}
         </span>
