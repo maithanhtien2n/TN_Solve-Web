@@ -261,8 +261,13 @@ const onChangeFilter = (event: any) => {
             {{ (item as any)?.lastMessage?.note }}
           </div>
 
-          <div v-if="(item as any)?.lastMessage?.errorMsg" class="text-red">
-            {{ (item as any)?.lastMessage?.errorMsg }}
+          <div class="text-red">
+            <div
+              v-if="(item as any)?.lastMessage?.errorMsg"
+              class="text-caption"
+            >
+              {{ (item as any)?.lastMessage?.errorMsg }}
+            </div>
           </div>
         </div>
 
