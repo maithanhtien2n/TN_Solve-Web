@@ -45,11 +45,11 @@ const menus = computed(() => {
         ? "mdi-calendar-sync"
         : "mdi-tag-plus-outline",
     },
-    {
-      title: "Mua tín dụng",
-      value: "buy-credit",
-      icon: "mdi-credit-card-outline",
-    },
+    // {
+    //   title: "Mua tín dụng",
+    //   value: "buy-credit",
+    //   icon: "mdi-credit-card-outline",
+    // },
     {
       title: "Cài đặt",
       value: "setting",
