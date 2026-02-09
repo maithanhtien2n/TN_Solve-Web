@@ -121,6 +121,20 @@ const videoStyleOptions = computed(() => {
         ].includes(x.value)
       );
     }
+    case "sync_process":
+    case "custom_process": {
+      return list.filter((x: any) =>
+        [
+          "general",
+          "slow_zoom",
+          "tracking",
+          "walkthrough",
+          "top_down",
+          "cutaway",
+          "exploded_view",
+        ].includes(x.value)
+      );
+    }
     case "my_subject": {
       return list.filter((x: any) =>
         ["general", "testimonial"].includes(x.value)
@@ -165,9 +179,11 @@ const videoDurationOptions = computed(() => {
     [
       "character_preservation",
       "scene_consistency",
+      "sync_process",
       "my_subject",
       "custom_character",
       "custom_scenes",
+      "custom_process",
     ].includes(formData.videoMode)
   ) {
     const shortVideoValues = ["1", "2", "3", "4", "5", "6", "7", "8"];
@@ -256,7 +272,9 @@ const onGetProductDetail = async (loadingType: string = "") => {
 
         setTimeout(() => {
           if (
-            ["custom_character", "custom_scenes"].includes(formData.videoMode)
+            ["custom_character", "custom_scenes", "custom_process"].includes(
+              formData.videoMode
+            )
           ) {
             uploadImageRefs.value.forEach((ref, index) => {
               ref?.setValue(data.images[index]);
@@ -284,9 +302,12 @@ const onSubmit = async () => {
   if (productId.value) formData._id = productId.value;
 
   if (
-    !["my_subject", "custom_character", "custom_scenes"].includes(
-      formData.videoMode
-    )
+    ![
+      "my_subject",
+      "custom_character",
+      "custom_scenes",
+      "custom_process",
+    ].includes(formData.videoMode)
   ) {
     delete formData.images;
   }
@@ -555,9 +576,11 @@ definePageMeta({ middleware: "auth" });
 
             <v-col
               v-else-if="
-                ['custom_character', 'custom_scenes'].includes(
-                  formData.videoMode
-                )
+                [
+                  'custom_character',
+                  'custom_scenes',
+                  'custom_process',
+                ].includes(formData.videoMode)
               "
               cols="12"
             >
@@ -728,7 +751,9 @@ definePageMeta({ middleware: "auth" });
 
           <v-col
             v-else-if="
-              ['custom_character', 'custom_scenes'].includes(formData.videoMode)
+              ['custom_character', 'custom_scenes', 'custom_process'].includes(
+                formData.videoMode
+              )
             "
             cols="12"
           >
@@ -789,6 +814,8 @@ definePageMeta({ middleware: "auth" });
                   (formData.videoMode === 'custom_character' && uploadImageRefs.filter((item: any) => item)
                     .some((ref: any) => !ref?.base64)) ||
                   (formData.videoMode === 'custom_scenes' && uploadImageRefs.filter((item: any) => item)
+                    .some((ref: any) => !ref?.base64)) ||
+                  (formData.videoMode === 'custom_process' && uploadImageRefs.filter((item: any) => item)
                     .some((ref: any) => !ref?.base64)),
               }"
               @click="onSubmit()"
