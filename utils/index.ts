@@ -1,7 +1,6 @@
 import { useWindowSize, useLocalStorage } from "@vueuse/core";
 
 export const referralId = useLocalStorage<string>("referralId", "");
-export const veo3Info = useLocalStorage<string>("veo3Info", "");
 
 export const GOOGLE_CLIENT_ID =
   "396019793466-q7fs9crp5bop6ui642elijh8hpf8f7ck.apps.googleusercontent.com";

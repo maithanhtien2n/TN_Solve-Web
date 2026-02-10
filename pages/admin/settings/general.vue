@@ -55,6 +55,11 @@ const onClickAction = async (action: string, data?: any | null) => {
         break;
       }
 
+      case "delete_profile_when_open_app": {
+        await masterDataService.settingAction({ _id: data._id });
+        break;
+      }
+
       case "scene_creation_mode": {
         await masterDataService.settingAction({ _id: data._id });
         break;
@@ -111,6 +116,14 @@ definePageMeta({ layout: "admin", title: "Thông tin chung" });
       </template>
 
       <template v-else-if="(item as any).title === 'Hiển thị trình duyệt'">
+        <span v-if="(item as any).value" class="text-green text-nowrap">
+          Cho phép
+        </span>
+
+        <span v-else class="text-red text-nowrap">Không cho phép</span>
+      </template>
+
+      <template v-else-if="(item as any).title === 'Xóa hồ sơ khi mở ứng dụng'">
         <span v-if="(item as any).value" class="text-green text-nowrap">
           Cho phép
         </span>
@@ -182,6 +195,18 @@ definePageMeta({ layout: "admin", title: "Thông tin chung" });
             class="my-1"
             :model-value="Boolean((item as any).value)"
             @click="onClickAction('show_browser', item)"
+          />
+        </template>
+
+        <template
+          v-else-if="(item as any).title === 'Xóa hồ sơ khi mở ứng dụng'"
+        >
+          <v-checkbox
+            readonly
+            hide-details
+            class="my-1"
+            :model-value="Boolean((item as any).value)"
+            @click="onClickAction('delete_profile_when_open_app', item)"
           />
         </template>
 
