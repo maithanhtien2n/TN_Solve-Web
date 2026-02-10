@@ -121,8 +121,7 @@ const videoStyleOptions = computed(() => {
         ].includes(x.value)
       );
     }
-    case "sync_process":
-    case "custom_process": {
+    case "sync_process": {
       return list.filter((x: any) =>
         [
           "general",
@@ -145,7 +144,8 @@ const videoStyleOptions = computed(() => {
         ["general", "advertising"].includes(x.value)
       );
     }
-    case "custom_scenes": {
+    case "custom_scenes":
+    case "custom_process": {
       return list.filter((x: any) =>
         [
           "general",
