@@ -59,6 +59,14 @@ const onClickAction = async (action: string, data?: any | null) => {
         await masterDataService.settingAction({ _id: data._id });
         break;
       }
+
+      case "run_in_browser": {
+        await masterDataService.settingAction({
+          _id: data._id,
+          value: data.value,
+        });
+        break;
+      }
     }
 
     dataTableRef.value?.loadItems();
@@ -120,6 +128,23 @@ definePageMeta({ layout: "admin", title: "Thông tin chung" });
         </span>
       </template>
 
+      <template v-else-if="(item as any).title === 'Chạy trên trình duyệt'">
+        <span v-if="(item as any).value === 'auto'" class="text-nowrap">
+          Tự động
+        </span>
+
+        <span v-else-if="(item as any).value === 'profile'" class="text-nowrap">
+          Có hồ sơ
+        </span>
+
+        <span
+          v-else-if="(item as any).value === 'anonymous'"
+          class="text-nowrap"
+        >
+          Ẩn danh
+        </span>
+      </template>
+
       <span v-else>{{ (item as any).value }}</span>
     </template>
 
@@ -173,6 +198,24 @@ definePageMeta({ layout: "admin", title: "Thông tin chung" });
                 { title: 'Trình duyệt', value: 'browser' },
               ]"
               @update:model-value="onClickAction('scene_creation_mode', item)"
+            />
+          </div>
+        </template>
+
+        <template v-else-if="(item as any).title === 'Chạy trên trình duyệt'">
+          <div>
+            <v-select
+              v-model="(item as any).value"
+              hide-details
+              density="compact"
+              variant="outlined"
+              class="my-4 w-10rem"
+              :items="[
+                { title: 'Tự động', value: 'auto' },
+                { title: 'Có hồ sơ', value: 'profile' },
+                { title: 'Ẩn danh', value: 'anonymous' },
+              ]"
+              @update:model-value="onClickAction('run_in_browser', item)"
             />
           </div>
         </template>
