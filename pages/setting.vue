@@ -128,7 +128,7 @@ definePageMeta({ middleware: "auth" });
 
     <v-col v-if="client" cols="12">
       <div>
-        <h3>{{ $t("Tài khoản veo3 cá nhân") }}</h3>
+        <h3 class="font-bold">{{ $t("Tài khoản veo3 cá nhân") }}</h3>
         <span class="text-caption">
           {{
             $t(
