@@ -129,13 +129,13 @@ definePageMeta({ middleware: "auth" });
     <v-col v-if="client" cols="12">
       <div>
         <h3>{{ $t("Tài khoản veo3 cá nhân") }}</h3>
-        <small>
+        <span class="text-caption">
           {{
             $t(
               "Sử dụng tài khoản veo3 của bạn để tạo video, giúp tăng tốc độ tạo video và tránh giới hạn từ tài khoản dùng chung."
             )
           }}
-        </small>
+        </span>
 
         <div
           v-if="existsAccount"
