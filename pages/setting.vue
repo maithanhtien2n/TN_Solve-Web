@@ -6,6 +6,7 @@ const { t } = useI18n();
 const { onGetterUserData, onActionGetUserData } = useAppStore();
 
 const loading = ref<boolean>(false);
+const existsAccount = ref<boolean>(false);
 
 const userData = computed(() => onGetterUserData.value || {});
 
@@ -34,12 +35,61 @@ const onSubmit = async () => {
     });
 };
 
+const disabledAction = ref<boolean>(false);
+const onClickLoginAccount = async () => {
+  if (client.value && (window as any)?.electronAPI) {
+    try {
+      disabledAction.value = true;
+      await (window as any)?.electronAPI?.loginAccount({
+        accountId: userData.value._id,
+      });
+      const existsAcc = await (window as any).electronAPI?.getAccount();
+      existsAccount.value = existsAcc;
+    } catch (error) {
+      console.error("Lỗi lấy version:", error);
+    } finally {
+      disabledAction.value = false;
+    }
+  }
+};
+
+const onClickDeleteAccount = async () => {
+  if (client.value && (window as any)?.electronAPI) {
+    try {
+      disabledAction.value = true;
+      await (window as any).electronAPI?.closeAccount();
+      await (window as any)?.electronAPI?.deleteAccount({
+        accountId: userData.value._id,
+      });
+      const existsAcc = await (window as any).electronAPI?.getAccount();
+      existsAccount.value = existsAcc;
+    } catch (error) {
+      console.error("Lỗi lấy version:", error);
+    } finally {
+      disabledAction.value = false;
+    }
+  }
+};
+
 watch(userData, (newValue) => {
   formData.useMyAccount = newValue.settings?.useMyAccount || false;
   formData.safeMode = newValue.settings?.safeMode || false;
   formData.flowCookies = newValue.settings?.flowCookies || "";
   formData.geminiCookies = newValue.settings?.geminiCookies || "";
   formData.isCreateSpeed = newValue.settings?.isCreateSpeed || false;
+});
+
+onMounted(async () => {
+  try {
+    const existsAcc = await (window as any).electronAPI?.getAccount();
+    existsAccount.value = existsAcc;
+  } catch (error) {
+    console.error("Lỗi lấy version:", error);
+  }
+});
+
+onUnmounted(() => {
+  (window as any).electronAPI?.closeAccount();
 });
 
 useSeo({
@@ -65,7 +115,7 @@ definePageMeta({ middleware: "auth" });
       />
     </v-col> -->
 
-    <v-col cols="12">
+    <!-- <v-col cols="12">
       <div>
         <v-checkbox
           v-model="formData.safeMode"
@@ -73,6 +123,35 @@ definePageMeta({ middleware: "auth" });
           :label="$t('Chế độ tạo video an toàn')"
           style="margin-left: -10px; margin-top: -1rem; margin-bottom: -10px"
         />
+      </div>
+    </v-col> -->
+
+    <v-col v-if="client" cols="12">
+      <div>
+        <h3>{{ $t("Sử dụng tài khoản veo3 cá nhân") }}</h3>
+        <p>
+          {{
+            $t(
+              "Sử dụng tài khoản veo3 của bạn để tạo video, giúp tăng tốc độ tạo video và tránh giới hạn từ tài khoản dùng chung."
+            )
+          }}
+        </p>
+
+        <div
+          v-if="existsAccount"
+          class="mt-3 d-flex align-center"
+          :class="{ disabled: disabledAction }"
+        >
+          <span class="text-red cursor-pointer" @click="onClickDeleteAccount">
+            {{ $t("Xóa tài khoản Veo3") }}
+          </span>
+        </div>
+
+        <div v-else class="mt-3" :class="{ disabled: disabledAction }">
+          <span class="text-blue cursor-pointer" @click="onClickLoginAccount">
+            {{ $t("Đăng nhập tài khoản Veo3") }}
+          </span>
+        </div>
       </div>
     </v-col>
 
@@ -123,7 +202,7 @@ definePageMeta({ middleware: "auth" });
       </div>
     </v-col> -->
 
-    <v-col cols="12" lg="3" md="4" class="mt-6">
+    <!-- <v-col cols="12" lg="3" md="4" class="mt-6">
       <div
         class="cta-button w-100 justify-center"
         style="border-radius: 6px"
@@ -141,6 +220,6 @@ definePageMeta({ middleware: "auth" });
 
         <h3>{{ $t("Lưu cài đặt") }}</h3>
       </div>
-    </v-col>
+    </v-col> -->
   </v-row>
 </template>
