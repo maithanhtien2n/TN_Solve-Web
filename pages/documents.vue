@@ -22,6 +22,11 @@ const documents = [
     value:
       "https://gemini.google.com/gem/1k-GUzKKA-pB_Xrc0sqAWRqLdtVKMvbFJ?usp=sharing",
   },
+  {
+    title: "🚀 Giải Pháp Tạo Video Timelapse Thông Minh",
+    value:
+      "https://gemini.google.com/gem/1HvNrJ2DLWd0PL_PJ3bJbqyjt_2_GlT9f?usp=sharing",
+  },
 ];
 
 const onClickDocument = (item: any) => {
