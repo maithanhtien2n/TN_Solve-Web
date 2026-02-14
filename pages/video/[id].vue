@@ -62,10 +62,9 @@ const isError = computed(() =>
 const modelVideoOptions = computed(() => {
   let list = onGetterMasterData.value["model-video"] || [];
 
-  // Tạm ẩn mô hình vip
-  if (onGetterUserData.value?.role !== EnumAccountRole.ADMIN) {
-    list = list?.filter((x: any) => !["tn_solve_1"].includes(x.value));
-  }
+  // if (onGetterUserData.value?.role !== EnumAccountRole.ADMIN) {
+  //   list = list?.filter((x: any) => !["tn_solve_1"].includes(x.value));
+  // }
 
   return list;
 });
