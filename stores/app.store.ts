@@ -12,11 +12,15 @@ export const useAppStore = defineStore("app", () => {
   const displayLogin = ref<boolean>(false);
   const userData = ref<any>(undefined);
 
+  const hasPlayed = ref<boolean>(false);
+
   const onGetterDisplayPopupBuyCredit = computed(() => displayPopupBuyCredit);
   const onGetterLoading = computed(() => loading);
   const onGetterSystemPopup = computed(() => systemPopup);
   const onGetterDisplayLogin = computed(() => displayLogin);
   const onGetterUserData = computed(() => userData);
+
+  const onGetterHasPlayed = computed(() => hasPlayed);
 
   const onActionSetSystemPopup = (payload: any) => {
     systemPopup.value = {
@@ -43,6 +47,8 @@ export const useAppStore = defineStore("app", () => {
     onGetterSystemPopup,
     onGetterDisplayLogin,
     onGetterUserData,
+
+    onGetterHasPlayed,
 
     onActionSetSystemPopup,
     onActionGetUserData,

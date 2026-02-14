@@ -126,7 +126,7 @@ const onClickMenuItem = (value: string) => {
       <div class="d-flex align-center justify-space-between ga-3">
         <div class="d-flex align-center">
           <v-img
-            src="/images/tn-solve-logo.png"
+            src="/images/tn-solve-tet-logo.png"
             lazy-src="/images/tn-solve-logo.png"
             :class="`${
               isMobile ? 'w-6rem' : 'w-8rem'
