@@ -318,6 +318,10 @@ useSeo({
   overflow: hidden;
   border-radius: 6px 0 0 6px;
   background: #000;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-image: url("/images/video-loading.jpg");
 }
 
 /* Video nền mờ */
