@@ -8,11 +8,11 @@ const { t } = useI18n();
 const { onGetterMasterData } = useMasterDataStore();
 
 const headers = [
-  { title: "Họ và tên", key: "accountId.name", sortable: false },
+  { title: "Thông tin khách hàng", key: "customerInfo", sortable: false },
   { title: "Chi tiết gói", key: "note", sortable: false },
+  { title: "Người giới thiệu", key: "referral.name", sortable: false },
   { title: "Ngày bắt đầu", key: "serviceStartDate", sortable: false },
   { title: "Ngày hết hạn", key: "serviceExpiry", sortable: false },
-  // { title: "Thời hạn đăng ký", key: "rentalMonths", sortable: false },
   { title: "Giá gói", key: "basePrice", align: "end", sortable: false },
   { title: "Thành tiền", key: "price", align: "end", sortable: false },
   { title: "Cập nhật", key: "updatedAt", sortable: false },
