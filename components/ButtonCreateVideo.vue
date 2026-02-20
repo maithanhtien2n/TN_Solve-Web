@@ -3,18 +3,19 @@ const router = useRouter();
 const localePath = useLocalePath();
 
 // ----------
-const { onGetterHasPlayed } = useAppStore();
+// const { onGetterHasPlayed } = useAppStore();
 
 const handleClick = async () => {
-  if (!onGetterHasPlayed.value) {
-    onGetterHasPlayed.value = true;
+  // Âm thanh chúc tết chỉ phát lần đầu tiên người dùng nhấn vào nút tạo video
+  // if (!onGetterHasPlayed.value) {
+  //   onGetterHasPlayed.value = true;
 
-    const audio = new Audio("/audio/intro.wav");
+  //   const audio = new Audio("/audio/intro.wav");
 
-    try {
-      await audio.play();
-    } catch (e) {}
-  }
+  //   try {
+  //     await audio.play();
+  //   } catch (e) {}
+  // }
 
   router.push(localePath("/video/create"));
 };

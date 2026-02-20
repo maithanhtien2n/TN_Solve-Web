@@ -194,7 +194,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <TetFireworksIntro />
+  <!-- <TetFireworksIntro /> -->
 
   <AppLoading v-if="loading || !breadcrumbsItems || !breadcrumbsItems.length" />
 
