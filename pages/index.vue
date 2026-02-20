@@ -126,9 +126,10 @@ useSeo({
         📢 Cập nhật tin tức, tính năng mới mỗi ngày
       </span>
 
-      <div>
+      <div :style="{ 'font-size': isMobile ? '1rem' : '1.2rem' }">
+        Nhóm Zalo:
         <a target="_blank" href="https://zalo.me/g/tuhmrl934">
-          Tham gia nhóm Zalo Tool AI TN Solve
+          https://zalo.me/g/tuhmrl934
         </a>
       </div>
     </div>
