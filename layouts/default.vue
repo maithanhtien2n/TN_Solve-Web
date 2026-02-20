@@ -17,7 +17,8 @@ const {
   onGetterDisplayPopupBuyCredit,
   onGetterDisplayLogin: displayLogin,
 } = useAppStore();
-const { onActionAllMasterDataClient } = useMasterDataStore();
+const { onGetterMasterData, onActionAllMasterDataClient } =
+  useMasterDataStore();
 
 const loading = ref(true);
 const commonDialogRef = ref<any>(null);
@@ -32,6 +33,10 @@ const pathArray = computed(() => {
   const filteredParts = parts.filter((i) => i);
   return filteredParts.slice(1);
 });
+
+const appVersionDownload = computed(
+  () => onGetterMasterData.value["app-version"] || ""
+);
 
 const onReturnTitle = (title: string) => {
   switch (title) {
@@ -179,6 +184,14 @@ onMounted(async () => {
       });
 
     await onActionAllMasterDataClient({ type: "app-version", download: true });
+
+    if (
+      userData.value?.role &&
+      userData.value?.role !== EnumAccountRole.ADMIN &&
+      !isMobile.value
+    ) {
+      commonDialogRef.value?.onDisplay(!client.value);
+    }
   } catch (error) {
     console.error(error);
   } finally {
@@ -194,8 +207,6 @@ onMounted(async () => {
 </script>
 
 <template>
-  <!-- <TetFireworksIntro /> -->
-
   <AppLoading v-if="loading || !breadcrumbsItems || !breadcrumbsItems.length" />
 
   <v-app>
@@ -216,59 +227,45 @@ onMounted(async () => {
 
         <div class="text-body-1 line-height-relaxed text-grey-darken-3">
           <p class="mb-4">
-            Để tối ưu hóa việc <strong>tạo Video AI tự động</strong> và vượt qua
-            cơ chế quét IP nghiêm ngặt của hệ thống <strong>VEO3</strong>, chúng
-            tôi đã phát hành phiên bản ứng dụng cài đặt trực tiếp trên máy tính.
+            Để tối ưu tốc độ <strong>tạo Video AI tự động</strong> và đảm bảo hệ
+            thống hoạt động <strong>ổn định</strong>, chúng tôi đã phát hành
+            phiên bản công cụ <strong>cài đặt trực tiếp trên máy tính</strong>.
           </p>
 
-          <v-alert type="info" variant="tonal" border="start" class="mb-4">
-            <strong>Giải pháp:</strong> Sử dụng công cụ chạy trên máy cá nhân
-            giúp tạo định danh IP riêng biệt, đảm bảo an toàn tuyệt đối cho tài
-            khoản và duy trì tính ổn định cao nhất khi xử lý video.
+          <v-alert type="warning" variant="tonal" border="start" class="mb-4">
+            <strong>Khuyến nghị:</strong> Sử dụng công cụ chạy trên máy cá nhân
+            giúp hạn chế gián đoạn, giảm lỗi khi xử lý video và đảm bảo trải
+            nghiệm ổn định nhất trong quá trình sử dụng.
           </v-alert>
 
-          <p class="text-body-2 text-grey-darken-1 mb-4 text-center">
-            <i>
-              (Hỗ trợ định dạng <strong>.exe</strong> cho Windows và
-              <strong>.dmg</strong> cho MacBook)
-            </i>
-          </p>
+          <!-- <p class="text-body-2 text-grey-darken-1 mb-4 text-center">
+            <i>(Hỗ trợ <strong>.exe</strong> cho Windows)</i>
+          </p> -->
         </div>
 
-        <v-divider class="my-6"></v-divider>
+        <v-divider class="my-10"></v-divider>
 
         <div class="d-flex flex-column gap-3">
-          <v-btn
-            color="primary"
-            size="large"
-            prepend-icon="mdi-download"
-            block
-            variant="flat"
-            class="text-none mb-3"
-            href="https://github.com/maithanhtien2n/tnsolve_release/releases"
+          <a
+            class="download-btn justify-center"
+            :href="appVersionDownload"
             target="_blank"
+            rel="noopener"
           >
-            Tải Công Cụ TN SOLVE
-          </v-btn>
+            <v-icon size="22" class="icon-win">mdi-microsoft-windows</v-icon>
+            <span :style="{ 'font-size': isMobile ? '1rem' : '1.2rem' }">
+              Tải công cụ TN Solve cho Windows
+            </span>
+          </a>
 
-          <v-btn
-            variant="outlined"
-            color="secondary"
-            size="large"
-            prepend-icon="mdi-book-open-variant"
-            block
-            class="text-none"
+          <!-- <a
+            target="_blank"
             href="https://youtube.com/shorts/NasjgxOiTXY?si=EvCKjKwMthEC73Zv"
-            target="_blank"
+            class="text-center mt-3"
           >
-            Xem Hướng Dẫn Cài Đặt
-          </v-btn>
+            Xem Video Hướng Dẫn Cài Đặt
+          </a> -->
         </div>
-
-        <p class="text-caption text-center text-grey mt-4">
-          * Vui lòng cài đặt phiên bản Local để tránh bị gián đoạn do quét IP
-          máy chủ.
-        </p>
       </v-card-text>
     </CommonDialog>
 

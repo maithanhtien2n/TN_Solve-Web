@@ -283,49 +283,4 @@ useSeo({
   color: #475569; /* đỡ mờ */
   line-height: 1.6;
 }
-
-/* Button */
-.download-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-
-  padding: 11px 16px;
-  border-radius: 12px;
-
-  font-size: 15px;
-  font-weight: 500;
-
-  border: 1.5px solid #0984e3;
-  background: #f8fafc;
-  color: #0984e3;
-
-  text-decoration: none;
-  cursor: pointer;
-
-  transition: all 0.15s ease;
-}
-
-.download-btn:hover {
-  background: #eff6ff;
-  border-color: #0984e3;
-}
-
-/* Windows icon */
-.icon-win {
-  color: #0984e3;
-}
-
-/* Mobile */
-@media (max-width: 640px) {
-  .download-wrap {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .download-btn {
-    justify-content: center;
-    width: 100%;
-  }
-}
 </style>
