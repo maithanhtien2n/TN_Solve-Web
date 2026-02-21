@@ -104,27 +104,33 @@ export function useSeo({
 }) {
   const config = useRuntimeConfig();
   const siteUrl = config.public.siteUrl;
-
-  // 👇 Lấy path hiện tại từ Nuxt
   const route = useRoute();
-  const url = siteUrl + route.fullPath;
+
+  const isHome = route.name?.toString().startsWith("index");
+
+  const fullTitle = isHome ? "TN Solve" : title;
+  const url = new URL(route.fullPath, siteUrl).toString();
+  const ogImage = image || `${siteUrl}/default-og.jpg`;
 
   useHead({
-    title,
+    title: fullTitle,
+    titleTemplate: isHome ? null : "%s | TN Solve",
+
     meta: [
       { name: "description", content: description },
-      { property: "og:title", content: title },
+
+      { property: "og:title", content: fullTitle },
       { property: "og:description", content: description },
       { property: "og:type", content: "website" },
       { property: "og:url", content: url },
-      { property: "og:image", content: image || `${siteUrl}/default-og.jpg` },
+      { property: "og:image", content: ogImage },
 
-      // optional: Twitter Card
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: title },
+      { name: "twitter:title", content: fullTitle },
       { name: "twitter:description", content: description },
-      { name: "twitter:image", content: image || `${siteUrl}/default-og.jpg` },
+      { name: "twitter:image", content: ogImage },
     ],
+
     link: [{ rel: "canonical", href: url }],
   });
 }
