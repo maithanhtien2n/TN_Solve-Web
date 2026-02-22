@@ -27,6 +27,8 @@ const onClickNavigate = (value: string) => {
       window.open("https://zalo.me/0343027232", "_blank");
     } else if (value === "zalo-group") {
       window.open("https://zalo.me/g/tuhmrl934", "_blank");
+    } else if (value === "facebook-group") {
+      window.open("https://www.facebook.com/groups/1175744533986396", "_blank");
     } else {
       router.push(localePath(`/${value}`));
     }
@@ -95,16 +97,20 @@ onMounted(async () => {
                   <a
                     v-for="(item, index) in [
                       { title: 'Chính sách', value: 'terms' },
-                      ...(version
-                        ? []
-                        : [
-                            {
-                              title: 'Tải công cụ về máy',
-                              value: 'download-tool',
-                            },
-                          ]),
+                      // ...(version
+                      //   ? []
+                      //   : [
+                      //       {
+                      //         title: 'Tải công cụ về máy',
+                      //         value: 'download-tool',
+                      //       },
+                      //     ]),
                       { title: 'Liên hệ admin (zalo)', value: 'contact' },
                       { title: 'Tham gia nhóm (zalo)', value: 'zalo-group' },
+                      {
+                        title: 'Tham gia nhóm (facebook)',
+                        value: 'facebook-group',
+                      },
                     ]"
                     :key="index"
                     class="cursor-pointer"
@@ -127,7 +133,7 @@ onMounted(async () => {
                     class="d-flex align-center ga-2"
                   >
                     <img src="/images/icon-tiktok.png" style="width: 1.3rem" />
-                    <span style="margin-bottom: 2.6px">@tnsolve</span>
+                    <span style="margin-bottom: 2.6px">TN Solve</span>
                   </a>
 
                   <a
@@ -136,7 +142,19 @@ onMounted(async () => {
                     class="d-flex align-center ga-2"
                   >
                     <img src="/images/icon-youtube.png" style="width: 1.3rem" />
-                    <span style="margin-bottom: 2.6px">@tiencodeweb</span>
+                    <span style="margin-bottom: 2.6px">Tien Code Web</span>
+                  </a>
+
+                  <a
+                    target="_blank"
+                    href="https://www.facebook.com/profile.php?id=61581457633919"
+                    class="d-flex align-center ga-2"
+                  >
+                    <img
+                      src="/images/icon-facebook.png"
+                      style="width: 1.3rem"
+                    />
+                    <span style="margin-bottom: 2.6px">Tien Code Web</span>
                   </a>
 
                   <a
