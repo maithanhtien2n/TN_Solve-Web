@@ -3,6 +3,8 @@ import { masterDataService } from "~/services/app";
 
 const route = useRoute();
 
+const props = defineProps({ accountId: { type: String, default: "" } });
+
 const headers = [
   { title: "Tên tài khoản", key: "title", sortable: false },
   { title: "Mật khẩu", key: "value", sortable: false },
@@ -24,21 +26,26 @@ const formData = reactive({
   accountInfo: "",
 });
 
-const type = computed(() => route.path?.split("/")?.pop() || "");
+const type = computed(() =>
+  props.accountId ? props.accountId : route.path?.split("/")?.pop() || ""
+);
 
 const accountTitle = computed(() => {
   if (type.value === "account-create-image") {
     return "Tài khoản Nano banana";
   } else if (type.value === "account-create-video-advanced") {
     return "Tài khoản Veo3 (Advanced)";
-  } else {
+  } else if (type.value === "account-create-video-basic") {
     return "Tài khoản Veo3 (Basic)";
+  } else {
+    return "Tài nguyên của tôi";
   }
 });
 
 async function loadItems(event: any) {
   const params = {
     ...event,
+    isMyAccount: Boolean(props.accountId),
     type: EnumMasterDataType.ACCOUNT_INFO,
     note: type.value,
     limit: 100,
@@ -74,10 +81,21 @@ const onClickUpdateData = async () => {
     .updateAccountInfo({
       accountInfo: formData.accountInfo,
       note: type.value,
+      isMyAccount: Boolean(props.accountId),
     })
     .then(() => {
       dataTableRef.value?.loadItems();
       commonDialogRef.value?.onDisplay(false);
+
+      if (
+        props.accountId &&
+        (window as any)?.electronAPI &&
+        (window as any)?.electronAPI?.cleanProfile
+      ) {
+        (window as any).electronAPI.cleanProfile({
+          accountId: props.accountId,
+        });
+      }
     })
     .finally(() => {
       loading.value = "";

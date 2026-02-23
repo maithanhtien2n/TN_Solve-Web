@@ -7,7 +7,11 @@ export const masterDataService = {
   },
 
   async getAllMasterData(params: any) {
-    return await api.get(`/master-data/admin/${params.type}`, { params });
+    if (params.isMyAccount) {
+      return await api.get(`/common/get-account-info`, { params });
+    } else {
+      return await api.get(`/master-data/admin/${params.type}`, { params });
+    }
   },
 
   async getMasterDataChild(params: any) {
@@ -44,7 +48,14 @@ export const masterDataService = {
   },
 
   async updateAccountInfo(payload: any) {
-    return await api.post(`/common/update-account-info`, payload);
+    if (payload.isMyAccount) {
+      return await api.post(`/common/save-account-info`, {
+        accountInfo: payload.accountInfo,
+      });
+    } else {
+      delete payload.isMyAccount;
+      return await api.post(`/common/update-account-info`, payload);
+    }
   },
 
   async getSettingGeneral(params: any) {

@@ -272,7 +272,7 @@ defineExpose({ params, selected, loadItems, resetSelected });
     <template #top>
       <div v-if="!hideSearch" class="mb-3 d-flex flex-column ga-3">
         <v-row dense>
-          <v-col v-if="!isMobile" cols="12" lg="5">
+          <v-col v-if="!isMobile" cols="12" lg="5" md="5" sm="5">
             <div class="d-flex ga-2">
               <v-text-field
                 v-model="params.search"
@@ -300,7 +300,7 @@ defineExpose({ params, selected, loadItems, resetSelected });
             </div>
           </v-col>
 
-          <v-col cols="12" lg="7" md="7">
+          <v-col cols="12" lg="7" md="7" sm="7">
             <slot name="action">
               <v-row v-if="props.actions?.length" dense>
                 <div class="flex-1" />
@@ -391,7 +391,7 @@ defineExpose({ params, selected, loadItems, resetSelected });
             </slot>
           </v-col>
 
-          <v-col v-if="isMobile" cols="12" lg="5">
+          <v-col v-if="isMobile" cols="12" lg="5" md="5" sm="5">
             <div class="d-flex ga-2">
               <v-text-field
                 v-model="params.search"
