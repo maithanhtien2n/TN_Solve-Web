@@ -17,6 +17,16 @@ const documents = [
       "https://gemini.google.com/gem/1ovviMlY7omu3CBx1jgj97oy1q-EpT0UG?usp=sharing",
   },
   {
+    title: "✨ Đạo Diễn Hiệu Ứng Pháo Hoa POV",
+    value:
+      "https://gemini.google.com/gem/1VT0_eNcuQBNLw3OOb0yxnuLTvHG9rv-s?usp=sharing",
+  },
+  {
+    title: "🎭 Đạo Diễn Nhân Vật Hóa (Đồ Vật Biết Nói)",
+    value:
+      "https://gemini.google.com/gem/19V5yizpIG9fp5hfjROVBxkV-EkYab5mv?usp=sharing",
+  },
+  {
     title: "💚 Xây dựng video nhân hoá nhân vật về sức khỏe",
     value:
       "https://gemini.google.com/gem/1-IBDvyXN9FZpRF9eBy9w1GePlMbnVuGS?usp=sharing",
