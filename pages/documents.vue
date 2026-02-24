@@ -7,9 +7,9 @@ const registered = computed(() => Boolean(userData.value?.serviceExpiry));
 
 const documents = [
   {
-    title: 'Trợ lý viết prompt "Làm phim"',
+    title: "🎬 Đạo Diễn Làm Phim Đa Vũ Trụ",
     value:
-      "https://gemini.google.com/gem/1sSwbpAhdzLev11WVRxMLiDGrXkmJSDrt?usp=sharing",
+      "https://gemini.google.com/gem/1xcYJ7af0H8S1NxE0n1IKRsFZX2y_qoIl?usp=sharing",
   },
   {
     title: "💚 Xây dựng video nhân hoá nhân vật về sức khỏe",
@@ -18,7 +18,7 @@ const documents = [
     // required: true,
   },
   {
-    title: "🎵 MV AI Pro – Tạo MV Ca Nhạc Chuẩn Ảnh → Video",
+    title: "🎵 Đạo Diễn Tạo MV Ca Nhạc",
     value:
       "https://gemini.google.com/gem/1k-GUzKKA-pB_Xrc0sqAWRqLdtVKMvbFJ?usp=sharing",
   },
