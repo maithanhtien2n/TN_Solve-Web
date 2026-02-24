@@ -12,6 +12,11 @@ const documents = [
       "https://gemini.google.com/gem/1xcYJ7af0H8S1NxE0n1IKRsFZX2y_qoIl?usp=sharing",
   },
   {
+    title: "🎨 Đạo Diễn Hoạt Hình Giáo Dục Trẻ Em Nói Tiếng Anh",
+    value:
+      "https://gemini.google.com/gem/1ovviMlY7omu3CBx1jgj97oy1q-EpT0UG?usp=sharing",
+  },
+  {
     title: "💚 Xây dựng video nhân hoá nhân vật về sức khỏe",
     value:
       "https://gemini.google.com/gem/1-IBDvyXN9FZpRF9eBy9w1GePlMbnVuGS?usp=sharing",
