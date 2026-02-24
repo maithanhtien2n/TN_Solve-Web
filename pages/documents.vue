@@ -12,6 +12,11 @@ const documents = [
       "https://gemini.google.com/gem/1xcYJ7af0H8S1NxE0n1IKRsFZX2y_qoIl?usp=sharing",
   },
   {
+    title: "📖 Đạo Diễn Phim Hoạt Hình AI Quà Tặng Cuộc Sống",
+    value:
+      "https://gemini.google.com/gem/18JVkNtXesH43TRA1zc1pC2_SEWAe4sdb?usp=sharing",
+  },
+  {
     title: "🎨 Đạo Diễn Hoạt Hình Giáo Dục Trẻ Em Nói Tiếng Anh",
     value:
       "https://gemini.google.com/gem/1ovviMlY7omu3CBx1jgj97oy1q-EpT0UG?usp=sharing",
