@@ -33,7 +33,7 @@ const formData = reactive<any>({
   )} ${new Date().toLocaleTimeString()} ${new Date().toLocaleDateString()}`,
   value: "",
   frameRate: "horizontal",
-  modelVideo: "grok",
+  modelVideo: "veo3_fast",
   videoMode: "movie",
   videoStyle: "general",
   videoDuration: "8",
@@ -62,11 +62,9 @@ const isError = computed(() =>
 const modelVideoOptions = computed(() => {
   let list = onGetterMasterData.value["model-video"] || [];
 
-  // if (onGetterUserData.value?.role !== EnumAccountRole.ADMIN) {
-  //   list = list?.filter(
-  //     (x: any) => !["tn_solve_1", "veo3_fast"].includes(x.value)
-  //   );
-  // }
+  if (onGetterUserData.value?.role !== EnumAccountRole.ADMIN) {
+    list = list?.filter((x: any) => !["grok"].includes(x.value));
+  }
 
   return list;
 });
