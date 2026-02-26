@@ -33,7 +33,7 @@ const formData = reactive<any>({
   )} ${new Date().toLocaleTimeString()} ${new Date().toLocaleDateString()}`,
   value: "",
   frameRate: "horizontal",
-  modelVideo: "veo3_fast",
+  modelVideo: "grok",
   videoMode: "movie",
   videoStyle: "general",
   videoDuration: "8",
@@ -70,11 +70,23 @@ const modelVideoOptions = computed(() => {
 });
 
 const videoModeOptions = computed(() => {
-  const list =
+  let list =
     onGetterMasterData.value["video-mode"]?.map((x: any) => ({
       title: t(x.title),
       value: x.value,
     })) || [];
+
+  if (formData.modelVideo === "grok") {
+    list = list.filter(
+      (x: any) =>
+        ![
+          "character_preservation",
+          "sync_process",
+          "custom_character",
+          "custom_process",
+        ].includes(x.value)
+    );
+  }
 
   return list;
 });
@@ -88,7 +100,7 @@ const frameRateOptions = computed(
 );
 
 const videoStyleOptions = computed(() => {
-  const list =
+  let list =
     onGetterMasterData.value["video-style"]?.map((x: any) => ({
       title: t(x.title),
       value: x.value,
@@ -163,13 +175,37 @@ const videoStyleOptions = computed(() => {
 });
 
 const videoDurationOptions = computed(() => {
-  const allOptions =
+  let allOptions =
     onGetterMasterData.value["video-duration"]?.filter(
       (option: any) =>
         !["76", "72", "68", "64", "60", "56", "52", "48", "44"].includes(
           option.value
         )
     ) || [];
+
+  if (formData.modelVideo === "grok") {
+    const convert8to6 = (time: string) => {
+      const [mm, ss] = time.split(":").map(Number);
+      const total = mm * 60 + ss;
+
+      const step = total / 8; // vì dữ liệu gốc là bội số của 8
+      const newTotal = step * 6; // đổi sang bội số 6
+
+      const newMM = Math.floor(newTotal / 60);
+      const newSS = newTotal % 60;
+
+      return `${String(newMM).padStart(2, "0")}:${String(newSS).padStart(
+        2,
+        "0"
+      )}`;
+    };
+
+    allOptions =
+      allOptions?.map((x: any) => ({
+        title: convert8to6(t(x.title)),
+        value: x.value,
+      })) || [];
+  }
 
   if (productId.value || formData.videoMode === "movie") {
     return allOptions;

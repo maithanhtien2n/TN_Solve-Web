@@ -90,6 +90,10 @@ const menus = computed<any>(() => {
       route: "master-data",
       children: [
         {
+          title: "Tài khoản Grok",
+          route: "/admin/master-data/account-create-video-grok",
+        },
+        {
           title: "Tài khoản Veo3 (Basic)",
           route: "/admin/master-data/account-create-video-basic",
         },
