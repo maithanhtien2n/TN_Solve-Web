@@ -237,35 +237,6 @@ const scrollToTimeline = () => {
   }
 };
 
-const onFormatString = (value: string) => {
-  if (!value) return;
-  if (value.includes("Tổng cộng có")) {
-    const match = value.match(/\d+/);
-    const amount = match ? match[0] : null;
-    return t("Tổng cộng có {amount} cảnh", { amount });
-  } else if (value.includes("Hoàn tất tạo video cho")) {
-    const match = value.match(/\d+/);
-    const amount = match ? match[0] : null;
-    return t("Hoàn tất tạo video cho {amount} cảnh", { amount });
-  } else if (value.includes("Lần thử")) {
-    const matches = value.match(/\d+\/\d+/g);
-    if (matches && matches.length >= 2) {
-      const [tryCount, sceneCount] = matches;
-      return t(`Lần thử {tryCount}: đang tạo video cho cảnh {sceneCount}...`, {
-        tryCount,
-        sceneCount,
-      });
-    } else {
-      return value;
-    }
-  } else if (value.includes("Tổng thời gian hoàn thành")) {
-    const [title, time] = value.split(":");
-    return t(title) + `: ${time}`;
-  } else {
-    return t(value);
-  }
-};
-
 const onGetProductDetail = async (loadingType: string = "") => {
   await masterDataService
     .getVideoFlow()
@@ -926,7 +897,7 @@ definePageMeta({ middleware: "auth" });
 
               <div>
                 <div class="font-bold">
-                  {{ onFormatString(item.title) }}
+                  {{ item.title }}
                 </div>
 
                 <div class="text-caption">
@@ -948,7 +919,7 @@ definePageMeta({ middleware: "auth" });
                     )
                   "
                 >
-                  {{ onFormatString(item.note) }}
+                  {{ item.note }}
                 </div>
                 <div
                   v-if="
