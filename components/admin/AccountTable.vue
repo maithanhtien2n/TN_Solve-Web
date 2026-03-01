@@ -57,7 +57,6 @@ const settingAccountDetail = ref<any>({
   name: "",
   flowCookies: "",
   geminiCookies: "",
-  safeMode: false,
   showBrowser: false,
   useMyAccount: false,
   isCreateSpeed: false,
@@ -164,7 +163,6 @@ const onClickSaveSetting = async () => {
   await appService
     .saveSetting({
       accountId: settingAccountDetail.value._id,
-      safeMode: settingAccountDetail.value.safeMode,
       showBrowser: settingAccountDetail.value.showBrowser,
     })
     .then(async () => {
@@ -292,14 +290,6 @@ const onClickSaveSetting = async () => {
           v-model="settingAccountDetail.showBrowser"
           hide-details
           :label="$t('Hiển thị quá trình thực thi')"
-        />
-      </div>
-
-      <div style="margin-left: -0.6rem">
-        <v-checkbox
-          v-model="settingAccountDetail.safeMode"
-          hide-details
-          :label="$t('Chế độ tạo video an toàn')"
         />
       </div>
 
