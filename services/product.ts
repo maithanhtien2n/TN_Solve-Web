@@ -45,6 +45,10 @@ export const productService = {
     });
   },
 
+  async deleteVideoProcess(payload: any) {
+    return await api.put(`/products/delete-video-process`, payload);
+  },
+
   async getProductMyLibrary(params: any) {
     return await api.get(`/products/my-library`, { params });
   },

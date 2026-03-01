@@ -257,15 +257,17 @@ const onChangeFilter = (event: any) => {
             {{ (item as any)?.lastMessage?.title }}
           </div>
 
-          <div v-if="(item as any)?.lastMessage?.note" class="text-caption">
-            {{ (item as any)?.lastMessage?.note }}
+          <div
+            v-if="(item as any)?.lastMessage?.note"
+            class="text-grey-darken-1"
+          >
+            <div class="text-caption">
+              {{ (item as any)?.lastMessage?.note }}
+            </div>
           </div>
 
-          <div class="text-red">
-            <div
-              v-if="(item as any)?.lastMessage?.errorMsg"
-              class="text-caption"
-            >
+          <div v-if="(item as any)?.lastMessage?.errorMsg" class="text-red">
+            <div class="text-caption">
               {{ (item as any)?.lastMessage?.errorMsg }}
             </div>
           </div>
@@ -280,8 +282,13 @@ const onChangeFilter = (event: any) => {
             {{ (item as any)?.lastMessage?.note }}
           </div>
 
-          <div v-if="(item as any)?.lastMessage?.errorMsg" class="text-caption">
-            {{ (item as any)?.lastMessage?.errorMsg }}
+          <div
+            v-if="(item as any)?.lastMessage?.errorMsg"
+            class="text-grey-darken-1"
+          >
+            <div class="text-caption">
+              {{ (item as any)?.lastMessage?.errorMsg }}
+            </div>
           </div>
         </div>
 

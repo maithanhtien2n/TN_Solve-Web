@@ -49,7 +49,13 @@ const onClickDotMenuItem = (type: string, data: any) => {
     } else if (type === "private") {
       message = t("Bạn có chắc chắn muốn riêng tư video này không?");
     } else if (type === "delete-video") {
-      message = t("Bạn có chắc chắn muốn xoá video này không?");
+      if (data.state === "primary") {
+        message = t(
+          "Xóa thước phim đang tạox` sẽ tốn 10 tín dụng. Bạn có muốn tiếp tục?"
+        );
+      } else {
+        message = t("Bạn có chắc chắn muốn xoá thước phim này không?");
+      }
     }
 
     confirmDialogRef.value.show({
@@ -57,10 +63,14 @@ const onClickDotMenuItem = (type: string, data: any) => {
       noTransMsg: true,
       onConfirm: async () => {
         try {
-          await productService.actionProduct({
-            ids: [data._id],
-            action: type === "delete-video" ? "delete" : type,
-          });
+          if (data.state === "primary") {
+            await productService.deleteVideoProcess({ _id: data._id });
+          } else {
+            await productService.actionProduct({
+              ids: [data._id],
+              action: type === "delete-video" ? "delete" : type,
+            });
+          }
 
           params.page = 1;
           await onGetProducts();
@@ -307,7 +317,7 @@ definePageMeta({ middleware: "auth" });
                       icon: 'mdi-tray-arrow-down',
                     },
                     {
-                      title: 'Xoá video',
+                      title: 'Xóa thước phim',
                       value: 'delete-video',
                       icon: 'mdi-delete-outline',
                     },
@@ -316,11 +326,9 @@ definePageMeta({ middleware: "auth" });
                   :value="menu.value"
                   :class="{
                     disabled:
-                      item.state === 'primary' ||
-                      (['download-video', 'public', 'private'].includes(
+                      ['download-video', 'public', 'private'].includes(
                         menu.value
-                      ) &&
-                        item.state === 'error'),
+                      ) && ['primary', 'error'].includes(item.state),
                   }"
                   @click="onClickDotMenuItem(menu.value, item)"
                 >
