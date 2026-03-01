@@ -60,16 +60,17 @@ const onClickAction = async (action: string, data?: any | null) => {
         break;
       }
 
-      case "scene_creation_mode": {
-        await masterDataService.settingAction({ _id: data._id });
-        break;
-      }
-
-      case "run_in_browser": {
+      case "amount_in_website":
+      case "amount_in_windows": {
         await masterDataService.settingAction({
           _id: data._id,
           value: data.value,
         });
+        break;
+      }
+
+      case "scene_creation_mode": {
+        await masterDataService.settingAction({ _id: data._id });
         break;
       }
     }
@@ -141,7 +142,9 @@ definePageMeta({ layout: "admin", title: "Thông tin chung" });
         </span>
       </template>
 
-      <template v-else-if="(item as any).title === 'Chạy trên trình duyệt'">
+      <template
+        v-else-if="(item as any).title === 'Số lượt tạo cùng lúc trên website'"
+      >
         <span v-if="(item as any).value === 'auto'" class="text-nowrap">
           Tự động
         </span>
@@ -210,6 +213,48 @@ definePageMeta({ layout: "admin", title: "Thông tin chung" });
           />
         </template>
 
+        <template
+          v-else-if="(item as any).title === 'Số lượt tạo cùng lúc trên website'"
+        >
+          <div>
+            <v-select
+              v-model="(item as any).value"
+              hide-details
+              density="compact"
+              variant="outlined"
+              class="my-4 w-10rem"
+              :items="[
+                { title: '1', value: '1' },
+                { title: '2', value: '2' },
+                { title: '3', value: '3' },
+                { title: '4', value: '4' },
+              ]"
+              @update:model-value="onClickAction('amount_in_website', item)"
+            />
+          </div>
+        </template>
+
+        <template
+          v-else-if="(item as any).title === 'Số lượt tạo cùng lúc trên windows'"
+        >
+          <div>
+            <v-select
+              v-model="(item as any).value"
+              hide-details
+              density="compact"
+              variant="outlined"
+              class="my-4 w-10rem"
+              :items="[
+                { title: '1', value: '1' },
+                { title: '2', value: '2' },
+                { title: '3', value: '3' },
+                { title: '4', value: '4' },
+              ]"
+              @update:model-value="onClickAction('amount_in_windows', item)"
+            />
+          </div>
+        </template>
+
         <template v-else-if="(item as any).title === 'Chế độ tạo bối cảnh'">
           <div>
             <v-select
@@ -223,24 +268,6 @@ definePageMeta({ layout: "admin", title: "Thông tin chung" });
                 { title: 'Trình duyệt', value: 'browser' },
               ]"
               @update:model-value="onClickAction('scene_creation_mode', item)"
-            />
-          </div>
-        </template>
-
-        <template v-else-if="(item as any).title === 'Chạy trên trình duyệt'">
-          <div>
-            <v-select
-              v-model="(item as any).value"
-              hide-details
-              density="compact"
-              variant="outlined"
-              class="my-4 w-10rem"
-              :items="[
-                { title: 'Tự động', value: 'auto' },
-                { title: 'Có hồ sơ', value: 'profile' },
-                { title: 'Ẩn danh', value: 'anonymous' },
-              ]"
-              @update:model-value="onClickAction('run_in_browser', item)"
             />
           </div>
         </template>
