@@ -51,7 +51,7 @@ const onClickDotMenuItem = (type: string, data: any) => {
     } else if (type === "delete-video") {
       if (data.state === "primary") {
         message = t(
-          "Xóa thước phim đang tạox` sẽ tốn 10 tín dụng. Bạn có muốn tiếp tục?"
+          "Xóa thước phim đang tạo sẽ tốn 10 tín dụng. Bạn có muốn tiếp tục?"
         );
       } else {
         message = t("Bạn có chắc chắn muốn xoá thước phim này không?");
