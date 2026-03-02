@@ -136,7 +136,7 @@ useSeo({
     </div>
   </div>
 
-  <div class="mt-8 mb-6 text-center mx-auto" style="max-width: 700px">
+  <!-- <div class="mt-8 mb-6 text-center mx-auto" style="max-width: 700px">
     <div
       class="py-3 px-4 rounded-lg d-inline-flex align-center justify-center flex-wrap ga-3"
       style="
@@ -164,7 +164,7 @@ useSeo({
         <v-icon right class="ml-1">mdi-open-in-new</v-icon>
       </a>
     </div>
-  </div>
+  </div> -->
 
   <div v-if="!client && !isMobile && appVersionDownload" class="section my-10">
     <div class="download-wrap">
