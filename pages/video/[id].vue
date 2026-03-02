@@ -175,13 +175,15 @@ const videoStyleOptions = computed(() => {
 });
 
 const videoDurationOptions = computed(() => {
-  let allOptions =
-    onGetterMasterData.value["video-duration"]?.filter(
-      (option: any) =>
-        !["76", "72", "68", "64", "60", "56", "52", "48", "44"].includes(
-          option.value
-        )
-    ) || [];
+  // let allOptions =
+  //   onGetterMasterData.value["video-duration"]?.filter(
+  //     (option: any) =>
+  //       !["76", "72", "68", "64", "60", "56", "52", "48", "44"].includes(
+  //         option.value
+  //       )
+  //   ) || [];
+
+  let allOptions = onGetterMasterData.value["video-duration"] || [];
 
   if (formData.modelVideo === "grok") {
     const convert8to6 = (time: string) => {
