@@ -211,14 +211,26 @@ const onClickMenuItem = (value: string) => {
                       <h3 class="font-bold" style="font-size: 1.1rem">
                         {{ userData.name }}
                       </h3>
-                    </template>
 
-                    <template
-                      v-if="userData?.role !== EnumAccountRole.ADMIN"
-                      #subtitle
-                    >
-                      <div class="mt-2">
-                        {{ `Tín dụng: ${userData.settings?.credit || 0}💎` }}
+                      <div style="margin-top: -0.2rem">
+                        <span v-if="userData?.role !== EnumAccountRole.ADMIN">
+                          <div
+                            v-if="userData.settings?.unlimitedVideo"
+                            class="mt-2 text-grey-darken-1"
+                            style="font-size: 0.9rem"
+                          >
+                            {{ `Tín dụng: ` }} <v-icon>mdi-infinity</v-icon>💎
+                          </div>
+                          <div
+                            v-else
+                            class="mt-2 text-grey-darken-1"
+                            style="font-size: 0.9rem"
+                          >
+                            {{
+                              `Tín dụng: ${userData.settings?.credit || 0}💎`
+                            }}
+                          </div>
+                        </span>
                       </div>
                     </template>
                   </v-list-item>

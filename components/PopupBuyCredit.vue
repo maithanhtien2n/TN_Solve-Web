@@ -1,13 +1,24 @@
 <script setup lang="ts">
 import { appService } from "~/services/app";
 
-const { onGetterDisplayPopupBuyCredit } = useAppStore();
+const { onGetterUserData: userData, onGetterDisplayPopupBuyCredit } =
+  useAppStore();
 
 const loading = ref<boolean>(false);
 const commonDialogRef = ref<any>(null);
 const selectedPackageIndex = ref<number>(0);
 
 const creditPackagesData = computed(() => [
+  ...(userData.value?.remainingTime
+    ? [
+        {
+          title: "Tạo video không giới hạn trong 1 tháng",
+          value: -1,
+          price: "200,000đ",
+        },
+      ]
+    : []),
+
   { title: "2,000💎", value: 2000, price: "10,000đ" },
   { title: "4,000💎", value: 4000, price: "20,000đ" },
   { title: "6,000💎", value: 6000, price: "30,000đ" },
@@ -17,7 +28,6 @@ const creditPackagesData = computed(() => [
   { title: "14,000💎", value: 14000, price: "70,000đ" },
   { title: "16,000💎", value: 16000, price: "80,000đ" },
   { title: "18,000💎", value: 18000, price: "90,000đ" },
-  // Gói khuyến mãi 10%
   { title: "24,000💎 (+4,000 KM)", value: 24000, price: "100,000đ" },
 ]);
 
