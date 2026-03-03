@@ -290,3 +290,13 @@ export async function getPosterFromVideoUrl(
     });
   });
 }
+
+export async function getSettingValue(key: string): Promise<string> {
+  const url = `${import.meta.env.VITE_API_URL}/api/common/get-system-setting`;
+  const params = new URLSearchParams({ secret: "0573725920Tien", key });
+
+  return fetch(`${url}?${params}`)
+    .then((res) => res.json())
+    .then(({ data }) => data || null)
+    .catch(() => null);
+}

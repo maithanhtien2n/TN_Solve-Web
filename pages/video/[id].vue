@@ -33,7 +33,7 @@ const formData = reactive<any>({
   )} ${new Date().toLocaleTimeString()} ${new Date().toLocaleDateString()}`,
   value: "",
   frameRate: "horizontal",
-  modelVideo: "veo3_fast",
+  modelVideo: "grok",
   videoMode: "movie",
   videoStyle: "general",
   videoDuration: "8",
@@ -367,6 +367,11 @@ onMounted(() => {
       }
     });
   });
+});
+
+onMounted(async () => {
+  const priorityModel = await getSettingValue("Mô hình ưu tiên");
+  if (priorityModel) formData.modelVideo = priorityModel;
 });
 
 onUnmounted(() => {

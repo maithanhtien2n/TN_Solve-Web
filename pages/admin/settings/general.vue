@@ -3,7 +3,7 @@ import { masterDataService } from "~/services/app";
 
 const headers = [
   { title: "Tên cài đặt", key: "title", sortable: false },
-  { title: "Trạng thái", key: "value", sortable: false },
+  { title: "Giá trị", key: "value", sortable: false },
   { title: "Cập nhật", key: "updatedAt", sortable: false },
   { title: "Thao tác", align: "center", key: "action", sortable: false },
 ];
@@ -26,7 +26,7 @@ async function loadItems(event: any) {
     });
 }
 
-const onClickAction = async (action: string, data?: any | null) => {
+const onClickAction = async (data?: any | null, action?: string) => {
   try {
     switch (action) {
       case "update_account": {
@@ -45,30 +45,7 @@ const onClickAction = async (action: string, data?: any | null) => {
         break;
       }
 
-      case "video_to_website": {
-        await masterDataService.settingAction({ _id: data._id });
-        break;
-      }
-
-      case "show_browser": {
-        await masterDataService.settingAction({ _id: data._id });
-        break;
-      }
-
-      case "delete_profile_when_open_app": {
-        await masterDataService.settingAction({ _id: data._id });
-        break;
-      }
-
-      case "scene_creation_mode": {
-        await masterDataService.settingAction({ _id: data._id });
-        break;
-      }
-
-      case "amount_in_website":
-      case "amount_in_windows":
-      case "amount_browser_in_client":
-      case "amount_browser_in_admin": {
+      default: {
         await masterDataService.settingAction({
           _id: data._id,
           value: data.value,
@@ -134,6 +111,19 @@ definePageMeta({ layout: "admin", title: "Thông tin chung" });
         <span v-else class="text-red text-nowrap">Không cho phép</span>
       </template>
 
+      <template v-else-if="(item as any).title === 'Mô hình ưu tiên'">
+        <span v-if="(item as any).value === 'grok'" class="text-nowrap">
+          🥉 TNS - 6s / 5💎
+        </span>
+
+        <span
+          v-else-if="(item as any).value === 'veo3_fast'"
+          class="text-nowrap"
+        >
+          🥈 TNS - 8s / 10💎
+        </span>
+      </template>
+
       <template v-else-if="(item as any).title === 'Chế độ tạo bối cảnh'">
         <span v-if="(item as any).value === 'api'" class="text-nowrap">
           API
@@ -142,6 +132,12 @@ definePageMeta({ layout: "admin", title: "Thông tin chung" });
         <span v-else-if="(item as any).value === 'browser'" class="text-nowrap">
           Trình duyệt
         </span>
+      </template>
+
+      <template
+        v-else-if="(item as any).title === 'Thời gian khởi động lại trình duyệt'"
+      >
+        <span class="text-nowrap">Sau {{ (item as any).value }} phút</span>
       </template>
 
       <template
@@ -174,7 +170,7 @@ definePageMeta({ layout: "admin", title: "Thông tin chung" });
               icon
               size="40"
               variant="text"
-              @click="onClickAction('update_account', item)"
+              @click="onClickAction(item, 'update_account')"
             >
               <v-icon size="20">mdi-reload</v-icon>
             </v-btn>
@@ -189,7 +185,7 @@ definePageMeta({ layout: "admin", title: "Thông tin chung" });
             hide-details
             class="my-1"
             :model-value="Boolean((item as any).value)"
-            @click="onClickAction('video_to_website', item)"
+            @click="onClickAction(item)"
           />
         </template>
 
@@ -199,7 +195,7 @@ definePageMeta({ layout: "admin", title: "Thông tin chung" });
             hide-details
             class="my-1"
             :model-value="Boolean((item as any).value)"
-            @click="onClickAction('show_browser', item)"
+            @click="onClickAction(item)"
           />
         </template>
 
@@ -211,8 +207,25 @@ definePageMeta({ layout: "admin", title: "Thông tin chung" });
             hide-details
             class="my-1"
             :model-value="Boolean((item as any).value)"
-            @click="onClickAction('delete_profile_when_open_app', item)"
+            @click="onClickAction(item)"
           />
+        </template>
+
+        <template v-else-if="(item as any).title === 'Mô hình ưu tiên'">
+          <div>
+            <v-select
+              v-model="(item as any).value"
+              hide-details
+              density="compact"
+              variant="outlined"
+              class="my-4 w-10rem"
+              :items="[
+                { title: '🥉 TNS - 6s / 5💎', value: 'grok' },
+                { title: '🥈 TNS - 8s / 10💎', value: 'veo3_fast' },
+              ]"
+              @update:model-value="onClickAction(item)"
+            />
+          </div>
         </template>
 
         <template v-else-if="(item as any).title === 'Chế độ tạo bối cảnh'">
@@ -227,7 +240,30 @@ definePageMeta({ layout: "admin", title: "Thông tin chung" });
                 { title: 'API', value: 'api' },
                 { title: 'Trình duyệt', value: 'browser' },
               ]"
-              @update:model-value="onClickAction('scene_creation_mode', item)"
+              @update:model-value="onClickAction(item)"
+            />
+          </div>
+        </template>
+
+        <template
+          v-else-if="(item as any).title === 'Thời gian khởi động lại trình duyệt'"
+        >
+          <div>
+            <v-select
+              v-model="(item as any).value"
+              hide-details
+              density="compact"
+              variant="outlined"
+              class="my-4 w-10rem"
+              :items="[
+                { title: 'Sau 10 phút', value: '10' },
+                { title: 'Sau 20 phút', value: '20' },
+                { title: 'Sau 30 phút', value: '30' },
+                { title: 'Sau 40 phút', value: '40' },
+                { title: 'Sau 50 phút', value: '50' },
+                { title: 'Sau 60 phút', value: '60' },
+              ]"
+              @update:model-value="onClickAction(item)"
             />
           </div>
         </template>
@@ -248,7 +284,7 @@ definePageMeta({ layout: "admin", title: "Thông tin chung" });
                 { title: '3', value: '3' },
                 { title: '4', value: '4' },
               ]"
-              @update:model-value="onClickAction('amount_in_website', item)"
+              @update:model-value="onClickAction(item)"
             />
           </div>
         </template>
@@ -269,7 +305,7 @@ definePageMeta({ layout: "admin", title: "Thông tin chung" });
                 { title: '3', value: '3' },
                 { title: '4', value: '4' },
               ]"
-              @update:model-value="onClickAction('amount_in_windows', item)"
+              @update:model-value="onClickAction(item)"
             />
           </div>
         </template>
@@ -290,9 +326,7 @@ definePageMeta({ layout: "admin", title: "Thông tin chung" });
                 { title: '3', value: '3' },
                 { title: '4', value: '4' },
               ]"
-              @update:model-value="
-                onClickAction('amount_browser_in_client', item)
-              "
+              @update:model-value="onClickAction(item)"
             />
           </div>
         </template>
@@ -329,9 +363,7 @@ definePageMeta({ layout: "admin", title: "Thông tin chung" });
                 { title: '19', value: '19' },
                 { title: '20', value: '20' },
               ]"
-              @update:model-value="
-                onClickAction('amount_browser_in_admin', item)
-              "
+              @update:model-value="onClickAction(item)"
             />
           </div>
         </template>
