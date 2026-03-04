@@ -666,6 +666,21 @@ definePageMeta({ middleware: "auth" });
               :readonly="Boolean(productId)"
               :class="{ disabled: Boolean(productId) }"
               :label="$t('Mô hình')"
+              @update:model-value="
+                (value) => {
+                  if (
+                    value === 'grok' &&
+                    [
+                      'character_preservation',
+                      'sync_process',
+                      'custom_character',
+                      'custom_process',
+                    ].includes(formData.videoMode)
+                  ) {
+                    formData.videoMode = 'movie';
+                  }
+                }
+              "
             />
           </v-col>
 
