@@ -219,7 +219,9 @@ const onClickMenuItem = (value: string) => {
                             class="mt-2 text-grey-darken-1"
                             style="font-size: 0.9rem"
                           >
-                            {{ `Tín dụng: ` }} <v-icon>mdi-infinity</v-icon>💎
+                            {{ `Tín dụng: ` }}
+                            <v-icon>mdi-infinity</v-icon>
+                            {{ userData.settings?.unlimitedVideo }} ngày 💎
                           </div>
                           <div
                             v-else
