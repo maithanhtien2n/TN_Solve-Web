@@ -9,7 +9,7 @@ const commonDialogRef = ref<any>(null);
 const selectedPackageIndex = ref<number>(0);
 
 const creditPackagesData = computed(() => [
-  ...(userData.value?.remainingTime && !userData.value?.settings?.unlimitedVideo
+  ...(userData.value?.remainingTime
     ? [
         {
           title: "Tạo video không giới hạn trong 1 tháng",
