@@ -220,7 +220,7 @@ const onClickMenuItem = (value: string) => {
                             style="font-size: 0.9rem"
                           >
                             {{ `Tín dụng: ` }}
-                            <v-icon>mdi-infinity</v-icon>
+                            <v-icon size="17">mdi-infinity</v-icon>
                             {{ userData.settings?.unlimitedVideo }} ngày 💎
                           </div>
                           <div
