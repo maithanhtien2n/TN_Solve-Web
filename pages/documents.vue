@@ -32,6 +32,11 @@ const documents = [
       "https://gemini.google.com/gem/19V5yizpIG9fp5hfjROVBxkV-EkYab5mv?usp=sharing",
   },
   {
+    title: "📜 AI Kịch Bản Nhân Vật Kể Chuyện",
+    value:
+      "https://gemini.google.com/gem/1QzEAOsmWa0WKefSGy2QImSfEkW7YnEOc?usp=sharing",
+  },
+  {
     title: "💚 Xây dựng video nhân hoá nhân vật về sức khỏe",
     value:
       "https://gemini.google.com/gem/1-IBDvyXN9FZpRF9eBy9w1GePlMbnVuGS?usp=sharing",
