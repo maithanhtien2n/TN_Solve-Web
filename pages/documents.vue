@@ -7,6 +7,11 @@ const registered = computed(() => Boolean(userData.value?.serviceExpiry));
 
 const documents = [
   {
+    title: "🔍 AI Phân Tích & Clone Video",
+    value:
+      "https://gemini.google.com/gem/1gc0fwxS3YpkFCa9c7ku2bL-XZ5PBVXm-?usp=sharing",
+  },
+  {
     title: "🎬 Đạo Diễn Làm Phim Đa Vũ Trụ",
     value:
       "https://gemini.google.com/gem/1xcYJ7af0H8S1NxE0n1IKRsFZX2y_qoIl?usp=sharing",
@@ -45,7 +50,6 @@ const documents = [
     title: "💚 Xây dựng video nhân hoá nhân vật về sức khỏe",
     value:
       "https://gemini.google.com/gem/1-IBDvyXN9FZpRF9eBy9w1GePlMbnVuGS?usp=sharing",
-    // required: true,
   },
   {
     title: "🎵 Đạo Diễn Tạo MV Ca Nhạc",
