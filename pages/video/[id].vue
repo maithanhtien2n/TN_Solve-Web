@@ -211,7 +211,7 @@ const videoDurationOptions = computed(() => {
 
   allOptions =
     allOptions?.map((x: any, index: number) => ({
-      title: t(`${x.title} (gồm ${index + 1} cảnh)`),
+      title: t(`${x.title} - (${index + 1} cảnh)`),
       value: x.value,
     })) || [];
 
