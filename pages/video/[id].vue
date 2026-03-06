@@ -204,7 +204,7 @@ const videoDurationOptions = computed(() => {
 
     allOptions =
       allOptions?.map((x: any) => ({
-        title: convert8to6(t(x.title)),
+        title: convert8to6(x.title),
         value: x.value,
       })) || [];
   }
