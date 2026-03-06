@@ -209,6 +209,12 @@ const videoDurationOptions = computed(() => {
       })) || [];
   }
 
+  allOptions =
+    allOptions?.map((x: any, index: number) => ({
+      title: t(`${x.title} (gồm ${index + 1} cảnh)`),
+      value: x.value,
+    })) || [];
+
   if (productId.value || formData.videoMode === "movie") {
     return allOptions;
   }
@@ -218,7 +224,6 @@ const videoDurationOptions = computed(() => {
       "scene_consistency",
       "sync_process",
       "my_subject",
-      "custom_scenes",
       "custom_process",
     ].includes(formData.videoMode)
   ) {
@@ -227,7 +232,9 @@ const videoDurationOptions = computed(() => {
       shortVideoValues.includes(option.value)
     );
   } else if (
-    ["character_preservation", "custom_character"].includes(formData.videoMode)
+    ["character_preservation", "custom_character", "custom_scenes"].includes(
+      formData.videoMode
+    )
   ) {
     const shortVideoValues = [
       "1",
