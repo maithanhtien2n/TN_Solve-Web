@@ -37,6 +37,11 @@ const documents = [
       "https://gemini.google.com/gem/1QzEAOsmWa0WKefSGy2QImSfEkW7YnEOc?usp=sharing",
   },
   {
+    title: "🍌 Bro Khỉ Tâm Sự Chuyện Đàn Ông",
+    value:
+      "https://gemini.google.com/gem/1cuZ3qYU3GkfR25YDXc1fPp1wk3rqGfw9?usp=sharing",
+  },
+  {
     title: "💚 Xây dựng video nhân hoá nhân vật về sức khỏe",
     value:
       "https://gemini.google.com/gem/1-IBDvyXN9FZpRF9eBy9w1GePlMbnVuGS?usp=sharing",
