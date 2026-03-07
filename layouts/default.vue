@@ -183,7 +183,10 @@ onMounted(async () => {
         }
       });
 
-    await onActionAllMasterDataClient({ type: "app-version", download: true });
+    await onActionAllMasterDataClient({
+      type: "app-version",
+      download: true,
+    }).catch(() => {});
 
     if (
       userData.value?.role &&
