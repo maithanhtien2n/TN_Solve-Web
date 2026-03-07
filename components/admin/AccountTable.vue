@@ -353,6 +353,14 @@ const onClickSaveSetting = async () => {
       </div>
     </template>
 
+    <template #row-settings.credit="{ item }">
+      <span v-if="(item as any)?.settings?.unlimitedVideo" class="ml-1">
+        <v-icon size="17">mdi-infinity</v-icon>
+        {{ (item as any)?.settings?.unlimitedVideo }} ngày 💎
+      </span>
+      <span v-else> {{ (item as any)?.settings?.credit || 0 }} 💎</span>
+    </template>
+
     <template #row-version="{ item }">
       <span
         :class="{ 'text-success': appVersion && appVersion ===(item as any).version  }"
