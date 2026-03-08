@@ -32,7 +32,7 @@ const documents = [
       "https://gemini.google.com/gem/1VT0_eNcuQBNLw3OOb0yxnuLTvHG9rv-s?usp=sharing",
   },
   {
-    title: "🎭 Đạo Diễn Nhân Vật Hóa (Đồ Vật Biết Nói)",
+    title: '🎭 Đạo Diễn 3D "Trái Cây Nổi Giận"',
     value:
       "https://gemini.google.com/gem/19V5yizpIG9fp5hfjROVBxkV-EkYab5mv?usp=sharing",
   },
