@@ -256,6 +256,7 @@ const videoDurationOptions = computed(() => {
       "21",
       "22",
       "23",
+      "24",
     ];
     return allOptions.filter((option: any) =>
       shortVideoValues.includes(option.value)
