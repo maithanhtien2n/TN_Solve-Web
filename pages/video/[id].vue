@@ -221,20 +221,14 @@ const videoDurationOptions = computed(() => {
 
   if (
     [
+      "my_subject",
+      "character_preservation",
       "scene_consistency",
       "sync_process",
-      "my_subject",
+      "custom_character",
+      "custom_scenes",
       "custom_process",
     ].includes(formData.videoMode)
-  ) {
-    const shortVideoValues = ["1", "2", "3", "4", "5", "6", "7", "8"];
-    return allOptions.filter((option: any) =>
-      shortVideoValues.includes(option.value)
-    );
-  } else if (
-    ["character_preservation", "custom_character", "custom_scenes"].includes(
-      formData.videoMode
-    )
   ) {
     const shortVideoValues = [
       "1",
