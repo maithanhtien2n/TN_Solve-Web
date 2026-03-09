@@ -76,6 +76,8 @@ const videoModeOptions = computed(() => {
       value: x.value,
     })) || [];
 
+  list = list.filter((x: any) => !["sync_process"].includes(x.value));
+
   if (formData.modelVideo === "grok") {
     list = list.filter(
       (x: any) =>
