@@ -130,12 +130,16 @@ onMounted(async () => {
     if (referralId.value) params.ref = referralId.value;
     if (!params.ref && route.query?.code) params.code = route.query.code;
 
-    if (route.query?.message === "giao-dich-thanh-cong") {
-      await onActionGetUserData(params)
-        .then(() => {
-          router.replace(localePath("/"));
-        })
-        .catch(() => {});
+    // if (route.query?.message === "giao-dich-thanh-cong") {
+    //   await onActionGetUserData(params)
+    //     .then(() => {
+    //       router.replace(localePath("/"));
+    //     })
+    //     .catch(() => {});
+    // }
+
+    if (route.query?.status === "PAID") {
+      router.replace(localePath("/"));
     }
 
     await onActionGetUserData(params)
