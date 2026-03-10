@@ -140,6 +140,8 @@ onMounted(async () => {
 
     if (route.query?.status === "PAID") {
       router.replace(localePath("/"));
+    } else if (route.query?.status === "CANCELLED") {
+      router.replace(localePath("/"));
     }
 
     await onActionGetUserData(params)
