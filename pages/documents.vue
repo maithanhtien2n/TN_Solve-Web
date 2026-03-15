@@ -93,7 +93,7 @@ definePageMeta({ middleware: "auth" });
     <h2 class="font-bold">{{ $t("Chatbot hỗ trợ viết prompt") }}</h2>
 
     <div class="mt-4 d-flex flex-column ga-2">
-      <template v-for="(item, index) in documents" :key="index">
+      <div v-for="(item, index) in documents" :key="index">
         <span
           class="text-blue cursor-pointer"
           style="text-decoration: underline"
@@ -101,7 +101,7 @@ definePageMeta({ middleware: "auth" });
         >
           {{ item.title }}
         </span>
-      </template>
+      </div>
     </div>
   </div>
 </template>
