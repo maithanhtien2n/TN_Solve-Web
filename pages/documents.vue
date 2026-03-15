@@ -61,6 +61,11 @@ const documents = [
     value:
       "https://gemini.google.com/gem/1VhlbwN5fQTUUOZ1IYQERbqS9NZ1LmNSu?usp=sharing",
   },
+  {
+    title: "📦 Tạo Video Quảng Cáo Xoay Sản Phẩm",
+    value:
+      "https://gemini.google.com/gem/1VVX-4ZWiP-JoJJP5CVTqcZxdBi2_8DMc?usp=sharing",
+  },
 ];
 
 const onClickDocument = (item: any) => {
