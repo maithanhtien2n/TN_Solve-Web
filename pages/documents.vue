@@ -52,7 +52,7 @@ const documents = [
       "https://gemini.google.com/gem/1-IBDvyXN9FZpRF9eBy9w1GePlMbnVuGS?usp=sharing",
   },
   {
-    title: "🎵 Đạo Diễn Tạo MV Ca Nhạc",
+    title: "🎵 Đạo Diễn AI Tạo MV Ca Nhạc Chuyên Nghiệp",
     value:
       "https://gemini.google.com/gem/1k-GUzKKA-pB_Xrc0sqAWRqLdtVKMvbFJ?usp=sharing",
   },
