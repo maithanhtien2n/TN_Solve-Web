@@ -47,11 +47,6 @@ const documents = [
       "https://gemini.google.com/gem/1cuZ3qYU3GkfR25YDXc1fPp1wk3rqGfw9?usp=sharing",
   },
   {
-    title: "💚 Xây dựng video nhân hoá nhân vật về sức khỏe",
-    value:
-      "https://gemini.google.com/gem/1-IBDvyXN9FZpRF9eBy9w1GePlMbnVuGS?usp=sharing",
-  },
-  {
     title: "🎵 Đạo Diễn AI Tạo MV Ca Nhạc Chuyên Nghiệp",
     value:
       "https://gemini.google.com/gem/1k-GUzKKA-pB_Xrc0sqAWRqLdtVKMvbFJ?usp=sharing",

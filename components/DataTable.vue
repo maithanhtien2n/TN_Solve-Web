@@ -469,15 +469,16 @@ defineExpose({ params, selected, loadItems, resetSelected });
             icon
             size="40"
             variant="text"
-            :disabled="Boolean((slotProps.item as any)?.isDelete || [
-              '❌ Hình ảnh tải lên vi phạm chính sách!',
-              '❌ Cookies flow (veo3) của bạn không hợp lệ!',
-              '❌ Cookies flow (veo3) của bạn đã hết hạn!',
-              '❌ Tín dụng tài khoản flow (veo3) của bạn không đủ!',
-              '❌ Hình ảnh tải lên vi phạm chính sách, vui lòng chọn ảnh khác!',
-              // '❌ Thước phim liên quan đến chủ đề nhạy cảm, vi phạm chính sách nội dung!'
-              '❌ Thước phim đã bị hỏng không thể sửa chữa, vui lòng xóa và tạo lại thước phim mới!',
-            ].includes((slotProps.item as any)?.lastMessage?.note)) || (slotProps.item as any).loading"
+            :disabled="
+              (slotProps.item as any).loading ||
+              Boolean((slotProps.item as any)?.isDelete
+              ||
+              [
+                '❌ Không nhận được phản hồi từ AI!',
+                '❌ Thước phim đã bị hỏng không thể sửa chữa, vui lòng xóa và tạo lại thước phim mới!',
+              ].includes((slotProps.item as any)?.lastMessage?.note))
+              || Boolean((slotProps.item as any)?.lastMessage?.note.includes('🚨') && (slotProps.item as any)?.lastMessage?.note !== '🚨 Thước phim gặp sự cố khi xử lý âm thanh cho kịch bản này.')
+            "
             @click="
               () => {
                 (slotProps.item as any).loading = true;
