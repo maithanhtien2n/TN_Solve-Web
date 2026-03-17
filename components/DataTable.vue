@@ -471,6 +471,7 @@ defineExpose({ params, selected, loadItems, resetSelected });
             variant="text"
             :disabled="
               (slotProps.item as any).loading
+              || (slotProps.item as any).isDelete
               || ['❌ Không nhận được phản hồi từ AI!'].includes((slotProps.item as any)?.lastMessage?.errorMsg)
               || Boolean((slotProps.item as any)?.lastMessage?.note.includes('🚨') && (slotProps.item as any)?.lastMessage?.note !== '🚨 Thước phim gặp sự cố khi xử lý âm thanh cho kịch bản này.')
             "
