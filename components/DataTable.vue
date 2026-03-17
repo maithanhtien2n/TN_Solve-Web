@@ -470,13 +470,8 @@ defineExpose({ params, selected, loadItems, resetSelected });
             size="40"
             variant="text"
             :disabled="
-              (slotProps.item as any).loading ||
-              Boolean((slotProps.item as any)?.isDelete
-              ||
-              [
-                '❌ Không nhận được phản hồi từ AI!',
-                '❌ Thước phim đã bị hỏng không thể sửa chữa, vui lòng xóa và tạo lại thước phim mới!',
-              ].includes((slotProps.item as any)?.lastMessage?.note))
+              (slotProps.item as any).loading
+              || ['❌ Không nhận được phản hồi từ AI!'].includes((slotProps.item as any)?.lastMessage?.errorMsg)
               || Boolean((slotProps.item as any)?.lastMessage?.note.includes('🚨') && (slotProps.item as any)?.lastMessage?.note !== '🚨 Thước phim gặp sự cố khi xử lý âm thanh cho kịch bản này.')
             "
             @click="
