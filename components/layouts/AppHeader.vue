@@ -63,6 +63,10 @@ const menus = computed(() => {
     },
   ];
 
+  if (!userData.value?.remainingTime) {
+    items = items.filter((item) => item.value !== "buy-credit");
+  }
+
   if (userData.value?.role === EnumAccountRole.ADMIN) {
     items.splice(1, 0, {
       title: "Trang quản trị",
