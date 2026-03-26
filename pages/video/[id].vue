@@ -220,15 +220,7 @@ const videoDurationOptions = computed(() => {
   }
 
   if (
-    [
-      "my_subject",
-      "character_preservation",
-      "scene_consistency",
-      "sync_process",
-      "custom_character",
-      "custom_scenes",
-      "custom_process",
-    ].includes(formData.videoMode)
+    ["character_preservation", "custom_character"].includes(formData.videoMode)
   ) {
     const shortVideoValues = [
       "1",
@@ -256,6 +248,19 @@ const videoDurationOptions = computed(() => {
       "23",
       "24",
     ];
+    return allOptions.filter((option: any) =>
+      shortVideoValues.includes(option.value)
+    );
+  } else if (
+    [
+      "my_subject",
+      "scene_consistency",
+      "sync_process",
+      "custom_scenes",
+      "custom_process",
+    ].includes(formData.videoMode)
+  ) {
+    const shortVideoValues = ["1", "2", "3", "4", "5", "6", "7", "8"];
     return allOptions.filter((option: any) =>
       shortVideoValues.includes(option.value)
     );
