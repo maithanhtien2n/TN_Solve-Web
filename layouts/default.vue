@@ -196,11 +196,10 @@ onMounted(async () => {
 
     if (
       userData.value?.role &&
-      userData.value?.role !== EnumAccountRole.ADMIN
-      // && !isMobile.value
+      userData.value?.role !== EnumAccountRole.ADMIN &&
+      !isMobile.value
     ) {
-      // commonDialogRef.value?.onDisplay(!client.value);
-      commonDialogRef.value?.onDisplay(true);
+      commonDialogRef.value?.onDisplay(!client.value);
     }
   } catch (error) {
     console.error(error);
@@ -214,65 +213,6 @@ onMounted(async () => {
 // onMounted(() => {
 //   commonDialogRef.value?.onDisplay(!client.value);
 // });
-
-// <CommonDialog
-//       ref="commonDialogRef"
-//       title="Thông báo từ TN SOLVE"
-//       width="530"
-//     >
-//       <v-card-text>
-//         <div class="d-flex flex-column align-center mb-6">
-//           <v-icon color="warning" size="64" class="mb-2">
-//             mdi-shield-alert-outline
-//           </v-icon>
-//           <h3 class="text-h5 font-weight-bold text-center">
-//             THÔNG BÁO QUAN TRỌNG
-//           </h3>
-//         </div>
-
-//         <div class="text-body-1 line-height-relaxed text-grey-darken-3">
-//           <p class="mb-4">
-//             Để tối ưu tốc độ <strong>tạo Video AI tự động</strong> và đảm bảo hệ
-//             thống hoạt động <strong>ổn định</strong>, chúng tôi đã phát hành
-//             phiên bản công cụ <strong>cài đặt trực tiếp trên máy tính</strong>.
-//           </p>
-
-//           <v-alert type="warning" variant="tonal" border="start" class="mb-4">
-//             <strong>Khuyến nghị:</strong> Sử dụng công cụ chạy trên máy cá nhân
-//             giúp hạn chế gián đoạn, giảm lỗi khi xử lý video và đảm bảo trải
-//             nghiệm ổn định nhất trong quá trình sử dụng.
-//           </v-alert>
-
-//           <!-- <p class="text-body-2 text-grey-darken-1 mb-4 text-center">
-//             <i>(Hỗ trợ <strong>.exe</strong> cho Windows)</i>
-//           </p> -->
-//         </div>
-
-//         <v-divider class="my-10"></v-divider>
-
-//         <div class="d-flex flex-column gap-3">
-//           <a
-//             class="download-btn justify-center"
-//             :href="appVersionDownload"
-//             target="_blank"
-//             rel="noopener"
-//           >
-//             <v-icon size="22" class="icon-win">mdi-microsoft-windows</v-icon>
-//             <span :style="{ 'font-size': isMobile ? '1rem' : '1.2rem' }">
-//               Tải công cụ TN Solve cho Windows
-//             </span>
-//           </a>
-
-//           <!-- <a
-//             target="_blank"
-//             href="https://youtube.com/shorts/NasjgxOiTXY?si=EvCKjKwMthEC73Zv"
-//             class="text-center mt-3"
-//           >
-//             Xem Video Hướng Dẫn Cài Đặt
-//           </a> -->
-//         </div>
-//       </v-card-text>
-//     </CommonDialog>
 </script>
 
 <template>
@@ -286,35 +226,54 @@ onMounted(async () => {
     >
       <v-card-text>
         <div class="d-flex flex-column align-center mb-6">
-          <v-icon color="error" size="64" class="mb-2">
-            mdi-alert-circle-outline
+          <v-icon color="warning" size="64" class="mb-2">
+            mdi-shield-alert-outline
           </v-icon>
           <h3 class="text-h5 font-weight-bold text-center">
-            THÔNG BÁO HỆ THỐNG
+            THÔNG BÁO QUAN TRỌNG
           </h3>
         </div>
 
         <div class="text-body-1 line-height-relaxed text-grey-darken-3">
           <p class="mb-4">
-            Hiện tại hệ thống
-            <strong>đang gặp sự cố trong quá trình xử lý</strong>, có thể ảnh
-            hưởng đến việc sử dụng công cụ <strong>Tạo Video AI</strong>.
+            Để tối ưu tốc độ <strong>tạo Video AI tự động</strong> và đảm bảo hệ
+            thống hoạt động <strong>ổn định</strong>, chúng tôi đã phát hành
+            phiên bản công cụ <strong>cài đặt trực tiếp trên máy tính</strong>.
           </p>
 
-          <v-alert type="error" variant="tonal" border="start" class="mb-4">
-            <strong>Thông tin:</strong> Đội ngũ kỹ thuật đang khẩn trương khắc
-            phục để hệ thống hoạt động ổn định trở lại trong thời gian sớm nhất.
+          <v-alert type="warning" variant="tonal" border="start" class="mb-4">
+            <strong>Khuyến nghị:</strong> Sử dụng công cụ chạy trên máy cá nhân
+            giúp hạn chế gián đoạn, giảm lỗi khi xử lý video và đảm bảo trải
+            nghiệm ổn định nhất trong quá trình sử dụng.
           </v-alert>
 
-          <p class="mb-2">
-            Chúng tôi cam kết
-            <strong>cộng bù thêm thời gian sử dụng</strong> cho quý khách tương
-            ứng với thời gian bị gián đoạn.
-          </p>
+          <!-- <p class="text-body-2 text-grey-darken-1 mb-4 text-center">
+            <i>(Hỗ trợ <strong>.exe</strong> cho Windows)</i>
+          </p> -->
+        </div>
 
-          <p class="text-body-2 text-grey-darken-1 mt-2">
-            Xin lỗi vì sự bất tiện này và cảm ơn quý khách đã thông cảm.
-          </p>
+        <v-divider class="my-10"></v-divider>
+
+        <div class="d-flex flex-column gap-3">
+          <a
+            class="download-btn justify-center"
+            :href="appVersionDownload"
+            target="_blank"
+            rel="noopener"
+          >
+            <v-icon size="22" class="icon-win">mdi-microsoft-windows</v-icon>
+            <span :style="{ 'font-size': isMobile ? '1rem' : '1.2rem' }">
+              Tải công cụ TN Solve cho Windows
+            </span>
+          </a>
+
+          <!-- <a
+            target="_blank"
+            href="https://youtube.com/shorts/NasjgxOiTXY?si=EvCKjKwMthEC73Zv"
+            class="text-center mt-3"
+          >
+            Xem Video Hướng Dẫn Cài Đặt
+          </a> -->
         </div>
       </v-card-text>
     </CommonDialog>
