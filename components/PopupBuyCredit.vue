@@ -23,12 +23,12 @@ const creditPackagesData = computed(() => [
   { title: "4,000💎", value: 4000, price: "20,000đ" },
   { title: "6,000💎", value: 6000, price: "30,000đ" },
   { title: "8,000💎", value: 8000, price: "40,000đ" },
-  { title: "11,000💎 (+1,000 KM)", value: 11000, price: "50,000đ" },
+  { title: "10,000💎 (+1,000 KM)", value: 11000, price: "50,000đ" },
   { title: "12,000💎", value: 12000, price: "60,000đ" },
   { title: "14,000💎", value: 14000, price: "70,000đ" },
   { title: "16,000💎", value: 16000, price: "80,000đ" },
   { title: "18,000💎", value: 18000, price: "90,000đ" },
-  { title: "24,000💎 (+4,000 KM)", value: 24000, price: "100,000đ" },
+  { title: "20,000💎 (+4,000 KM)", value: 24000, price: "100,000đ" },
 ]);
 
 const onClickPayment = async () => {
