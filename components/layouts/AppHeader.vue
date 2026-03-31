@@ -50,11 +50,11 @@ const menus = computed(() => {
       value: "buy-credit",
       icon: "mdi-credit-card-outline",
     },
-    {
-      title: "Cài đặt",
-      value: "setting",
-      icon: "mdi-cog-outline",
-    },
+    // {
+    //   title: "Cài đặt",
+    //   value: "setting",
+    //   icon: "mdi-cog-outline",
+    // },
     {
       title: "Đăng xuất",
       value: "logout",
