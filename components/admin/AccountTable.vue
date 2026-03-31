@@ -338,7 +338,6 @@ const onClickSaveSetting = async () => {
     <template #row-name="{ item }">
       <div class="d-flex align-center">
         <v-btn
-          v-if="role !== EnumAccountRole.ADMIN"
           icon
           size="40"
           variant="text"
