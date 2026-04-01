@@ -96,21 +96,13 @@ onMounted(async () => {
                 <nav>
                   <a
                     v-for="(item, index) in [
-                      { title: 'Chính sách', value: 'terms' },
-                      // ...(version
-                      //   ? []
-                      //   : [
-                      //       {
-                      //         title: 'Tải công cụ về máy',
-                      //         value: 'download-tool',
-                      //       },
-                      //     ]),
                       { title: 'Liên hệ admin (zalo)', value: 'contact' },
                       { title: 'Tham gia nhóm (zalo)', value: 'zalo-group' },
                       {
                         title: 'Tham gia nhóm (facebook)',
                         value: 'facebook-group',
                       },
+                      { title: 'Điều khoản & Thanh toán', value: 'terms' },
                     ]"
                     :key="index"
                     class="cursor-pointer"
@@ -138,22 +130,22 @@ onMounted(async () => {
 
                   <a
                     target="_blank"
-                    href="https://www.youtube.com/@tiencodeweb"
-                    class="d-flex align-center ga-2"
-                  >
-                    <img src="/images/icon-youtube.png" style="width: 1.3rem" />
-                    <span style="margin-bottom: 2.6px">Tien Code Web</span>
-                  </a>
-
-                  <a
-                    target="_blank"
-                    href="https://www.facebook.com/profile.php?id=61581457633919"
+                    href="https://www.facebook.com/tnsolve2025"
                     class="d-flex align-center ga-2"
                   >
                     <img
                       src="/images/icon-facebook.png"
                       style="width: 1.3rem"
                     />
+                    <span style="margin-bottom: 2.6px">TN Solve</span>
+                  </a>
+
+                  <a
+                    target="_blank"
+                    href="https://www.youtube.com/@tiencodeweb"
+                    class="d-flex align-center ga-2"
+                  >
+                    <img src="/images/icon-youtube.png" style="width: 1.3rem" />
                     <span style="margin-bottom: 2.6px">Tien Code Web</span>
                   </a>
 

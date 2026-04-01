@@ -3,116 +3,89 @@ const { t } = useI18n();
 
 const content = ref<string>(`
   <div>
-    <h1 class="text-h5 text-md-h4 font-bold mb-1">Chính sách & Điều khoản</h1>
-    <p class="text-grey-darken-1 mb-6">Cập nhật lần cuối: [Ngày 31 tháng 01 năm 2026]</p>
+    <h1 class="text-h5 text-md-h4 font-bold mb-1">Điều khoản & Thanh toán</h1>
+    <p class="text-grey-darken-1 mb-6">Cập nhật lần cuối: Ngày 31 tháng 01 năm 2026</p>
     
     <p class="mb-6">
-      Chào mừng bạn đến với <b>Tool Video TN Solve</b>! Cảm ơn bạn đã tin dùng. Khi bạn <strong>thanh toán online</strong> và sử dụng tool, bạn đồng ý với các quy định đơn giản và rõ ràng dưới đây.
+      Chào mừng bạn đến với <b>Tool Video TN Solve</b>. Để đảm bảo quyền lợi của đôi bên, vui lòng đọc kỹ các quy định về chi phí và sử dụng dưới đây.
     </p>
 
-    <div id="tom-tat" class="section-anchor"></div>
-    <div 
-      class="pa-4 mb-8" 
-      style="background-color: #E3F2FD; border-left: 5px solid #1E88E5; border-radius: 4px;"
-    >
-      <h4 class="text-h6 mb-2 text-primary d-flex align-center">
-        <i class="mdi mdi-information-outline mr-3" style="font-size: 28px;"></i>
-        Tóm tắt nhanh (Những điều quan trọng nhất)
+    <div id="tom-tat" class="pa-4 mb-8" style="background-color: #E8F5E9; border-left: 5px solid #4CAF50; border-radius: 4px;">
+      <h4 class="text-h6 mb-2 text-success d-flex align-center">
+        <i class="mdi mdi-flash-outline mr-3" style="font-size: 28px;"></i>
+        Thông tin quan trọng
       </h4>
       <ul class="pl-10">
-        <li><strong>Video của bạn là của bạn:</strong> Bạn toàn quyền sở hữu và sử dụng video (kể cả mục đích thương mại).</li>
-        <li><strong>Thanh toán online (99k/tháng):</strong> Thanh toán trực tiếp qua hệ thống, kích hoạt tự động theo số tháng bạn chọn.</li>
-        <li><strong>Gia hạn:</strong> Hết hạn tool sẽ tự khóa. Bạn có thể gia hạn online bất cứ lúc nào.</li>
-        <li><strong>Bảo mật & Chơi đẹp:</strong> Chúng tôi không bán dữ liệu của bạn và mong bạn không dùng tool để làm việc xấu.</li>
+        <li><strong>Dùng thử trước:</strong> Bạn có thể trải nghiệm tool miễn phí trước khi quyết định mua.</li>
+        <li><strong>Sở hữu video:</strong> Video bạn tạo ra thuộc toàn quyền sở hữu của bạn.</li>
+        <li><strong>Bảo mật:</strong> Chúng tôi không bán dữ liệu của bạn cho bất kỳ bên thứ ba nào.</li>
       </ul>
     </div>
 
-    <div id="thanh-toan" class="section-anchor"></div>
-    <h2 class="text-h5 font-weight-bold mt-10 mb-4">1. Đăng ký & Thanh toán (Gói 99k/tháng)</h2>
-    <p class="mb-4">Quy trình thanh toán online rất đơn giản:</p>
-    
-    <ul style="list-style: none; padding-left: 0;">
-      <li class="d-flex align-start mb-4">
-        <span><strong>Chọn gói:</strong> Bạn chọn số tháng cần đăng ký (99.000 VNĐ/tháng).</span>
-      </li>
-      <li class="d-flex align-start mb-4">
-        <span><strong>Thanh toán online:</strong> Bạn thanh toán trực tiếp qua hệ thống (ví dụ: 3 tháng = 297.000 VNĐ).</span>
-      </li>
-      <li class="d-flex align-start mb-4">
-        <span><strong>Kích hoạt tự động:</strong> Sau khi thanh toán thành công, tài khoản sẽ được kích hoạt/gia hạn tự động theo thời gian bạn đã mua.</span>
-      </li>
-      <li class="d-flex align-start mb-4">
-        <span><strong>Hết hạn:</strong> Khi hết thời gian, tài khoản sẽ tự động không thể tạo video mới cho đến khi bạn gia hạn.</span>
-      </li>
-      <li class="d-flex align-start mb-4">
-        <span><strong>Gia hạn online:</strong> Bạn có thể gia hạn bất cứ lúc nào bằng cách thanh toán lại cho chu kỳ tiếp theo.</span>
-      </li>
-    </ul>
-
-    <div 
-      class="pa-4 mt-7" 
-      style="border: 1px solid #90CAF9; background-color: #E3F2FD; border-radius: 4px;"
-    >
-      <p class="d-flex align-center text-primary" style="margin: 0;">
-        <i class="mdi mdi-credit-card-check-outline mr-3" style="font-size: 24px;"></i>
-        <strong>Xác nhận thanh toán:</strong> Nếu bạn đã thanh toán thành công nhưng tài khoản chưa được kích hoạt, vui lòng liên hệ hỗ trợ và cung cấp email/số điện thoại đăng ký + mã giao dịch (nếu có) để chúng tôi kiểm tra.
-      </p>
+    <div id="gia-ca" class="section-anchor"></div>
+    <h2 class="text-h5 font-weight-bold mt-10 mb-4">1. Chi phí & Hệ thống tín dụng</h2>
+    <div class="v-table v-table--has-top v-table--has-bottom theme--light mb-6">
+      <table class="w-100" style="border-collapse: collapse; border: 1px solid #eee;">
+        <thead>
+          <tr style="background-color: #f5f5f5;">
+            <th class="text-left pa-3">Gói dịch vụ</th>
+            <th class="text-left pa-3">Chi phí</th>
+            <th class="text-left pa-3">Quyền lợi</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="pa-3 border-bottom"><strong>Gói Đăng ký</strong></td>
+            <td class="pa-3 border-bottom">99.000 VNĐ</td>
+            <td class="pa-3 border-bottom">Kích hoạt tài khoản + <strong>4.000 tín dụng</strong></td>
+          </tr>
+          <tr>
+            <td class="pa-3 border-bottom"><strong>Mua lẻ tín dụng</strong></td>
+            <td class="pa-3 border-bottom">10.000 VNĐ</td>
+            <td class="pa-3 border-bottom">Thêm <strong>2.000 tín dụng</strong></td>
+          </tr>
+        </tbody>
+      </table>
     </div>
-    
-    <div 
-      class="pa-4 mt-6" 
-      style="border: 1px solid #FB8C00; background-color: #FFF3E0; border-radius: 4px;"
-    >
-      <p class="d-flex align-center text-warning-darken-3" style="margin: 0;">
-        <i class="mdi mdi-cash-remove mr-3" style="font-size: 24px;"></i>
-        Lưu ý về Hoàn tiền: Vì chi phí máy chủ AI rất tốn kém, chúng tôi không hỗ trợ hoàn tiền sau khi gói đã được kích hoạt hoặc đã phát sinh lượt xử lý.
+    <p class="mb-4 italic text-grey-darken-2">* Tín dụng sẽ được trừ dần dựa trên số lượng/thời lượng video bạn tạo.</p>
+
+    <div id="hoan-tien" class="section-anchor"></div>
+    <div class="pa-4 mt-6" style="border: 1px solid #FB8C00; background-color: #FFF3E0; border-radius: 4px;">
+      <h3 class="text-h6 font-weight-bold mb-2 text-warning-darken-4 d-flex align-center">
+        <i class="mdi mdi-alert-circle-outline mr-2"></i> Chính sách Không hoàn tiền
+      </h3>
+      <p class="mb-0">
+        TN Solve cung cấp <strong>chế độ dùng thử miễn phí</strong> để khách hàng kiểm tra tính năng và chất lượng trước khi thanh toán. Do đó, sau khi bạn đã đăng ký gói hoặc mua thêm tín dụng, chúng tôi <strong>không hỗ trợ hoàn trả tiền</strong> với bất kỳ lý do gì.
       </p>
     </div>
 
     <div id="quyen-so-huu" class="section-anchor"></div>
-    <h2 class="text-h5 font-weight-bold mt-10 mb-4">2. Quyền Sở hữu Video</h2>
-    <p class="mb-4">
-      <strong>Nội dung của bạn:</strong> Mọi nội dung (văn bản, hình ảnh, v.v.) bạn tải lên đều là của bạn.
-    </p>
-    <p class="mb-4">
-      <strong>Video do AI tạo ra:</strong> Bạn là chủ sở hữu của video cuối cùng. Bạn được cấp phép đầy đủ (kể cả quyền thương mại) để sử dụng, chia sẻ, hoặc bán các video bạn tạo ra trong thời gian tài khoản còn hạn.
-    </p>
-
-    <div id="bao-mat" class="section-anchor"></div>
-    <h2 class="text-h5 font-weight-bold mt-10 mb-4">3. Chính sách Bảo mật</h2>
-    <p class="mb-4">
-      Chúng tôi chỉ thu thập thông tin tài khoản cơ bản (email) và nội dung bạn tải lên để AI xử lý.
-    </p>
-    <p class="mb-4">
-      <strong>Cam kết:</strong> Chúng tôi <strong>KHÔNG</strong> bán hoặc chia sẻ thông tin cá nhân của bạn cho bất kỳ bên thứ ba nào. Dữ liệu của bạn chỉ dùng để duy trì dịch vụ.
-    </p>
-
-    <div id="quy-tac" class="section-anchor"></div>
-    <h2 class="text-h5 font-weight-bold mt-10 mb-4">4. Quy tắc Sử dụng</h2>
-    <p class="mb-4">Vui lòng không sử dụng dịch vụ của chúng tôi để tạo ra nội dung:</p>
-    <ul class="pl-6 mb-4">
-      <li>Vi phạm pháp luật Việt Nam.</li>
-      <li>Có tính chất thù địch, bạo lực, hoặc phân biệt đối xử.</li>
-      <li>Vi phạm bản quyền hoặc thương hiệu của người khác.</li>
-      <li>Tạo thông tin sai lệch (deepfake) có mục đích gây hại.</li>
+    <h2 class="text-h5 font-weight-bold mt-10 mb-4">2. Quyền & Trách nhiệm</h2>
+    <ul class="pl-6">
+      <li class="mb-2"><strong>Quyền sở hữu:</strong> Bạn có quyền sử dụng video cho mục đích cá nhân hoặc thương mại (YouTube, TikTok, quảng cáo...).</li>
+      <li class="mb-2"><strong>Bảo mật:</strong> Tài khoản của bạn là duy nhất. Vui lòng không chia sẻ tài khoản cho nhiều người dùng chung.</li>
+      <li class="mb-2"><strong>Nội dung cấm:</strong> Không sử dụng tool để tạo nội dung vi phạm pháp luật, đồi trụy, lừa đảo (deepfake) hoặc công kích cá nhân/tổ chức.</li>
     </ul>
-    <p>Chúng tôi có quyền khóa tài khoản của bạn (kể cả khi còn hạn) nếu phát hiện vi phạm nghiêm trọng.</p>
+
+    <div class="pa-4 mt-8 text-center" style="background-color: #f9f9f9; border-radius: 8px;">
+      <p class="mb-0">Mọi thắc mắc về kích hoạt tài khoản hoặc lỗi kỹ thuật, vui lòng liên hệ Zalo hỗ trợ để được xử lý nhanh nhất.</p>
+    </div>
 
     <style>
       .section-anchor {
         display: block;
         position: relative;
-        top: -80px; /* Điều chỉnh bằng chiều cao header của bạn */
+        top: -80px;
         visibility: hidden;
       }
+      .border-bottom { border-bottom: 1px solid #eee; }
     </style>
   </div>
 `);
 
 useSeo({
-  title: t("Chính sách"),
-  description:
-    "Nền tảng AI giúp bạn tạo video chuyên nghiệp chỉ trong vài phút",
+  title: t("Chính sách & Điều khoản"),
+  description: "Nền tảng AI giúp bạn tạo video chuyên nghiệp chỉ với 99k",
   image: "/images/page-home.png",
 });
 </script>
