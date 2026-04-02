@@ -164,8 +164,6 @@ onMounted(async () => {
         ]);
 
         if (client.value) {
-          // await appService.restartProcess().catch(() => null);
-
           if (
             (window as any).electronAPI &&
             (window as any).electronAPI.sendEmailToSocket &&
