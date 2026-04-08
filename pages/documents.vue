@@ -61,6 +61,11 @@ const documents = [
     value:
       "https://gemini.google.com/gem/1VVX-4ZWiP-JoJJP5CVTqcZxdBi2_8DMc?usp=sharing",
   },
+  {
+    title: "📝 AI Chuyên Làm Video Podcast Triết Lý",
+    value:
+      "https://gemini.google.com/gem/1FZkD9kDuDCE-AvnPIt4KNrEa1Ih_XjIK?usp=sharing",
+  },
 ];
 
 const onClickDocument = (item: any) => {
