@@ -66,6 +66,11 @@ const documents = [
     value:
       "https://gemini.google.com/gem/1FZkD9kDuDCE-AvnPIt4KNrEa1Ih_XjIK?usp=sharing",
   },
+  {
+    title: "📝 Xưởng Phim Cinematic AI (Pro Director)",
+    value:
+      "https://gemini.google.com/gem/1a6CxQz_FAGG4Ks_ZOy87PVBoBD3lv97C?usp=sharing",
+  },
 ];
 
 const onClickDocument = (item: any) => {
