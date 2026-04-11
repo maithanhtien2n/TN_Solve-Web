@@ -17,6 +17,11 @@ const documents = [
       "https://gemini.google.com/gem/1xcYJ7af0H8S1NxE0n1IKRsFZX2y_qoIl?usp=sharing",
   },
   {
+    title: "🎬 AI Biên Soạn Prompt Drama Mẹ Chồng Nàng Dâu (Đồng bộ nhân vật)",
+    value:
+      "https://gemini.google.com/gem/14P3CwGGH-SOmH76uRoeGoICMcYk5C5wx?usp=sharing",
+  },
+  {
     title:
       "📝 AI Chuyên Làm Video Podcast Triết Lý (Đồng bộ nhân vật, Tùy chỉnh nhân vật)",
     value:
