@@ -354,13 +354,32 @@ definePageMeta({ middleware: "auth" });
       <div ref="loadMore" />
     </v-row>
 
-    <div v-else class="mx-auto my-10 text-center">
-      <v-icon icon="mdi-movie-open-outline" size="40" class="mb-1" />
+    <v-card
+      v-else
+      class="empty-state-box d-flex flex-column align-center justify-center rounded-xl bg-grey-lighten-5 text-center mt-6"
+      variant="flat"
+      style="min-height: 24rem"
+    >
+      <div
+        class="empty-icon-wrapper mb-5 d-flex align-center justify-center rounded-circle bg-white"
+      >
+        <v-icon color="#8cb8f4" size="56">mdi-movie-open-remove-outline</v-icon>
+      </div>
+      <h3 class="text-h6 font-weight-bold text-grey-darken-3 mb-2">
+        {{ $t("Bạn chưa có thước phim nào") }}
+      </h3>
+      <span class="text-grey-darken-1 text-body-1 mb-6">
+        Hãy tạo video đầu tiên để bắt đầu trải nghiệm hệ thống.
+      </span>
+      <ButtonCreateVideo />
+    </v-card>
 
-      <div>{{ $t("Chưa có thước phim nào của bạn") }}.</div>
+    <div
+      v-if="Array.isArray(products.docs) && products.docs.length"
+      class="mt-8"
+    >
+      <ButtonCreateVideo />
     </div>
-
-    <ButtonCreateVideo style="margin-top: 2rem" />
   </div>
 </template>
 
@@ -417,5 +436,20 @@ definePageMeta({ middleware: "auth" });
   height: 100%;
   object-fit: contain;
   z-index: 1;
+}
+
+/* Hiệu ứng cho Empty State */
+.empty-state-box {
+  border: 2px dashed #cbd5e1;
+  transition: all 0.3s ease;
+}
+.empty-state-box:hover {
+  border-color: #94a3b8;
+  background-color: #f1f5f9 !important;
+}
+.empty-icon-wrapper {
+  width: 96px;
+  height: 96px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04);
 }
 </style>
