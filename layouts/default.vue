@@ -197,6 +197,7 @@ onMounted(async () => {
     }).catch(() => {});
 
     if (
+      !commonDialogPaymentRef.value?.display &&
       userData.value?.role &&
       userData.value?.role !== EnumAccountRole.ADMIN &&
       !isMobile.value
@@ -226,7 +227,7 @@ onMounted(async () => {
       title="Thông báo hệ thống"
       width="450"
     >
-      <v-card-text class="pa-8 text-center">
+      <v-card-text class="py-4 px-1 text-center">
         <v-avatar color="success-lighten-5" size="80" class="mb-6">
           <v-icon icon="mdi-check-circle" color="success" size="64"></v-icon>
         </v-avatar>

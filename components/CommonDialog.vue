@@ -18,7 +18,7 @@ watch(display, (newValue) => {
   emits("change", newValue);
 });
 
-defineExpose({ onDisplay });
+defineExpose({ onDisplay, display });
 </script>
 
 <template>
