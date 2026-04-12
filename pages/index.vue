@@ -96,8 +96,8 @@ useSeo({
 
         <div :style="{ 'font-size': isMobile ? '1rem' : '1.2rem' }">
           Nhóm Zalo:
-          <a target="_blank" href="https://zalo.me/g/manjgi860">
-            https://zalo.me/g/manjgi860
+          <a target="_blank" href="https://zalo.me/g/p8hls5tonlfkqmyfndmx">
+            https://zalo.me/g/p8hls5tonlfkqmyfndmx
           </a>
         </div>
       </div>
@@ -129,8 +129,8 @@ useSeo({
 
       <div :style="{ 'font-size': isMobile ? '1rem' : '1.2rem' }">
         Nhóm Zalo:
-        <a target="_blank" href="https://zalo.me/g/manjgi860">
-          https://zalo.me/g/manjgi860
+        <a target="_blank" href="https://zalo.me/g/p8hls5tonlfkqmyfndmx">
+          https://zalo.me/g/p8hls5tonlfkqmyfndmx
         </a>
       </div>
     </div>

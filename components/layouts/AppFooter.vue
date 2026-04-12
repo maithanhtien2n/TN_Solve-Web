@@ -26,7 +26,7 @@ const onClickNavigate = (value: string) => {
     if (value === "contact") {
       window.open("https://zalo.me/0343027232", "_blank");
     } else if (value === "zalo-group") {
-      window.open("https://zalo.me/g/manjgi860", "_blank");
+      window.open("https://zalo.me/g/p8hls5tonlfkqmyfndmx", "_blank");
     } else if (value === "facebook-group") {
       window.open("https://www.facebook.com/groups/1175744533986396", "_blank");
     } else {

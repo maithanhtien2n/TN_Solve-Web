@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { accountService, appService, authService } from "~/services/app";
+import { accountService, authService } from "~/services/app";
 
 import AppHeader from "~/components/layouts/AppHeader.vue";
 import AppFooter from "~/components/layouts/AppFooter.vue";
@@ -9,6 +9,7 @@ const router = useRouter();
 const localePath = useLocalePath();
 
 const { t } = useI18n();
+const { $toast } = useNuxtApp();
 const { isMobile } = useDevice();
 
 const {
@@ -22,6 +23,7 @@ const { onGetterMasterData, onActionAllMasterDataClient } =
 
 const loading = ref(true);
 const commonDialogRef = ref<any>(null);
+const commonDialogPaymentRef = ref<any>(null);
 
 const client = computed<boolean>(() => {
   const win = window as any;
@@ -140,8 +142,10 @@ onMounted(async () => {
 
     if (route.query?.status === "PAID") {
       router.replace(localePath("/"));
+      commonDialogPaymentRef.value?.onDisplay(true);
     } else if (route.query?.status === "CANCELLED") {
       router.replace(localePath("/"));
+      $toast.error("Bạn đã hủy thanh toán!");
     }
 
     await onActionGetUserData(params)
@@ -217,6 +221,54 @@ onMounted(async () => {
   <AppLoading v-if="loading || !breadcrumbsItems || !breadcrumbsItems.length" />
 
   <v-app>
+    <CommonDialog
+      ref="commonDialogPaymentRef"
+      title="Thông báo hệ thống"
+      width="450"
+    >
+      <v-card-text class="pa-8 text-center">
+        <v-avatar color="success-lighten-5" size="80" class="mb-6">
+          <v-icon icon="mdi-check-circle" color="success" size="64"></v-icon>
+        </v-avatar>
+
+        <h3 class="text-h5 font-weight-bold mb-2 text-grey-darken-3">
+          Thanh toán thành công!
+        </h3>
+
+        <p class="text-body-1 text-grey-darken-1 mb-6">
+          Cảm ơn bạn đã tin dùng <strong>TN SOLVE</strong>. Để không bỏ lỡ các
+          tài liệu và hướng dẫn mới nhất, mời bạn tham gia cộng đồng của chúng
+          tôi.
+        </p>
+
+        <v-sheet
+          color="blue-lighten-5"
+          rounded="lg"
+          class="pa-4 mb-6 border-dashed border-blue-lighten-3 border-md"
+        >
+          <div class="d-flex align-center justify-center mb-2">
+            <v-icon color="blue-darken-2" class="mr-2" size="27">
+              mdi-account-group
+            </v-icon>
+            <span
+              class="font-bold text-blue-darken-3"
+              style="font-size: 1.2rem"
+            >
+              Cộng đồng hỗ trợ Zalo
+            </span>
+          </div>
+
+          <a
+            target="_blank"
+            href="https://zalo.me/g/p8hls5tonlfkqmyfndmx"
+            style="font-size: 1.2rem"
+          >
+            https://zalo.me/g/p8hls5tonlfkqmyfndmx
+          </a>
+        </v-sheet>
+      </v-card-text>
+    </CommonDialog>
+
     <CommonDialog
       ref="commonDialogRef"
       title="Thông báo từ TN SOLVE"
@@ -320,5 +372,27 @@ onMounted(async () => {
   .swiper-slide-container {
     border-radius: 0 !important;
   }
+}
+
+.v-avatar {
+  animation: scaleIn 0.5s ease-out;
+}
+
+@keyframes scaleIn {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  60% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.border-dashed {
+  border-style: dashed !important;
 }
 </style>
