@@ -33,8 +33,8 @@ const onClickAction = async (data?: any | null, action?: string) => {
         await fetch(
           `${
             import.meta.env.VITE_API_URL === "http://localhost:3000"
-              ? "http://localhost:3000/api/common/update-storage-state?secret=0573725920Tien"
-              : "https://api.tnsolve.com/api/common/update-storage-state?secret=0573725920Tien"
+              ? "http://localhost:3000/api/common/update-storage-state?secret=tnchonghack@2026"
+              : "https://api.tnsolve.com/api/common/update-storage-state?secret=tnchonghack@2026"
           }`,
           {
             method: "GET",
