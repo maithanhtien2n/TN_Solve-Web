@@ -62,7 +62,7 @@ const isError = computed(() =>
 const modelVideoOptions = computed(() => {
   let list = onGetterMasterData.value["model-video"] || [];
 
-  list = list?.filter((x: any) => !["tn_solve_1", 'grok'].includes(x.value));
+  list = list?.filter((x: any) => !["tn_solve_1", "grok"].includes(x.value));
 
   return list;
 });
@@ -207,6 +207,10 @@ const videoDurationOptions = computed(() => {
         title: convert8to6(x.title),
         value: x.value,
       })) || [];
+
+    return allOptions.filter((option: any) =>
+      ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"].includes(option.value)
+    );
   }
 
   allOptions =
