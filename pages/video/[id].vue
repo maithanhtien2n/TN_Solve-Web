@@ -208,7 +208,7 @@ const videoDurationOptions = computed(() => {
         value: x.value,
       })) || [];
 
-    return allOptions.filter((option: any) =>
+    allOptions = allOptions.filter((option: any) =>
       [
         "1",
         "2",
