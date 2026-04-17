@@ -17,6 +17,11 @@ const documents = [
       "https://gemini.google.com/gem/1xcYJ7af0H8S1NxE0n1IKRsFZX2y_qoIl?usp=sharing",
   },
   {
+    title: "🎬 ĐẠO DIỄN AI SỬ THI 2D (Làm phim, Đồng bộ nhân vật)",
+    value:
+      "https://gemini.google.com/gem/1PMB2sYtZ9Z1tP5RRaOTwiLA0MBkL2-GN?usp=sharing",
+  },
+  {
     title: "🎬 AI Biên Soạn Prompt Drama Mẹ Chồng Nàng Dâu (Đồng bộ nhân vật)",
     value:
       "https://gemini.google.com/gem/14P3CwGGH-SOmH76uRoeGoICMcYk5C5wx?usp=sharing",
