@@ -132,21 +132,22 @@ onMounted(async () => {
     if (referralId.value) params.ref = referralId.value;
     if (!params.ref && route.query?.code) params.code = route.query.code;
 
-    // if (route.query?.message === "giao-dich-thanh-cong") {
-    //   await onActionGetUserData(params)
-    //     .then(() => {
-    //       router.replace(localePath("/"));
-    //     })
-    //     .catch(() => {});
-    // }
-
-    if (route.query?.status === "PAID") {
-      router.replace(localePath("/"));
-      commonDialogPaymentRef.value?.onDisplay(true);
-    } else if (route.query?.status === "CANCELLED") {
-      router.replace(localePath("/"));
-      $toast.error("Bạn đã hủy thanh toán!");
+    if (route.query?.message === "giao-dich-thanh-cong") {
+      await onActionGetUserData(params)
+        .then(() => {
+          router.replace(localePath("/"));
+          commonDialogPaymentRef.value?.onDisplay(true);
+        })
+        .catch(() => {});
     }
+
+    // if (route.query?.status === "PAID") {
+    //   router.replace(localePath("/"));
+    //   commonDialogPaymentRef.value?.onDisplay(true);
+    // } else if (route.query?.status === "CANCELLED") {
+    //   router.replace(localePath("/"));
+    //   $toast.error("Bạn đã hủy thanh toán!");
+    // }
 
     await onActionGetUserData(params)
       .then(async () => {
