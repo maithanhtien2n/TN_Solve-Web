@@ -148,7 +148,7 @@ const videoStyleOptions = computed(() => {
     }
     case "my_subject": {
       return list.filter((x: any) =>
-        ["general", "testimonial"].includes(x.value)
+        ["general", "testimonial", 'shorts'].includes(x.value)
       );
     }
     case "custom_character": {
