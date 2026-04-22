@@ -27,6 +27,11 @@ const documents = [
       "https://gemini.google.com/gem/1GcTxzg1m9wmH052hKGniwmOZTdWSu0U8?usp=sharing",
   },
   {
+    title: "🎭 Kiến Trúc Sư AI Video Truyền Động Lực (Làm phim)",
+    value:
+      "https://gemini.google.com/gem/1gIW0-Ha8OtkB38hbo6V7rP0tTi_kXm6J?usp=sharing",
+  },
+  {
     title: "🎬 AI Biên Soạn Prompt Drama Mẹ Chồng Nàng Dâu (Đồng bộ nhân vật)",
     value:
       "https://gemini.google.com/gem/14P3CwGGH-SOmH76uRoeGoICMcYk5C5wx?usp=sharing",
