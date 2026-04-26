@@ -1,7 +1,7 @@
 module.exports = {
   apps: [
     {
-      name: "tool_video-fe",
+      name: "tn_solve-fe",
       script: ".output/server/index.mjs",
       interpreter: "node",
       env: {
