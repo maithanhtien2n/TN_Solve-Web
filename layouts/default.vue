@@ -171,14 +171,14 @@ onMounted(async () => {
         if (client.value) {
           if (
             (window as any).electronAPI &&
-            (window as any).electronAPI.sendEmailToSocket &&
+            (window as any).electronAPI.sendUserData &&
             userData.value?.email
           ) {
-            (window as any).electronAPI.sendEmailToSocket(
-              userData.value?.email
+            (window as any).electronAPI.sendUserData(
+              JSON.stringify(userData.value)
             );
           } else {
-            console.error("Không tìm thấy electronAPI hoặc sendEmailToSocket");
+            console.error("Không tìm thấy electronAPI hoặc sendUserData");
           }
         }
       })

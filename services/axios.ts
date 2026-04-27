@@ -73,6 +73,7 @@ api.interceptors.response.use(
         "❌ Tài khoản đã bị tạm dừng!",
         "❌ Tài khoản bị đình chỉ do vi phạm!",
         "❌ Tài khoản đã bị xoá!",
+        "❌ Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại để tiếp tục!",
       ].includes(error.response?.data?.message)
     ) {
       useAppStore().onActionSetSystemPopup({
