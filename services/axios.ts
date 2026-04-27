@@ -68,6 +68,19 @@ api.interceptors.response.use(
       useRouter().replace("/");
     }
 
+    if (
+      [
+        "❌ Tài khoản đã bị tạm dừng!",
+        "❌ Tài khoản bị đình chỉ do vi phạm!",
+        "❌ Tài khoản đã bị xoá!",
+      ].includes(error.response?.data?.message)
+    ) {
+      useAppStore().onActionSetSystemPopup({
+        type: "error",
+        content: error.response?.data?.message || error.message,
+      });
+    }
+
     return Promise.reject(error);
   }
 );
