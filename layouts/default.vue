@@ -9,11 +9,11 @@ const router = useRouter();
 const localePath = useLocalePath();
 
 const { t } = useI18n();
-const { $toast } = useNuxtApp();
 const { isMobile } = useDevice();
 
 const {
   onActionGetUserData,
+  onGetterSystemPopup,
   onGetterUserData: userData,
   onGetterDisplayPopupBuyCredit,
   onGetterDisplayLogin: displayLogin,
@@ -132,14 +132,14 @@ onMounted(async () => {
     if (referralId.value) params.ref = referralId.value;
     if (!params.ref && route.query?.code) params.code = route.query.code;
 
-    if (route.query?.message === "giao-dich-thanh-cong") {
-      await onActionGetUserData(params)
-        .then(() => {
-          router.replace(localePath("/"));
-          commonDialogPaymentRef.value?.onDisplay(true);
-        })
-        .catch(() => {});
-    }
+    // if (route.query?.message === "giao-dich-thanh-cong") {
+    //   await onActionGetUserData(params)
+    //     .then(() => {
+    //       router.replace(localePath("/"));
+    //       commonDialogPaymentRef.value?.onDisplay(true);
+    //     })
+    //     .catch(() => {});
+    // }
 
     // if (route.query?.status === "PAID") {
     //   router.replace(localePath("/"));
@@ -148,6 +148,17 @@ onMounted(async () => {
     //   router.replace(localePath("/"));
     //   $toast.error("Bạn đã hủy thanh toán!");
     // }
+
+    if (route.query?.message === "0") {
+      router.replace(localePath("/"));
+      commonDialogPaymentRef.value?.onDisplay(true);
+    } else {
+      router.replace(localePath("/"));
+      useAppStore().onActionSetSystemPopup({
+        type: "error",
+        content: "Bạn đã hủy thanh toán thành công!",
+      });
+    }
 
     await onActionGetUserData(params)
       .then(async () => {
@@ -198,6 +209,7 @@ onMounted(async () => {
     }).catch(() => {});
 
     if (
+      !onGetterSystemPopup.value?.display &&
       !commonDialogPaymentRef.value?.display &&
       userData.value?.role &&
       userData.value?.role !== EnumAccountRole.ADMIN &&

@@ -25,21 +25,21 @@ export const appService = {
     return await api.post("/accounts/settings", data);
   },
 
-  // async createPaymentUrl(payload: any) {
-  //   return await api.post("/common/payment-requests", payload);
-  // },
-
-  // async createPaymentUrlBuyCredit(payload: any) {
-  //   return await api.post("/common/payment-requests/buy-credit", payload);
-  // },
-
   async createPaymentUrl(payload: any) {
-    return await api.post("/common/create-payment-url", payload);
+    return await api.post("/common/payment2s-requests", payload);
   },
 
   async createPaymentUrlBuyCredit(payload: any) {
-    return await api.post("/common/create-payment-url/buy-credit", payload);
+    return await api.post("/common/payment2s-requests/buy-credit", payload);
   },
+
+  // async createPaymentUrl(payload: any) {
+  //   return await api.post("/common/create-payment-url", payload);
+  // },
+
+  // async createPaymentUrlBuyCredit(payload: any) {
+  //   return await api.post("/common/create-payment-url/buy-credit", payload);
+  // },
 
   async restartProcess() {
     return await api.post("/common/restart-process");
