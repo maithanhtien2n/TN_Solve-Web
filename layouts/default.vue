@@ -163,7 +163,7 @@ onMounted(async () => {
         // 🟡 KHÁCH TỰ HỦY
         useAppStore().onActionSetSystemPopup({
           type: "warning",
-          content: "❌ Bạn đã hủy giao dịch thanh toán!",
+          content: "⚠️ Bạn đã hủy giao dịch thanh toán!",
         });
       } else {
         // 🔴 THẤT BẠI (Các lỗi hệ thống, ngân hàng từ chối...)
