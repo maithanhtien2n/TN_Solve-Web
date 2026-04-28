@@ -75,10 +75,10 @@ onMounted(async () => {
                 <nav>
                   <a
                     v-for="(item, index) in [
-                      { title: 'Tài liệu', value: 'documents' },
                       { title: 'Hướng dẫn', value: 'tutorial' },
                       // { title: 'Công cụ đa năng', value: 'tnsolve-teacher' },
                       { title: 'Đăng ký/gia hạn dịch vụ', value: 'payment' },
+                      { title: 'Điều khoản & Thanh toán', value: 'terms' },
                     ]"
                     :key="index"
                     class="cursor-pointer"
@@ -96,13 +96,13 @@ onMounted(async () => {
                 <nav>
                   <a
                     v-for="(item, index) in [
-                      { title: 'Liên hệ admin (zalo)', value: 'contact' },
+                      { title: 'Trợ lý viết câu lệnh', value: 'documents' },
+                      // { title: 'Liên hệ admin (zalo)', value: 'contact' },
                       { title: 'Tham gia nhóm (zalo)', value: 'zalo-group' },
                       {
                         title: 'Tham gia nhóm (facebook)',
                         value: 'facebook-group',
                       },
-                      { title: 'Điều khoản & Thanh toán', value: 'terms' },
                     ]"
                     :key="index"
                     class="cursor-pointer"
