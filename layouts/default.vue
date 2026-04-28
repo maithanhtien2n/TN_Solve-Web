@@ -163,7 +163,8 @@ onMounted(async () => {
         // 🟡 KHÁCH TỰ HỦY
         useAppStore().onActionSetSystemPopup({
           type: "warning",
-          content: "⚠️ Bạn đã hủy giao dịch thanh toán!",
+          content:
+            "⚠️ Bạn vừa hủy giao dịch, mã QR trước đó sẽ không còn hiệu lực!",
         });
       } else {
         // 🔴 THẤT BẠI (Các lỗi hệ thống, ngân hàng từ chối...)
