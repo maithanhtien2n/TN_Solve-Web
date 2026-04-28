@@ -149,15 +149,30 @@ onMounted(async () => {
     //   $toast.error("Bạn đã hủy thanh toán!");
     // }
 
-    if (route.query?.message === "0") {
+    const { resultCode } = route.query;
+
+    if (resultCode !== undefined && resultCode !== null) {
+      // 1. Làm sạch URL (Chuyển ngay về trang chủ)
       router.replace(localePath("/"));
-      commonDialogPaymentRef.value?.onDisplay(true);
-    } else {
-      router.replace(localePath("/"));
-      useAppStore().onActionSetSystemPopup({
-        type: "error",
-        content: "Bạn đã hủy thanh toán thành công!",
-      });
+
+      // 2. Phân nhánh xử lý theo mã trạng thái
+      if (resultCode === "0") {
+        // 🟢 THÀNH CÔNG
+        commonDialogPaymentRef.value?.onDisplay(true);
+      } else if (resultCode === "2") {
+        // 🟡 KHÁCH TỰ HỦY
+        useAppStore().onActionSetSystemPopup({
+          type: "warning",
+          content: "❌ Bạn đã hủy giao dịch thanh toán!",
+        });
+      } else {
+        // 🔴 THẤT BẠI (Các lỗi hệ thống, ngân hàng từ chối...)
+        useAppStore().onActionSetSystemPopup({
+          type: "error",
+          content:
+            "❌ Giao dịch không thành công, vui lòng kiểm tra lại tài khoản hoặc thử lại sau!",
+        });
+      }
     }
 
     await onActionGetUserData(params)
