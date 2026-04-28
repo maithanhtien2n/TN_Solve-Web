@@ -26,11 +26,11 @@ export const appService = {
   },
 
   async createPaymentUrl(payload: any) {
-    return await api.post("/common/payment2s-requests", payload);
+    return await api.post("/common/payment-requests", payload);
   },
 
   async createPaymentUrlBuyCredit(payload: any) {
-    return await api.post("/common/payment2s-requests/buy-credit", payload);
+    return await api.post("/common/payment-requests/buy-credit", payload);
   },
 
   // async createPaymentUrl(payload: any) {
