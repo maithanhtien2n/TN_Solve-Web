@@ -18,10 +18,10 @@ export default defineNuxtConfig({
     // xsl: false,
     autoI18n: true,
     autoLastmod: true,
-    exclude: ["/admin/**", "/lo/admin/**", "/vi/admin/**", "/en/admin/**"],
+    exclude: ["/admin/**", "/vi/admin/**"],
   },
   robots: {
-    disallow: ["/admin", "/lo/admin", "/vi/admin", "/en/admin"],
+    disallow: ["/admin", "/vi/admin", "/en/admin", "/lo/admin"],
     sitemap: ["/sitemap.xml"],
   },
 
@@ -38,7 +38,7 @@ export default defineNuxtConfig({
     defaultLocale: "vi",
     locales: [
       { code: "vi", name: "VietNam" },
-      { code: "lo", name: "Laos" },
+      // { code: "lo", name: "Laos" },
       // { code: "en", name: "English" },
     ],
     vueI18n: fileURLToPath(new URL("./i18n/index.ts", import.meta.url)),
