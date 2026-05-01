@@ -335,11 +335,9 @@ onMounted(async () => {
           </p> -->
         </div>
 
-        <v-divider class="my-10"></v-divider>
-
         <div class="d-flex flex-column gap-3">
           <a
-            class="download-btn justify-center"
+            class="download-btn justify-center mt-2"
             :href="appVersionDownload"
             target="_blank"
             rel="noopener"
@@ -349,6 +347,18 @@ onMounted(async () => {
               Tải công cụ TN Solve cho Windows
             </span>
           </a>
+
+          <div class="mt-6 d-flex justify-center">
+            <iframe
+              class="w-100"
+              height="300"
+              src="https://www.youtube.com/embed/GR2b8sXxUac"
+              frameborder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              referrerpolicy="strict-origin-when-cross-origin"
+              allowfullscreen
+            />
+          </div>
 
           <!-- <a
             target="_blank"
