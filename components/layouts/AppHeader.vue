@@ -76,13 +76,13 @@ const menus = computed(() => {
 
     items = items.filter((item) => item.value !== "account");
   } else if (userData.value?.role === "partner") {
-    items.splice(1, 0, {
+    items.splice(4, 0, {
       title: "Cộng tác viên",
       value: "partner",
       icon: "mdi-account-multiple-outline",
     });
 
-    items = items.filter((item) => item.value !== "account");
+    // items = items.filter((item) => item.value !== "account");
   }
 
   return items;
@@ -99,12 +99,6 @@ const onClickMenuItem = (value: string) => {
       ) {
         (window as any).electronAPI.logout({});
       }
-    });
-    return;
-  } else if (value === "account") {
-    onActionSetSystemPopup({
-      type: "info",
-      content: "Tính năng đang được phát triển!",
     });
     return;
   } else if (value === "buy-credit") {

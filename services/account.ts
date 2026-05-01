@@ -18,6 +18,14 @@ export const accountService = {
     return await api.get(`/accounts/transaction-history`, { params });
   },
 
+  async getMyPackageHistory(params: any) {
+    return await api.get("/accounts/my-package-history", { params });
+  },
+
+  async getMyCreditHistory(params: any) {
+    return await api.get("/accounts/my-credit-history", { params });
+  },
+
   // Dịch vụ thuê ---------------------
   async getAllServiceRental(params: any) {
     return await api.get(`/service-rentals`, { params });

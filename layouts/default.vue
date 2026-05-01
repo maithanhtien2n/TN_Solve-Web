@@ -42,6 +42,9 @@ const appVersionDownload = computed(
 
 const onReturnTitle = (title: string) => {
   switch (title) {
+    case "account": {
+      return "Tài khoản";
+    }
     case "create": {
       return "Tạo video";
     }
