@@ -293,7 +293,7 @@ export async function getPosterFromVideoUrl(
 
 export async function getSettingValue(key: string): Promise<string> {
   const url = `${import.meta.env.VITE_API_URL}/api/common/get-system-setting`;
-  const params = new URLSearchParams({ secret: "tnchonghack@2026", key });
+  const params = new URLSearchParams({ secret: "d98aeba92127b1cc2f7adfbe04dee7395fbebe84ec9052744b87ed5fa6a3bccc", key });
 
   return fetch(`${url}?${params}`)
     .then((res) => res.json())
