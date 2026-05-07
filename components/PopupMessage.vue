@@ -2,6 +2,26 @@
 import { useAppStore } from "@/stores/app.store";
 
 const { onGetterSystemPopup: systemPopup } = useAppStore();
+
+watch(
+  () => systemPopup.value.display,
+  (newValue, oldValue) => {
+    if (oldValue === true && newValue === false) {
+      const isUpdatePopup = systemPopup.value?.content?.includes(
+        "Ứng dụng đã có phiên bản mới"
+      );
+
+      if (isUpdatePopup) {
+        if (
+          (window as any)?.electronAPI &&
+          (window as any)?.electronAPI?.restartApp
+        ) {
+          (window as any).electronAPI.restartApp({});
+        }
+      }
+    }
+  }
+);
 </script>
 
 <template>
