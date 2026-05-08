@@ -78,6 +78,56 @@ export async function downloadVideo(
     (/iPad|iPhone|iPod/.test(navigator.userAgent) ||
       (/Macintosh/.test(navigator.userAgent) && navigator.maxTouchPoints > 1));
 
+  if (isIOS) {
+    // Mở tab trắng NGAY trong user gesture (trước bất kỳ await nào)
+    // để tránh popup blocker chặn khi gọi window.open sau async
+    const fallbackTab = window.open("about:blank", "_blank");
+
+    try {
+      if (callBack) callBack("download");
+
+      const response = await fetch(url);
+      if (!response.ok) throw new Error(`Fetch failed: ${response.status}`);
+
+      const blob = await response.blob();
+      const fileName = formatFileName(title, url);
+      const mimeType = blob.type || "video/mp4";
+      const file = new File([blob], fileName, { type: mimeType });
+
+      if (navigator.canShare?.({ files: [file] }) && navigator.share) {
+        // iOS 15+: đóng tab trắng rồi mở share sheet
+        fallbackTab?.close();
+        try {
+          await navigator.share({ files: [file], title });
+        } catch (shareErr: any) {
+          // AbortError = user tự đóng share sheet → không làm gì
+          // Lỗi khác → mở tab với URL gốc
+          if ((shareErr as any)?.name !== "AbortError") {
+            window.open(url, "_blank");
+          }
+        }
+      } else {
+        // Không hỗ trợ share files → redirect tab trắng sang video để long-press lưu
+        if (fallbackTab && !fallbackTab.closed) {
+          fallbackTab.location.href = url;
+        } else {
+          window.open(url, "_blank");
+        }
+      }
+    } catch {
+      // Fetch thất bại → redirect tab trắng sang URL gốc
+      if (fallbackTab && !fallbackTab.closed) {
+        fallbackTab.location.href = url;
+      } else {
+        window.open(url, "_blank");
+      }
+    }
+
+    if (callBack) callBack("");
+    return;
+  }
+
+  // Desktop / Android
   try {
     if (callBack) callBack("download");
 
@@ -86,31 +136,6 @@ export async function downloadVideo(
 
     const blob = await response.blob();
     const fileName = formatFileName(title, url);
-
-    // iOS/iPadOS: dùng Web Share API → share sheet → lưu vào Files/Photos
-    if (isIOS) {
-      const mimeType = blob.type || "video/mp4";
-      const file = new File([blob], fileName, { type: mimeType });
-      if (navigator.canShare?.({ files: [file] }) && navigator.share) {
-        try {
-          await navigator.share({ files: [file], title });
-        } catch (shareErr: any) {
-          if (shareErr?.name !== "AbortError") {
-            // Lỗi thật (không phải user cancel) → mở tab mới
-            window.open(url, "_blank");
-          }
-          // AbortError = user tự đóng share sheet → không làm gì thêm
-        }
-        if (callBack) callBack("");
-        return;
-      }
-      // Thiết bị iOS quá cũ không hỗ trợ share files → mở tab mới, long-press để lưu
-      window.open(url, "_blank");
-      if (callBack) callBack("");
-      return;
-    }
-
-    // Desktop / Android: blob URL + anchor click
     const blobUrl = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = blobUrl;
@@ -123,20 +148,13 @@ export async function downloadVideo(
     if (callBack) callBack("");
   } catch (err) {
     console.error("❌ Lỗi tải video:", err);
-
-    // Fetch thất bại (CORS / network) → fallback mở thẳng URL
-    if (isIOS) {
-      window.open(url, "_blank");
-    } else {
-      const a = document.createElement("a");
-      a.href = url;
-      a.target = "_blank";
-      a.setAttribute("download", "");
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-    }
-
+    const a = document.createElement("a");
+    a.href = url;
+    a.target = "_blank";
+    a.setAttribute("download", "");
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
     if (callBack) callBack("");
   }
 }
