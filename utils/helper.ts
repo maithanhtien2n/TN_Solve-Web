@@ -61,64 +61,81 @@ export async function downloadVideo(
   title: string,
   callBack?: (status: string) => void
 ) {
-  // Hàm format tên file giữ nguyên
   function formatFileName(title: string, originalUrl: string) {
-    const extension = originalUrl.split(".").pop()?.split("?")[0] || "mp4"; // Fix thêm lỗi nếu url có query string (?v=...)
+    const extension = originalUrl.split(".").pop()?.split("?")[0] || "mp4";
     const formatted = title
       .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[̀-ͯ]/g, "")
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, "-")
       .replace(/^-+|-+$/g, "");
-
     return `${formatted}.${extension}`;
   }
 
-  // Hàm tải trực tiếp (Fallback)
-  function forceDownloadFallback(url: string) {
-    console.warn("⚠️ Đang chuyển sang chế độ tải trực tiếp (Fallback)...");
-    const a = document.createElement("a");
-    a.href = url;
-    a.target = "_blank"; // Mở tab mới để tránh ảnh hưởng trang hiện tại
-    a.setAttribute("download", ""); // Gợi ý trình duyệt tải xuống thay vì play
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-  }
+  // Detect iOS/iPadOS (iPadOS 13+ request desktop site → userAgent báo Macintosh nhưng có touch)
+  const isIOS =
+    typeof navigator !== "undefined" &&
+    (/iPad|iPhone|iPod/.test(navigator.userAgent) ||
+      (/Macintosh/.test(navigator.userAgent) && navigator.maxTouchPoints > 1));
 
   try {
     if (callBack) callBack("download");
 
-    // Thử tải bằng fetch trước
     const response = await fetch(url);
-
-    // Nếu dính CORS hoặc lỗi server -> ném lỗi để nhảy xuống catch
     if (!response.ok) throw new Error(`Fetch failed: ${response.status}`);
 
     const blob = await response.blob();
-    const blobUrl = URL.createObjectURL(blob);
     const fileName = formatFileName(title, url);
 
+    // iOS/iPadOS: dùng Web Share API → share sheet → lưu vào Files/Photos
+    if (isIOS) {
+      const mimeType = blob.type || "video/mp4";
+      const file = new File([blob], fileName, { type: mimeType });
+      if (navigator.canShare?.({ files: [file] }) && navigator.share) {
+        try {
+          await navigator.share({ files: [file], title });
+        } catch (shareErr: any) {
+          if (shareErr?.name !== "AbortError") {
+            // Lỗi thật (không phải user cancel) → mở tab mới
+            window.open(url, "_blank");
+          }
+          // AbortError = user tự đóng share sheet → không làm gì thêm
+        }
+        if (callBack) callBack("");
+        return;
+      }
+      // Thiết bị iOS quá cũ không hỗ trợ share files → mở tab mới, long-press để lưu
+      window.open(url, "_blank");
+      if (callBack) callBack("");
+      return;
+    }
+
+    // Desktop / Android: blob URL + anchor click
+    const blobUrl = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = blobUrl;
-    a.download = fileName; // Chỉ fetch mới đổi được tên file
+    a.download = fileName;
     document.body.appendChild(a);
     a.click();
     a.remove();
-
     URL.revokeObjectURL(blobUrl);
-    console.log(`✅ Video đã tải xuống: ${fileName}`);
 
     if (callBack) callBack("");
   } catch (err) {
-    console.error(
-      "❌ Không thể tải qua Fetch (khả năng do CORS hoặc File quá lớn).",
-      err
-    );
+    console.error("❌ Lỗi tải video:", err);
 
-    // THỰC HIỆN FALLBACK:
-    // Nếu fetch thất bại, mở trực tiếp link gốc
-    forceDownloadFallback(url);
+    // Fetch thất bại (CORS / network) → fallback mở thẳng URL
+    if (isIOS) {
+      window.open(url, "_blank");
+    } else {
+      const a = document.createElement("a");
+      a.href = url;
+      a.target = "_blank";
+      a.setAttribute("download", "");
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+    }
 
     if (callBack) callBack("");
   }
