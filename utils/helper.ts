@@ -79,10 +79,6 @@ export async function downloadVideo(
       (/Macintosh/.test(navigator.userAgent) && navigator.maxTouchPoints > 1));
 
   if (isIOS) {
-    // Mở tab trắng NGAY trong user gesture (trước bất kỳ await nào)
-    // để tránh popup blocker chặn khi gọi window.open sau async
-    const fallbackTab = window.open("about:blank", "_blank");
-
     try {
       if (callBack) callBack("download");
 
@@ -95,32 +91,27 @@ export async function downloadVideo(
       const file = new File([blob], fileName, { type: mimeType });
 
       if (navigator.canShare?.({ files: [file] }) && navigator.share) {
-        // iOS 15+: đóng tab trắng rồi mở share sheet
-        fallbackTab?.close();
+        // iOS 15+: mở share sheet → người dùng chọn "Lưu vào Ảnh" / Files
         try {
           await navigator.share({ files: [file], title });
+          if (callBack) callBack("");
+          return;
         } catch (shareErr: any) {
-          // AbortError = user tự đóng share sheet → không làm gì
-          // Lỗi khác → mở tab với URL gốc
-          if ((shareErr as any)?.name !== "AbortError") {
-            window.open(url, "_blank");
+          if ((shareErr as any)?.name === "AbortError") {
+            // User tự tắt share sheet → không làm gì thêm
+            if (callBack) callBack("");
+            return;
           }
-        }
-      } else {
-        // Không hỗ trợ share files → redirect tab trắng sang video để long-press lưu
-        if (fallbackTab && !fallbackTab.closed) {
-          fallbackTab.location.href = url;
-        } else {
-          window.open(url, "_blank");
+          // Lỗi thật → rơi xuống fallback bên dưới
         }
       }
+
+      // Fallback (iOS cũ / share lỗi): điều hướng tab hiện tại sang URL video
+      // window.location.href không phải popup → không bao giờ bị chặn
+      window.location.href = url;
     } catch {
-      // Fetch thất bại → redirect tab trắng sang URL gốc
-      if (fallbackTab && !fallbackTab.closed) {
-        fallbackTab.location.href = url;
-      } else {
-        window.open(url, "_blank");
-      }
+      // Fetch thất bại → điều hướng thẳng đến URL gốc
+      window.location.href = url;
     }
 
     if (callBack) callBack("");
