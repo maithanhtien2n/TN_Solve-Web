@@ -26,6 +26,10 @@ export const accountService = {
     return await api.get("/accounts/my-credit-history", { params });
   },
 
+  async getPersonalToken() {
+    return await api.post("/accounts/personal-token");
+  },
+
   // Dịch vụ thuê ---------------------
   async getAllServiceRental(params: any) {
     return await api.get(`/service-rentals`, { params });

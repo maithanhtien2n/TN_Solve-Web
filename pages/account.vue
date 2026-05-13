@@ -8,6 +8,31 @@ const tab = ref("packages");
 const packageHistory = ref<any>([]);
 const creditHistory = ref<any>([]);
 
+const apiKey = ref("");
+const apiKeyLoading = ref(false);
+const apiKeyCopied = ref(false);
+const apiKeyDialogRef = ref<any>(null);
+
+const onGetPersonalToken = async () => {
+  apiKeyLoading.value = true;
+  await accountService
+    .getPersonalToken()
+    .then((res) => {
+      apiKey.value = res?.data?.token || "";
+      if (apiKey.value) apiKeyDialogRef.value?.onDisplay(true);
+    })
+    .finally(() => {
+      apiKeyLoading.value = false;
+    });
+};
+
+const onCopyApiKey = () => {
+  if (!apiKey.value) return;
+  navigator.clipboard.writeText(apiKey.value);
+  apiKeyCopied.value = true;
+  setTimeout(() => (apiKeyCopied.value = false), 2000);
+};
+
 onMounted(async () => {
   await accountService.getMyPackageHistory({}).then((res) => {
     packageHistory.value = res.data;
@@ -96,6 +121,9 @@ definePageMeta({ middleware: "auth" });
             </v-tab>
             <v-tab value="credits" class="text-none font-weight-bold">
               <v-icon start>mdi-database-clock-outline</v-icon> Lịch sử tín dụng
+            </v-tab>
+            <v-tab value="api" class="text-none font-weight-bold">
+              <v-icon start>mdi-key-outline</v-icon> API Key
             </v-tab>
           </v-tabs>
         </div>
@@ -204,8 +232,49 @@ definePageMeta({ middleware: "auth" });
                 </tbody>
               </v-table>
             </v-window-item>
+            <v-window-item value="api">
+              <div class="py-6">
+                <v-btn
+                  color="primary"
+                  variant="outlined"
+                  prepend-icon="mdi-key-outline"
+                  style="height: 45px"
+                  :loading="apiKeyLoading"
+                  @click="onGetPersonalToken"
+                >
+                  Lấy API Key
+                </v-btn>
+              </div>
+            </v-window-item>
           </v-window>
         </v-card>
+
+        <!-- Dialog hiển thị API Key -->
+        <CommonDialog ref="apiKeyDialogRef" title="API Key của bạn" width="500">
+          <v-sheet
+            color="grey-lighten-4"
+            rounded="lg"
+            class="pa-3 mt-2 d-flex align-center ga-2"
+          >
+            <code
+              class="flex-1"
+              style="word-break: break-all; font-size: 0.78rem"
+            >
+              {{ apiKey }}
+            </code>
+            <v-btn
+              icon
+              size="small"
+              variant="text"
+              :color="apiKeyCopied ? 'success' : 'grey-darken-1'"
+              @click="onCopyApiKey"
+            >
+              <v-icon size="18">{{
+                apiKeyCopied ? "mdi-check" : "mdi-content-copy"
+              }}</v-icon>
+            </v-btn>
+          </v-sheet>
+        </CommonDialog>
       </v-col>
     </v-row>
   </v-container>
