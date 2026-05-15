@@ -29,7 +29,7 @@ const client = computed<boolean>(() => {
 
 const formData = reactive<any>({
   title: `${t(
-    "Video của tôi"
+    "Video của tôi",
   )} ${new Date().toLocaleTimeString()} ${new Date().toLocaleDateString()}`,
   value: "",
   frameRate: "horizontal",
@@ -48,21 +48,21 @@ const formData = reactive<any>({
 });
 
 const productId = computed(() =>
-  route.params.id !== "create" ? route.params.id : null
+  route.params.id !== "create" ? route.params.id : null,
 );
 
 const isError = computed(() =>
   Boolean(
     productId.value &&
-      formData.messages.length &&
-      formData.messages[formData.messages.length - 1]?.color === "error"
-  )
+    formData.messages.length &&
+    formData.messages[formData.messages.length - 1]?.color === "error",
+  ),
 );
 
 const modelVideoOptions = computed(() => {
   let list = onGetterMasterData.value["model-video"] || [];
 
-  list = list?.filter((x: any) => !["tn_solve_1"].includes(x.value));
+  list = list?.filter((x: any) => !["tn_solve_1", "grok"].includes(x.value));
 
   return list;
 });
@@ -84,7 +84,7 @@ const videoModeOptions = computed(() => {
           "sync_process",
           "custom_character",
           "custom_process",
-        ].includes(x.value)
+        ].includes(x.value),
     );
   }
 
@@ -96,7 +96,7 @@ const frameRateOptions = computed(
     onGetterMasterData.value["frame-rate"]?.map((x: any) => ({
       title: t(x.title),
       value: x.value,
-    })) || []
+    })) || [],
 );
 
 const videoStyleOptions = computed(() => {
@@ -118,7 +118,7 @@ const videoStyleOptions = computed(() => {
           "documentary",
           "advertising",
           "storytelling",
-        ].includes(x.value)
+        ].includes(x.value),
       );
     }
     case "scene_consistency": {
@@ -130,7 +130,7 @@ const videoStyleOptions = computed(() => {
           "interview",
           "walk_and_talk",
           "conversational",
-        ].includes(x.value)
+        ].includes(x.value),
       );
     }
     case "sync_process": {
@@ -143,17 +143,17 @@ const videoStyleOptions = computed(() => {
           "top_down",
           "cutaway",
           "exploded_view",
-        ].includes(x.value)
+        ].includes(x.value),
       );
     }
     case "my_subject": {
       return list.filter((x: any) =>
-        ["general", "testimonial", "shorts"].includes(x.value)
+        ["general", "testimonial", "shorts"].includes(x.value),
       );
     }
     case "custom_character": {
       return list.filter((x: any) =>
-        ["general", "advertising"].includes(x.value)
+        ["general", "advertising"].includes(x.value),
       );
     }
     case "custom_scenes":
@@ -165,7 +165,7 @@ const videoStyleOptions = computed(() => {
           "pan_horizontal",
           "pan_vertical",
           "dynamic",
-        ].includes(x.value)
+        ].includes(x.value),
       );
     }
     default: {
@@ -198,7 +198,7 @@ const videoDurationOptions = computed(() => {
 
       return `${String(newMM).padStart(2, "0")}:${String(newSS).padStart(
         2,
-        "0"
+        "0",
       )}`;
     };
 
@@ -230,7 +230,7 @@ const videoDurationOptions = computed(() => {
         "18",
         "19",
         "20",
-      ].includes(option.value)
+      ].includes(option.value),
     );
   }
 
@@ -274,7 +274,7 @@ const videoDurationOptions = computed(() => {
       "24",
     ];
     return allOptions.filter((option: any) =>
-      shortVideoValues.includes(option.value)
+      shortVideoValues.includes(option.value),
     );
   } else if (
     [
@@ -287,7 +287,7 @@ const videoDurationOptions = computed(() => {
   ) {
     const shortVideoValues = ["1", "2", "3", "4", "5", "6", "7", "8"];
     return allOptions.filter((option: any) =>
-      shortVideoValues.includes(option.value)
+      shortVideoValues.includes(option.value),
     );
   } else {
     return allOptions;
@@ -326,7 +326,7 @@ const onGetProductDetail = async (loadingType: string = "") => {
         formData.author = data.author;
         formData.images = [];
         formData.hasImage = Boolean(
-          Array.isArray(data.images) && data.images.length
+          Array.isArray(data.images) && data.images.length,
         );
         formData.video = data.video;
         formData.messages = data.messages || [];
@@ -343,7 +343,7 @@ const onGetProductDetail = async (loadingType: string = "") => {
         setTimeout(() => {
           if (
             ["custom_character", "custom_scenes", "custom_process"].includes(
-              formData.videoMode
+              formData.videoMode,
             )
           ) {
             uploadImageRefs.value.forEach((ref, index) => {
@@ -412,7 +412,7 @@ onMounted(() => {
   onGetProductDetail(
     Array.isArray(formData.messages) && formData.messages?.length
       ? ""
-      : "detail"
+      : "detail",
   );
 });
 
@@ -571,7 +571,7 @@ definePageMeta({ middleware: "auth" });
               <br />
               {{
                 modelVideoOptions.find(
-                  (i: any) => i.value === formData.modelVideo
+                  (i: any) => i.value === formData.modelVideo,
                 )?.title || $t("Chưa có")
               }}
             </div>
@@ -583,7 +583,7 @@ definePageMeta({ middleware: "auth" });
               <br />
               {{
                 frameRateOptions.find(
-                  (i: any) => i.value === formData.frameRate
+                  (i: any) => i.value === formData.frameRate,
                 )?.title || $t("Chưa có")
               }}
             </div>
@@ -595,7 +595,7 @@ definePageMeta({ middleware: "auth" });
               <br />
               {{
                 videoModeOptions.find(
-                  (i: any) => i.value === formData.videoMode
+                  (i: any) => i.value === formData.videoMode,
                 )?.title || $t("Chưa có")
               }}
             </div>
@@ -607,7 +607,7 @@ definePageMeta({ middleware: "auth" });
               <br />
               {{
                 videoStyleOptions.find(
-                  (i: any) => i.value === formData.videoStyle
+                  (i: any) => i.value === formData.videoStyle,
                 )?.title || $t("Chưa có")
               }}
             </div>
@@ -619,7 +619,7 @@ definePageMeta({ middleware: "auth" });
               <br />
               {{
                 videoDurationOptions.find(
-                  (i: any) => i.value === formData.videoDuration
+                  (i: any) => i.value === formData.videoDuration,
                 )?.title || $t("Chưa có")
               }}
             </div>
@@ -777,13 +777,17 @@ definePageMeta({ middleware: "auth" });
               @update:modelValue="
                 () => {
                   if (
-                    !videoStyleOptions.some((x: any) => x.value === formData.videoStyle)
+                    !videoStyleOptions.some(
+                      (x: any) => x.value === formData.videoStyle,
+                    )
                   ) {
                     formData.videoStyle = videoStyleOptions[0].value;
                   }
 
                   if (
-                    !videoDurationOptions.some((x: any) => x.value === formData.videoDuration)
+                    !videoDurationOptions.some(
+                      (x: any) => x.value === formData.videoDuration,
+                    )
                   ) {
                     formData.videoDuration = videoDurationOptions[0].value;
                   }
@@ -842,7 +846,7 @@ definePageMeta({ middleware: "auth" });
           <v-col
             v-else-if="
               ['custom_character', 'custom_scenes', 'custom_process'].includes(
-                formData.videoMode
+                formData.videoMode,
               )
             "
             cols="12"
@@ -900,13 +904,20 @@ definePageMeta({ middleware: "auth" });
                   loading === 'submit' ||
                   !formData.title ||
                   !formData.value ||
-                  (formData.videoMode === 'my_subject' && !uploadImageRef?.base64) ||
-                  (formData.videoMode === 'custom_character' && uploadImageRefs.filter((item: any) => item)
-                    .some((ref: any) => !ref?.base64)) ||
-                  (formData.videoMode === 'custom_scenes' && uploadImageRefs.filter((item: any) => item)
-                    .some((ref: any) => !ref?.base64)) ||
-                  (formData.videoMode === 'custom_process' && uploadImageRefs.filter((item: any) => item)
-                    .some((ref: any) => !ref?.base64)),
+                  (formData.videoMode === 'my_subject' &&
+                    !uploadImageRef?.base64) ||
+                  (formData.videoMode === 'custom_character' &&
+                    uploadImageRefs
+                      .filter((item: any) => item)
+                      .some((ref: any) => !ref?.base64)) ||
+                  (formData.videoMode === 'custom_scenes' &&
+                    uploadImageRefs
+                      .filter((item: any) => item)
+                      .some((ref: any) => !ref?.base64)) ||
+                  (formData.videoMode === 'custom_process' &&
+                    uploadImageRefs
+                      .filter((item: any) => item)
+                      .some((ref: any) => !ref?.base64)),
               }"
               @click="onSubmit()"
             >
@@ -998,7 +1009,7 @@ definePageMeta({ middleware: "auth" });
                   @click="
                     onClickNoteMessage(
                       item.note?.includes('Đã phân tích xong kịch bản') &&
-                        onGetterUserData?.role === EnumAccountRole.ADMIN
+                        onGetterUserData?.role === EnumAccountRole.ADMIN,
                     )
                   "
                 >
