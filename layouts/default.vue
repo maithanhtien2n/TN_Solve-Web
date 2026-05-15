@@ -37,7 +37,7 @@ const pathArray = computed(() => {
 });
 
 const appVersionDownload = computed(
-  () => onGetterMasterData.value["app-version"] || ""
+  () => onGetterMasterData.value["app-version"] || "",
 );
 
 const onReturnTitle = (title: string) => {
@@ -205,7 +205,7 @@ onMounted(async () => {
             userData.value?.email
           ) {
             (window as any).electronAPI.sendUserData(
-              JSON.stringify(userData.value)
+              JSON.stringify(userData.value),
             );
           } else {
             console.error("Không tìm thấy electronAPI hoặc sendUserData");
@@ -217,25 +217,27 @@ onMounted(async () => {
         if (isAuth || route.query.action === "buy-credit") {
           displayLogin.value = true;
           router.replace(
-            localePath(`/?redirect=${removeLocalePrefixStrict(route.fullPath)}`)
+            localePath(
+              `/?redirect=${removeLocalePrefixStrict(route.fullPath)}`,
+            ),
           );
         }
       });
 
-    await onActionAllMasterDataClient({
-      type: "app-version",
-      download: true,
-    }).catch(() => {});
+    // await onActionAllMasterDataClient({
+    //   type: "app-version",
+    //   download: true,
+    // }).catch(() => {});
 
-    if (
-      !onGetterSystemPopup.value?.display &&
-      !commonDialogPaymentRef.value?.display &&
-      userData.value?.role &&
-      userData.value?.role !== EnumAccountRole.ADMIN &&
-      !isMobile.value
-    ) {
-      commonDialogRef.value?.onDisplay(!client.value);
-    }
+    // if (
+    //   !onGetterSystemPopup.value?.display &&
+    //   !commonDialogPaymentRef.value?.display &&
+    //   userData.value?.role &&
+    //   userData.value?.role !== EnumAccountRole.ADMIN &&
+    //   !isMobile.value
+    // ) {
+    //   commonDialogRef.value?.onDisplay(!client.value);
+    // }
   } catch (error) {
     console.error(error);
   } finally {
@@ -354,7 +356,15 @@ onMounted(async () => {
               height="300"
               src="https://www.youtube.com/embed/GR2b8sXxUac"
               frameborder="0"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              allow="
+                accelerometer;
+                autoplay;
+                clipboard-write;
+                encrypted-media;
+                gyroscope;
+                picture-in-picture;
+                web-share;
+              "
               referrerpolicy="strict-origin-when-cross-origin"
               allowfullscreen
             />
