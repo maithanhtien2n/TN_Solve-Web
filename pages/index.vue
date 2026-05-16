@@ -14,7 +14,7 @@ const client = computed<boolean>(() => {
 });
 
 const appVersionDownload = computed(
-  () => onGetterMasterData.value["app-version"] || ""
+  () => onGetterMasterData.value["app-version"] || "",
 );
 const appVersion = computed(() => {
   let result = appVersionDownload.value?.split("/")?.pop();
@@ -166,7 +166,7 @@ useSeo({
     </div>
   </div> -->
 
-  <div v-if="!client && !isMobile && appVersionDownload" class="section my-10">
+  <!-- <div v-if="!client && !isMobile && appVersionDownload" class="section my-10">
     <div class="download-wrap">
       <div class="download-left">
         <div
@@ -199,7 +199,7 @@ useSeo({
         </span>
       </a>
     </div>
-  </div>
+  </div> -->
 
   <div class="my-10 d-flex justify-center">
     <div class="video-wrap">
@@ -209,7 +209,15 @@ useSeo({
           height="400"
           src="https://www.youtube.com/embed/AFyTHzDbUwA"
           frameborder="0"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          allow="
+            accelerometer;
+            autoplay;
+            clipboard-write;
+            encrypted-media;
+            gyroscope;
+            picture-in-picture;
+            web-share;
+          "
           referrerpolicy="strict-origin-when-cross-origin"
           allowfullscreen
         />
