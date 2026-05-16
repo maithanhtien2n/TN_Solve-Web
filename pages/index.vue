@@ -42,7 +42,7 @@ useSeo({
     >
       <h3 v-if="isMobile" class="font-bold text-red" style="font-size: 1.2rem">
         💥 <span class="text-primary text-2xl">GIÁ ƯU ĐÃI</span> — Chỉ
-        <span class="text-2xl text-primary">99.000đ/tháng</span>!
+        <span class="text-2xl text-primary">139.000đ/tháng</span>!
       </h3>
 
       <h1 v-else class="font-bold text-red">
@@ -52,7 +52,7 @@ useSeo({
         </span>
         — Chỉ
         <span class="text-primary font-bold" style="font-size: 2rem">
-          99.000đ/tháng
+          139.000đ/tháng
         </span>
         !
       </h1>

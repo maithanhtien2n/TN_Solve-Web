@@ -18,7 +18,7 @@ const couponDetail = ref<any>(null);
 
 const totalPrice = computed(() => {
   const rentalMonths = formData.value.rentalMonths;
-  const basePricePerMonth = 99000;
+  const basePricePerMonth = 139000;
 
   const coupon = couponDetail.value; // Có hoặc null
 
@@ -31,15 +31,15 @@ const totalPrice = computed(() => {
 
   switch (rentalMonths) {
     case 3:
-      finalPrice = 275000;
+      finalPrice = 388000;
       packageDiscountAmount = originalPrice - finalPrice;
       break;
     case 6:
-      finalPrice = 500000;
+      finalPrice = 701000;
       packageDiscountAmount = originalPrice - finalPrice;
       break;
     case 12:
-      finalPrice = 890000;
+      finalPrice = 1251000;
       packageDiscountAmount = originalPrice - finalPrice;
       break;
     default:
@@ -149,12 +149,12 @@ definePageMeta({ middleware: "auth" });
     >
       <h3 v-if="isMobile" class="font-bold text-red">
         💥 <span class="text-primary text-2xl">GIÁ ƯU ĐÃI</span> — Chỉ
-        <span class="text-2xl text-primary">99.000đ/tháng</span>!
+        <span class="text-2xl text-primary">139.000đ/tháng</span>!
       </h3>
 
       <h1 v-else class="font-bold text-red">
         💥 <span class="text-primary text-2xl">GIÁ ƯU ĐÃI</span> — Chỉ
-        <span class="text-2xl text-primary">99.000đ/tháng</span>!
+        <span class="text-2xl text-primary">139.000đ/tháng</span>!
       </h1>
 
       <p v-if="isMobile" class="text-center text-sm text-gray-600 mt-1 mb-3">

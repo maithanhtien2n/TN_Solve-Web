@@ -70,9 +70,9 @@ const priceOptions = computed(() =>
     ? [
         { title: "60.000 VND", value: 60000 },
         { title: "69,000 VND", value: 69000 },
-        { title: "99,000 VND", value: 99000 },
+        { title: "139,000 VND", value: 139000 },
       ]
-    : [{ title: "99,000 VND", value: 99000 }]
+    : [{ title: "139,000 VND", value: 139000 }]
 );
 const rentalMonthsOptions = computed(
   () =>
@@ -111,7 +111,7 @@ const onResetForm = async (item: any) => {
     item.remainingTime === "Chưa từng đăng ký" && item.referral
       ? item.referral
       : { isReferral: false };
-  formData.price = role.value !== "user" ? 99000 : 69000;
+  formData.price = role.value !== "user" ? 139000 : 69000;
   formData.rentalMonths = 1;
   formData.remainingTime = item.remainingTime || "Chưa từng đăng ký";
 };

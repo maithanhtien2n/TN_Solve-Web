@@ -36,7 +36,7 @@ const content = ref<string>(`
         <tbody>
           <tr>
             <td class="pa-3 border-bottom"><strong>Gói Đăng ký</strong></td>
-            <td class="pa-3 border-bottom">99.000 VNĐ</td>
+            <td class="pa-3 border-bottom">139.000 VNĐ</td>
             <td class="pa-3 border-bottom">Kích hoạt tài khoản + <strong>4.000 tín dụng</strong></td>
           </tr>
           <tr>
@@ -85,7 +85,7 @@ const content = ref<string>(`
 
 useSeo({
   title: t("Chính sách & Điều khoản"),
-  description: "Nền tảng AI giúp bạn tạo video chuyên nghiệp chỉ với 99k",
+  description: "Nền tảng AI giúp bạn tạo video chuyên nghiệp chỉ với 139k",
   image: "/images/page-home.png",
 });
 </script>
