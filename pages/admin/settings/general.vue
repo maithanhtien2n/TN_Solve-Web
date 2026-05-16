@@ -230,9 +230,7 @@ definePageMeta({ layout: "admin", title: "Thông tin chung" });
           </div>
         </template>
 
-        <template
-          v-else-if="(item as any).title === 'Số lượng slot trên mỗi worker'"
-        >
+        <template v-else-if="(item as any).title.includes('Số lượng slot')">
           <div>
             <v-select
               v-model="(item as any).value"
