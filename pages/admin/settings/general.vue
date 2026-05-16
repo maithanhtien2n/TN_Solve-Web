@@ -39,7 +39,7 @@ const onClickAction = async (data?: any | null, action?: string) => {
           {
             method: "GET",
             headers: { "Content-Type": "application/json" },
-          }
+          },
         );
 
         break;
@@ -135,7 +135,9 @@ definePageMeta({ layout: "admin", title: "Thông tin chung" });
       </template>
 
       <template
-        v-else-if="(item as any).title === 'Thời gian khởi động lại trình duyệt'"
+        v-else-if="
+          (item as any).title === 'Thời gian khởi động lại trình duyệt'
+        "
       >
         <span class="text-nowrap">Sau {{ (item as any).value }} phút</span>
       </template>
@@ -228,6 +230,33 @@ definePageMeta({ layout: "admin", title: "Thông tin chung" });
           </div>
         </template>
 
+        <template
+          v-else-if="(item as any).title === 'Số lượng slot trên mỗi worker'"
+        >
+          <div>
+            <v-select
+              v-model="(item as any).value"
+              hide-details
+              density="compact"
+              variant="outlined"
+              class="my-4 w-10rem"
+              :items="[
+                { title: '1', value: '1' },
+                { title: '2', value: '2' },
+                { title: '3', value: '3' },
+                { title: '4', value: '4' },
+                { title: '5', value: '5' },
+                { title: '6', value: '6' },
+                { title: '7', value: '7' },
+                { title: '8', value: '8' },
+                { title: '9', value: '9' },
+                { title: '10', value: '10' },
+              ]"
+              @update:model-value="onClickAction(item)"
+            />
+          </div>
+        </template>
+
         <template v-else-if="(item as any).title === 'Chế độ tạo bối cảnh'">
           <div>
             <v-select
@@ -246,7 +275,9 @@ definePageMeta({ layout: "admin", title: "Thông tin chung" });
         </template>
 
         <template
-          v-else-if="(item as any).title === 'Thời gian khởi động lại trình duyệt'"
+          v-else-if="
+            (item as any).title === 'Thời gian khởi động lại trình duyệt'
+          "
         >
           <div>
             <v-select
@@ -269,7 +300,9 @@ definePageMeta({ layout: "admin", title: "Thông tin chung" });
         </template>
 
         <template
-          v-else-if="(item as any).title === 'Số lượt tạo cùng lúc trên website'"
+          v-else-if="
+            (item as any).title === 'Số lượt tạo cùng lúc trên website'
+          "
         >
           <div>
             <v-select
@@ -296,7 +329,9 @@ definePageMeta({ layout: "admin", title: "Thông tin chung" });
         </template>
 
         <template
-          v-else-if="(item as any).title === 'Số lượt tạo cùng lúc trên windows'"
+          v-else-if="
+            (item as any).title === 'Số lượt tạo cùng lúc trên windows'
+          "
         >
           <div>
             <v-select
@@ -323,7 +358,9 @@ definePageMeta({ layout: "admin", title: "Thông tin chung" });
         </template>
 
         <template
-          v-else-if="(item as any).title === 'Số lượng browser khởi động trên máy khách'"
+          v-else-if="
+            (item as any).title === 'Số lượng browser khởi động trên máy khách'
+          "
         >
           <div>
             <v-select
@@ -344,7 +381,9 @@ definePageMeta({ layout: "admin", title: "Thông tin chung" });
         </template>
 
         <template
-          v-else-if="(item as any).title === 'Số lượng browser khởi động trên máy admin'"
+          v-else-if="
+            (item as any).title === 'Số lượng browser khởi động trên máy admin'
+          "
         >
           <div>
             <v-select
