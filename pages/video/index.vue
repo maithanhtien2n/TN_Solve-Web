@@ -341,13 +341,16 @@ definePageMeta({ middleware: "auth" });
       <!-- Empty state -->
       <div v-else class="empty-state">
         <div class="empty-icon">
-          <v-icon size="52" color="#8cb8f4"
-            >mdi-movie-open-remove-outline</v-icon
-          >
+          <v-icon size="40" color="white">mdi-movie-open-play-outline</v-icon>
         </div>
-        <h3>Bạn chưa có thước phim nào</h3>
-        <p>Hãy tạo video đầu tiên để bắt đầu trải nghiệm hệ thống.</p>
-        <ButtonCreateVideo />
+        <div class="empty-body">
+          <h3 class="empty-title">Chưa có thước phim nào</h3>
+          <p class="empty-desc">Tạo video AI đầu tiên của bạn chỉ trong vài phút.</p>
+        </div>
+        <button class="empty-cta" @click="$router.push('/video/create')">
+          <v-icon size="17">mdi-image-filter-tilt-shift</v-icon>
+          Tạo video ngay
+        </button>
       </div>
 
       <!-- Create button at bottom -->
@@ -663,42 +666,61 @@ definePageMeta({ middleware: "auth" });
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-height: 24rem;
-  gap: 14px;
-  border: 2px dashed #cbd5e1;
-  border-radius: 16px;
-  background: #f8fafc;
+  min-height: 22rem;
+  gap: 20px;
+  border-radius: 20px;
+  background: linear-gradient(135deg, #f0f7ff 0%, #e8f4fd 100%);
+  border: 1px solid #dbeafe;
   padding: 3rem 2rem;
   text-align: center;
-  transition: all 0.25s ease;
-}
-
-.empty-state:hover {
-  border-color: #94a3b8;
-  background: #f1f5f9;
 }
 
 .empty-icon {
-  width: 88px;
-  height: 88px;
-  border-radius: 50%;
-  background: #fff;
+  width: 76px;
+  height: 76px;
+  border-radius: 20px;
+  background: linear-gradient(135deg, #1e88e5, #42a5f5);
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 8px 24px rgba(30,136,229,0.25);
 }
 
-.empty-state h3 {
+.empty-body { display: flex; flex-direction: column; gap: 8px; }
+
+.empty-title {
   margin: 0;
-  font-size: 1.05rem;
+  font-size: 1.15rem;
   font-weight: 700;
-  color: #374151;
+  color: #0f172a;
 }
 
-.empty-state p {
+.empty-desc {
   margin: 0;
   font-size: 0.875rem;
-  color: #6b7280;
+  color: #64748b;
+  max-width: 340px;
+  line-height: 1.6;
+}
+
+.empty-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 11px 24px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #1565c0, #1e88e5);
+  color: #fff;
+  font-size: 0.9rem;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(30,136,229,0.35);
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.empty-cta:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(30,136,229,0.45);
 }
 </style>

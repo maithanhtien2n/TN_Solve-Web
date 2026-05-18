@@ -6,8 +6,7 @@ const { onGetterUserData: userData } = useAppStore();
 
 useSeo({
   title: "Tài khoản",
-  description:
-    "Quản lý tài khoản TN Solve - Xem lịch sử gói dịch vụ, tín dụng và thông tin cá nhân của bạn.",
+  description: "Quản lý tài khoản TN Solve - Xem lịch sử gói dịch vụ, tín dụng và thông tin cá nhân của bạn.",
   keywords: "tài khoản TN Solve, quản lý tài khoản, lịch sử dịch vụ",
 });
 
@@ -20,7 +19,23 @@ const creditHistory = ref<any>([]);
 const apiKey = ref("");
 const apiKeyLoading = ref(false);
 const apiKeyCopied = ref(false);
-const apiKeyDialogRef = ref<any>(null);
+const showApiKey = ref(false);
+
+const formatDate = (iso: string) => {
+  if (!iso) return "—";
+  const d = new Date(iso);
+  return d.toLocaleString("vi-VN", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" });
+};
+
+const serviceStatus = computed(() => {
+  if (userData.value?.role === EnumAccountRole.ADMIN)
+    return { label: "Quản trị viên", color: "#7c3aed", bg: "#f3e8ff" };
+  if (userData.value?.serviceExpiry)
+    return userData.value?.remainingTime
+      ? { label: `Còn ${userData.value.remainingTime}`, color: "#059669", bg: "#ecfdf5" }
+      : { label: "Đã hết hạn", color: "#dc2626", bg: "#fef2f2" };
+  return { label: "Chưa đăng ký", color: "#64748b", bg: "#f1f5f9" };
+});
 
 const onGetPersonalToken = async () => {
   apiKeyLoading.value = true;
@@ -28,11 +43,9 @@ const onGetPersonalToken = async () => {
     .getPersonalToken()
     .then((res) => {
       apiKey.value = res?.data?.token || "";
-      if (apiKey.value) apiKeyDialogRef.value?.onDisplay(true);
+      if (apiKey.value) showApiKey.value = true;
     })
-    .finally(() => {
-      apiKeyLoading.value = false;
-    });
+    .finally(() => { apiKeyLoading.value = false; });
 };
 
 const onCopyApiKey = () => {
@@ -43,294 +56,596 @@ const onCopyApiKey = () => {
 };
 
 onMounted(async () => {
-  await accountService.getMyPackageHistory({}).then((res) => {
-    packageHistory.value = res.data;
-  });
-
-  await accountService.getMyCreditHistory({}).then((res) => {
-    creditHistory.value = res.data;
-  });
+  await accountService.getMyPackageHistory({}).then((res) => { packageHistory.value = res.data; });
+  await accountService.getMyCreditHistory({}).then((res) => { creditHistory.value = res.data; });
 });
 
 definePageMeta({ middleware: "auth" });
 </script>
 
 <template>
-  <div
-    v-if="!userData?.email"
-    class="d-flex justify-center flex-column align-center ga-3 pt-10 pb-16"
-  >
+  <div v-if="!userData?.email" class="d-flex justify-center flex-column align-center ga-3 pt-10 pb-16">
     <v-progress-circular width="2" size="40" color="primary" indeterminate />
     Đang tải dữ liệu...
   </div>
 
-  <v-container v-else fluid class="pa-0 bg-white">
-    <v-row no-gutters>
-      <v-col cols="12">
-        <!-- 1. Phần Profile -->
-        <v-card
-          variant="flat"
-          class="rounded-0 w-100 bg-white border-bottom pt-5"
-        >
-          <v-row
-            align="center"
-            justify="center"
-            :class="isMobile ? 'mb-4' : 'mb-10'"
-            no-gutters
-          >
-            <v-col cols="12" md="3" class="text-center">
-              <v-avatar size="140" class="border-lg elevation-1">
-                <v-img :src="userData?.avatar" cover />
-              </v-avatar>
-              <h2 class="text-h5 mt-4 font-weight-bold">
-                {{ userData?.name }}
-              </h2>
-            </v-col>
+  <div v-else class="account-wrap">
 
-            <v-col cols="12" md="6" :class="isMobile ? 'mt-7' : ''">
-              <div
-                v-if="!isMobile"
-                class="text-overline text-primary font-weight-bold mb-7"
-              >
-                Thông tin tài khoản
-              </div>
+    <!-- Profile card -->
+    <div class="profile-card">
+      <div class="profile-main">
+        <v-avatar size="80" class="profile-avatar">
+          <v-img :src="userData?.avatar" cover />
+        </v-avatar>
 
-              <v-row dense>
-                <v-col cols="12">
-                  <!-- SỬA LỖI: Dùng :model-value thay vì v-model cho dữ liệu Store readonly -->
-                  <v-text-field
-                    :model-value="userData?.name"
-                    label="Họ và tên"
-                    variant="outlined"
-                    density="comfortable"
-                    readonly
-                    bg-color="grey-lighten-5"
-                  />
-                </v-col>
-                <v-col cols="12">
-                  <v-text-field
-                    :model-value="userData?.email"
-                    label="Email"
-                    variant="outlined"
-                    density="comfortable"
-                    readonly
-                    bg-color="grey-lighten-5"
-                  />
-                </v-col>
-              </v-row>
-            </v-col>
-          </v-row>
-        </v-card>
+        <div class="profile-info">
+          <div class="profile-name">{{ userData?.name }}</div>
+          <div class="profile-email">{{ userData?.email }}</div>
+          <div class="profile-badge" :style="{ color: serviceStatus.color, background: serviceStatus.bg }">
+            <span class="badge-dot" :style="{ background: serviceStatus.color }" />
+            {{ serviceStatus.label }}
+          </div>
+        </div>
+      </div>
 
-        <!-- 2. Hệ thống Tabs -->
-        <div class="bg-white border-bottom">
-          <v-tabs v-model="tab" color="primary" align-tabs="start">
-            <v-tab value="packages" class="text-none font-weight-bold">
-              <v-icon start>mdi-package-variant-closed</v-icon> Lịch sử gói
-            </v-tab>
-            <v-tab value="credits" class="text-none font-weight-bold">
-              <v-icon start>mdi-database-clock-outline</v-icon> Lịch sử tín dụng
-            </v-tab>
-            <v-tab value="api" class="text-none font-weight-bold">
-              <v-icon start>mdi-key-outline</v-icon> API Key
-            </v-tab>
-          </v-tabs>
+      <!-- Stats -->
+      <div class="profile-stats">
+        <div class="stat-item">
+          <div class="stat-icon" style="background: #eff6ff">
+            <v-icon size="18" color="#1e88e5">mdi-circle-multiple-outline</v-icon>
+          </div>
+          <div>
+            <div class="stat-label">Tín dụng</div>
+            <div class="stat-value">
+              <template v-if="userData?.settings?.unlimitedVideo">
+                <v-icon size="14">mdi-infinity</v-icon> {{ userData.settings.unlimitedVideo }} ngày
+              </template>
+              <template v-else>{{ (userData?.settings?.credit || 0).toLocaleString("vi-VN") }}</template>
+            </div>
+          </div>
         </div>
 
-        <!-- 3. Nội dung bảng -->
-        <v-card variant="flat" class="rounded-0 w-100 bg-white">
-          <v-window v-model="tab">
-            <v-window-item value="packages">
-              <v-table hover class="custom-table">
-                <thead>
-                  <tr>
-                    <th class="text-left column-1 text-nowrap">GÓI MUA</th>
-                    <th class="text-left column-2 text-nowrap">GIÁ TIỀN</th>
-                    <th class="text-right column-3 text-nowrap">TRẠNG THÁI</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr v-for="item in packageHistory" :key="item.id">
-                    <td class="column-1 py-4">
-                      <span class="font-bold text-nowrap">
-                        {{ item.note }}
-                      </span>
-                      <br />
-                      <small class="text-nowrap">
-                        {{ item.serviceStartDate }} - {{ item.serviceExpiry }}
-                      </small>
-                    </td>
-                    <td
-                      class="text-left column-2 text-grey-darken-1 text-nowrap"
-                    >
-                      <span class="font-bold text-primary text-nowrap">
-                        {{ formatCurrency(item.price) }}
-                      </span>
-                      <br />
-                      <small v-if="+item.discount" class="text-red">
-                        Có mã giảm
-                        {{ formatCurrency(+item.discount) }}
-                      </small>
-                    </td>
-                    <td class="text-right column-3 py-4">
-                      <v-chip :class="`text-${item.statusColor}`">
-                        {{ item.statusText }}
-                      </v-chip>
-                    </td>
-                  </tr>
-                </tbody>
-              </v-table>
-            </v-window-item>
+        <div class="stat-divider" />
 
-            <v-window-item value="credits">
-              <v-table hover class="custom-table">
-                <thead>
-                  <tr>
-                    <th class="text-left column-1 text-nowrap">SỐ TÍN DỤNG</th>
-                    <th class="text-left column-2 text-nowrap">GIÁ TIỀN</th>
-                    <th class="text-right column-3 text-nowrap">THỜI GIAN</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr v-for="item in creditHistory" :key="item.id">
-                    <td class="column-1">
-                      <span class="font-bold text-nowrap py-4">
-                        {{
-                          item.creditAmount === -1
-                            ? "Không giới hạn 💎"
-                            : `Mua ${item.creditAmount}💎`
-                        }}
+        <div class="stat-item">
+          <div class="stat-icon" style="background: #f0fdf4">
+            <v-icon size="18" color="#059669">mdi-calendar-check-outline</v-icon>
+          </div>
+          <div>
+            <div class="stat-label">Hết hạn</div>
+            <div class="stat-value">{{ formatDate(userData?.serviceExpiry) }}</div>
+          </div>
+        </div>
 
-                        <span
-                          v-if="[11000, 24000].includes(item.creditAmount)"
-                          class="text-nowrap"
-                        >
-                          {{
-                            `(+ ${
-                              item.creditAmount === 11000 ? "1,000" : "4,000"
-                            } KM)`
-                          }}
-                        </span>
-                      </span>
-                      <br />
-                      <small
-                        v-if="item.creditAmount === -1"
-                        class="text-nowrap"
-                      >
-                        {{ item.serviceStartDate }} - {{ item.serviceExpiry }}
-                      </small>
-                    </td>
-                    <td
-                      class="text-left column-2 text-grey-darken-1 text-nowrap"
-                    >
-                      <span class="font-bold text-primary text-nowrap">
-                        {{ formatCurrency(item.price) }}
-                      </span>
-                      <br />
-                      <small v-if="+item.discount" class="text-red">
-                        Có mã giảm
-                        {{ formatCurrency(+item.discount) }}
-                      </small>
-                    </td>
-                    <td
-                      class="text-right column-3 font-weight-bold text-success text-nowrap"
-                    >
-                      {{ item.serviceStartDate }}
-                    </td>
-                  </tr>
-                </tbody>
-              </v-table>
-            </v-window-item>
-            <v-window-item value="api">
-              <div class="py-6">
-                <v-btn
-                  color="primary"
-                  variant="outlined"
-                  prepend-icon="mdi-key-outline"
-                  style="height: 45px"
-                  :loading="apiKeyLoading"
-                  @click="onGetPersonalToken"
-                >
-                  Lấy API Key
-                </v-btn>
-              </div>
-            </v-window-item>
-          </v-window>
-        </v-card>
+        <div class="stat-divider" />
 
-        <!-- Dialog hiển thị API Key -->
-        <CommonDialog ref="apiKeyDialogRef" title="API Key của bạn" width="500">
-          <v-sheet
-            color="grey-lighten-4"
-            rounded="lg"
-            class="pa-3 mt-2 d-flex align-center ga-2"
-          >
-            <code
-              class="flex-1"
-              style="word-break: break-all; font-size: 0.78rem"
-            >
-              {{ apiKey }}
-            </code>
-            <v-btn
-              icon
-              size="small"
-              variant="text"
-              :color="apiKeyCopied ? 'success' : 'grey-darken-1'"
-              @click="onCopyApiKey"
-            >
-              <v-icon size="18">{{
-                apiKeyCopied ? "mdi-check" : "mdi-content-copy"
-              }}</v-icon>
-            </v-btn>
-          </v-sheet>
-        </CommonDialog>
-      </v-col>
-    </v-row>
-  </v-container>
+        <div class="stat-item">
+          <div class="stat-icon" style="background: #fdf4ff">
+            <v-icon size="18" color="#9333ea">mdi-package-variant-closed</v-icon>
+          </div>
+          <div>
+            <div class="stat-label">Lịch sử gói</div>
+            <div class="stat-value">{{ packageHistory.length }} gói</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tab-section">
+      <div class="tab-bar">
+        <div
+          class="tab-item"
+          :class="{ 'tab-item--active': tab === 'packages' }"
+          @click="tab = 'packages'"
+        >
+          <v-icon size="16">mdi-package-variant-closed</v-icon>
+          Lịch sử gói
+        </div>
+        <div
+          class="tab-item"
+          :class="{ 'tab-item--active': tab === 'credits' }"
+          @click="tab = 'credits'"
+        >
+          <v-icon size="16">mdi-database-clock-outline</v-icon>
+          Lịch sử tín dụng
+        </div>
+        <div
+          class="tab-item"
+          :class="{ 'tab-item--active': tab === 'api' }"
+          @click="tab = 'api'"
+        >
+          <v-icon size="16">mdi-key-outline</v-icon>
+          API Key
+        </div>
+      </div>
+
+      <!-- Package history -->
+      <div v-show="tab === 'packages'" class="tab-content">
+        <div v-if="!packageHistory.length" class="empty-state">
+          <v-icon size="40" color="#cbd5e1">mdi-package-variant</v-icon>
+          <div>Chưa có lịch sử gói</div>
+        </div>
+        <table v-else class="data-table">
+          <thead>
+            <tr>
+              <th>Gói mua</th>
+              <th>Giá tiền</th>
+              <th class="text-right">Trạng thái</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="item in packageHistory" :key="item.id">
+              <td>
+                <div class="cell-title">{{ item.note }}</div>
+                <div class="cell-sub">{{ item.serviceStartDate }} → {{ item.serviceExpiry }}</div>
+              </td>
+              <td>
+                <div class="cell-price">{{ formatCurrency(item.price) }}</div>
+                <div v-if="+item.discount" class="cell-discount">Giảm {{ formatCurrency(+item.discount) }}</div>
+              </td>
+              <td class="text-right">
+                <span class="status-chip" :class="`status-${item.statusColor}`">{{ item.statusText }}</span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Credit history -->
+      <div v-show="tab === 'credits'" class="tab-content">
+        <div v-if="!creditHistory.length" class="empty-state">
+          <v-icon size="40" color="#cbd5e1">mdi-database-off-outline</v-icon>
+          <div>Chưa có lịch sử tín dụng</div>
+        </div>
+        <table v-else class="data-table">
+          <thead>
+            <tr>
+              <th>Tín dụng</th>
+              <th>Giá tiền</th>
+              <th class="text-right">Thời gian</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="item in creditHistory" :key="item.id">
+              <td>
+                <div class="cell-title">
+                  {{ item.creditAmount === -1 ? "Không giới hạn 💎" : `Mua ${item.creditAmount} 💎` }}
+                  <span v-if="[11000, 24000].includes(item.creditAmount)" class="cell-bonus">
+                    +{{ item.creditAmount === 11000 ? "1,000" : "4,000" }} KM
+                  </span>
+                </div>
+                <div v-if="item.creditAmount === -1" class="cell-sub">
+                  {{ item.serviceStartDate }} → {{ item.serviceExpiry }}
+                </div>
+              </td>
+              <td>
+                <div class="cell-price">{{ formatCurrency(item.price) }}</div>
+                <div v-if="+item.discount" class="cell-discount">Giảm {{ formatCurrency(+item.discount) }}</div>
+              </td>
+              <td class="text-right">
+                <div class="cell-date">{{ item.serviceStartDate }}</div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- API Key -->
+      <div v-show="tab === 'api'" class="tab-content">
+        <div class="api-section">
+          <div class="api-desc">
+            <v-icon size="20" color="#1e88e5">mdi-information-outline</v-icon>
+            <span>Token cá nhân dùng để xác thực API. Không chia sẻ cho người khác.</span>
+          </div>
+          <button class="api-btn" :disabled="apiKeyLoading" @click="onGetPersonalToken">
+            <v-progress-circular v-if="apiKeyLoading" width="2" size="16" color="white" indeterminate />
+            <template v-else>
+              <v-icon size="16">mdi-key-outline</v-icon>
+              Lấy API Key
+            </template>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- API Key Dialog -->
+    <v-dialog v-model="showApiKey" max-width="480">
+      <v-card rounded="xl" class="api-dialog">
+        <v-card-title class="api-dialog-header">
+          <div class="api-dialog-title">
+            <div class="api-dialog-icon">
+              <v-icon color="white" size="18">mdi-key-outline</v-icon>
+            </div>
+            <div>
+              <div class="api-dialog-name">API Key của bạn</div>
+              <div class="api-dialog-sub">Không chia sẻ token này cho người khác</div>
+            </div>
+          </div>
+          <v-btn icon="mdi-close" variant="text" size="small" @click="showApiKey = false" />
+        </v-card-title>
+
+        <v-card-text class="pt-2 pb-5 px-5">
+          <div class="api-key-box">
+            <code class="api-key-code">{{ apiKey }}</code>
+            <button class="api-copy-btn" :class="{ 'api-copy-btn--ok': apiKeyCopied }" @click="onCopyApiKey">
+              <v-icon size="16">{{ apiKeyCopied ? "mdi-check" : "mdi-content-copy" }}</v-icon>
+              Sao chép
+            </button>
+          </div>
+        </v-card-text>
+      </v-card>
+    </v-dialog>
+  </div>
 </template>
 
 <style scoped>
-.v-card {
-  border-radius: 0 !important;
-}
-.border-bottom {
-  border-bottom: 1px solid #e0e0e0 !important;
-}
-
-/* Chia cột 3 phần đều nhau */
-.column-1 {
-  width: 50%;
-  padding-left: 15px !important;
-}
-.column-2 {
-  width: 25%;
-}
-.column-3 {
-  width: 25%;
-  padding-right: 15px !important;
+.account-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding-bottom: 60px;
 }
 
-.custom-table {
-  background: white !important;
-  width: 100%;
+/* ─── Profile card ───────────────────────────────────── */
+.profile-card {
+  background: #fff;
+  border-radius: 16px;
+  border: 1px solid #f0f0f0;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+  overflow: hidden;
 }
 
-.custom-table :deep(th) {
-  height: 52px !important;
-  font-size: 0.75rem !important;
-  color: #757575 !important;
+.profile-main {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 24px;
+}
+
+.profile-avatar {
+  border: 3px solid #e5e7eb;
+  flex-shrink: 0;
+}
+
+.profile-name {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin-bottom: 4px;
+}
+
+.profile-email {
+  font-size: 0.875rem;
+  color: #64748b;
+  margin-bottom: 10px;
+}
+
+.profile-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.badge-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* Stats */
+.profile-stats {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  border-top: 1px solid #f0f0f0;
+  padding: 0 24px;
+}
+
+.stat-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 0;
+  flex: 1;
+}
+
+.stat-divider {
+  width: 1px;
+  height: 40px;
+  background: #f0f0f0;
+  margin: 0 24px;
+}
+
+.stat-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.stat-label {
+  font-size: 0.73rem;
+  color: #94a3b8;
+  font-weight: 500;
   text-transform: uppercase;
-  letter-spacing: 1px !important;
-  background-color: #fcfcfc !important;
+  letter-spacing: 0.4px;
 }
 
-.custom-table :deep(td) {
-  height: 60px !important;
-  font-size: 0.95rem !important;
-  border-bottom: 1px solid #f5f5f5 !important;
+.stat-value {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin-top: 1px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
 
-:deep(.v-window__container) {
-  height: auto !important;
+@media (max-width: 600px) {
+  .profile-stats { flex-direction: column; align-items: flex-start; padding: 0 16px; }
+  .stat-divider { width: 100%; height: 1px; margin: 0; }
+  .stat-item { width: 100%; }
 }
+
+/* ─── Tabs ───────────────────────────────────────────── */
+.tab-section {
+  background: #fff;
+  border-radius: 16px;
+  border: 1px solid #f0f0f0;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+  overflow: hidden;
+}
+
+.tab-bar {
+  display: flex;
+  border-bottom: 1px solid #f0f0f0;
+  padding: 0 8px;
+}
+
+.tab-item {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 14px 18px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #64748b;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  transition: color 0.18s, border-color 0.18s;
+  white-space: nowrap;
+}
+
+.tab-item:hover { color: #1e88e5; }
+
+.tab-item--active {
+  color: #1e88e5;
+  border-bottom-color: #1e88e5;
+  font-weight: 600;
+}
+
+.tab-content { padding: 0; }
+
+/* ─── Table ──────────────────────────────────────────── */
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.data-table th {
+  padding: 12px 20px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: #94a3b8;
+  background: #fafafa;
+  border-bottom: 1px solid #f0f0f0;
+  text-align: left;
+}
+
+.data-table td {
+  padding: 14px 20px;
+  border-bottom: 1px solid #f8f8f8;
+  vertical-align: middle;
+}
+
+.data-table tr:last-child td { border-bottom: none; }
+.data-table tr:hover td { background: #fafcff; }
+
+.cell-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #1a1a1a;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.cell-sub {
+  font-size: 0.775rem;
+  color: #94a3b8;
+  margin-top: 3px;
+}
+
+.cell-price {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #1e88e5;
+}
+
+.cell-discount {
+  font-size: 0.75rem;
+  color: #ef4444;
+  margin-top: 2px;
+}
+
+.cell-date {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #059669;
+}
+
+.cell-bonus {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #f59e0b;
+  background: #fffbeb;
+  padding: 1px 7px;
+  border-radius: 999px;
+}
+
+.status-chip {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.status-success { background: #ecfdf5; color: #059669; }
+.status-warning { background: #fffbeb; color: #d97706; }
+.status-error   { background: #fef2f2; color: #dc2626; }
+.status-grey    { background: #f1f5f9; color: #64748b; }
+
+/* ─── Empty state ────────────────────────────────────── */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 48px 20px;
+  color: #94a3b8;
+  font-size: 0.875rem;
+}
+
+/* ─── API section ────────────────────────────────────── */
+.api-section {
+  padding: 28px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.api-desc {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.875rem;
+  color: #475569;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-radius: 10px;
+  padding: 12px 16px;
+}
+
+.api-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 22px;
+  border-radius: 10px;
+  background: #1e88e5;
+  color: #fff;
+  font-size: 0.875rem;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  width: fit-content;
+  transition: background 0.18s, transform 0.15s;
+}
+
+.api-btn:hover:not(:disabled) { background: #1565c0; transform: translateY(-1px); }
+.api-btn:disabled { opacity: 0.7; cursor: not-allowed; }
+
+/* ─── API Key dialog ─────────────────────────────────── */
+.api-dialog { overflow: hidden; }
+
+.api-dialog-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 20px 16px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.api-dialog-title {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.api-dialog-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 11px;
+  background: linear-gradient(135deg, #1565c0, #1e88e5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(30,136,229,0.3);
+}
+
+.api-dialog-name {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.api-dialog-sub {
+  font-size: 0.775rem;
+  color: #94a3b8;
+  margin-top: 2px;
+}
+
+.api-key-box {
+  margin-top: 8px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 14px 16px;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.api-key-code {
+  flex: 1;
+  font-size: 0.78rem;
+  word-break: break-all;
+  color: #334155;
+  font-family: monospace;
+  line-height: 1.6;
+}
+
+.api-copy-btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  border: 1px solid #e2e8f0;
+  background: #fff;
+  color: #475569;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: all 0.18s;
+}
+
+.api-copy-btn:hover { background: #f1f5f9; }
+.api-copy-btn--ok { background: #ecfdf5; color: #059669; border-color: #a7f3d0; }
 </style>

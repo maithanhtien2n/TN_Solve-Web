@@ -197,8 +197,17 @@ useSeo({
 
   <!-- Empty -->
   <div v-else class="empty-state">
-    <v-icon size="56" color="grey-lighten-1">mdi-movie-open-outline</v-icon>
-    <p class="empty-text">Chưa có thước phim nào từ cộng đồng.</p>
+    <div class="empty-icon">
+      <v-icon size="40" color="white">mdi-earth</v-icon>
+    </div>
+    <div class="empty-body">
+      <h3 class="empty-title">Chưa có thước phim nào</h3>
+      <p class="empty-desc">Cộng đồng chưa có video nào. Hãy là người đầu tiên chia sẻ tác phẩm của bạn!</p>
+    </div>
+    <button class="empty-cta" @click="$router.push('/video/create')">
+      <v-icon size="17">mdi-image-filter-tilt-shift</v-icon>
+      Tạo video ngay
+    </button>
   </div>
 
   <ButtonCreateVideo style="margin-top: 2rem" />
@@ -462,13 +471,61 @@ useSeo({
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 60px 0;
-  gap: 12px;
+  min-height: 22rem;
+  gap: 20px;
+  border-radius: 20px;
+  background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+  border: 1px solid #bbf7d0;
+  padding: 3rem 2rem;
+  text-align: center;
 }
 
-.empty-text {
-  font-size: 0.95rem;
-  color: #9e9e9e;
+.empty-icon {
+  width: 76px;
+  height: 76px;
+  border-radius: 20px;
+  background: linear-gradient(135deg, #059669, #10b981);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 24px rgba(16,185,129,0.25);
+}
+
+.empty-body { display: flex; flex-direction: column; gap: 8px; }
+
+.empty-title {
   margin: 0;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.empty-desc {
+  margin: 0;
+  font-size: 0.875rem;
+  color: #64748b;
+  max-width: 340px;
+  line-height: 1.6;
+}
+
+.empty-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 11px 24px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #059669, #10b981);
+  color: #fff;
+  font-size: 0.9rem;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(16,185,129,0.35);
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.empty-cta:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(16,185,129,0.45);
 }
 </style>

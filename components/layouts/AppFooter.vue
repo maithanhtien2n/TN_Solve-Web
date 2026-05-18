@@ -2,35 +2,26 @@
 const router = useRouter();
 
 const currentYear = new Date().getFullYear();
-
 const version = ref<string | null>(null);
 
 const onClickNavigate = (value: string) => {
   if (!value) {
-    useAppStore().onActionSetSystemPopup({
-      type: "info",
-      content: "Tính năng đang được phát triển!",
-    });
+    useAppStore().onActionSetSystemPopup({ type: "info", content: "Tính năng đang được phát triển!" });
     return;
   } else if (value === "tutorial") {
     window.open("https://youtu.be/dCb8hL7wLAM", "_blank");
   } else if (value === "tnsolve-teacher") {
     window.open("https://teacher.tnsolve.com", "_blank");
   } else if (value === "download-tool") {
-    window.open(
-      "https://github.com/maithanhtien2n/tnsolve_release/releases",
-      "_blank"
-    );
+    window.open("https://github.com/maithanhtien2n/tnsolve_release/releases", "_blank");
+  } else if (value === "contact") {
+    window.open("https://zalo.me/0343027232", "_blank");
+  } else if (value === "zalo-group") {
+    window.open("https://zalo.me/g/p8hls5tonlfkqmyfndmx", "_blank");
+  } else if (value === "facebook-group") {
+    window.open("https://www.facebook.com/groups/1175744533986396", "_blank");
   } else {
-    if (value === "contact") {
-      window.open("https://zalo.me/0343027232", "_blank");
-    } else if (value === "zalo-group") {
-      window.open("https://zalo.me/g/p8hls5tonlfkqmyfndmx", "_blank");
-    } else if (value === "facebook-group") {
-      window.open("https://www.facebook.com/groups/1175744533986396", "_blank");
-    } else {
-      router.push(`/${value}`);
-    }
+    router.push(`/${value}`);
   }
 };
 
@@ -38,188 +29,194 @@ onMounted(async () => {
   try {
     const ver = await (window as any).electronAPI?.getAppVersion();
     version.value = ver;
-  } catch (error) {
-    console.error("Lỗi lấy version:", error);
-  }
+  } catch {}
 });
 </script>
 
 <template>
-  <footer style="background-color: #ddd; padding-top: 2.4rem; margin-top: 3rem">
+  <footer class="app-footer">
     <v-container max-width="1400">
-      <v-row>
-        <v-col cols="12" lg="6">
-          <div>
-            <v-img
-              src="/images/tn-solve-icon.png"
-              lazy-src="/images/tn-solve-logo.png"
-              :class="`w-10rem  b-radius-1`"
-            />
-          </div>
+      <div class="footer-grid">
 
-          <p class="tagline mt-2">
-            Nền tảng AI giúp bạn tạo video chuyên nghiệp chỉ trong vài phút
+        <!-- Brand -->
+        <div class="footer-brand">
+          <v-img
+            src="/images/tn-solve-icon.png"
+            lazy-src="/images/tn-solve-logo.png"
+            width="120"
+            height="44"
+            class="mb-4"
+          />
+          <p class="brand-tagline">
+            Nền tảng AI giúp bạn tạo video chuyên nghiệp chỉ trong vài phút.
           </p>
-        </v-col>
-
-        <v-col cols="12" lg="6">
-          <v-row>
-            <v-col cols="6" lg="4" md="4" sm="4">
-              <div class="footer-section footer-links">
-                <h4>Bắt đầu sử dụng</h4>
-                <nav>
-                  <a
-                    v-for="(item, index) in [
-                      { title: 'Hướng dẫn', value: 'tutorial' },
-                      // { title: 'Công cụ đa năng', value: 'tnsolve-teacher' },
-                      { title: 'Đăng ký/gia hạn dịch vụ', value: 'payment' },
-                      { title: 'Điều khoản & Thanh toán', value: 'terms' },
-                    ]"
-                    :key="index"
-                    class="cursor-pointer"
-                    @click="onClickNavigate(item.value)"
-                  >
-                    {{ item.title }}
-                  </a>
-                </nav>
-              </div>
-            </v-col>
-
-            <v-col cols="6" lg="4" md="4" sm="4">
-              <div class="footer-section footer-links">
-                <h4>Trợ giúp</h4>
-                <nav>
-                  <a
-                    v-for="(item, index) in [
-                      { title: 'Trợ lý viết câu lệnh', value: 'documents' },
-                      // { title: 'Liên hệ admin (zalo)', value: 'contact' },
-                      { title: 'Tham gia nhóm (zalo)', value: 'zalo-group' },
-                      {
-                        title: 'Tham gia nhóm (facebook)',
-                        value: 'facebook-group',
-                      },
-                    ]"
-                    :key="index"
-                    class="cursor-pointer"
-                    @click="onClickNavigate(item.value)"
-                  >
-                    {{ item.title }}
-                  </a>
-                </nav>
-              </div>
-            </v-col>
-
-            <v-col cols="12" lg="4" md="4" sm="4">
-              <div class="footer-section footer-links">
-                <h4>Theo dõi chúng tôi</h4>
-
-                <nav>
-                  <a
-                    target="_blank"
-                    href="https://www.tiktok.com/@tnsolve"
-                    class="d-flex align-center ga-2"
-                  >
-                    <img src="/images/icon-tiktok.png" style="width: 1.3rem" />
-                    <span style="margin-bottom: 2.6px">TN Solve</span>
-                  </a>
-
-                  <a
-                    target="_blank"
-                    href="https://www.facebook.com/tnsolve2025"
-                    class="d-flex align-center ga-2"
-                  >
-                    <img
-                      src="/images/icon-facebook.png"
-                      style="width: 1.3rem"
-                    />
-                    <span style="margin-bottom: 2.6px">TN Solve</span>
-                  </a>
-
-                  <a
-                    target="_blank"
-                    href="https://www.youtube.com/@tiencodeweb"
-                    class="d-flex align-center ga-2"
-                  >
-                    <img src="/images/icon-youtube.png" style="width: 1.3rem" />
-                    <span style="margin-bottom: 2.6px">Tien Code Web</span>
-                  </a>
-
-                  <a
-                    class="cursor-pointer d-flex align-center ga-2"
-                    @click="router.push('/video/public')"
-                  >
-                    <img src="/images/icon-video.png" style="width: 1.2rem" />
-                    <span style="margin-bottom: 1px">
-                      Thước phim cộng đồng
-                    </span>
-                  </a>
-                </nav>
-              </div>
-            </v-col>
-          </v-row>
-        </v-col>
-      </v-row>
-
-      <div class="footer-bottom">
-        <div v-if="version" class="font-bold text-black">
-          Phiên bản {{ version }}
+          <!-- Social icons -->
+          <div class="social-row">
+            <a href="https://www.tiktok.com/@tnsolve" target="_blank" class="social-icon">
+              <img src="/images/icon-tiktok.png" style="width:18px;height:18px;object-fit:contain" />
+            </a>
+            <a href="https://www.facebook.com/tnsolve2025" target="_blank" class="social-icon">
+              <img src="/images/icon-facebook.png" style="width:18px;height:18px;object-fit:contain" />
+            </a>
+            <a href="https://www.youtube.com/@tiencodeweb" target="_blank" class="social-icon">
+              <img src="/images/icon-youtube.png" style="width:18px;height:18px;object-fit:contain" />
+            </a>
+          </div>
         </div>
-        <span>
-          &copy; <span class="font-bold">{{ currentYear }} TN Solve</span>. Cảm
-          ơn bạn đã tin tưởng và sử dụng dịch vụ của chúng tôi.
-        </span>
+
+        <!-- Links: Bắt đầu -->
+        <div class="footer-col">
+          <div class="col-title">Bắt đầu sử dụng</div>
+          <div class="col-links">
+            <a class="col-link" @click="onClickNavigate('tutorial')">Hướng dẫn sử dụng</a>
+            <a class="col-link" @click="onClickNavigate('payment')">Đăng ký / Gia hạn</a>
+            <a class="col-link" @click="onClickNavigate('terms')">Điều khoản & Thanh toán</a>
+          </div>
+        </div>
+
+        <!-- Links: Trợ giúp -->
+        <div class="footer-col">
+          <div class="col-title">Trợ giúp</div>
+          <div class="col-links">
+            <a class="col-link" @click="onClickNavigate('documents')">Trợ lý viết câu lệnh</a>
+            <a class="col-link" @click="onClickNavigate('zalo-group')">Nhóm hỗ trợ Zalo</a>
+            <a class="col-link" @click="onClickNavigate('facebook-group')">Nhóm Facebook</a>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Bottom -->
+      <div class="footer-bottom">
+        <span v-if="version" class="footer-version">v{{ version }}</span>
+        <span class="footer-copy-main">© {{ currentYear }} <strong>TN Solve</strong></span>
+        <span class="footer-sep">·</span>
+        <span class="footer-copy-sub">Cảm ơn bạn đã tin tưởng và sử dụng dịch vụ.</span>
       </div>
     </v-container>
   </footer>
 </template>
 
 <style scoped>
+/* ─── Shell ──────────────────────────────────────────── */
 .app-footer {
-  background-color: #f1f1f1;
+  background: #fff;
+  border-top: 1px solid #e2e8f0;
+  margin-top: 3rem;
+  padding-top: 3rem;
+}
+
+/* ─── Grid ───────────────────────────────────────────── */
+.footer-grid {
+  display: grid;
+  grid-template-columns: 1.6fr 1fr 1fr;
+  gap: 48px;
+  padding-bottom: 3rem;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+@media (max-width: 768px) {
+  .footer-grid { grid-template-columns: 1fr 1fr; gap: 24px; padding-bottom: 1.5rem; }
+  .footer-brand { grid-column: 1 / -1; }
+  .app-footer { padding-top: 1.5rem; }
+  .footer-bottom { padding: 14px 0; }
+}
+
+@media (max-width: 480px) {
+  .footer-grid { grid-template-columns: 1fr; }
+}
+
+/* ─── Brand ──────────────────────────────────────────── */
+.brand-tagline {
+  font-size: 0.875rem;
+  color: #64748b;
+  line-height: 1.6;
+  margin: 0 0 20px;
+  max-width: 280px;
+}
+
+/* ─── Social ─────────────────────────────────────────── */
+.social-row {
+  display: flex;
+  gap: 10px;
+}
+
+.social-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 9px;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.18s, border-color 0.18s, box-shadow 0.18s;
+  cursor: pointer;
+}
+
+.social-icon:hover {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+/* ─── Columns ────────────────────────────────────────── */
+.col-title {
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
   color: #374151;
-  padding: 1.3rem 1rem;
-  width: 100%;
-  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-    sans-serif;
+  margin-bottom: 16px;
 }
 
-.footer-brand .logo {
-  margin-bottom: 1rem;
-}
-
-.footer-links h4 {
-  color: #1f2937;
-  font-size: 1rem;
-  font-weight: 600;
-  margin-bottom: 1rem;
-}
-
-.footer-links nav {
+.col-links {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 11px;
 }
 
-.footer-links a {
-  color: #374151;
+.col-link {
+  font-size: 0.875rem;
+  color: #475569;
+  cursor: pointer;
   text-decoration: none;
-  font-size: 0.9rem;
-  transition: color 0.2s ease;
+  transition: color 0.18s;
+  line-height: 1.4;
 }
 
-.footer-links a:hover {
-  color: #0984e3;
+.col-link:hover {
+  color: #1e88e5;
 }
 
+/* ─── Bottom ─────────────────────────────────────────── */
 .footer-bottom {
-  max-width: 1400px;
-  margin: 0 auto;
-  padding-top: 1.3rem;
-  padding-bottom: 1.3rem;
-  margin-top: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 24px 0;
+  font-size: 0.9rem;
+  color: #475569;
+  flex-wrap: wrap;
   text-align: center;
-  font-size: 0.85rem;
-  color: #323336;
-  border-top: 1px solid #e5e7eb;
+}
+
+.footer-version {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  padding: 2px 10px;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #64748b;
+}
+
+.footer-copy-main strong { color: #475569; }
+.footer-copy-main, .footer-copy-sub, .footer-sep { color: #475569; font-size: 0.9rem; }
+
+@media (max-width: 768px) {
+  .footer-bottom { flex-direction: column; gap: 4px; }
+  .footer-sep { display: none; }
 }
 </style>
