@@ -6,6 +6,7 @@ export default defineNuxtPlugin((nuxtApp) => {
     autoClose: 3000,
     position: toast.POSITION.TOP_RIGHT,
     theme: "light",
+    draggable: false,
   });
 
   // Cung cấp toast để dùng ở bất kỳ đâu

@@ -23,8 +23,8 @@ api.interceptors.request.use((config: InternalAxiosRequestConfig) => {
 api.interceptors.response.use(
   (response: AxiosResponse) => {
     if (response?.data?.message && response?.data?.message !== "Success") {
-      const { $toast, $i18n } = useNuxtApp();
-      $toast.success($i18n.t(response.data.message));
+      const { $toast } = useNuxtApp();
+      $toast.success(response.data.message);
     }
 
     return response.data;
