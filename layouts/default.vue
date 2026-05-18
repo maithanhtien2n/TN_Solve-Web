@@ -28,9 +28,7 @@ const client = computed<boolean>(() => {
 });
 
 const pathArray = computed(() => {
-  const parts = route.path.split("/");
-  const filteredParts = parts.filter((i) => i);
-  return filteredParts.slice(1);
+  return route.path.split("/").filter((i) => i);
 });
 
 const appVersionDownload = computed(

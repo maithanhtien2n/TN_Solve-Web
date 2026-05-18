@@ -2,8 +2,6 @@
 import { productService } from "~/services/product";
 import { useIntersectionObserver } from "@vueuse/core";
 
-const { width, isMobile } = useDevice();
-
 const { onGetterUserData } = useAppStore();
 
 const params = reactive<any>({
@@ -49,7 +47,8 @@ const onClickDotMenuItem = (type: string, data: any) => {
       message = "Bạn có chắc chắn muốn riêng tư video này không?";
     } else if (type === "delete-video") {
       if (data.state === "primary") {
-        message = "Xóa thước phim đang tạo sẽ tốn 10 tín dụng. Bạn có muốn tiếp tục?";
+        message =
+          "Xóa thước phim đang tạo sẽ tốn 10 tín dụng. Bạn có muốn tiếp tục?";
       } else {
         message = "Bạn có chắc chắn muốn xoá thước phim này không?";
       }
@@ -78,6 +77,25 @@ const onClickDotMenuItem = (type: string, data: any) => {
     });
     return;
   }
+};
+
+const onCardMouseEnter = (event: MouseEvent) => {
+  const card = event.currentTarget as HTMLElement;
+  const videos = card.querySelectorAll(
+    "video"
+  ) as NodeListOf<HTMLVideoElement>;
+  videos.forEach((v) => v.play().catch(() => {}));
+};
+
+const onCardMouseLeave = (event: MouseEvent) => {
+  const card = event.currentTarget as HTMLElement;
+  const videos = card.querySelectorAll(
+    "video"
+  ) as NodeListOf<HTMLVideoElement>;
+  videos.forEach((v) => {
+    v.pause();
+    v.currentTime = 0;
+  });
 };
 
 onMounted(async () => {
@@ -129,326 +147,558 @@ definePageMeta({ middleware: "auth" });
 </script>
 
 <template>
-  <div
-    v-if="Boolean(loading === 'list')"
-    class="d-flex justify-center flex-column align-center ga-3 pt-10 pb-16"
-  >
-    <v-progress-circular width="2" size="40" color="primary" indeterminate />
-    Đang tải dữ liệu...
-  </div>
-
-  <div v-else>
+  <div>
     <ConfirmDialog ref="confirmDialogRef" />
 
-    <v-row
-      v-if="Array.isArray(products.docs) && products.docs.length"
-      :dense="isMobile"
-    >
-      <v-col
-        v-for="(item, index) in products.docs"
-        :key="index"
-        lg="4"
-        md="6"
-        sm="12"
-        cols="12"
+    <!-- Skeleton loading -->
+    <div v-if="loading === 'list'" class="video-grid">
+      <div v-for="i in 12" :key="i" class="skeleton-card">
+        <div class="skeleton-thumb">
+          <v-skeleton-loader type="image" height="100%" />
+        </div>
+        <div class="pa-3 d-flex flex-column ga-2">
+          <v-skeleton-loader type="text" />
+          <v-skeleton-loader type="text" width="55%" />
+        </div>
+      </div>
+    </div>
+
+    <template v-else>
+      <!-- Video grid -->
+      <div
+        v-if="Array.isArray(products.docs) && products.docs.length"
+        class="video-grid"
       >
         <router-link
-          class="d-flex cursor-pointer un-select video-card"
-          style="
-            border-radius: 6px;
-            box-shadow: rgba(0, 0, 0, 0.05) 0px 0px 0px 1px;
-          "
+          v-for="(item, index) in products.docs"
+          :key="index"
+          class="video-card"
           :to="`/video/${item._id}`"
+          @mouseenter="onCardMouseEnter"
+          @mouseleave="onCardMouseLeave"
         >
-          <div
-            v-if="item.state === 'success' && item.video"
-            class="relative d-flex"
-          >
-            <!-- KHỔ DỌC -->
-            <div
-              class="video-wrapper cursor-pointer"
-              :style="{
-                width: width > 650 ? '160px' : '140px',
-                height: width > 650 ? '101.25px' : '90px',
-              }"
-            >
-              <!-- Video nền mờ -->
-              <video class="video-bg" preload="metadata" muted playsinline>
-                <source :src="item.video" type="video/mp4" />
-              </video>
+          <!-- Thumbnail -->
+          <div class="thumb-area">
+            <!-- Success -->
+            <template v-if="item.state === 'success' && item.video">
+              <div class="video-wrapper">
+                <video
+                  class="video-bg"
+                  :src="item.video"
+                  preload="metadata"
+                  muted
+                  playsinline
+                />
+                <video
+                  class="video-main"
+                  :src="item.video"
+                  preload="metadata"
+                  muted
+                  playsinline
+                  :style="
+                    item.frameRate === 'Khổ ngang (16:9)'
+                      ? { objectFit: 'cover' }
+                      : {}
+                  "
+                />
+              </div>
 
-              <!-- Video chính -->
-              <video
-                :style="
-                  item.frameRate === 'Khổ ngang (16:9)'
-                    ? { 'object-fit': 'cover' }
-                    : {}
-                "
-                class="video-main"
-                preload="metadata"
-                muted
-                playsinline
-              >
-                <source :src="item.video" type="video/mp4" />
-              </video>
-            </div>
-
-            <!-- KHỔ NGANG -->
-            <!-- <video
-              class="cursor-pointer bg-black"
-              style="border-radius: 6px 0 0 6px"
-              :key="item.video"
-              :width="width > 650 ? 160 : 140"
-              :height="width > 650 ? 101.25 : 90"
-              preload="metadata"
-              muted
-              playsinline
-              :style="{ objectFit: 'cover' }"
-            >
-              <source :src="item.video" type="video/mp4" />
-            </video> -->
-
-            <span class="video-duration">
-              {{ item.videoDuration }}
-            </span>
-          </div>
-
-          <div v-else-if="item.state === 'primary'" class="relative">
-            <v-skeleton-loader
-              style="border-radius: 6px 0 0 6px"
-              :style="{
-                width: width > 650 ? '160px' : '140px',
-                height: width > 650 ? '101.25px' : '90px',
-              }"
-            />
-
-            <div
-              class="absolute d-flex flex-column align-center justify-center ga-2 bg-opacity-90"
-              style="top: 0; left: 0; right: 0; bottom: 0"
-            >
-              <v-icon size="24" color="blue">mdi-progress-helper</v-icon>
-            </div>
-          </div>
-
-          <div
-            v-else
-            class="d-flex align-center justify-center cursor-pointer ga-1 bg-grey-lighten-3"
-            style="border-radius: 6px 0 0 6px"
-            :style="{
-              width: width > 650 ? '160px' : '140px',
-              height: width > 650 ? '101.25px' : '90px',
-            }"
-          >
-            <v-icon size="24" color="error">mdi-alert-circle-outline</v-icon>
-          </div>
-
-          <div class="d-flex flex-column flex-1 pa-3 pt-2">
-            <h4
-              class="video-card-title font-bold cursor-pointer mb-1"
-              style="line-height: 1.4rem"
-              :class="`line-clamp-${isMobile ? 1 : 1}`"
-            >
-              {{ item.client ? "💻" : "🌐" }} {{ item.title }}
-            </h4>
-
-            <!-- <small>{{ item.frameRate }}</small> -->
-
-            <!-- <small>{{ item.modelVideo }}</small> -->
-
-            <small v-if="item.visibility === 'public'">
-              <v-icon size="16" color="primary" style="margin-bottom: 2px">
-                mdi-star-four-points-outline
-              </v-icon>
-              {{ item.createdAt }}
-            </small>
-
-            <small v-else>
-              <v-icon size="15" style="margin-bottom: 2.5px">
-                mdi-lock-outline
-              </v-icon>
-              {{ item.createdAt }}
-            </small>
-
-            <div
-              v-if="item.visibility === 'public'"
-              class="d-flex align-center"
-            >
-              <small class="text-nowrap text-grey-darken-2">
-                {{ item?.viewsCount }} lượt xem
-              </small>
-
-              <v-icon>mdi-circle-small</v-icon>
-
-              <small class="text-nowrap text-grey-darken-2">
-                {{ item?.likesCount }} lượt thích
-              </small>
-            </div>
-          </div>
-
-          <v-menu location="bottom right">
-            <template v-slot:activator="{ props }">
-              <v-btn
-                v-bind="props"
-                size="40"
-                variant="text"
-                icon="mdi-dots-vertical"
-                @click.prevent.stop
-              />
+              <span v-if="item.videoDuration" class="duration-badge">
+                {{ item.videoDuration }}
+              </span>
             </template>
 
-            <v-card min-width="200">
-              <v-list>
-                <v-list-item
-                  v-for="(menu, index) in [
-                    {
-                      title:
-                        item.visibility === 'public' ? 'Riêng tư' : 'Công khai',
-                      value:
-                        item.visibility === 'public' ? 'private' : 'public',
-                      icon:
-                        item.visibility === 'public'
-                          ? 'mdi-lock-outline'
-                          : 'mdi-star-four-points-outline',
-                    },
-                    {
-                      title: 'Tải video',
-                      value: 'download-video',
-                      icon: 'mdi-tray-arrow-down',
-                    },
-                    {
-                      title: 'Xóa thước phim',
-                      value: 'delete-video',
-                      icon: 'mdi-delete-outline',
-                    },
-                  ]"
-                  :key="index"
-                  :value="menu.value"
-                  :class="{
-                    disabled:
-                      ['download-video', 'public', 'private'].includes(
-                        menu.value
-                      ) && ['primary', 'error'].includes(item.state),
-                  }"
-                  @click="onClickDotMenuItem(menu.value, item)"
-                >
-                  <div class="d-flex align-center ga-4">
-                    <v-icon
-                      :icon="menu.icon"
-                      :color="`${menu.value === 'delete-video' ? 'red' : ''}`"
-                    />
-                    <label
-                      class="cursor-pointer"
-                      :class="{ 'text-red': menu.value === 'delete-video' }"
-                    >
-                      {{ menu.title }}
-                    </label>
-                  </div>
-                </v-list-item>
-              </v-list>
-            </v-card>
-          </v-menu>
+            <!-- Processing -->
+            <template v-else-if="item.state === 'primary'">
+              <div class="processing-state">
+                <v-progress-circular
+                  indeterminate
+                  color="rgba(255,255,255,0.85)"
+                  size="38"
+                  width="2"
+                />
+                <span class="processing-label">Đang xử lý</span>
+                <span class="processing-hint">Video đang được tạo...</span>
+              </div>
+            </template>
+
+            <!-- Error -->
+            <template v-else>
+              <div class="error-state">
+                <div class="error-icon-wrap">
+                  <v-icon size="28" color="white">mdi-alert-outline</v-icon>
+                </div>
+                <span class="error-label">Tạo video thất bại</span>
+                <span class="error-hint">Nhấn vào để xem chi tiết</span>
+              </div>
+            </template>
+
+            <!-- Visibility badge -->
+            <div class="visibility-badge">
+              <v-icon
+                v-if="item.visibility === 'public'"
+                size="13"
+                color="white"
+              >
+                mdi-earth
+              </v-icon>
+              <v-icon v-else size="13" color="white">mdi-lock-outline</v-icon>
+              <span>{{
+                item.visibility === "public" ? "Công khai" : "Riêng tư"
+              }}</span>
+            </div>
+
+            <!-- 3-dot menu -->
+            <v-menu location="bottom end">
+              <template #activator="{ props }">
+                <v-btn
+                  v-bind="props"
+                  class="menu-btn"
+                  icon="mdi-dots-vertical"
+                  size="30"
+                  variant="text"
+                  color="white"
+                  @click.prevent.stop
+                />
+              </template>
+
+              <v-card min-width="200">
+                <v-list>
+                  <v-list-item
+                    v-for="(menu, mIdx) in [
+                      {
+                        title:
+                          item.visibility === 'public'
+                            ? 'Riêng tư'
+                            : 'Công khai',
+                        value:
+                          item.visibility === 'public' ? 'private' : 'public',
+                        icon:
+                          item.visibility === 'public'
+                            ? 'mdi-lock-outline'
+                            : 'mdi-earth',
+                      },
+                      {
+                        title: 'Tải video',
+                        value: 'download-video',
+                        icon: 'mdi-tray-arrow-down',
+                      },
+                      {
+                        title: 'Xóa thước phim',
+                        value: 'delete-video',
+                        icon: 'mdi-delete-outline',
+                      },
+                    ]"
+                    :key="mIdx"
+                    :class="{
+                      disabled:
+                        ['download-video', 'public', 'private'].includes(
+                          menu.value
+                        ) && ['primary', 'error'].includes(item.state),
+                    }"
+                    @click="onClickDotMenuItem(menu.value, item)"
+                  >
+                    <div class="d-flex align-center ga-4">
+                      <v-icon
+                        :icon="menu.icon"
+                        :color="`${menu.value === 'delete-video' ? 'red' : ''}`"
+                      />
+                      <label
+                        class="cursor-pointer"
+                        :class="{ 'text-red': menu.value === 'delete-video' }"
+                      >
+                        {{ menu.title }}
+                      </label>
+                    </div>
+                  </v-list-item>
+                </v-list>
+              </v-card>
+            </v-menu>
+          </div>
+
+          <!-- Card info -->
+          <div class="card-info">
+            <p class="video-title">
+              {{ item.title }}
+            </p>
+
+            <div class="video-meta">
+              <span>{{ item.createdAt }}</span>
+
+              <template v-if="item.visibility === 'public'">
+                <span class="dot">·</span>
+                <span>{{ item.viewsCount }} lượt xem</span>
+                <span class="dot">·</span>
+                <span>{{ item.likesCount }} thích</span>
+              </template>
+            </div>
+          </div>
         </router-link>
-      </v-col>
 
-      <div ref="loadMore" />
-    </v-row>
-
-    <v-card
-      v-else
-      class="empty-state-box d-flex flex-column align-center justify-center rounded-xl bg-grey-lighten-5 text-center mt-6"
-      variant="flat"
-      style="min-height: 24rem"
-    >
-      <div
-        class="empty-icon-wrapper mb-5 d-flex align-center justify-center rounded-circle bg-white"
-      >
-        <v-icon color="#8cb8f4" size="56">mdi-movie-open-remove-outline</v-icon>
+        <div ref="loadMore" class="load-more-trigger" />
       </div>
-      <h3 class="text-h6 font-weight-bold text-grey-darken-3 mb-2">
-        Bạn chưa có thước phim nào
-      </h3>
-      <span class="text-grey-darken-1 text-body-1 mb-6">
-        Hãy tạo video đầu tiên để bắt đầu trải nghiệm hệ thống.
-      </span>
-      <ButtonCreateVideo />
-    </v-card>
 
-    <div
-      v-if="Array.isArray(products.docs) && products.docs.length"
-      class="mt-8"
-    >
-      <ButtonCreateVideo />
-    </div>
+      <!-- Empty state -->
+      <div v-else class="empty-state">
+        <div class="empty-icon">
+          <v-icon size="52" color="#8cb8f4"
+            >mdi-movie-open-remove-outline</v-icon
+          >
+        </div>
+        <h3>Bạn chưa có thước phim nào</h3>
+        <p>Hãy tạo video đầu tiên để bắt đầu trải nghiệm hệ thống.</p>
+        <ButtonCreateVideo />
+      </div>
+
+      <!-- Create button at bottom -->
+      <div
+        v-if="Array.isArray(products.docs) && products.docs.length"
+        class="mt-8"
+      >
+        <ButtonCreateVideo />
+      </div>
+    </template>
   </div>
 </template>
 
 <style scoped>
-.un-select:hover .video-card-title {
-  text-decoration: underline;
-  color: #1e88e5;
-  transition: all 0.3s;
+/* ─── Grid ─────────────────────────────────────────── */
+.video-grid {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(3, 1fr);
 }
 
-.video-duration {
-  right: 5px;
-  z-index: 9;
-  bottom: 5px;
-  color: #fff;
-  font-size: 0.8rem;
-  position: absolute;
-  border-radius: 6px;
-  padding: 0 6px;
-  background-color: rgba(0, 0, 0, 0.533);
+@media (max-width: 1100px) {
+  .video-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
 }
 
+@media (max-width: 840px) {
+  .video-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .video-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+}
+
+/* ─── Skeleton card ─────────────────────────────────── */
+.skeleton-card {
+  border-radius: 12px;
+  overflow: hidden;
+  background: #fff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.07);
+}
+
+.skeleton-thumb {
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+}
+
+/* ─── Video card ────────────────────────────────────── */
 .video-card {
-  color: inherit; /* Giữ nguyên màu chữ */
-  text-decoration: none; /* Bỏ gạch chân */
+  display: flex;
+  flex-direction: column;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #fff;
+  color: inherit;
+  text-decoration: none;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.07), 0 1px 2px rgba(0, 0, 0, 0.05);
+  transition: box-shadow 0.22s ease, transform 0.22s ease;
+  cursor: pointer;
+}
+
+.video-card:hover {
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.12), 0 3px 10px rgba(0, 0, 0, 0.08);
+}
+
+/* ─── Thumbnail ─────────────────────────────────────── */
+.thumb-area {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  background: #111;
+  overflow: hidden;
+  flex-shrink: 0;
 }
 
 .video-wrapper {
-  position: relative;
-  overflow: hidden;
-  border-radius: 6px 0 0 6px;
-  background: #000;
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  background-image: url("/images/video-loading.jpg");
+  position: absolute;
+  inset: 0;
 }
 
-/* Video nền mờ */
 .video-bg {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
-  filter: blur(10px) brightness(0.75);
-  transform: scale(1.2); /* tránh viền mờ */
+  filter: blur(14px) brightness(0.55);
+  transform: scale(1.18);
 }
 
-/* Video chính */
 .video-main {
-  position: relative;
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
   object-fit: contain;
   z-index: 1;
 }
 
-/* Hiệu ứng cho Empty State */
-.empty-state-box {
+.video-main::-webkit-media-controls,
+.video-bg::-webkit-media-controls {
+  display: none !important;
+}
+
+.video-main::-webkit-media-controls-start-playback-button,
+.video-bg::-webkit-media-controls-start-playback-button {
+  display: none !important;
+  opacity: 0 !important;
+}
+
+/* ─── Play overlay ──────────────────────────────────── */
+.play-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.1);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.video-card:hover .play-overlay {
+  opacity: 1;
+}
+
+.play-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.video-card:hover .play-btn {
+  transform: scale(1.12);
+  background: rgba(0, 0, 0, 0.72);
+}
+
+/* ─── Duration badge ────────────────────────────────── */
+.duration-badge {
+  position: absolute;
+  right: 7px;
+  bottom: 7px;
+  z-index: 3;
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 600;
+  background: rgba(0, 0, 0, 0.72);
+  border-radius: 4px;
+  padding: 1px 6px;
+  letter-spacing: 0.2px;
+}
+
+/* ─── Visibility badge ──────────────────────────────── */
+.visibility-badge {
+  position: absolute;
+  left: 7px;
+  top: 7px;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 500;
+  background: rgba(0, 0, 0, 0.52);
+  backdrop-filter: blur(4px);
+  border-radius: 20px;
+  padding: 2px 7px 2px 5px;
+}
+
+/* ─── 3-dot menu button ─────────────────────────────── */
+.menu-btn {
+  position: absolute !important;
+  right: 6px;
+  top: 6px;
+  z-index: 4;
+  opacity: 0;
+  transition: opacity 0.18s ease;
+  background: rgba(0, 0, 0, 0.5) !important;
+  backdrop-filter: blur(4px);
+  width: 30px !important;
+  height: 30px !important;
+  min-width: 30px !important;
+  border-radius: 50% !important;
+  padding: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.video-card:hover .menu-btn {
+  opacity: 1;
+}
+
+/* ─── Processing state ──────────────────────────────── */
+.processing-state {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: linear-gradient(135deg, #0d1117 0%, #1a2332 100%);
+}
+
+.processing-label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.9);
+  letter-spacing: 0.2px;
+  margin-top: 2px;
+}
+
+.processing-hint {
+  font-size: 0.68rem;
+  color: rgba(255, 255, 255, 0.35);
+}
+
+.error-state {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: linear-gradient(135deg, #1a1a1a 0%, #2d1515 100%);
+}
+
+.error-icon-wrap {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: rgba(229, 57, 53, 0.25);
+  border: 2px solid rgba(229, 57, 53, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 2px;
+}
+
+.error-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #ff7070;
+  letter-spacing: 0.2px;
+}
+
+.error-hint {
+  font-size: 0.68rem;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+/* ─── Card info ─────────────────────────────────────── */
+.card-info {
+  padding: 10px 12px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.video-title {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+  line-height: 1.45;
+  color: #1a1a1a;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  transition: color 0.18s ease;
+}
+
+.video-card:hover .video-title {
+  color: #1e88e5;
+}
+
+.video-meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px;
+  font-size: 0.72rem;
+  color: #9e9e9e;
+}
+
+.dot {
+  color: #bdbdbd;
+}
+
+/* ─── Load more trigger ─────────────────────────────── */
+.load-more-trigger {
+  grid-column: 1 / -1;
+}
+
+/* ─── Empty state ───────────────────────────────────── */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 24rem;
+  gap: 14px;
   border: 2px dashed #cbd5e1;
-  transition: all 0.3s ease;
+  border-radius: 16px;
+  background: #f8fafc;
+  padding: 3rem 2rem;
+  text-align: center;
+  transition: all 0.25s ease;
 }
-.empty-state-box:hover {
+
+.empty-state:hover {
   border-color: #94a3b8;
-  background-color: #f1f5f9 !important;
+  background: #f1f5f9;
 }
-.empty-icon-wrapper {
-  width: 96px;
-  height: 96px;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04);
+
+.empty-icon {
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+}
+
+.empty-state h3 {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #374151;
+}
+
+.empty-state p {
+  margin: 0;
+  font-size: 0.875rem;
+  color: #6b7280;
 }
 </style>

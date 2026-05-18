@@ -473,7 +473,26 @@ definePageMeta({ middleware: "auth" });
     Đang tải dữ liệu...
   </div>
 
-  <v-row v-else>
+  <v-row v-else align="start">
+    <v-col
+      v-if="videoFlow && Object.values(videoFlow || {})?.length"
+      cols="12"
+    >
+      <div class="flow-status-bar mb-2">
+        <div class="flow-status-header">
+          <span class="flow-status-title">{{ videoFlow.title }}</span>
+          <span class="flow-status-pct">{{ videoFlow.value }}%</span>
+        </div>
+        <v-progress-linear
+          :color="videoFlow.color"
+          :modelValue="videoFlow.value"
+          height="6"
+          rounded
+          bg-color="#d8d8d8"
+        />
+      </div>
+    </v-col>
+
     <v-col cols="12" lg="6" md="6">
       <div v-if="formData.video" class="d-flex flex-column ga-3">
         <div
@@ -512,119 +531,68 @@ definePageMeta({ middleware: "auth" });
           <h3>Tải video</h3>
         </div>
 
-        <h3 v-if="isMobile" class="font-bold mt-2" style="line-height: 1.6rem">
-          {{ formData.title }}
-        </h3>
+        <!-- Title + stats -->
+        <div class="title-stats-row mt-2">
+          <div class="title-block">
+            <h3 v-if="isMobile" class="font-bold" style="line-height: 1.6rem">
+              {{ formData.title }}
+            </h3>
+            <h2 v-else class="font-bold">{{ formData.title }}</h2>
 
-        <h2 v-else class="font-bold mt-2">
-          {{ formData.title }}
-        </h2>
-
-        <div
-          v-if="formData.visibility === 'public'"
-          class="d-flex align-center ga-3"
-        >
-          <div class="d-flex align-center ga-3">
-            <v-btn
-              icon
-              size="40"
-              variant="tonal"
-              :class="{ 'text-primary': formData?.isLiked }"
-              @click="onClickLikeVideo()"
-            >
-              <v-icon size="18">mdi-thumb-up-outline</v-icon>
-            </v-btn>
-            <span class="text-grey-darken-2">
-              {{ formData?.likesCount }} lượt thích
-            </span>
+            <div v-if="formData.visibility === 'public'" class="meta-line">
+              <span class="stat-item">
+                <v-icon size="13">mdi-eye-outline</v-icon>
+                {{ formData?.viewsCount }} lượt xem
+              </span>
+              <span class="stats-dot">·</span>
+              <span class="stat-item">
+                <v-icon size="13">mdi-clock-outline</v-icon>
+                {{ timeAgoVi(formData?.createdAt) }}
+              </span>
+            </div>
           </div>
 
-          |
+          <button
+            v-if="formData.visibility === 'public'"
+            class="like-btn"
+            :class="{ liked: formData?.isLiked }"
+            @click="onClickLikeVideo()"
+          >
+            <v-icon size="16">
+              {{ formData?.isLiked ? 'mdi-thumb-up' : 'mdi-thumb-up-outline' }}
+            </v-icon>
+            <span>{{ formData?.likesCount }}</span>
+          </button>
+        </div>
 
-          <div class="d-flex align-center">
-            <span class="text-nowrap text-grey-darken-2">
-              {{ formData?.viewsCount }} lượt xem
-            </span>
-
-            <v-icon>mdi-circle-small</v-icon>
-
-            <span class="text-nowrap text-grey-darken-2">
-              {{ timeAgoVi(formData?.createdAt) }}
-            </span>
+        <div class="info-grid">
+          <div class="info-card">
+            <span class="info-label">Mô hình</span>
+            <span class="info-value">{{ modelVideoOptions.find((i: any) => i.value === formData.modelVideo)?.title || "Chưa có" }}</span>
+          </div>
+          <div class="info-card">
+            <span class="info-label">Tỷ lệ khung hình</span>
+            <span class="info-value">{{ frameRateOptions.find((i: any) => i.value === formData.frameRate)?.title || "Chưa có" }}</span>
+          </div>
+          <div class="info-card">
+            <span class="info-label">Chế độ</span>
+            <span class="info-value">{{ videoModeOptions.find((i: any) => i.value === formData.videoMode)?.title || "Chưa có" }}</span>
+          </div>
+          <div class="info-card">
+            <span class="info-label">Phong cách</span>
+            <span class="info-value">{{ videoStyleOptions.find((i: any) => i.value === formData.videoStyle)?.title || "Chưa có" }}</span>
+          </div>
+          <div class="info-card">
+            <span class="info-label">Thời lượng</span>
+            <span class="info-value">{{ videoDurationOptions.find((i: any) => i.value === formData.videoDuration)?.title || "Chưa có" }}</span>
+          </div>
+          <div class="info-card">
+            <span class="info-label">Tác giả</span>
+            <span class="info-value">{{ formData?.account?.name || "Chưa có" }}</span>
           </div>
         </div>
 
         <v-row dense>
-          <v-col cols="6">
-            <div>
-              <span class="font-bold">Mô hình:</span>
-              <br />
-              {{
-                modelVideoOptions.find(
-                  (i: any) => i.value === formData.modelVideo,
-                )?.title || "Chưa có"
-              }}
-            </div>
-          </v-col>
-
-          <v-col cols="6">
-            <div>
-              <span class="font-bold">Tỷ lệ khung hình:</span>
-              <br />
-              {{
-                frameRateOptions.find(
-                  (i: any) => i.value === formData.frameRate,
-                )?.title || "Chưa có"
-              }}
-            </div>
-          </v-col>
-
-          <v-col cols="6">
-            <div>
-              <span class="font-bold">Chế độ:</span>
-              <br />
-              {{
-                videoModeOptions.find(
-                  (i: any) => i.value === formData.videoMode,
-                )?.title || "Chưa có"
-              }}
-            </div>
-          </v-col>
-
-          <v-col cols="6">
-            <div>
-              <span class="font-bold">Phong cách:</span>
-              <br />
-              {{
-                videoStyleOptions.find(
-                  (i: any) => i.value === formData.videoStyle,
-                )?.title || "Chưa có"
-              }}
-            </div>
-          </v-col>
-
-          <v-col cols="6">
-            <div>
-              <span class="font-bold">Thời lượng:</span>
-              <br />
-              {{
-                videoDurationOptions.find(
-                  (i: any) => i.value === formData.videoDuration,
-                )?.title || "Chưa có"
-              }}
-            </div>
-          </v-col>
-
-          <v-col cols="6">
-            <div>
-              <span class="font-bold">Tác giả:</span>
-              <br />
-              {{ formData?.account?.name || "Chưa có" }}
-            </div>
-          </v-col>
-
-          <v-divider class="my-2" />
-
           <template v-if="formData.hasImage">
             <v-col v-if="formData.videoMode === 'my_subject'" cols="12">
               <div>
@@ -658,22 +626,21 @@ definePageMeta({ middleware: "auth" });
                   :key="index"
                   cols="6"
                 >
-                  <div>
-                    <span class="font-bold">
+                  <div class="info-card">
+                    <span class="info-label">
                       {{
                         `${
                           formData.videoMode === "custom_character"
                             ? "Ảnh nhân vật"
                             : "Ảnh bối cảnh"
                         } ${index + 1}`
-                      }}:
+                      }}
                     </span>
-                    <br />
                     <UploadImage
                       :readonly="true"
                       :ref="(el) => (uploadImageRefs[index] = el)"
                       :height="width > 550 ? '10rem' : '8rem'"
-                      class="mt-2 mb-1"
+                      class="mt-1 mb-1"
                     />
                   </div>
                 </v-col>
@@ -682,10 +649,9 @@ definePageMeta({ middleware: "auth" });
           </template>
 
           <v-col cols="12">
-            <div>
-              <span class="font-bold">Prompt:</span>
-              <br />
-              <span v-html="formData.value" style="white-space: pre-line" />
+            <div class="info-card">
+              <span class="info-label">Prompt</span>
+              <span v-html="formData.value" class="info-value" style="white-space: pre-line" />
             </div>
           </v-col>
         </v-row>
@@ -927,116 +893,64 @@ definePageMeta({ middleware: "auth" });
     </v-col>
 
     <v-col lg="6" md="6" cols="12">
-      <div
-        v-if="videoFlow && Object.values(videoFlow || {})?.length"
-        class="mb-4"
-      >
-        <v-progress-linear
-          height="10"
-          :color="videoFlow.color"
-          :modelValue="videoFlow.value"
-        />
-        <div class="mt-2">
-          {{ formData.client ? "💻" : "🌐" }} {{ videoFlow.title }}
-        </div>
-      </div>
-
-      <div ref="myTimeline">
-        <v-timeline
-          side="end"
-          class="mb-4"
-          direction="vertical"
-          :density="'compact'"
+      <div ref="myTimeline" class="steps-timeline">
+        <div
+          v-for="(item, index) in productId
+            ? formData.messages
+            : [{ title: 'Hoàn tất thông tin', dateTime: '', color: 'grey' }]"
+          :key="index"
+          class="step-item"
+          :class="`step-${item.color}`"
         >
-          <template
-            v-for="(item, index) in productId
-              ? formData.messages
-              : [
-                  {
-                    title: 'Hoàn tất thông tin',
-                    dateTime: '',
-                    color: 'grey',
-                  },
-                ]"
-            :key="index"
-          >
-            <v-timeline-item :dot-color="item.color" size="small">
-              <template v-slot:icon>
-                <v-icon v-if="item.color === 'success'" color="white" size="20">
-                  mdi-check
-                </v-icon>
+          <!-- connector line -->
+          <div class="step-line" v-if="index !== 0" />
 
-                <v-progress-circular
-                  v-else-if="item.color === 'primary'"
-                  color="white"
-                  width="2"
-                  size="16"
-                  indeterminate
-                />
+          <div class="step-row">
+            <!-- icon -->
+            <div class="step-icon" :class="`step-icon--${item.color}`">
+              <v-icon v-if="item.color === 'success'" color="white" size="16">mdi-check</v-icon>
+              <v-progress-circular v-else-if="item.color === 'primary'" color="white" width="2" size="14" indeterminate />
+              <v-icon v-else-if="item.color === 'error'" color="white" size="16">mdi-close</v-icon>
+              <v-icon v-else color="white" size="14">mdi-clock-outline</v-icon>
+            </div>
 
-                <v-icon v-if="item.color === 'error'" color="white" size="20">
-                  mdi-close
-                </v-icon>
-              </template>
-
-              <div>
-                <div class="font-bold">
-                  {{ item.title }}
-                </div>
-
-                <div class="text-caption">
-                  {{ item.dateTime }}
-                </div>
-
-                <div
-                  v-if="item.note"
-                  class="text-caption"
-                  :class="{
-                    'cursor-pointer text-blue-darken-1':
-                      item.note?.includes('Đã phân tích xong kịch bản') &&
+            <!-- content -->
+            <div class="step-content">
+              <div class="step-title">{{ item.title }}</div>
+              <div v-if="item.dateTime" class="step-time">{{ item.dateTime }}</div>
+              <div
+                v-if="item.note"
+                class="step-note"
+                :class="{
+                  'step-note--link':
+                    item.note?.includes('Đã phân tích xong kịch bản') &&
+                    onGetterUserData?.role === EnumAccountRole.ADMIN,
+                }"
+                @click="
+                  onClickNoteMessage(
+                    item.note?.includes('Đã phân tích xong kịch bản') &&
                       onGetterUserData?.role === EnumAccountRole.ADMIN,
-                  }"
-                  @click="
-                    onClickNoteMessage(
-                      item.note?.includes('Đã phân tích xong kịch bản') &&
-                        onGetterUserData?.role === EnumAccountRole.ADMIN,
-                    )
-                  "
-                >
-                  {{ item.note }}
-                </div>
-                <div
-                  v-if="
-                    [
-                      '❌ Cookies flow (veo3) của bạn không hợp lệ!',
-                      '❌ Cookies flow (veo3) của bạn đã hết hạn!',
-                    ].includes(item.note)
-                  "
-                  class="text-caption"
-                >
-                  Vui lòng cập nhật cookies mới
-                  <a
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    href="https://tnsolve.com/setting"
-                  >
-                    tại đây
-                  </a>
-                </div>
-
-                <div
-                  v-if="
-                    onGetterUserData?.role === EnumAccountRole.ADMIN &&
-                    item.errorMsg
-                  "
-                  class="text-caption"
-                >
-                  {{ item.errorMsg }}
-                </div>
+                  )
+                "
+              >
+                {{ item.note }}
               </div>
-            </v-timeline-item>
-          </template>
-        </v-timeline>
+              <div
+                v-if="['❌ Cookies flow (veo3) của bạn không hợp lệ!', '❌ Cookies flow (veo3) của bạn đã hết hạn!'].includes(item.note)"
+                class="step-note"
+              >
+                Vui lòng cập nhật cookies mới
+                <a target="_blank" rel="noopener noreferrer" href="https://tnsolve.com/setting">tại đây</a>
+              </div>
+              <div
+                v-if="onGetterUserData?.role === EnumAccountRole.ADMIN && item.errorMsg"
+                class="step-note step-note--error"
+              >
+                {{ item.errorMsg }}
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </v-col>
 
@@ -1064,5 +978,251 @@ definePageMeta({ middleware: "auth" });
 .auto-grow-textarea ::v-deep(textarea) {
   max-height: 450px;
   overflow-y: auto;
+}
+
+/* ─── Info cards grid ───────────────────────────────── */
+.info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.info-card {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: #f8f9fa;
+  border: 1px solid #eeeeee;
+}
+
+.info-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #212121;
+  letter-spacing: 0.5px;
+}
+
+.info-value {
+  font-size: 0.85rem;
+  font-weight: 400;
+  color: #212121;
+  line-height: 1.35;
+}
+
+/* ─── Title + stats row ─────────────────────────────── */
+.title-stats-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.title-block {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+  min-width: 0;
+}
+
+.meta-line {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.like-btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 14px;
+  border-radius: 20px;
+  border: 1px solid #e0e0e0;
+  background: transparent;
+  cursor: pointer;
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: #616161;
+  transition: background 0.18s, color 0.18s, border-color 0.18s;
+}
+
+.like-btn:hover {
+  background: #f5f5f5;
+  border-color: #bdbdbd;
+}
+
+.like-btn.liked {
+  background: #e3f2fd;
+  border-color: #90caf9;
+  color: #1976d2;
+}
+
+.stats-divider {
+  width: 1px;
+  height: 16px;
+  background: #e0e0e0;
+}
+
+.stat-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.8rem;
+  color: #9e9e9e;
+}
+
+.stats-dot {
+  color: #bdbdbd;
+  font-size: 0.9rem;
+}
+
+/* ─── Flow Status Bar ───────────────────────────────── */
+.flow-status-bar {
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: #f9f9f9;
+  border: 1px solid #efefef;
+}
+
+.flow-status-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.flow-status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  animation: pulse-dot 1.5s ease-in-out infinite;
+}
+
+.flow-dot--success { background: #43a047; animation: none; }
+.flow-dot--primary { background: #1e88e5; }
+.flow-dot--error   { background: #e53935; animation: none; }
+.flow-dot--grey    { background: #bdbdbd; animation: none; }
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.5; transform: scale(1.3); }
+}
+
+.flow-status-title {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #212121;
+  flex: 1;
+}
+
+.flow-status-pct {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #9e9e9e;
+}
+
+/* ─── Steps Timeline ─────────────────────────────────── */
+.steps-timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding: 4px 0;
+  margin-top: -4px;
+}
+
+.step-item {
+  position: relative;
+}
+
+.step-line {
+  position: absolute;
+  top: -12px;
+  left: 15px;
+  width: 2px;
+  height: 12px;
+  background: #e0e0e0;
+}
+
+.step-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  min-height: 56px;
+  border-radius: 10px;
+  background: #f9f9f9;
+  border: 1px solid #efefef;
+  margin-bottom: 8px;
+  transition: background 0.15s;
+}
+
+.step-success .step-row {
+  background: #f0faf4;
+  border-color: #c8ecd6;
+}
+
+.step-primary .step-row {
+  background: #f0f6ff;
+  border-color: #c2d9f8;
+}
+
+.step-error .step-row {
+  background: #fff4f4;
+  border-color: #fdd;
+}
+
+.step-icon {
+  flex-shrink: 0;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 1px;
+}
+
+.step-icon--success { background: #43a047; }
+.step-icon--primary { background: #1e88e5; }
+.step-icon--error   { background: #e53935; }
+.step-icon--grey    { background: #bdbdbd; }
+
+.step-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.step-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #212121;
+  line-height: 1.4;
+}
+
+.step-time {
+  font-size: 0.75rem;
+  color: #9e9e9e;
+}
+
+.step-note {
+  font-size: 0.78rem;
+  color: #555;
+  margin-top: 1px;
+}
+
+.step-note--link {
+  color: #1e88e5;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.step-note--error {
+  color: #e53935;
 }
 </style>

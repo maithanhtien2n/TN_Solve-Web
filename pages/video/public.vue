@@ -2,7 +2,7 @@
 import { productService } from "~/services/product";
 import { useIntersectionObserver } from "@vueuse/core";
 
-const { width, isMobile } = useDevice();
+const { isMobile } = useDevice();
 
 const params = reactive<any>({
   search: "",
@@ -31,6 +31,21 @@ const onGetProducts = async (loadingType: string = "") => {
     .finally(() => {
       loading.value = "";
     });
+};
+
+const onCardMouseEnter = (event: MouseEvent) => {
+  const card = event.currentTarget as HTMLElement;
+  const videos = card.querySelectorAll("video") as NodeListOf<HTMLVideoElement>;
+  videos.forEach((v) => v.play().catch(() => {}));
+};
+
+const onCardMouseLeave = (event: MouseEvent) => {
+  const card = event.currentTarget as HTMLElement;
+  const videos = card.querySelectorAll("video") as NodeListOf<HTMLVideoElement>;
+  videos.forEach((v) => {
+    v.pause();
+    v.currentTime = 0;
+  });
 };
 
 onMounted(async () => {
@@ -63,281 +78,397 @@ useSeo({
 </script>
 
 <template>
-  <div
-    v-if="Boolean(loading === 'list')"
-    class="d-flex justify-center flex-column align-center ga-3 pt-10 pb-16"
-  >
-    <v-progress-circular width="2" size="40" color="primary" indeterminate />
-    Đang tải dữ liệu...
+  <!-- Header -->
+  <div class="page-header mb-6">
+    <div class="page-title-row">
+      <div class="page-icon">
+        <v-icon size="28" color="#1e88e5">mdi-earth</v-icon>
+      </div>
+      <div>
+        <h2 class="page-title">Thước phim cộng đồng</h2>
+        <p class="page-desc">Các thước phim đã được chia sẻ từ cộng đồng để mọi người cùng xem và học tập.</p>
+      </div>
+    </div>
   </div>
 
-  <div v-else>
-    <div class="mb-4 d-flex flex-column">
-      <h2 class="font-bold" style="margin-top: -7px">
-        Thước phim cộng đồng
-      </h2>
-      <span>
-        Các thước phim đã được chia sẻ từ cộng đồng để mọi người cùng xem và học tập.
-      </span>
+  <!-- Skeleton loading -->
+  <div v-if="Boolean(loading === 'list')" class="video-grid">
+    <div v-for="i in 12" :key="i" class="video-card-skeleton">
+      <v-skeleton-loader type="image" class="thumb-skeleton" />
+      <div class="skeleton-info">
+        <v-skeleton-loader type="text" width="80%" />
+        <v-skeleton-loader type="text" width="50%" />
+      </div>
     </div>
+  </div>
 
-    <v-row
-      v-if="Array.isArray(products.docs) && products.docs.length"
-      :dense="isMobile"
-    >
-      <v-col
+  <!-- Grid -->
+  <div v-else-if="Array.isArray(products.docs) && products.docs.length">
+    <div class="video-grid">
+      <router-link
         v-for="(item, index) in products.docs"
-        :key="index"
-        lg="4"
-        md="6"
-        sm="12"
-        cols="12"
+        :key="item._id"
+        class="video-card"
+        :to="`/video/${item._id}`"
+        @mouseenter="onCardMouseEnter"
+        @mouseleave="onCardMouseLeave"
       >
-        <router-link
-          class="d-flex cursor-pointer un-select video-card"
-          style="
-            border-radius: 6px;
-            box-shadow: rgba(0, 0, 0, 0.05) 0px 0px 0px 1px;
-          "
-          :to="`/video/${item._id}`"
-        >
-          <div
-            v-if="item.state === 'success' && item.video"
-            class="relative d-flex"
-          >
-            <!-- KHỔ DỌC -->
-            <div
-              class="video-wrapper cursor-pointer"
-              :style="{
-                width: width > 650 ? '160px' : '140px',
-                height: width > 650 ? '101.25px' : '90px',
-              }"
-            >
-              <!-- Video nền mờ -->
-              <video class="video-bg" preload="metadata" muted playsinline>
-                <source :src="item.video" type="video/mp4" />
-              </video>
-
-              <!-- Video chính -->
-              <video
-                :style="
-                  item.frameRate === 'Khổ ngang (16:9)'
-                    ? { 'object-fit': 'cover' }
-                    : {}
-                "
-                class="video-main"
-                preload="metadata"
-                muted
-                playsinline
-              >
-                <source :src="item.video" type="video/mp4" />
-              </video>
-            </div>
-
-            <!-- KHỔ NGANG -->
-            <!-- <video
-              class="cursor-pointer bg-black"
-              style="border-radius: 6px 0 0 6px"
-              :key="item.video"
-              :width="width > 650 ? 160 : 140"
-              :height="width > 650 ? 101.25 : 90"
+        <!-- Thumbnail -->
+        <div class="thumb-area">
+          <!-- Success: video -->
+          <template v-if="item.state === 'success' && item.video">
+            <video class="video-bg" preload="metadata" muted playsinline>
+              <source :src="item.video" type="video/mp4" />
+            </video>
+            <video
+              class="video-main"
+              :style="item.frameRate === 'Khổ ngang (16:9)' ? { objectFit: 'cover' } : {}"
               preload="metadata"
               muted
               playsinline
-              :style="{ objectFit: 'cover' }"
             >
               <source :src="item.video" type="video/mp4" />
-            </video> -->
+            </video>
+          </template>
 
-            <span class="video-duration">
-              {{ item.videoDuration }}
-            </span>
-
-            <span
-              v-if="[1, 2, 3].includes(+index + 1)"
-              class="video-top"
-              :class="{
-                'top-1': index === 0,
-                'top-2': index === 1,
-                'top-3': index === 2,
-              }"
-            >
-              {{ +index + 1 }}
-            </span>
-          </div>
-
-          <div v-else-if="item.state === 'primary'" class="relative">
-            <v-skeleton-loader
-              style="border-radius: 6px 0 0 6px"
-              :style="{
-                width: width > 650 ? '160px' : '140px',
-                height: width > 650 ? '101.25px' : '90px',
-              }"
-            />
-
-            <div
-              class="absolute d-flex flex-column align-center justify-center ga-2 bg-opacity-90"
-              style="top: 0; left: 0; right: 0; bottom: 0"
-            >
-              <v-icon size="24" color="blue">mdi-progress-helper</v-icon>
+          <!-- Processing -->
+          <div v-else-if="item.state === 'primary'" class="state-overlay state-processing">
+            <div class="state-icon-wrap">
+              <v-progress-circular color="white" width="2" size="28" indeterminate />
             </div>
+            <span class="state-label">Đang xử lý</span>
           </div>
 
+          <!-- Error -->
+          <div v-else class="state-overlay state-error">
+            <div class="state-icon-wrap">
+              <v-icon color="white" size="28">mdi-alert-circle-outline</v-icon>
+            </div>
+            <span class="state-label">Lỗi xử lý</span>
+          </div>
+
+          <!-- Duration badge -->
+          <span v-if="item.videoDuration" class="badge-duration">
+            {{ item.videoDuration }}
+          </span>
+
+          <!-- Top rank badge -->
           <div
-            v-else
-            class="d-flex align-center justify-center cursor-pointer ga-1 bg-grey-lighten-3"
-            style="border-radius: 6px 0 0 6px"
-            :style="{
-              width: width > 650 ? '160px' : '140px',
-              height: width > 650 ? '101.25px' : '90px',
-            }"
+            v-if="[0, 1, 2].includes(index)"
+            class="badge-rank"
+            :class="`rank-${index + 1}`"
           >
-            <v-icon size="24" color="error">mdi-alert-circle-outline</v-icon>
+            <v-icon v-if="index === 0" size="13">mdi-crown</v-icon>
+            <v-icon v-else size="13">mdi-medal</v-icon>
+            <span>{{ index + 1 }}</span>
           </div>
+        </div>
 
-          <div class="d-flex flex-column flex-1 pa-3 pt-2">
-            <h4
-              class="video-card-title font-bold cursor-pointer mb-1"
-              style="line-height: 1.4rem"
-              :class="`line-clamp-${isMobile ? 1 : 1}`"
-            >
-              {{ item.title }}
-            </h4>
+        <!-- Info -->
+        <div class="card-info">
+          <p class="video-title">{{ item.title }}</p>
 
-            <div class="d-flex align-center">
-              <small class="line-clamp-1">
-                <v-icon size="15" style="margin-bottom: 3px">
-                  mdi-account-tie
-                </v-icon>
-                {{ item?.account?.name }}
-              </small>
-            </div>
+          <div class="video-meta">
+            <span>{{ item?.account?.name }}</span>
 
-            <div
-              v-if="item.visibility === 'public'"
-              class="d-flex align-center"
-            >
-              <small class="text-nowrap text-grey-darken-2">
-                {{ item?.viewsCount }} lượt xem
-              </small>
-
-              <v-icon>mdi-circle-small</v-icon>
-
-              <small class="text-nowrap text-grey-darken-2">
-                {{ timeAgoVi(item?.createdAt) }}
-              </small>
-            </div>
+            <template v-if="item.visibility === 'public'">
+              <span class="dot">·</span>
+              <span>{{ item?.viewsCount }} lượt xem</span>
+              <span class="dot">·</span>
+              <span>{{ timeAgoVi(item?.createdAt) }}</span>
+            </template>
           </div>
-        </router-link>
-      </v-col>
-
-      <div ref="loadMore" />
-    </v-row>
-
-    <div v-else class="mx-auto my-10 text-center">
-      <v-icon icon="mdi-movie-open-outline" size="40" class="mb-1" />
-
-      <div>Chưa có thước phim nào từ cộng đồng.</div>
+        </div>
+      </router-link>
     </div>
 
-    <ButtonCreateVideo style="margin-top: 2rem" />
+    <!-- Load more trigger -->
+    <div ref="loadMore" class="d-flex justify-center py-4">
+      <v-progress-circular
+        v-if="loading === ''"
+        width="2"
+        size="28"
+        color="primary"
+        indeterminate
+        style="opacity: 0"
+      />
+    </div>
   </div>
+
+  <!-- Empty -->
+  <div v-else class="empty-state">
+    <v-icon size="56" color="grey-lighten-1">mdi-movie-open-outline</v-icon>
+    <p class="empty-text">Chưa có thước phim nào từ cộng đồng.</p>
+  </div>
+
+  <ButtonCreateVideo style="margin-top: 2rem" />
 </template>
 
 <style scoped>
-.un-select:hover .video-card-title {
-  text-decoration: underline;
-  color: #1e88e5;
-  transition: all 0.3s;
+/* ─── Header ─────────────────────────────────────────── */
+.page-header {
+  padding-bottom: 20px;
+  border-bottom: 1px solid #f0f0f0;
 }
 
-.video-duration {
-  right: 5px;
-  z-index: 9;
-  bottom: 5px;
-  color: #fff;
-  font-size: 0.8rem;
-  position: absolute;
-  border-radius: 6px;
-  padding: 0 6px;
-  background-color: rgba(0, 0, 0, 0.533);
+.page-title-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
 }
 
-.video-top {
-  position: absolute;
-  top: 5px;
-  left: 5px;
-  z-index: 9;
-
-  min-width: 32px;
-  height: 32px;
-  padding: 0 8px;
-
+.page-icon {
+  flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: center;
+}
 
-  border-radius: 999px;
+.page-title {
+  font-size: 1.35rem;
   font-weight: 700;
-  font-size: 14px;
-  line-height: 1;
-
-  color: #111;
-  background: #e5e7eb; /* default */
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  color: #1a1a1a;
+  margin: 0 0 3px;
+  letter-spacing: -0.2px;
 }
 
-/* TOP 1 */
-.video-top.top-1 {
-  background: linear-gradient(135deg, #facc15, #f59e0b);
-  color: #111;
+.page-desc {
+  font-size: 0.82rem;
+  color: #9e9e9e;
+  margin: 0;
 }
 
-/* TOP 2 */
-.video-top.top-2 {
-  background: linear-gradient(135deg, #e5e7eb, #9ca3af);
-  color: #111;
+/* ─── Grid ───────────────────────────────────────────── */
+.video-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
 }
 
-/* TOP 3 */
-.video-top.top-3 {
-  background: linear-gradient(135deg, #fbbf24, #92400e);
-  color: #fff;
+@media (max-width: 900px) {
+  .video-grid { grid-template-columns: repeat(2, 1fr); gap: 14px; }
 }
 
+@media (max-width: 550px) {
+  .video-grid { grid-template-columns: 1fr; gap: 12px; }
+}
+
+/* ─── Card ───────────────────────────────────────────── */
 .video-card {
-  color: inherit; /* Giữ nguyên màu chữ */
-  text-decoration: none; /* Bỏ gạch chân */
-}
-
-.video-wrapper {
-  position: relative;
+  display: flex;
+  flex-direction: column;
+  border-radius: 12px;
   overflow: hidden;
-  border-radius: 6px 0 0 6px;
-  background: #000;
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  background-image: url("/images/video-loading.jpg");
+  background: #fff;
+  border: 1px solid #f0f0f0;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  text-decoration: none;
+  color: inherit;
+  transition: box-shadow 0.2s ease, border-color 0.2s ease;
 }
 
-/* Video nền mờ */
+.video-card:hover {
+  box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+  border-color: #e0e0e0;
+}
+
+/* ─── Thumbnail ──────────────────────────────────────── */
+.thumb-area {
+  position: relative;
+  width: 100%;
+  padding-top: 56.25%;
+  background: #0d0d0d;
+  overflow: hidden;
+}
+
 .video-bg {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
-  filter: blur(10px) brightness(0.75);
-  transform: scale(1.2); /* tránh viền mờ */
+  filter: blur(10px) brightness(0.7);
+  transform: scale(1.15);
+  z-index: 0;
 }
 
-/* Video chính */
 .video-main {
-  position: relative;
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
   object-fit: contain;
   z-index: 1;
+}
+
+.video-main::-webkit-media-controls,
+.video-bg::-webkit-media-controls {
+  display: none !important;
+}
+
+.video-main::-webkit-media-controls-start-playback-button,
+.video-bg::-webkit-media-controls-start-playback-button {
+  display: none !important;
+  opacity: 0 !important;
+}
+
+/* ─── State overlays ─────────────────────────────────── */
+.state-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.state-processing {
+  background: linear-gradient(135deg, #0d1117, #1a2332);
+}
+
+.state-error {
+  background: linear-gradient(135deg, #1a1a1a, #2d1515);
+}
+
+.state-icon-wrap {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.state-label {
+  font-size: 0.75rem;
+  color: rgba(255,255,255,0.7);
+  letter-spacing: 0.3px;
+}
+
+/* ─── Badges ─────────────────────────────────────────── */
+.badge-duration {
+  position: absolute;
+  bottom: 6px;
+  right: 6px;
+  z-index: 9;
+  background: rgba(0,0,0,0.6);
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 500;
+  padding: 1px 6px;
+  border-radius: 4px;
+}
+
+.badge-rank {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  z-index: 9;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  padding: 3px 8px 3px 6px;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 12px;
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(255,255,255,0.3);
+}
+
+.badge-rank span {
+  line-height: 1;
+}
+
+.rank-1 {
+  background: linear-gradient(135deg, #f59e0b, #fcd34d);
+  color: #7c2d00;
+  box-shadow: 0 2px 12px rgba(245,158,11,0.5);
+}
+
+.rank-2 {
+  background: linear-gradient(135deg, #94a3b8, #e2e8f0);
+  color: #334155;
+  box-shadow: 0 2px 10px rgba(148,163,184,0.45);
+}
+
+.rank-3 {
+  background: linear-gradient(135deg, #92400e, #d97706);
+  color: #fef3c7;
+  box-shadow: 0 2px 10px rgba(146,64,14,0.45);
+}
+
+/* ─── Card info ──────────────────────────────────────── */
+.card-info {
+  padding: 10px 12px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.video-title {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+  line-height: 1.45;
+  color: #1a1a1a;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  transition: color 0.18s ease;
+}
+
+.video-card:hover .video-title {
+  color: #1e88e5;
+}
+
+.video-meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px;
+  font-size: 0.72rem;
+  color: #9e9e9e;
+}
+
+.dot {
+  color: #bdbdbd;
+}
+
+/* ─── Skeleton ───────────────────────────────────────── */
+.video-card-skeleton {
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid #f0f0f0;
+}
+
+.thumb-skeleton {
+  width: 100%;
+  aspect-ratio: 16/9;
+}
+
+.skeleton-info {
+  padding: 10px 12px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* ─── Empty ──────────────────────────────────────────── */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 0;
+  gap: 12px;
+}
+
+.empty-text {
+  font-size: 0.95rem;
+  color: #9e9e9e;
+  margin: 0;
 }
 </style>

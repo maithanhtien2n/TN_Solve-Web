@@ -25,10 +25,7 @@ const props = defineProps({
 const loading = ref<boolean>(true);
 const videoPlayerRef = ref<HTMLVideoElement | null>(null);
 
-// ✅ ĐÚNG: Định nghĩa options ở đây
 const customPlayerOptions = {
-  //   autopause: true,
-  //   autoplay: false,
   controls: [
     "play-large",
     "play",
@@ -74,7 +71,6 @@ const customPlayerOptions = {
   },
 };
 
-// Biến lưu trữ đối tượng player
 let player: Plyr | null = null;
 
 onMounted(async () => {
@@ -82,7 +78,6 @@ onMounted(async () => {
   const Plyr = PlyrModule.default;
 
   if (videoPlayerRef.value) {
-    // ✅ ĐÚNG: Truyền 'customPlayerOptions' vào lúc khởi tạo Plyr
     player = new Plyr(videoPlayerRef.value, customPlayerOptions);
 
     player.source = {
@@ -115,9 +110,7 @@ onBeforeUnmount(() => {
       portrait: frameRate === 'vertical',
     }"
     :style="{
-      // Luôn giữ chiều cao theo 16:9 để không bị dài khi dọc
       'padding-top': '56.25%',
-      // Nếu dọc và có poster thì dùng poster làm nền (blur)
       'background-image':
         frameRate === 'vertical' && poster ? `url(${poster})` : '',
     }"
@@ -147,7 +140,7 @@ onBeforeUnmount(() => {
   height: 0;
   overflow: hidden;
   border-radius: 13px;
-  background: #000; /* fallback */
+  background: #000;
   background-size: cover;
   background-position: center;
 }
@@ -155,7 +148,7 @@ onBeforeUnmount(() => {
 .bg-blur {
   position: absolute;
   inset: 0;
-  background-image: inherit; /* lấy background-image từ video-wrapper */
+  background-image: inherit;
   background-size: cover;
   background-position: center;
   filter: blur(16px) brightness(0.75);
@@ -170,7 +163,7 @@ onBeforeUnmount(() => {
   height: 100%;
 }
 
-/* ✅ ép Plyr full size */
+/* ép Plyr full size */
 .video-wrapper :deep(.plyr) {
   width: 100%;
   height: 100%;
@@ -181,19 +174,19 @@ onBeforeUnmount(() => {
   height: 100%;
 }
 
-/* ✅ ép thẻ video luôn full khung */
+/* ép thẻ video luôn full khung */
 .video-wrapper :deep(video) {
   width: 100% !important;
   height: 100% !important;
   display: block;
 }
 
-/* ✅ ngang = cover */
+/* ngang = cover */
 .video-wrapper:not(.portrait) :deep(video) {
   object-fit: cover !important;
 }
 
-/* ✅ dọc = contain để lộ nền blur */
+/* dọc = contain để lộ nền blur */
 .video-wrapper.portrait :deep(video) {
   object-fit: contain !important;
   background: transparent !important;
