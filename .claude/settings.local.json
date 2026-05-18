@@ -33,7 +33,9 @@
       "Bash(powershell -Command \"Select-String -Path 'components/layouts/AppHeader.vue' -Pattern 'localePath\\\\\\(route.path\\\\\\)|localePath\\\\\\(path\\\\\\)' -Context 0,0\")",
       "Bash(powershell -Command \"Get-Content nuxt.config.ts | Select-String 'vi/|/vi' | wc -l\")",
       "Bash(Remove-Item -Recurse -Force .nuxt -ErrorAction SilentlyContinue)",
-      "Bash(Remove-Item -Recurse -Force .output -ErrorAction SilentlyContinue)"
+      "Bash(Remove-Item -Recurse -Force .output -ErrorAction SilentlyContinue)",
+      "Bash(findstr /R /S \"UploadImage\\\\|UploadImages\" components pages --include=\"*.vue\")",
+      "Bash(powershell -Command \"Get-ChildItem -Path . -Recurse -Filter '*.vue' -File | Select-Object -ExpandProperty FullName | head -15\")"
     ]
   }
 }
