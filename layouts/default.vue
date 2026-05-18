@@ -19,6 +19,7 @@ const { onGetterMasterData, onActionAllMasterDataClient } =
   useMasterDataStore();
 
 const loading = ref(true);
+const mounted = ref(false);
 const commonDialogRef = ref<any>(null);
 const commonDialogPaymentRef = ref<any>(null);
 
@@ -83,6 +84,7 @@ const breadcrumbsItems = computed(() => {
 });
 
 onMounted(async () => {
+  mounted.value = true;
   try {
     const { state, code, scope, authuser } = route.query;
 
@@ -246,7 +248,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <AppLoading v-if="loading || !breadcrumbsItems || !breadcrumbsItems.length" />
+  <AppLoading v-if="mounted && (loading || !breadcrumbsItems?.length)" />
 
   <v-app>
     <CommonDialog
@@ -384,10 +386,7 @@ onMounted(async () => {
         <div :class="{ 'mx-4': isMobile }">
           <v-breadcrumbs
             v-show="
-              ![
-                '/',
-                '/video/public',
-              ].includes(route.path) &&
+              !['/', '/video/public'].includes(route.path) &&
               breadcrumbsItems &&
               breadcrumbsItems.length
             "

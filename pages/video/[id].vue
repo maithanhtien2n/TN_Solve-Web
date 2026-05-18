@@ -374,6 +374,9 @@ const onSubmit = async () => {
       const productId = res?.data?.productId;
       if (productId) {
         await onGetProductDetail();
+        formData.messages = formData.messages?.length
+          ? formData.messages
+          : [{ title: 'Đang xử lý...', dateTime: '', color: 'primary' }];
         router.replace(`/video/${productId}`);
       }
     })
@@ -396,11 +399,7 @@ onMounted(() => {
   if (!productId.value) {
     formData.title = `Video của tôi ${new Date().toLocaleTimeString()} ${new Date().toLocaleDateString()}`;
   }
-  onGetProductDetail(
-    Array.isArray(formData.messages) && formData.messages?.length
-      ? ""
-      : "detail",
-  );
+  onGetProductDetail();
 });
 
 onMounted(() => {
@@ -1297,24 +1296,24 @@ definePageMeta({ middleware: "auth" });
   border-radius: 10px;
   background: #fff;
   border: 1px solid #d0dae6;
-  margin-bottom: 8px;
+  margin-bottom: 20px;
   box-shadow: 0 1px 3px rgba(0,0,0,0.05);
   transition: background 0.15s;
 }
 
 .step-success .step-row {
-  background: #f0faf4;
-  border-color: #c8ecd6;
+  background: #e8f8f0;
+  border-color: #a8d8ba;
 }
 
 .step-primary .step-row {
-  background: #f0f6ff;
-  border-color: #c2d9f8;
+  background: #e8f1ff;
+  border-color: #93c0f5;
 }
 
 .step-error .step-row {
-  background: #fff4f4;
-  border-color: #fdd;
+  background: #fff0f0;
+  border-color: #f5b8b8;
 }
 
 .step-icon {

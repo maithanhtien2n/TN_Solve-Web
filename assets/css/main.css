@@ -68,6 +68,10 @@ body.lang-la {
   background-color: rgb(223, 223, 223) !important;
 }
 
+.v-field {
+  background-color: #fff !important;
+}
+
 .v-data-table__th {
   text-wrap: nowrap !important;
   background-color: rgb(223, 223, 223) !important;
