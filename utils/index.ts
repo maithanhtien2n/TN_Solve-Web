@@ -80,7 +80,7 @@ export function getGoogleAuthUrl(path: string, isApp: boolean = false): string {
     navigator.userAgent || navigator.vendor || (window as any).opera;
 
   const isWebView = /wv|Android.*Version\/|Instagram|FBAN|FBAV|Zalo|Line/i.test(
-    userAgent
+    userAgent,
   );
   const isAndroid = /Android/i.test(userAgent);
 
@@ -110,7 +110,7 @@ export function useSeo({
 
   const isHome = route.name?.toString().startsWith("index");
 
-  const fullTitle = isHome ? "TN Solve - Tạo Video AI Tự Động" : title;
+  const fullTitle = isHome ? "TN Solve" : title;
   const canonicalPath = removeLocalePrefixStrict(route.path);
   const url = new URL(canonicalPath, siteUrl).toString();
   const ogImage = image
