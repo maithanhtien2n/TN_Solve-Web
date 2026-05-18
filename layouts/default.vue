@@ -6,9 +6,6 @@ import AppFooter from "~/components/layouts/AppFooter.vue";
 
 const route = useRoute();
 const router = useRouter();
-const localePath = useLocalePath();
-
-const { t } = useI18n();
 const { isMobile } = useDevice();
 
 const {
@@ -75,12 +72,12 @@ const onReturnTitle = (title: string) => {
 const breadcrumbsItems = computed(() => {
   return [
     {
-      title: t("Trang chủ"),
+      title: "Trang chủ",
       disabled: false,
       href: "/",
     },
     ...pathArray.value.map((part, index) => ({
-      title: t(onReturnTitle(part)),
+      title: onReturnTitle(part),
       disabled: index === pathArray.value.length - 1,
       href: `/${pathArray.value.slice(0, index + 1).join("/")}`,
     })),
@@ -138,17 +135,17 @@ onMounted(async () => {
     // if (route.query?.message === "giao-dich-thanh-cong") {
     //   await onActionGetUserData(params)
     //     .then(() => {
-    //       router.replace(localePath("/"));
+    //       router.replace("/");
     //       commonDialogPaymentRef.value?.onDisplay(true);
     //     })
     //     .catch(() => {});
     // }
 
     // if (route.query?.status === "PAID") {
-    //   router.replace(localePath("/"));
+    //   router.replace("/");
     //   commonDialogPaymentRef.value?.onDisplay(true);
     // } else if (route.query?.status === "CANCELLED") {
-    //   router.replace(localePath("/"));
+    //   router.replace("/");
     //   $toast.error("Bạn đã hủy thanh toán!");
     // }
 
@@ -156,7 +153,7 @@ onMounted(async () => {
 
     if (resultCode !== undefined && resultCode !== null) {
       // 1. Làm sạch URL (Chuyển ngay về trang chủ)
-      router.replace(localePath("/"));
+      router.replace("/");
 
       // 2. Phân nhánh xử lý theo mã trạng thái
       if (resultCode === "0") {
@@ -217,9 +214,7 @@ onMounted(async () => {
         if (isAuth || route.query.action === "buy-credit") {
           displayLogin.value = true;
           router.replace(
-            localePath(
-              `/?redirect=${removeLocalePrefixStrict(route.fullPath)}`,
-            ),
+            `/?redirect=${removeLocalePrefixStrict(route.fullPath)}`,
           );
         }
       });
@@ -392,8 +387,8 @@ onMounted(async () => {
           <v-breadcrumbs
             v-show="
               ![
-                `${localePath('/')}`,
-                `${localePath('/video/public')}`,
+                '/',
+                '/video/public',
               ].includes(route.path) &&
               breadcrumbsItems &&
               breadcrumbsItems.length

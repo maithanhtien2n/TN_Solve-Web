@@ -3,8 +3,6 @@ import { accountService } from "~/services/app";
 
 const route = useRoute();
 
-const { t } = useI18n();
-
 const { onGetterMasterData } = useMasterDataStore();
 
 const headers = [
@@ -27,9 +25,7 @@ const loading = ref<string>("");
 const dataTableRef = ref<any>(null);
 const confirmDialogRef = ref<any>(null);
 
-const statusItems = computed(() =>
-  statusOptions?.map((x: any) => ({ ...x, title: t(x.title) }))
-);
+const statusItems = computed(() => statusOptions);
 
 async function loadItems(event: any) {
   const params = { ...event, role: route.path?.split("/")?.pop() || "user" };

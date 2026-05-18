@@ -1,5 +1,3 @@
-export const langs = ["vi", "lo", "en"] as const;
-
 export const statusOptions = [
   { value: null, title: "Tất cả" },
   { value: EnumStatus.ACTIVE, title: "Hoạt động" },

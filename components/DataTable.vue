@@ -1,7 +1,6 @@
 <script setup lang="ts">
 const appStore = useAppStore();
 
-const { t } = useI18n();
 const { isMobile } = useDevice();
 
 const props = defineProps({
@@ -37,12 +36,7 @@ const params = reactive<any>({
 });
 
 const dataHeaders = computed(() =>
-  Array.isArray(props.headers) && props.headers?.length
-    ? props.headers.map((h: any) => ({
-        ...h,
-        title: t(h.title),
-      }))
-    : []
+  Array.isArray(props.headers) && props.headers?.length ? props.headers : []
 );
 
 // Trường hợp key = user.profile
@@ -123,17 +117,13 @@ const onConfirmAction = (action: string, item?: any | null) => {
 
   switch (action) {
     case "active":
-      message = t("Bạn có chắc chắn muốn kích hoạt {amount} dữ liệu?", {
-        amount,
-      });
+      message = `Bạn có chắc chắn muốn kích hoạt ${amount} dữ liệu?`;
       break;
     case "inactive":
-      message = t("Bạn có chắc chắn muốn tạm dừng {amount} dữ liệu?", {
-        amount,
-      });
+      message = `Bạn có chắc chắn muốn tạm dừng ${amount} dữ liệu?`;
       break;
     case "delete":
-      message = t("Bạn có chắc chắn muốn xóa {amount} dữ liệu?", { amount });
+      message = `Bạn có chắc chắn muốn xóa ${amount} dữ liệu?`;
       break;
     default:
       break;
@@ -186,7 +176,7 @@ defineExpose({ params, selected, loadItems, resetSelected });
     <template v-slot:prepend>
       <div class="d-flex align-center ga-2 mx-3" style="height: 64px">
         <v-icon size="25">mdi-filter-variant</v-icon>
-        <h3>{{ $t("Bộ lọc") }}</h3>
+        <h3>Bộ lọc</h3>
       </div>
     </template>
 
@@ -202,7 +192,7 @@ defineExpose({ params, selected, loadItems, resetSelected });
           v-model="params[item.field]"
           variant="outlined"
           density="comfortable"
-          :label="item.label ? $t(item.label) : ''"
+          :label="item.label || ''"
           @update:model-value="
             emits('change-filter', {
               type: item.type,
@@ -218,7 +208,7 @@ defineExpose({ params, selected, loadItems, resetSelected });
           variant="outlined"
           density="comfortable"
           :items="item.items"
-          :label="item.label ? $t(item.label) : ''"
+          :label="item.label || ''"
           :item-title="item.itemTitle || 'title'"
           :item-value="item.itemValue || 'value'"
           @update:model-value="
@@ -235,7 +225,7 @@ defineExpose({ params, selected, loadItems, resetSelected });
     <template v-slot:append>
       <div class="d-flex ga-2 ma-4">
         <v-btn
-          :text="$t('Đóng')"
+          text="Đóng"
           variant="outlined"
           color="primary"
           class="flex-1"
@@ -244,7 +234,7 @@ defineExpose({ params, selected, loadItems, resetSelected });
         />
 
         <v-btn
-          :text="$t('Tìm kiếm')"
+          text="Tìm kiếm"
           variant="flat"
           color="primary"
           class="flex-1"
@@ -281,8 +271,8 @@ defineExpose({ params, selected, loadItems, resetSelected });
                 density="comfortable"
                 variant="outlined"
                 prepend-inner-icon="mdi-magnify"
-                :label="$t('Tìm kiếm')"
-                :placeholder="$t('Tìm kiếm')"
+                label="Tìm kiếm"
+                placeholder="Tìm kiếm"
                 @keyup.enter="search('search')"
                 @click:prepend-inner="search('search')"
               />
@@ -295,7 +285,7 @@ defineExpose({ params, selected, loadItems, resetSelected });
                 @click="display = true"
               >
                 <v-icon size="19">mdi-filter-variant</v-icon>
-                <span class="ml-2">{{ $t("Bộ lọc") }}</span>
+                <span class="ml-2">Bộ lọc</span>
               </v-btn>
             </div>
           </v-col>
@@ -317,11 +307,7 @@ defineExpose({ params, selected, loadItems, resetSelected });
                 >
                   <v-btn
                     :text="
-                      $t(
-                        props.actions.includes('update')
-                          ? 'Cập nhật'
-                          : 'Thêm mới'
-                      )
+                      props.actions.includes('update') ? 'Cập nhật' : 'Thêm mới'
                     "
                     style="height: 48px"
                     variant="flat"
@@ -345,7 +331,7 @@ defineExpose({ params, selected, loadItems, resetSelected });
                   sm="3"
                 >
                   <v-btn
-                    :text="$t('Kích hoạt')"
+                    text="Kích hoạt"
                     style="height: 48px"
                     variant="flat"
                     color="green"
@@ -362,7 +348,7 @@ defineExpose({ params, selected, loadItems, resetSelected });
                   sm="3"
                 >
                   <v-btn
-                    :text="$t('Tạm dừng')"
+                    text="Tạm dừng"
                     style="height: 48px"
                     variant="flat"
                     color="red"
@@ -379,7 +365,7 @@ defineExpose({ params, selected, loadItems, resetSelected });
                   sm="3"
                 >
                   <v-btn
-                    :text="$t('Chi tiết')"
+                    text="Chi tiết"
                     style="height: 48px"
                     variant="flat"
                     color="green"
@@ -400,8 +386,8 @@ defineExpose({ params, selected, loadItems, resetSelected });
                 density="comfortable"
                 variant="outlined"
                 prepend-inner-icon="mdi-magnify"
-                :label="$t('Tìm kiếm')"
-                :placeholder="$t('Tìm kiếm')"
+                label="Tìm kiếm"
+                placeholder="Tìm kiếm"
                 @keyup.enter="search('search')"
                 @click:prepend-inner="search('search')"
               />
@@ -414,7 +400,7 @@ defineExpose({ params, selected, loadItems, resetSelected });
                 @click="display = true"
               >
                 <v-icon size="19">mdi-filter-variant</v-icon>
-                <span class="ml-2">{{ $t("Bộ lọc") }}</span>
+                <span class="ml-2">Bộ lọc</span>
               </v-btn>
             </div>
           </v-col>
@@ -428,7 +414,7 @@ defineExpose({ params, selected, loadItems, resetSelected });
       v-slot:[`header.${h.key}`]
     >
       <span class="font-bold" :class="`text-${h.align || 'start'}`">
-        {{ $t(h.title) }}
+        {{ h.title }}
       </span>
     </template>
 
@@ -455,7 +441,7 @@ defineExpose({ params, selected, loadItems, resetSelected });
               "
             :color="(slotProps.item as any)?.[h.key]?.color"
           >
-            {{ $t((slotProps.item as any)?.[h.key]?.name) }}
+            {{ (slotProps.item as any)?.[h.key]?.name }}
           </v-chip>
 
           <v-chip v-else>

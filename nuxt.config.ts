@@ -1,5 +1,4 @@
 import { resolve } from "path";
-import { fileURLToPath } from "url";
 
 const siteUrl = "https://tnsolve.com";
 
@@ -10,18 +9,15 @@ export default defineNuxtConfig({
   runtimeConfig: { public: { siteUrl } },
   modules: [
     "@pinia/nuxt",
-    "@nuxtjs/i18n",
     "nuxt-simple-robots",
     "nuxt-simple-sitemap",
   ],
   sitemap: {
-    // xsl: false,
-    autoI18n: true,
     autoLastmod: true,
-    exclude: ["/admin/**", "/vi/admin/**"],
+    exclude: ["/admin/**"],
   },
   robots: {
-    disallow: ["/admin", "/vi/admin", "/en/admin", "/lo/admin"],
+    disallow: ["/admin"],
     sitemap: ["/sitemap.xml"],
   },
 
@@ -31,19 +27,6 @@ export default defineNuxtConfig({
     resolve(__dirname, "assets/css/main.css"),
     resolve(__dirname, "assets/css/base.css"),
   ],
-
-  // I18n
-  i18n: {
-    strategy: "prefix",
-    defaultLocale: "vi",
-    locales: [
-      { code: "vi", name: "VietNam" },
-      // { code: "lo", name: "Laos" },
-      // { code: "en", name: "English" },
-    ],
-    vueI18n: fileURLToPath(new URL("./i18n/index.ts", import.meta.url)),
-    bundle: { optimizeTranslationDirective: false },
-  },
 
   build: {
     transpile: ["vuetify"],
@@ -61,13 +44,24 @@ export default defineNuxtConfig({
   app: {
     head: {
       titleTemplate: "%s | TN Solve",
+      htmlAttrs: { lang: "vi" },
       meta: [
-        { name: "charset", content: "utf-8" },
+        { charset: "utf-8" },
         { name: "viewport", content: "width=device-width, initial-scale=1" },
         { name: "author", content: "TN Solve" },
+        { name: "robots", content: "index, follow" },
+        {
+          name: "keywords",
+          content:
+            "tạo video AI, TN Solve, video AI tự động, Veo, Grok, công cụ tạo video, AI video generator",
+        },
         { property: "og:type", content: "website" },
+        { property: "og:locale", content: "vi_VN" },
+        { property: "og:site_name", content: "TN Solve" },
       ],
-
+      link: [
+        { rel: "icon", type: "image/x-icon", href: "/favicon.ico" },
+      ],
       script: [
         {
           src: "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5256006208836790",

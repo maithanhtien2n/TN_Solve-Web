@@ -1,6 +1,5 @@
 <script setup lang="ts">
 const router = useRouter();
-const localePath = useLocalePath();
 
 const { onGetterUserData: userData } = useAppStore();
 const { onGetterMasterData } = useMasterDataStore();
@@ -9,7 +8,7 @@ const dashboard = computed(() => onGetterMasterData.value["dashboard"]);
 
 const onClickViewDashboardPartnerDetail = (id: string) => {
   if (userData.value?.role !== EnumAccountRole.ADMIN) return;
-  router.push(localePath(`/partner?id=${id}`));
+  router.push(`/partner?id=${id}`);
   // window.location.href = `https://tnsolve.com/partner?id=${id}`;
 };
 

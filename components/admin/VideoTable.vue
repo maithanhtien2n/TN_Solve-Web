@@ -5,8 +5,6 @@ import ConfirmDialog from "~/components/ConfirmDialog.vue";
 
 const route = useRoute();
 
-const { t } = useI18n();
-
 const { onGetterMasterData } = useMasterDataStore();
 
 const headers = [
@@ -46,37 +44,21 @@ const modelVideoItems = computed(() => [
   ...(onGetterMasterData.value["model-video"] || []),
 ]);
 
-const frameRateItems = computed(
-  () =>
-    [
-      { title: "Tất cả", value: null },
-      ...onGetterMasterData.value["frame-rate"],
-    ]?.map((x: any) => ({
-      title: t(x.title),
-      value: x.value,
-    })) || []
-);
+const frameRateItems = computed(() => [
+  { title: "Tất cả", value: null },
+  ...(onGetterMasterData.value["frame-rate"] || []),
+]);
 
-const videoModeItems = computed(
-  () =>
-    [
-      { title: "Tất cả", value: null },
-      ...onGetterMasterData.value["video-mode"],
-    ]?.map((x: any) => ({
-      title: t(x.title),
-      value: x.value,
-    })) || []
-);
+const videoModeItems = computed(() => [
+  { title: "Tất cả", value: null },
+  ...(onGetterMasterData.value["video-mode"] || []),
+]);
 
 const videoStyleItems = computed(() => {
-  const list =
-    [
-      { title: "Tất cả", value: null },
-      ...onGetterMasterData.value["video-style"],
-    ]?.map((x: any) => ({
-      title: t(x.title),
-      value: x.value,
-    })) || [];
+  const list = [
+    { title: "Tất cả", value: null },
+    ...(onGetterMasterData.value["video-style"] || []),
+  ];
 
   switch (params.videoMode) {
     case "movie": {
@@ -129,9 +111,7 @@ const videoDurationItems = computed(() => {
 });
 
 const statusItems = computed(() =>
-  statusOptions
-    .filter((x: any) => x.value !== "all")
-    ?.map((x: any) => ({ ...x, title: t(x.title) }))
+  statusOptions.filter((x: any) => x.value !== "all")
 );
 
 async function loadItems(event: any) {

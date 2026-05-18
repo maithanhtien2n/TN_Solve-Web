@@ -2,7 +2,6 @@
 import { productService } from "~/services/product";
 import { useIntersectionObserver } from "@vueuse/core";
 
-const { t } = useI18n();
 const { width, isMobile } = useDevice();
 
 const params = reactive<any>({
@@ -54,10 +53,12 @@ onMounted(() => {
 });
 
 useSeo({
-  title: t("Thước phim cộng đồng"),
+  title: "Thước phim cộng đồng",
   description:
-    "Nền tảng AI giúp bạn tạo video chuyên nghiệp chỉ trong vài phút",
+    "Khám phá thư viện video AI cộng đồng TN Solve. Xem hàng ngàn video được tạo bằng AI Veo, Grok. Nguồn cảm hứng sáng tạo nội dung miễn phí.",
   image: "/images/page-video.png",
+  keywords:
+    "thước phim cộng đồng, video AI công khai, TN Solve video, xem video AI, mẫu video Veo Grok",
 });
 </script>
 
@@ -67,20 +68,16 @@ useSeo({
     class="d-flex justify-center flex-column align-center ga-3 pt-10 pb-16"
   >
     <v-progress-circular width="2" size="40" color="primary" indeterminate />
-    {{ $t("Đang tải dữ liệu...") }}
+    Đang tải dữ liệu...
   </div>
 
   <div v-else>
     <div class="mb-4 d-flex flex-column">
       <h2 class="font-bold" style="margin-top: -7px">
-        {{ $t("Thước phim cộng đồng") }}
+        Thước phim cộng đồng
       </h2>
       <span>
-        {{
-          $t(
-            "Các thước phim đã được chia sẻ từ cộng đồng để mọi người cùng xem và học tập."
-          )
-        }}
+        Các thước phim đã được chia sẻ từ cộng đồng để mọi người cùng xem và học tập.
       </span>
     </div>
 
@@ -221,7 +218,7 @@ useSeo({
               class="d-flex align-center"
             >
               <small class="text-nowrap text-grey-darken-2">
-                {{ item?.viewsCount }} {{ $t("lượt xem") }}
+                {{ item?.viewsCount }} lượt xem
               </small>
 
               <v-icon>mdi-circle-small</v-icon>
@@ -240,7 +237,7 @@ useSeo({
     <div v-else class="mx-auto my-10 text-center">
       <v-icon icon="mdi-movie-open-outline" size="40" class="mb-1" />
 
-      <div>{{ $t("Chưa có thước phim nào từ cộng đồng") }}.</div>
+      <div>Chưa có thước phim nào từ cộng đồng.</div>
     </div>
 
     <ButtonCreateVideo style="margin-top: 2rem" />

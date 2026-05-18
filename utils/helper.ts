@@ -1,25 +1,3 @@
-import { useLocale } from "vuetify";
-import { langs } from "~/utils/constants";
-
-export function setLanguageByBrowser() {
-  const router = useRouter();
-  const localeVuetify = useLocale();
-
-  const raw = navigator.language.split("-")[0];
-
-  const lang = langs.includes(raw as any)
-    ? (raw as (typeof langs)[number])
-    : "lo";
-
-  localeVuetify.current.value = lang;
-  router.push(`/${lang}`);
-}
-
-export function updateBodyLangClass(locale: string) {
-  if (locale === "lo") document.body.classList.add("lang-la");
-  else document.body.classList.remove("lang-la");
-}
-
 export function capitalizeFirstLetter(str: string): string {
   if (!str) return "";
   return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();

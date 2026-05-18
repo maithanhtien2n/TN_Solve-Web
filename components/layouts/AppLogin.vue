@@ -88,7 +88,7 @@ useHead({
               lazy-src="/images/tn-solve-icon.png"
             />
             <h2 class="font-bold text-center">
-              {{ $t("Đăng nhập") }}
+              Đăng nhập
             </h2>
           </div>
 
@@ -99,7 +99,7 @@ useHead({
           >
             <v-icon size="23">mdi-google</v-icon>
             <h3>
-              {{ $t(loading) }}
+              {{ loading }}
             </h3>
           </div>
         </div>

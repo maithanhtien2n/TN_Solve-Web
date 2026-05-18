@@ -4,6 +4,15 @@ import { accountService } from "~/services/account";
 const { isMobile } = useDevice();
 const { onGetterUserData: userData } = useAppStore();
 
+useSeo({
+  title: "Tài khoản",
+  description:
+    "Quản lý tài khoản TN Solve - Xem lịch sử gói dịch vụ, tín dụng và thông tin cá nhân của bạn.",
+  keywords: "tài khoản TN Solve, quản lý tài khoản, lịch sử dịch vụ",
+});
+
+useHead({ meta: [{ name: "robots", content: "noindex, nofollow" }] });
+
 const tab = ref("packages");
 const packageHistory = ref<any>([]);
 const creditHistory = ref<any>([]);
@@ -52,7 +61,7 @@ definePageMeta({ middleware: "auth" });
     class="d-flex justify-center flex-column align-center ga-3 pt-10 pb-16"
   >
     <v-progress-circular width="2" size="40" color="primary" indeterminate />
-    {{ $t("Đang tải dữ liệu...") }}
+    Đang tải dữ liệu...
   </div>
 
   <v-container v-else fluid class="pa-0 bg-white">

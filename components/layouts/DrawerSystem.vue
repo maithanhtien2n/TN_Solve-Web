@@ -3,7 +3,6 @@ import { authService } from "~/services/auth";
 
 const route = useRoute();
 const router = useRouter();
-const localePath = useLocalePath();
 
 const { width, isMobile } = useDevice();
 
@@ -171,8 +170,8 @@ const onDisplay = (value: boolean) => {
 };
 
 const onSelectMenuItem = (event: any) => {
-  if (event.id === "home") router.push(localePath("/"));
-  else if (event.id) router.push(localePath(event.id));
+  if (event.id === "home") router.push("/");
+  else if (event.id) router.push(event.id);
 };
 
 const onClickLogout = () => {
@@ -185,7 +184,7 @@ onMounted(() => {
   for (const menu of menus.value) {
     if (menu.children) {
       const match = menu.children.find(
-        (child: any) => localePath(child.route) === route.fullPath
+        (child: any) => child.route === route.fullPath
       );
       if (match) {
         open.value = [menu.route];
@@ -246,7 +245,7 @@ defineExpose({ onDisplay });
           <template v-slot:activator="{ props }">
             <v-list-item v-bind="props" :prepend-icon="menu.icon">
               <template #default>
-                <span>{{ $t(menu.title) }}</span>
+                <span>{{ menu.title }}</span>
               </template>
             </v-list-item>
           </template>
@@ -255,11 +254,11 @@ defineExpose({ onDisplay });
             v-for="(i, idex) in menu.children"
             :key="idex"
             color="primary"
-            :active="localePath(i.route) == route.fullPath"
+            :active="i.route == route.fullPath"
             :value="i.route"
           >
             <template #default>
-              <span>{{ $t(i.title) }}</span>
+              <span>{{ i.title }}</span>
             </template>
           </v-list-item>
         </v-list-group>
@@ -269,10 +268,10 @@ defineExpose({ onDisplay });
           color="primary"
           :prepend-icon="menu.icon"
           :value="menu.route"
-          :active="localePath(menu.route) == route.fullPath"
+          :active="menu.route == route.fullPath"
         >
           <template #default>
-            <span>{{ $t(menu.title) }}</span>
+            <span>{{ menu.title }}</span>
           </template>
         </v-list-item>
       </template>
@@ -287,7 +286,7 @@ defineExpose({ onDisplay });
           @click="onClickLogout"
         >
           <template #default>
-            <span>{{ $t("Đăng xuất") }}</span>
+            <span>Đăng xuất</span>
           </template>
         </v-list-item>
       </v-list>

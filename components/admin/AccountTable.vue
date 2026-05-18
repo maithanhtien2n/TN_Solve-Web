@@ -5,8 +5,6 @@ import ConfirmDialog from "~/components/ConfirmDialog.vue";
 
 const route = useRoute();
 
-const { t } = useI18n();
-
 const { onGetterMasterData } = useMasterDataStore();
 
 const headers = computed(() => {
@@ -62,9 +60,7 @@ const settingAccountDetail = ref<any>({
   isCreateSpeed: false,
 });
 
-const statusItems = computed(() =>
-  statusOptions?.map((x: any) => ({ ...x, title: t(x.title) }))
-);
+const statusItems = computed(() => statusOptions);
 const priceOptions = computed(() =>
   role.value === "user"
     ? [
@@ -75,11 +71,7 @@ const priceOptions = computed(() =>
     : [{ title: "139,000 VND", value: 139000 }]
 );
 const rentalMonthsOptions = computed(
-  () =>
-    onGetterMasterData.value["rental-months"]?.map((x: any) => ({
-      title: t(x.title),
-      value: x.value,
-    })) || []
+  () => onGetterMasterData.value["rental-months"] || []
 );
 const totalPrice = computed(() =>
   formatCurrency(formData.price * formData.rentalMonths)
@@ -239,7 +231,7 @@ const onClickSaveSetting = async () => {
           item-title="title"
           item-value="value"
           :items="priceOptions"
-          :label="$t('Giá gói')"
+          label="Giá gói"
         />
 
         <v-select
@@ -249,7 +241,7 @@ const onClickSaveSetting = async () => {
           item-title="title"
           item-value="value"
           :items="rentalMonthsOptions"
-          :label="$t('Thời hạn đăng ký')"
+          label="Thời hạn đăng ký"
         />
       </div>
 
@@ -289,7 +281,7 @@ const onClickSaveSetting = async () => {
         <v-checkbox
           v-model="settingAccountDetail.showBrowser"
           hide-details
-          :label="$t('Hiển thị quá trình thực thi')"
+          label="Hiển thị quá trình thực thi"
         />
       </div>
 

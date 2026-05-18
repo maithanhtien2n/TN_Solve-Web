@@ -5,7 +5,6 @@ import AppLogin from "./AppLogin.vue";
 
 const route = useRoute();
 const router = useRouter();
-const localePath = useLocalePath();
 
 const { isMobile } = useDevice();
 
@@ -22,7 +21,7 @@ const navItems = [
   { title: "Đăng ký dịch vụ", path: "/payment" },
 ];
 
-const isActive = (path: string) => localePath(route.path) === localePath(path);
+const isActive = (path: string) => route.path === path;
 
 const menus = computed(() => {
   let items = [
@@ -104,7 +103,7 @@ const onClickMenuItem = (value: string) => {
   } else if (value === "buy-credit") {
     onGetterDisplayPopupBuyCredit.value = true;
   } else {
-    router.push(localePath(`/${value}`));
+    router.push(`/${value}`);
   }
 };
 </script>
@@ -129,7 +128,7 @@ const onClickMenuItem = (value: string) => {
             :class="`${
               isMobile ? 'w-6rem' : 'w-8rem'
             } h-3rem b-radius-1 cursor-pointer`"
-            @click="router.push(localePath('/'))"
+            @click="router.push('/')"
           />
         </div>
 
@@ -141,9 +140,9 @@ const onClickMenuItem = (value: string) => {
               class="nav-item"
               style="font-size: 1.02rem"
               :class="{ active: isActive(item.path) }"
-              @click="router.push(localePath(item.path))"
+              @click="router.push(item.path)"
             >
-              {{ $t(item.title) }}
+              {{ item.title }}
             </div>
           </div>
         </div>
@@ -176,8 +175,8 @@ const onClickMenuItem = (value: string) => {
               <span v-if="userData?.serviceExpiry">
                 {{
                   userData?.remainingTime
-                    ? `${$t("Còn")} ${userData?.remainingTime}`
-                    : $t("Đã hết hạn")
+                    ? `Còn ${userData?.remainingTime}`
+                    : "Đã hết hạn"
                 }}
               </span>
 
@@ -255,7 +254,7 @@ const onClickMenuItem = (value: string) => {
                         class="cursor-pointer"
                         :class="{ 'text-red': item.value === 'logout' }"
                       >
-                        {{ $t(item.title) }}
+                        {{ item.title }}
                       </label>
                     </div>
                   </v-list-item>
@@ -269,7 +268,7 @@ const onClickMenuItem = (value: string) => {
             class="cta-button cursor-pointer"
             @click="displayLogin = true"
           >
-            <h3>{{ $t("Đăng nhập") }}</h3>
+            <h3>Đăng nhập</h3>
           </div>
         </div>
       </div>

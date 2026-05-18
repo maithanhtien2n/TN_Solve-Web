@@ -1,8 +1,5 @@
 <script setup lang="ts">
 const router = useRouter();
-const localePath = useLocalePath();
-
-const { t, locale } = useI18n();
 const { width, isMobile } = useDevice();
 
 const { onGetterUserData: userData } = useAppStore();
@@ -22,10 +19,12 @@ const appVersion = computed(() => {
 });
 
 useSeo({
-  title: t("Trang chủ"),
+  title: "Trang chủ",
   description:
-    "Nền tảng AI giúp bạn tạo video chuyên nghiệp chỉ trong vài phút",
+    "TN Solve - Nền tảng AI tạo video tự động chuyên nghiệp chỉ 139.000đ/tháng. Tạo video AI với mô hình Veo, Grok trong vài phút. Đăng ký ngay!",
   image: "/images/page-home.png",
+  keywords:
+    "TN Solve, tạo video AI, video AI tự động, Veo, Grok, tạo video chuyên nghiệp, công cụ AI, tạo video online 139k",
 });
 </script>
 
@@ -35,11 +34,8 @@ useSeo({
       !userData ||
       (userData?.role !== EnumAccountRole.ADMIN && !userData?.remainingTime)
     "
+    class="mt-10 mb-3 d-flex flex-column align-center text-center ga-2"
   >
-    <div
-      v-if="locale === 'vi'"
-      class="mt-10 mb-3 d-flex flex-column align-center text-center ga-2"
-    >
       <h3 v-if="isMobile" class="font-bold text-red" style="font-size: 1.2rem">
         💥 <span class="text-primary text-2xl">GIÁ ƯU ĐÃI</span> — Chỉ
         <span class="text-2xl text-primary">139.000đ/tháng</span>!
@@ -70,7 +66,7 @@ useSeo({
         <span
           class="text-primary font-semibold cursor-pointer"
           style="text-decoration: underline"
-          @click="router.push(localePath('/payment'))"
+          @click="router.push('/payment')"
         >
           tại đây
         </span>
@@ -101,7 +97,6 @@ useSeo({
           </a>
         </div>
       </div>
-    </div>
   </div>
 
   <div

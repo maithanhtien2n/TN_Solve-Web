@@ -1,0 +1,39 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(Get-ChildItem -Path \"d:\\\\Project Cá Nhân\\\\TN_Solve-Project\\\\TN_Solve-Web\" -Force)",
+      "Bash(Select-Object FullName, Name)",
+      "Bash(xargs -I {} basename {})",
+      "Bash(Remove-Item \"d:\\\\Project Cá Nhân\\\\TN_Solve-Project\\\\TN_Solve-Web\\\\i18n\\\\language\\\\lo.ts\" -Force)",
+      "Bash(Remove-Item \"d:\\\\Project Cá Nhân\\\\TN_Solve-Project\\\\TN_Solve-Web\\\\i18n\\\\messages.ts\" -Force)",
+      "Bash(Remove-Item \"d:\\\\Project Cá Nhân\\\\TN_Solve-Project\\\\TN_Solve-Web\\\\components\\\\LanguageMenu.vue\" -Force)",
+      "Bash(Write-Host \"Done\")",
+      "Bash(rm \"d:/Project Cá Nhân/TN_Solve-Project/TN_Solve-Web/i18n/language/lo.ts\")",
+      "Bash(rm \"d:/Project Cá Nhân/TN_Solve-Project/TN_Solve-Web/i18n/messages.ts\")",
+      "Bash(rm \"d:/Project Cá Nhân/TN_Solve-Project/TN_Solve-Web/components/LanguageMenu.vue\")",
+      "Bash(xargs grep -l \"t\\(\\\\\"\")",
+      "Bash(xargs grep -L \"useSeo\\\\|definePageMeta.*noSeo\\\\|# no seo\")",
+      "Bash(grep -r '$t\\\\\\(' components/ButtonCreateVideo.vue)",
+      "Bash(powershell -Command \"Get-Content layouts/default.vue | Select-String -Pattern '<template' -Context 0,50 | head -80\")",
+      "Bash(xargs grep -l \"from.*vuetify/locale\")",
+      "Bash(powershell -Command \"\\(Get-Content pages/index.vue | Measure-Object -Line\\).Lines\")",
+      "Bash(powershell -Command \"Select-String -Path 'components/layouts/AppHeader.vue' -Pattern 'isActive' -Context 1,3 | head -20\")",
+      "Bash(powershell -Command \"Select-String -Path 'layouts/default.vue' -Pattern 'breadcrumbsItems' -Context 0,2 | head -30\")",
+      "Bash(powershell -Command \"Select-String -Path 'pages/index.vue' -Pattern '</template>' -Context 0,0\")",
+      "Bash(powershell -Command \"Get-Content pages/index.vue | tail -10\")",
+      "Bash(powershell -Command \"Select-String -Path 'plugins/vuetify.ts' -Pattern 'import|locale|en'\")",
+      "Bash(xargs grep -l \"LanguageMenu\\\\|i18n.messages\\\\|i18n/messages\")",
+      "Bash(powershell -Command \"ls -Recurse -Path 'i18n' -File | Select-Object -ExpandProperty FullName\")",
+      "Bash(powershell -Command \"ls -Recurse -Path 'i18n/language' -File\")",
+      "Bash(powershell -Command \"Get-ChildItem -Path 'i18n' -Force -Recurse\")",
+      "Bash(powershell -Command \"Get-ChildItem -Path 'i18n' -Force\")",
+      "Bash(powershell -Command \"Get-ChildItem -Path 'i18n/language' -Force\")",
+      "Bash(powershell -Command \"Get-Content -Path 'i18n/index.ts' -Raw\")",
+      "Bash(xargs grep -l \"fallbackWarn\\\\|missingWarn\")",
+      "Bash(powershell -Command \"Select-String -Path 'components/layouts/AppHeader.vue' -Pattern 'localePath\\\\\\(route.path\\\\\\)|localePath\\\\\\(path\\\\\\)' -Context 0,0\")",
+      "Bash(powershell -Command \"Get-Content nuxt.config.ts | Select-String 'vi/|/vi' | wc -l\")",
+      "Bash(Remove-Item -Recurse -Force .nuxt -ErrorAction SilentlyContinue)",
+      "Bash(Remove-Item -Recurse -Force .output -ErrorAction SilentlyContinue)"
+    ]
+  }
+}

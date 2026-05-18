@@ -78,7 +78,7 @@ definePageMeta({ layout: "partner", title: "Thanh toán" });
           v-model="formData.bankName"
           class="w-100"
           variant="outlined"
-          :label="$t('Tên ngân hàng (Ví dụ: ACB, Vietcombank...)')"
+          label="Tên ngân hàng (Ví dụ: ACB, Vietcombank...)"
         /> -->
 
         <v-autocomplete
@@ -122,14 +122,14 @@ definePageMeta({ layout: "partner", title: "Thanh toán" });
           v-model="formData.accountName"
           class="w-100"
           variant="outlined"
-          :label="$t('Tên chủ tài khoản (Viết hoa, không dấu)')"
+          label="Tên chủ tài khoản (Viết hoa, không dấu)"
         />
 
         <v-text-field
           v-model="formData.accountNumber"
           class="w-100"
           variant="outlined"
-          :label="$t('Số tài khoản')"
+          label="Số tài khoản"
         />
       </div>
 
@@ -188,9 +188,9 @@ definePageMeta({ layout: "partner", title: "Thanh toán" });
               class="pa-4 d-flex align-center justify-space-between rounded-lg"
             >
               <div>
-                <div class="font-bold">{{ $t("BẠN CHƯA THÊM NGÂN HÀNG") }}</div>
+                <div class="font-bold">BẠN CHƯA THÊM NGÂN HÀNG</div>
                 <div class="mt-1">
-                  {{ $t("Vui lòng thêm thông tin để có thể rút tiền.") }}
+                  Vui lòng thêm thông tin để có thể rút tiền.
                 </div>
               </div>
 
@@ -234,7 +234,7 @@ definePageMeta({ layout: "partner", title: "Thanh toán" });
 
           <v-card-text>
             <h3 class="mb-2 font-bold">
-              {{ $t("LINK GỚI THIỆU CỦA BẠN") }}
+              LINK GỚI THIỆU CỦA BẠN
             </h3>
 
             <v-text-field
@@ -258,7 +258,7 @@ definePageMeta({ layout: "partner", title: "Thanh toán" });
             "
           >
             <h3 class="mb-2 font-bold">
-              {{ $t("LỊCH SỬ THANH TOÁN") }}
+              LỊCH SỬ THANH TOÁN
             </h3>
 
             <v-data-table

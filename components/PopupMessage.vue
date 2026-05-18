@@ -59,7 +59,7 @@ watch(
 
           <span
             v-if="systemPopup?.content"
-            v-html="$t(systemPopup?.content)"
+            v-html="systemPopup?.content"
             class="text-center"
             style="white-space: pre-line"
           />

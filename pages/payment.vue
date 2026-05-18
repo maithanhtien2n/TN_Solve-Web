@@ -4,7 +4,6 @@ import { couponService } from "~/services/app";
 
 const route = useRoute();
 
-const { t } = useI18n();
 const { isMobile } = useDevice();
 
 const { onGetterMasterData } = useMasterDataStore();
@@ -90,11 +89,7 @@ const totalPrice = computed(() => {
 });
 
 const rentalMonthsOptions = computed(
-  () =>
-    onGetterMasterData.value["rental-months"]?.map((x: any) => ({
-      title: t(x.title),
-      value: x.value,
-    })) || []
+  () => onGetterMasterData.value["rental-months"] || []
 );
 
 const onClickPayment = async () => {
@@ -128,10 +123,12 @@ const onChangeDiscountCode = async (event: any) => {
 };
 
 useSeo({
-  title: t("Đăng ký dịch vụ"),
+  title: "Đăng ký dịch vụ",
   description:
-    "Nền tảng AI giúp bạn tạo video chuyên nghiệp chỉ trong vài phút",
+    "Đăng ký dịch vụ TN Solve - Tạo video AI không giới hạn từ 139.000đ/tháng. Hỗ trợ Veo, Grok. Thanh toán an toàn, kích hoạt ngay lập tức.",
   image: "/images/page-home.png",
+  keywords:
+    "đăng ký TN Solve, mua gói tạo video AI, giá 139k, Veo Grok giá rẻ, gói dịch vụ tạo video",
 });
 
 definePageMeta({ middleware: "auth" });
@@ -140,7 +137,7 @@ definePageMeta({ middleware: "auth" });
 <template>
   <div class="max-w-xl mx-auto">
     <h1 class="text-2xl font-bold text-center text-gray-800 mb-6">
-      {{ $t("Đăng ký/Gia hạn dịch vụ") }}
+      Đăng ký/Gia hạn dịch vụ
     </h1>
 
     <div
@@ -174,7 +171,7 @@ definePageMeta({ middleware: "auth" });
         item-title="title"
         item-value="value"
         :items="rentalMonthsOptions"
-        :label="$t('Thời hạn đăng ký')"
+        label="Thời hạn đăng ký"
       />
 
       <v-text-field
@@ -183,7 +180,7 @@ definePageMeta({ middleware: "auth" });
         variant="outlined"
         item-title="title"
         item-value="value"
-        :label="$t('Mã giảm giá (nếu có)')"
+        label="Mã giảm giá (nếu có)"
         @change="onChangeDiscountCode"
       />
 
@@ -248,7 +245,7 @@ definePageMeta({ middleware: "auth" });
         />
 
         <v-icon v-else size="27">mdi-credit-card-outline</v-icon>
-        <h3>{{ $t("Thanh toán") }}</h3>
+        <h3>Thanh toán</h3>
       </div>
     </div>
   </div>

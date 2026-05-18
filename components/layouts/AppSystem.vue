@@ -3,9 +3,6 @@ import DrawerSystem from "~/components/layouts/DrawerSystem.vue";
 
 const route = useRoute();
 const router = useRouter();
-const localePath = useLocalePath();
-
-const { t } = useI18n();
 const { width } = useDevice();
 
 const { onGetterUserData, onActionGetUserData } = useAppStore();
@@ -23,28 +20,28 @@ const breadcrumbs = computed<any>(() => {
   if (matched.length === 1 && matched[0].path.includes("/admin/accounts")) {
     matched.unshift({
       path: "/admin/accounts",
-      meta: { title: t("Tài khoản") },
+      meta: { title: "Tài khoản" },
     } as unknown as any);
   }
 
   if (matched.length === 1 && matched[0].path.includes("/admin/videos")) {
     matched.unshift({
       path: "/admin/videos",
-      meta: { title: t("Thước phim") },
+      meta: { title: "Thước phim" },
     } as unknown as any);
   }
 
   if (matched.length === 1 && matched[0].path.includes("/admin/master-data")) {
     matched.unshift({
       path: "/admin/master-data",
-      meta: { title: t("Quản lý dữ liệu") },
+      meta: { title: "Quản lý dữ liệu" },
     } as unknown as any);
   }
 
   if (matched.length === 1 && matched[0].path.includes("/admin/settings")) {
     matched.unshift({
       path: "/admin/settings",
-      meta: { title: t("Cài đặt") },
+      meta: { title: "Cài đặt" },
     } as unknown as any);
   }
 
@@ -54,20 +51,18 @@ const breadcrumbs = computed<any>(() => {
   ) {
     matched.unshift({
       path: "/partner/my-referral",
-      meta: { title: t("Quản lý giới thiệu") },
+      meta: { title: "Quản lý giới thiệu" },
     } as unknown as any);
   }
 
   return [
     {
-      // title: t("Trang chủ"),
       disabled: false,
       href: "/",
     },
     ...matched.map((item: any, index) => ({
-      title: t(item.meta?.title || ""),
+      title: item.meta?.title || "",
       disabled: index === matched.length - 1,
-      // href: item.path,
     })),
   ];
 });

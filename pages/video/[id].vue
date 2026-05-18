@@ -4,11 +4,7 @@ import { masterDataService } from "~/services/app";
 
 const route = useRoute();
 const router = useRouter();
-const localePath = useLocalePath();
-
 const { isMobile } = useDevice();
-
-const { t } = useI18n();
 const { width } = useDevice();
 const { $socket } = useNuxtApp();
 
@@ -28,9 +24,7 @@ const client = computed<boolean>(() => {
 });
 
 const formData = reactive<any>({
-  title: `${t(
-    "Video của tôi",
-  )} ${new Date().toLocaleTimeString()} ${new Date().toLocaleDateString()}`,
+  title: "Video của tôi",
   value: "",
   frameRate: "horizontal",
   modelVideo: "veo3_fast",
@@ -69,10 +63,7 @@ const modelVideoOptions = computed(() => {
 
 const videoModeOptions = computed(() => {
   let list =
-    onGetterMasterData.value["video-mode"]?.map((x: any) => ({
-      title: t(x.title),
-      value: x.value,
-    })) || [];
+    onGetterMasterData.value["video-mode"] || [];
 
   list = list.filter((x: any) => !["sync_process"].includes(x.value));
 
@@ -92,19 +83,12 @@ const videoModeOptions = computed(() => {
 });
 
 const frameRateOptions = computed(
-  () =>
-    onGetterMasterData.value["frame-rate"]?.map((x: any) => ({
-      title: t(x.title),
-      value: x.value,
-    })) || [],
+  () => onGetterMasterData.value["frame-rate"] || [],
 );
 
 const videoStyleOptions = computed(() => {
   let list =
-    onGetterMasterData.value["video-style"]?.map((x: any) => ({
-      title: t(x.title),
-      value: x.value,
-    })) || [];
+    onGetterMasterData.value["video-style"] || [];
 
   switch (formData.videoMode) {
     case "movie":
@@ -236,7 +220,7 @@ const videoDurationOptions = computed(() => {
 
   allOptions =
     allOptions?.map((x: any, index: number) => ({
-      title: t(`${x.title} - (${index + 1} cảnh)`),
+      title: `${x.title} - (${index + 1} cảnh)`,
       value: x.value,
     })) || [];
 
@@ -354,11 +338,11 @@ const onGetProductDetail = async (loadingType: string = "") => {
           }
         }, 100);
       } else {
-        router.replace(localePath("/video/create"));
+        router.replace("/video/create");
       }
     })
     .catch(() => {
-      router.replace(localePath("/video/create"));
+      router.replace("/video/create");
     })
     .finally(() => {
       loading.value = "";
@@ -390,7 +374,7 @@ const onSubmit = async () => {
       const productId = res?.data?.productId;
       if (productId) {
         await onGetProductDetail();
-        router.replace(localePath(`/video/${productId}`));
+        router.replace(`/video/${productId}`);
       }
     })
     .catch(() => {
@@ -409,6 +393,9 @@ const onClickLikeVideo = () => {
 };
 
 onMounted(() => {
+  if (!productId.value) {
+    formData.title = `Video của tôi ${new Date().toLocaleTimeString()} ${new Date().toLocaleDateString()}`;
+  }
   onGetProductDetail(
     Array.isArray(formData.messages) && formData.messages?.length
       ? ""
@@ -440,10 +427,13 @@ onUnmounted(() => {
 });
 
 useSeo({
-  title: t(productId.value ? "Chi tiết" : "Tạo video"),
-  description:
-    "Nền tảng AI giúp bạn tạo video chuyên nghiệp chỉ trong vài phút",
+  title: productId.value ? "Chi tiết video" : "Tạo video AI",
+  description: productId.value
+    ? "Xem chi tiết và theo dõi tiến trình tạo video AI của bạn trên TN Solve. Xem từng cảnh quay, tải xuống video hoàn chỉnh."
+    : "Tạo video AI chuyên nghiệp với TN Solve - Chọn mô hình Veo, Grok, thiết lập cảnh quay và tạo video tự động chỉ trong vài phút.",
   image: "/images/page-detail.png",
+  keywords:
+    "tạo video AI, Veo, Grok, video tự động, TN Solve tạo video, AI video creator",
 });
 
 definePageMeta({ middleware: "auth" });
@@ -458,12 +448,12 @@ definePageMeta({ middleware: "auth" });
         class="d-flex flex-column"
       >
         <div>
-          <span class="font-bold">{{ $t("Cảnh") }}: </span>
+          <span class="font-bold">Cảnh: </span>
           <span v-html="item.scene" />
         </div>
 
         <div>
-          <span class="font-bold">{{ $t("Mô tả") }}: </span>
+          <span class="font-bold">Mô tả: </span>
           <span v-html="item.description" />
         </div>
 
@@ -480,7 +470,7 @@ definePageMeta({ middleware: "auth" });
     class="d-flex justify-center flex-column align-center ga-3 pt-10 pb-16"
   >
     <v-progress-circular width="2" size="40" color="primary" indeterminate />
-    {{ $t("Đang tải dữ liệu...") }}
+    Đang tải dữ liệu...
   </div>
 
   <v-row v-else>
@@ -519,7 +509,7 @@ definePageMeta({ middleware: "auth" });
           />
 
           <v-icon v-else size="27">mdi-tray-arrow-down</v-icon>
-          <h3>{{ $t("Tải video") }}</h3>
+          <h3>Tải video</h3>
         </div>
 
         <h3 v-if="isMobile" class="font-bold mt-2" style="line-height: 1.6rem">
@@ -545,7 +535,7 @@ definePageMeta({ middleware: "auth" });
               <v-icon size="18">mdi-thumb-up-outline</v-icon>
             </v-btn>
             <span class="text-grey-darken-2">
-              {{ formData?.likesCount }} {{ $t("lượt thích") }}
+              {{ formData?.likesCount }} lượt thích
             </span>
           </div>
 
@@ -553,7 +543,7 @@ definePageMeta({ middleware: "auth" });
 
           <div class="d-flex align-center">
             <span class="text-nowrap text-grey-darken-2">
-              {{ formData?.viewsCount }} {{ $t("lượt xem") }}
+              {{ formData?.viewsCount }} lượt xem
             </span>
 
             <v-icon>mdi-circle-small</v-icon>
@@ -567,69 +557,69 @@ definePageMeta({ middleware: "auth" });
         <v-row dense>
           <v-col cols="6">
             <div>
-              <span class="font-bold">{{ $t("Mô hình") }}:</span>
+              <span class="font-bold">Mô hình:</span>
               <br />
               {{
                 modelVideoOptions.find(
                   (i: any) => i.value === formData.modelVideo,
-                )?.title || $t("Chưa có")
+                )?.title || "Chưa có"
               }}
             </div>
           </v-col>
 
           <v-col cols="6">
             <div>
-              <span class="font-bold">{{ $t("Tỷ lệ khung hình") }}:</span>
+              <span class="font-bold">Tỷ lệ khung hình:</span>
               <br />
               {{
                 frameRateOptions.find(
                   (i: any) => i.value === formData.frameRate,
-                )?.title || $t("Chưa có")
+                )?.title || "Chưa có"
               }}
             </div>
           </v-col>
 
           <v-col cols="6">
             <div>
-              <span class="font-bold">{{ $t("Chế độ") }}:</span>
+              <span class="font-bold">Chế độ:</span>
               <br />
               {{
                 videoModeOptions.find(
                   (i: any) => i.value === formData.videoMode,
-                )?.title || $t("Chưa có")
+                )?.title || "Chưa có"
               }}
             </div>
           </v-col>
 
           <v-col cols="6">
             <div>
-              <span class="font-bold">{{ $t("Phong cách") }}:</span>
+              <span class="font-bold">Phong cách:</span>
               <br />
               {{
                 videoStyleOptions.find(
                   (i: any) => i.value === formData.videoStyle,
-                )?.title || $t("Chưa có")
+                )?.title || "Chưa có"
               }}
             </div>
           </v-col>
 
           <v-col cols="6">
             <div>
-              <span class="font-bold">{{ $t("Thời lượng") }}:</span>
+              <span class="font-bold">Thời lượng:</span>
               <br />
               {{
                 videoDurationOptions.find(
                   (i: any) => i.value === formData.videoDuration,
-                )?.title || $t("Chưa có")
+                )?.title || "Chưa có"
               }}
             </div>
           </v-col>
 
           <v-col cols="6">
             <div>
-              <span class="font-bold">{{ $t("Tác giả") }}:</span>
+              <span class="font-bold">Tác giả:</span>
               <br />
-              {{ formData?.account?.name || $t("Chưa có") }}
+              {{ formData?.account?.name || "Chưa có" }}
             </div>
           </v-col>
 
@@ -638,7 +628,7 @@ definePageMeta({ middleware: "auth" });
           <template v-if="formData.hasImage">
             <v-col v-if="formData.videoMode === 'my_subject'" cols="12">
               <div>
-                <span class="font-bold">{{ $t("Ảnh chủ thể") }}:</span>
+                <span class="font-bold">Ảnh chủ thể:</span>
                 <br />
                 <UploadImage
                   ref="uploadImageRef"
@@ -673,8 +663,8 @@ definePageMeta({ middleware: "auth" });
                       {{
                         `${
                           formData.videoMode === "custom_character"
-                            ? $t("Ảnh nhân vật")
-                            : $t("Ảnh bối cảnh")
+                            ? "Ảnh nhân vật"
+                            : "Ảnh bối cảnh"
                         } ${index + 1}`
                       }}:
                     </span>
@@ -693,7 +683,7 @@ definePageMeta({ middleware: "auth" });
 
           <v-col cols="12">
             <div>
-              <span class="font-bold">{{ $t("Prompt") }}:</span>
+              <span class="font-bold">Prompt:</span>
               <br />
               <span v-html="formData.value" style="white-space: pre-line" />
             </div>
@@ -709,7 +699,7 @@ definePageMeta({ middleware: "auth" });
               hide-details
               class="w-100"
               variant="outlined"
-              :label="$t('Tiêu đề') + ' (✳)'"
+              label="Tiêu đề (✳)"
               :readonly="Boolean(productId)"
               :class="{ disabled: Boolean(productId) }"
             />
@@ -726,7 +716,7 @@ definePageMeta({ middleware: "auth" });
               :items="modelVideoOptions"
               :readonly="Boolean(productId)"
               :class="{ disabled: Boolean(productId) }"
-              :label="$t('Mô hình')"
+              label="Mô hình"
               @update:model-value="
                 (value) => {
                   if (
@@ -758,7 +748,7 @@ definePageMeta({ middleware: "auth" });
                 Boolean(productId || formData.videoMode === 'short_form_video')
               "
               :class="{ disabled: Boolean(productId) }"
-              :label="$t('Tỷ lệ khung hình')"
+              label="Tỷ lệ khung hình"
             />
           </v-col>
 
@@ -773,7 +763,7 @@ definePageMeta({ middleware: "auth" });
               :items="videoModeOptions"
               :readonly="Boolean(productId)"
               :class="{ disabled: Boolean(productId) }"
-              :label="$t('Chế độ')"
+              label="Chế độ"
               @update:modelValue="
                 () => {
                   if (
@@ -813,7 +803,7 @@ definePageMeta({ middleware: "auth" });
               :class="{
                 disabled: Boolean(productId),
               }"
-              :label="$t('Phong cách')"
+              label="Phong cách"
             />
           </v-col>
 
@@ -828,7 +818,7 @@ definePageMeta({ middleware: "auth" });
               :items="videoDurationOptions"
               :readonly="Boolean(productId)"
               :class="{ disabled: Boolean(productId) }"
-              :label="$t('Thời lượng')"
+              label="Thời lượng"
             />
           </v-col>
 
@@ -865,7 +855,7 @@ definePageMeta({ middleware: "auth" });
                   :class="{ disabled: Boolean(productId) }"
                   :height="width > 550 ? '10rem' : '8rem'"
                   iconUpload="mdi-image-outline"
-                  :textUpload="`${t('Chọn ảnh')} ${index + 1}`"
+                  :textUpload="`Chọn ảnh ${index + 1}`"
                   @on-select-file="
                     (event) => (formData.images[index] = event?.file)
                   "
@@ -929,7 +919,7 @@ definePageMeta({ middleware: "auth" });
                 indeterminate
               />
               <v-icon v-else size="27">mdi-image-filter-tilt-shift</v-icon>
-              <h3>{{ isError ? $t("Tạo lại video") : $t("Tạo video") }}</h3>
+              <h3>{{ isError ? "Tạo lại video" : "Tạo video" }}</h3>
             </div>
           </v-col>
         </v-row>
@@ -1024,13 +1014,13 @@ definePageMeta({ middleware: "auth" });
                   "
                   class="text-caption"
                 >
-                  {{ $t("Vui lòng cập nhật cookies mới") }}
+                  Vui lòng cập nhật cookies mới
                   <a
                     target="_blank"
                     rel="noopener noreferrer"
                     href="https://tnsolve.com/setting"
                   >
-                    {{ $t("tại đây") }}
+                    tại đây
                   </a>
                 </div>
 

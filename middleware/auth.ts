@@ -3,9 +3,6 @@ export default defineNuxtRouteMiddleware((to, from) => {
   const { onGetterDisplayLogin: displayLogin, onGetterUserData: userData } =
     appStore;
 
-  const nuxtApp = useNuxtApp();
-  const localePath = nuxtApp.$localePath;
-
   const isNotLoggedIn =
     typeof userData.value === "object" &&
     !Object.values(userData.value || {}).length;
@@ -14,9 +11,7 @@ export default defineNuxtRouteMiddleware((to, from) => {
     displayLogin.value = true;
 
     return navigateTo(
-      localePath(
-        `${from.fullPath}?redirect=${removeLocalePrefixStrict(to.fullPath)}`
-      )
+      `${from.path}?redirect=${removeLocalePrefixStrict(to.fullPath)}`
     );
   }
 });

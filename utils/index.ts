@@ -97,10 +97,12 @@ export function useSeo({
   title,
   description,
   image,
+  keywords,
 }: {
   title: string;
   description: string;
   image?: string;
+  keywords?: string;
 }) {
   const config = useRuntimeConfig();
   const siteUrl = config.public.siteUrl;
@@ -108,29 +110,64 @@ export function useSeo({
 
   const isHome = route.name?.toString().startsWith("index");
 
-  const fullTitle = isHome ? "TN Solve" : title;
-  const url = new URL(route.fullPath, siteUrl).toString();
-  const ogImage = image || `${siteUrl}/default-og.jpg`;
+  const fullTitle = isHome ? "TN Solve - Tạo Video AI Tự Động" : title;
+  const canonicalPath = removeLocalePrefixStrict(route.path);
+  const url = new URL(canonicalPath, siteUrl).toString();
+  const ogImage = image
+    ? new URL(image, siteUrl).toString()
+    : `${siteUrl}/images/page-home.png`;
+
+  const defaultKeywords =
+    "tạo video AI, TN Solve, video AI tự động, Veo, Grok, công cụ tạo video, AI video generator, tạo video online";
+
+  const metaTags: any[] = [
+    { name: "description", content: description },
+    { name: "keywords", content: keywords || defaultKeywords },
+
+    { property: "og:title", content: fullTitle },
+    { property: "og:description", content: description },
+    { property: "og:type", content: "website" },
+    { property: "og:url", content: url },
+    { property: "og:image", content: ogImage },
+    { property: "og:image:width", content: "1200" },
+    { property: "og:image:height", content: "630" },
+    { property: "og:locale", content: "vi_VN" },
+    { property: "og:site_name", content: "TN Solve" },
+
+    { name: "twitter:card", content: "summary_large_image" },
+    { name: "twitter:title", content: fullTitle },
+    { name: "twitter:description", content: description },
+    { name: "twitter:image", content: ogImage },
+    { name: "twitter:site", content: "@tnsolve" },
+  ];
+
+  const jsonLd = isHome
+    ? {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        name: "TN Solve",
+        url: siteUrl,
+        description,
+        potentialAction: {
+          "@type": "SearchAction",
+          target: `${siteUrl}/video/public?q={search_term_string}`,
+          "query-input": "required name=search_term_string",
+        },
+      }
+    : null;
 
   useHead({
     title: fullTitle,
     titleTemplate: isHome ? null : "%s | TN Solve",
-
-    meta: [
-      { name: "description", content: description },
-
-      { property: "og:title", content: fullTitle },
-      { property: "og:description", content: description },
-      { property: "og:type", content: "website" },
-      { property: "og:url", content: url },
-      { property: "og:image", content: ogImage },
-
-      { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: fullTitle },
-      { name: "twitter:description", content: description },
-      { name: "twitter:image", content: ogImage },
-    ],
-
+    meta: metaTags,
     link: [{ rel: "canonical", href: url }],
+    ...(jsonLd && {
+      script: [
+        {
+          type: "application/ld+json",
+          innerHTML: JSON.stringify(jsonLd),
+        },
+      ],
+    }),
   });
 }

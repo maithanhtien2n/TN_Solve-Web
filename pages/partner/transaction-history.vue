@@ -3,8 +3,6 @@ import { accountService } from "~/services/app";
 
 const route = useRoute();
 
-const { t } = useI18n();
-
 const { onGetterMasterData } = useMasterDataStore();
 
 const headers = [
@@ -43,15 +41,9 @@ const loading = ref<string>("");
 const dataTableRef = ref<any>(null);
 const confirmDialogRef = ref<any>(null);
 
-const statusItems = computed(() =>
-  commissionStatusOptions?.map((x: any) => ({ ...x, title: t(x.title) }))
-);
+const statusItems = computed(() => commissionStatusOptions);
 const transactionMonthsItems = computed(
-  () =>
-    onGetterMasterData.value["transaction-months"]?.map((x: any) => ({
-      title: t(x.title),
-      value: x.value,
-    })) || []
+  () => onGetterMasterData.value["transaction-months"] || []
 );
 
 async function loadItems(event: any) {

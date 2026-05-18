@@ -4,8 +4,6 @@ import { couponService } from "~/services/coupon";
 
 const route = useRoute();
 
-const { t } = useI18n();
-
 const { onGetterMasterData } = useMasterDataStore();
 
 const headers = [
@@ -32,22 +30,12 @@ const dataTableRef = ref<any>(null);
 const commonDialogRef = ref<any>(null);
 const confirmDialogRef = ref<any>(null);
 
-const statusItems = computed(() =>
-  expiryStatusOptions?.map((x: any) => ({ ...x, title: t(x.title) }))
-);
+const statusItems = computed(() => expiryStatusOptions);
 const discountTypeOptions = computed(
-  () =>
-    onGetterMasterData.value["discount-type"]?.map((x: any) => ({
-      title: t(x.title),
-      value: x.value,
-    })) || []
+  () => onGetterMasterData.value["discount-type"] || []
 );
 const conditionTypeOptions = computed(
-  () =>
-    onGetterMasterData.value["condition-type"]?.map((x: any) => ({
-      title: t(x.title),
-      value: x.value,
-    })) || []
+  () => onGetterMasterData.value["condition-type"] || []
 );
 
 const {
@@ -70,33 +58,33 @@ const {
   },
   validationSchema: {
     name(value: any) {
-      if (!value) return t("Vui lòng nhập tên mã giảm giá");
+      if (!value) return "Vui lòng nhập tên mã giảm giá";
       return true;
     },
 
     code(value: any) {
-      if (!value) return t("Vui lòng nhập mã giảm giá");
+      if (!value) return "Vui lòng nhập mã giảm giá";
       return true;
     },
 
     description(value: any) {
-      if (!value) return t("Vui lòng nhập mô tả");
+      if (!value) return "Vui lòng nhập mô tả";
       return true;
     },
 
     discountType(value: any) {
-      if (!value) return t("Vui lòng chọn loại giảm giá");
+      if (!value) return "Vui lòng chọn loại giảm giá";
       return true;
     },
 
     discountValue(value: any) {
-      if (!value) return t("Vui lòng nhập giá trị giảm giá");
-      if (value <= 0) return t("Giá trị giảm giá phải lớn hơn 0");
+      if (!value) return "Vui lòng nhập giá trị giảm giá";
+      if (value <= 0) return "Giá trị giảm giá phải lớn hơn 0";
       return true;
     },
 
     startDate(value: any) {
-      if (!value) return t("Vui lòng chọn ngày bắt đầu");
+      if (!value) return "Vui lòng chọn ngày bắt đầu";
 
       const today = new Date();
       today.setHours(0, 0, 0, 0);
@@ -104,14 +92,14 @@ const {
       const start = new Date(value);
 
       if (!_id.value.value && start < today) {
-        return t("Ngày bắt đầu không được nhỏ hơn ngày hiện tại");
+        return "Ngày bắt đầu không được nhỏ hơn ngày hiện tại";
       }
 
       return true;
     },
 
     endDate(value: any, { form }: any) {
-      if (!value) return t("Vui lòng chọn ngày kết thúc");
+      if (!value) return "Vui lòng chọn ngày kết thúc";
 
       const end = new Date(value);
 
@@ -120,7 +108,7 @@ const {
       today.setHours(0, 0, 0, 0);
 
       if (end < today) {
-        return t("Ngày kết thúc không được nhỏ hơn ngày hiện tại");
+        return "Ngày kết thúc không được nhỏ hơn ngày hiện tại";
       }
 
       // Kiểm tra ngày kết thúc >= ngày bắt đầu
@@ -128,7 +116,7 @@ const {
       if (startValue) {
         const start = new Date(startValue);
         if (end < start) {
-          return t("Ngày kết thúc không được nhỏ hơn ngày bắt đầu");
+          return "Ngày kết thúc không được nhỏ hơn ngày bắt đầu";
         }
       }
 
@@ -136,7 +124,7 @@ const {
     },
 
     usageLimit(value: any) {
-      if (!value) return t("Vui lòng nhập giới hạn sử dụng");
+      if (!value) return "Vui lòng nhập giới hạn sử dụng";
       return true;
     },
   },
@@ -244,7 +232,7 @@ definePageMeta({ layout: "admin", title: "Mã giảm giá" });
           <v-text-field
             v-model="name.value.value"
             variant="outlined"
-            :label="$t(`Tên mã giảm giá`) + ' (✳)'"
+            label="Tên mã giảm giá (✳)"
             :error-messages="name.errorMessage.value"
             :hide-details="Boolean(!name.errorMessage.value)"
           />
@@ -254,7 +242,7 @@ definePageMeta({ layout: "admin", title: "Mã giảm giá" });
           <v-text-field
             v-model="code.value.value"
             variant="outlined"
-            :label="$t(`Mã giảm giá`) + ' (✳)'"
+            label="Mã giảm giá (✳)"
             :error-messages="code.errorMessage.value"
             :hide-details="Boolean(!code.errorMessage.value)"
           />
@@ -265,7 +253,7 @@ definePageMeta({ layout: "admin", title: "Mã giảm giá" });
             v-model="description.value.value"
             rows="3"
             variant="outlined"
-            :label="$t(`Mô tả`) + ' (✳)'"
+            label="Mô tả (✳)"
             :error-messages="description.errorMessage.value"
             :hide-details="Boolean(!description.errorMessage.value)"
           />
@@ -279,7 +267,7 @@ definePageMeta({ layout: "admin", title: "Mã giảm giá" });
             item-title="title"
             item-value="value"
             :items="discountTypeOptions"
-            :label="$t(`Loại giảm giá`) + ' (✳)'"
+            label="Loại giảm giá (✳)"
             :error-messages="discountType.errorMessage.value"
             :hide-details="Boolean(!discountType.errorMessage.value)"
             @update:model-value="
@@ -304,7 +292,7 @@ definePageMeta({ layout: "admin", title: "Mã giảm giá" });
                 ? 1000
                 : 500000
             "
-            :label="$t(`Giá trị giảm giá`) + ' (✳)'"
+            label="Giá trị giảm giá (✳)"
             :error-messages="discountValue.errorMessage.value"
             :hide-details="Boolean(!discountValue.errorMessage.value)"
           />
@@ -317,7 +305,7 @@ definePageMeta({ layout: "admin", title: "Mã giảm giá" });
                 v-model="startDate.value.value"
                 variant="outlined"
                 type="datetime-local"
-                :label="$t(`Ngày và giờ bắt đầu`) + ' (✳)'"
+                label="Ngày và giờ bắt đầu (✳)"
                 :error-messages="startDate.errorMessage.value"
                 :hide-details="Boolean(!startDate.errorMessage.value)"
               />
@@ -328,7 +316,7 @@ definePageMeta({ layout: "admin", title: "Mã giảm giá" });
                 v-model="endDate.value.value"
                 variant="outlined"
                 type="datetime-local"
-                :label="$t(`Ngày và giờ kết thúc`) + ' (✳)'"
+                label="Ngày và giờ kết thúc (✳)"
                 :error-messages="endDate.errorMessage.value"
                 :hide-details="Boolean(!endDate.errorMessage.value)"
               />
@@ -344,7 +332,7 @@ definePageMeta({ layout: "admin", title: "Mã giảm giá" });
                 variant="outlined"
                 control-variant="stacked"
                 :min="1"
-                :label="$t(`Giới hạn sử dụng`) + ' (✳)'"
+                label="Giới hạn sử dụng (✳)"
                 :error-messages="usageLimit.errorMessage.value"
                 :hide-details="Boolean(!usageLimit.errorMessage.value)"
               />
@@ -356,7 +344,7 @@ definePageMeta({ layout: "admin", title: "Mã giảm giá" });
                 variant="outlined"
                 control-variant="stacked"
                 :min="0"
-                :label="$t(`Giới hạn với mỗi tài khoản`)"
+                label="Giới hạn với mỗi tài khoản"
                 :error-messages="limitPerAccount.errorMessage.value"
                 :hide-details="Boolean(!limitPerAccount.errorMessage.value)"
               />
@@ -373,7 +361,7 @@ definePageMeta({ layout: "admin", title: "Mã giảm giá" });
             item-title="title"
             item-value="value"
             :items="conditionTypeOptions"
-            :label="$t(`Đối tượng áp dụng`)"
+            label="Đối tượng áp dụng"
             :error-messages="conditionType.errorMessage.value"
             :hide-details="Boolean(!conditionType.errorMessage.value)"
           />

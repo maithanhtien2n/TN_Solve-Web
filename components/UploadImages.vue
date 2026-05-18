@@ -96,7 +96,7 @@ defineExpose({ files, base64s, setValue, deleteImages });
           <v-icon :size="isMobile ? 27 : 27" color="grey-darken-1">
             mdi-image-outline
           </v-icon>
-          <span>{{ $t("Chọn ảnh") }}</span>
+          <span>Chọn ảnh</span>
         </div>
 
         <input

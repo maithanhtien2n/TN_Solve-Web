@@ -1,6 +1,5 @@
 <script setup lang="ts">
 const router = useRouter();
-const localePath = useLocalePath();
 
 const currentYear = new Date().getFullYear();
 
@@ -30,7 +29,7 @@ const onClickNavigate = (value: string) => {
     } else if (value === "facebook-group") {
       window.open("https://www.facebook.com/groups/1175744533986396", "_blank");
     } else {
-      router.push(localePath(`/${value}`));
+      router.push(`/${value}`);
     }
   }
 };
@@ -59,11 +58,7 @@ onMounted(async () => {
           </div>
 
           <p class="tagline mt-2">
-            {{
-              $t(
-                "Nền tảng AI giúp bạn tạo video chuyên nghiệp chỉ trong vài phút"
-              )
-            }}
+            Nền tảng AI giúp bạn tạo video chuyên nghiệp chỉ trong vài phút
           </p>
         </v-col>
 
@@ -71,7 +66,7 @@ onMounted(async () => {
           <v-row>
             <v-col cols="6" lg="4" md="4" sm="4">
               <div class="footer-section footer-links">
-                <h4>{{ $t("Bắt đầu sử dụng") }}</h4>
+                <h4>Bắt đầu sử dụng</h4>
                 <nav>
                   <a
                     v-for="(item, index) in [
@@ -92,7 +87,7 @@ onMounted(async () => {
 
             <v-col cols="6" lg="4" md="4" sm="4">
               <div class="footer-section footer-links">
-                <h4>{{ $t("Trợ giúp") }}</h4>
+                <h4>Trợ giúp</h4>
                 <nav>
                   <a
                     v-for="(item, index) in [
@@ -116,7 +111,7 @@ onMounted(async () => {
 
             <v-col cols="12" lg="4" md="4" sm="4">
               <div class="footer-section footer-links">
-                <h4>{{ $t("Theo dõi chúng tôi") }}</h4>
+                <h4>Theo dõi chúng tôi</h4>
 
                 <nav>
                   <a
@@ -151,11 +146,11 @@ onMounted(async () => {
 
                   <a
                     class="cursor-pointer d-flex align-center ga-2"
-                    @click="router.push(localePath('/video/public'))"
+                    @click="router.push('/video/public')"
                   >
                     <img src="/images/icon-video.png" style="width: 1.2rem" />
                     <span style="margin-bottom: 1px">
-                      {{ $t("Thước phim cộng đồng") }}
+                      Thước phim cộng đồng
                     </span>
                   </a>
                 </nav>
@@ -167,7 +162,7 @@ onMounted(async () => {
 
       <div class="footer-bottom">
         <div v-if="version" class="font-bold text-black">
-          {{ $t("Phiên bản") }} {{ version }}
+          Phiên bản {{ version }}
         </div>
         <span>
           &copy; <span class="font-bold">{{ currentYear }} TN Solve</span>. Cảm

@@ -1,6 +1,4 @@
 <script setup lang="ts">
-const { t } = useI18n();
-
 const { onGetterUserData: userData } = useAppStore();
 
 const registered = computed(() => Boolean(userData.value?.serviceExpiry));
@@ -110,10 +108,12 @@ const onClickDocument = (item: any) => {
 };
 
 useSeo({
-  title: t("Tài liệu"),
+  title: "Tài liệu",
   description:
-    "Nền tảng AI giúp bạn tạo video chuyên nghiệp chỉ trong vài phút",
+    "Trợ lý viết câu lệnh AI TN Solve - Hướng dẫn viết prompt hiệu quả cho Veo, Grok. Bộ sưu tập prompt mẫu giúp tạo video AI chất lượng cao.",
   image: "/images/page-home.png",
+  keywords:
+    "prompt AI, viết câu lệnh AI, hướng dẫn Veo Grok, prompt tạo video, TN Solve tài liệu, mẫu prompt video AI",
 });
 
 definePageMeta({ middleware: "auth" });
@@ -121,7 +121,7 @@ definePageMeta({ middleware: "auth" });
 
 <template>
   <div>
-    <h2 class="font-bold">{{ $t("Chatbot hỗ trợ viết prompt") }}</h2>
+    <h2 class="font-bold">Chatbot hỗ trợ viết prompt</h2>
 
     <div class="mt-4 d-flex flex-column ga-2">
       <div v-for="(item, index) in documents" :key="index">

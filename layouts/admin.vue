@@ -1,14 +1,13 @@
 <script setup lang="ts">
 import AppSystem from "~/components/layouts/AppSystem.vue";
 
-const { t } = useI18n();
-
 useSeo({
-  title: t("Trang quản trị"),
-  description:
-    "Nền tảng AI giúp bạn tạo video chuyên nghiệp chỉ trong vài phút",
+  title: "Trang quản trị",
+  description: "Trang quản trị TN Solve",
   image: "/images/page-home.png",
 });
+
+useHead({ meta: [{ name: "robots", content: "noindex, nofollow" }] });
 </script>
 
 <template>

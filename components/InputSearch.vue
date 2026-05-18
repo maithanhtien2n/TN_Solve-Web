@@ -25,7 +25,7 @@ defineExpose({ keywords })
   >
     <input
       v-model="keywords"
-      :placeholder="$t(placeholder)"
+      :placeholder="placeholder"
       class="flex-1 py-3"
       style="outline: none"
       @keypress.enter="onSearch"

@@ -30,7 +30,7 @@ defineExpose({ onDisplay, display });
     :fullscreen="Boolean(isMobile)"
   >
     <v-card>
-      <v-toolbar v-if="title" :title="$t(title)" class="py-0 px-0">
+      <v-toolbar v-if="title" :title="title" class="py-0 px-0">
         <div class="mr-4">
           <v-btn size="40" variant="tonal" icon @click="display = false">
             <v-icon size="24">mdi-close</v-icon>

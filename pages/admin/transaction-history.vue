@@ -3,8 +3,6 @@ import { accountService } from "~/services/app";
 
 const route = useRoute();
 
-const { t } = useI18n();
-
 const { onGetterMasterData } = useMasterDataStore();
 
 const headers = [
@@ -45,23 +43,13 @@ const commonDialogRef = ref<any>(null);
 const banks = computed(() => onGetterMasterData.value["banks"] || []);
 
 const partnerItems = computed(
-  () =>
-    onGetterMasterData.value["my-partner"]?.map((x: any) => ({
-      title: t(x.title),
-      value: x.value,
-    })) || []
+  () => onGetterMasterData.value["my-partner"] || []
 );
 
-const statusItems = computed(() =>
-  commissionStatusOptions?.map((x: any) => ({ ...x, title: t(x.title) }))
-);
+const statusItems = computed(() => commissionStatusOptions);
 
 const transactionMonthsItems = computed(
-  () =>
-    onGetterMasterData.value["transaction-months"]?.map((x: any) => ({
-      title: t(x.title),
-      value: x.value,
-    })) || []
+  () => onGetterMasterData.value["transaction-months"] || []
 );
 
 function onGetBankName(code: string) {

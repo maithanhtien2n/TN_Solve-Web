@@ -2,7 +2,6 @@
 import { productService } from "~/services/product";
 import { useIntersectionObserver } from "@vueuse/core";
 
-const { t } = useI18n();
 const { width, isMobile } = useDevice();
 
 const { onGetterUserData } = useAppStore();
@@ -45,16 +44,14 @@ const onClickDotMenuItem = (type: string, data: any) => {
     let message = "";
 
     if (type === "public") {
-      message = t("Bạn có chắc chắn muốn công khai video này không?");
+      message = "Bạn có chắc chắn muốn công khai video này không?";
     } else if (type === "private") {
-      message = t("Bạn có chắc chắn muốn riêng tư video này không?");
+      message = "Bạn có chắc chắn muốn riêng tư video này không?";
     } else if (type === "delete-video") {
       if (data.state === "primary") {
-        message = t(
-          "Xóa thước phim đang tạo sẽ tốn 10 tín dụng. Bạn có muốn tiếp tục?"
-        );
+        message = "Xóa thước phim đang tạo sẽ tốn 10 tín dụng. Bạn có muốn tiếp tục?";
       } else {
-        message = t("Bạn có chắc chắn muốn xoá thước phim này không?");
+        message = "Bạn có chắc chắn muốn xoá thước phim này không?";
       }
     }
 
@@ -120,10 +117,12 @@ onMounted(() => {
 });
 
 useSeo({
-  title: t("Thư viện của tôi"),
+  title: "Thư viện của tôi",
   description:
-    "Nền tảng AI giúp bạn tạo video chuyên nghiệp chỉ trong vài phút",
+    "Thư viện video AI của bạn trên TN Solve - Quản lý, xem lại và tải xuống các video đã tạo bằng Veo, Grok. Theo dõi tiến trình tạo video.",
   image: "/images/page-video.png",
+  keywords:
+    "thư viện video AI, video đã tạo, quản lý video TN Solve, tải video AI",
 });
 
 definePageMeta({ middleware: "auth" });
@@ -135,7 +134,7 @@ definePageMeta({ middleware: "auth" });
     class="d-flex justify-center flex-column align-center ga-3 pt-10 pb-16"
   >
     <v-progress-circular width="2" size="40" color="primary" indeterminate />
-    {{ $t("Đang tải dữ liệu...") }}
+    Đang tải dữ liệu...
   </div>
 
   <div v-else>
@@ -275,13 +274,13 @@ definePageMeta({ middleware: "auth" });
               class="d-flex align-center"
             >
               <small class="text-nowrap text-grey-darken-2">
-                {{ item?.viewsCount }} {{ $t("lượt xem") }}
+                {{ item?.viewsCount }} lượt xem
               </small>
 
               <v-icon>mdi-circle-small</v-icon>
 
               <small class="text-nowrap text-grey-darken-2">
-                {{ item?.likesCount }} {{ $t("lượt thích") }}
+                {{ item?.likesCount }} lượt thích
               </small>
             </div>
           </div>
@@ -341,7 +340,7 @@ definePageMeta({ middleware: "auth" });
                       class="cursor-pointer"
                       :class="{ 'text-red': menu.value === 'delete-video' }"
                     >
-                      {{ $t(menu.title) }}
+                      {{ menu.title }}
                     </label>
                   </div>
                 </v-list-item>
@@ -366,7 +365,7 @@ definePageMeta({ middleware: "auth" });
         <v-icon color="#8cb8f4" size="56">mdi-movie-open-remove-outline</v-icon>
       </div>
       <h3 class="text-h6 font-weight-bold text-grey-darken-3 mb-2">
-        {{ $t("Bạn chưa có thước phim nào") }}
+        Bạn chưa có thước phim nào
       </h3>
       <span class="text-grey-darken-1 text-body-1 mb-6">
         Hãy tạo video đầu tiên để bắt đầu trải nghiệm hệ thống.

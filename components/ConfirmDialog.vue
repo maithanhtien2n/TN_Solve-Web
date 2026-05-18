@@ -4,9 +4,6 @@ const emits = defineEmits<{
   (e: "onYes", data: any): void;
 }>();
 
-// Internationalization
-const { t } = useI18n();
-
 // Default configuration
 const defaultConfig = {
   display: false,
@@ -72,7 +69,7 @@ export type ConfirmConfig = typeof defaultConfig;
         <!-- Title -->
         <slot name="title" :config="confirmConfig">
           <h2 class="font-bold" style="font-size: 1.3rem">
-            {{ t(confirmConfig.title) }}
+            {{ confirmConfig.title }}
           </h2>
         </slot>
 
@@ -84,7 +81,7 @@ export type ConfirmConfig = typeof defaultConfig;
             v-html="confirmConfig.message"
           />
           <div v-else class="whitespace-pre-line">
-            {{ t(confirmConfig.message) }}
+            {{ confirmConfig.message }}
           </div>
         </slot>
 
@@ -98,7 +95,7 @@ export type ConfirmConfig = typeof defaultConfig;
             :disabled="Boolean(loading)"
             @click="onClickNo"
           >
-            {{ t(confirmConfig.noTitle) }}
+            {{ confirmConfig.noTitle }}
           </v-btn>
 
           <!-- Yes Button -->
@@ -111,7 +108,7 @@ export type ConfirmConfig = typeof defaultConfig;
               :loading="loading"
               @click="onClickYes"
             >
-              {{ t(confirmConfig.yesTitle) }}
+              {{ confirmConfig.yesTitle }}
             </v-btn>
           </slot>
         </div>

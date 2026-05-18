@@ -3,8 +3,6 @@ import { accountService } from "~/services/app";
 
 const route = useRoute();
 
-const { t } = useI18n();
-
 const { onGetterMasterData } = useMasterDataStore();
 
 const headers = [
@@ -29,15 +27,9 @@ const loading = ref<string>("");
 const dataTableRef = ref<any>(null);
 const confirmDialogRef = ref<any>(null);
 
-const statusItems = computed(() =>
-  expiryStatusOptions?.map((x: any) => ({ ...x, title: t(x.title) }))
-);
+const statusItems = computed(() => expiryStatusOptions);
 const rentalMonthsOptions = computed(
-  () =>
-    onGetterMasterData.value["rental-months"]?.map((x: any) => ({
-      title: t(x.title),
-      value: x.value,
-    })) || []
+  () => onGetterMasterData.value["rental-months"] || []
 );
 
 async function loadItems(event: any) {
@@ -104,7 +96,7 @@ definePageMeta({ layout: "admin", title: "Gói cho thuê" });
       <v-chip
         :color="(item as any)?.expiryStatus == 'Đã hết hạn' ? 'red': 'success'"
       >
-        {{ $t((item as any)?.expiryStatus) }}
+        {{ (item as any)?.expiryStatus }}
       </v-chip>
     </template>
   </DataTable>

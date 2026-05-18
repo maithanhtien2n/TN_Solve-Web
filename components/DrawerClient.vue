@@ -1,9 +1,6 @@
 <script setup lang="ts">
 const route = useRoute();
 const router = useRouter();
-const localePath = useLocalePath();
-
-const { t } = useI18n();
 const { isMobile } = useDevice();
 
 const display = ref(false);
@@ -31,14 +28,14 @@ const onSelectMenuItem = (event: any) => {
 
     return;
   }
-  if (route) router.push(localePath(route));
+  if (route) router.push(route);
 };
 
 onMounted(() => {
   for (const menu of menus.value) {
     if (menu.children) {
       const match = menu.children.find(
-        (child: any) => localePath(child.route) === route.path
+        (child: any) => child.route === route.path
       );
       if (match) {
         open.value = [menu.route];
@@ -99,7 +96,7 @@ defineExpose({ onDisplay });
             v-for="(i, idex) in menu.children"
             :key="idex"
             color="primary"
-            :active="localePath(i.route) == route.fullPath"
+            :active="i.route == route.fullPath"
             :value="i.route"
           >
             <template #default>
@@ -113,10 +110,10 @@ defineExpose({ onDisplay });
           color="primary"
           :prepend-icon="menu.icon"
           :value="menu.route"
-          :active="localePath(menu.route) == route.fullPath"
+          :active="menu.route == route.fullPath"
         >
           <template #default>
-            <span>{{ $t(menu.title) }}</span>
+            <span>{{ menu.title }}</span>
           </template>
         </v-list-item>
       </template>

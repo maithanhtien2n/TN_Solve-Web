@@ -62,7 +62,7 @@ watch(onGetterDisplayPopupBuyCredit, (newVal) => {
     <div class="text-center mb-2">
       <v-icon icon="mdi-gift" color="amber-darken-1" size="small" />
       <span class="font-bold text-blue-darken-3 ml-2">
-        {{ $t("Tặng thêm tín dụng khi bạn chọn gói 50.000đ hoặc 100.000đ") }}
+        Tặng thêm tín dụng khi bạn chọn gói 50.000đ hoặc 100.000đ
       </span>
     </div>
 
@@ -111,7 +111,7 @@ watch(onGetterDisplayPopupBuyCredit, (newVal) => {
         />
 
         <v-icon v-else size="27">mdi-credit-card-outline</v-icon>
-        <h3>{{ $t("Thanh toán") }}</h3>
+        <h3>Thanh toán</h3>
       </div>
     </template>
   </CommonDialog>

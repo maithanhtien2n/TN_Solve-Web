@@ -1,6 +1,4 @@
 <script setup lang="ts">
-const { t } = useI18n();
-
 const content = ref<string>(`
   <div>
     <h1 class="text-h5 text-md-h4 font-bold mb-1">Điều khoản & Thanh toán</h1>
@@ -84,9 +82,12 @@ const content = ref<string>(`
 `);
 
 useSeo({
-  title: t("Chính sách & Điều khoản"),
-  description: "Nền tảng AI giúp bạn tạo video chuyên nghiệp chỉ với 139k",
+  title: "Chính sách & Điều khoản",
+  description:
+    "Chính sách và điều khoản sử dụng dịch vụ TN Solve - Quy định về đăng ký, thanh toán, hoàn tiền, bảo mật thông tin và quyền sở hữu nội dung.",
   image: "/images/page-home.png",
+  keywords:
+    "điều khoản TN Solve, chính sách sử dụng, chính sách hoàn tiền, điều khoản dịch vụ AI",
 });
 </script>
 

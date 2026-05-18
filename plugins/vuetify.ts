@@ -1,5 +1,4 @@
-import la from "../i18n/language/lo";
-import { vi, en } from "vuetify/locale";
+import { vi } from "vuetify/locale";
 
 import * as components from "vuetify/components";
 import * as directives from "vuetify/directives";
@@ -33,8 +32,8 @@ export default defineNuxtPlugin((nuxtApp) => {
     },
     locale: {
       locale: "vi",
-      fallback: "en",
-      messages: { en, vi, la },
+      fallback: "vi",
+      messages: { vi },
     },
   });
 
