@@ -486,9 +486,9 @@ definePageMeta({ middleware: "auth" });
         <v-progress-linear
           :color="videoFlow.color"
           :modelValue="videoFlow.value"
-          height="6"
+          height="9"
           rounded
-          bg-color="#d8d8d8"
+          bg-color="#96a8be"
         />
       </div>
     </v-col>
@@ -893,11 +893,58 @@ definePageMeta({ middleware: "auth" });
     </v-col>
 
     <v-col lg="6" md="6" cols="12">
-      <div ref="myTimeline" class="steps-timeline">
+
+      <!-- Guide panel khi chưa tạo video -->
+      <div v-if="!productId" class="guide-panel">
+        <div class="guide-header">
+          <div class="guide-header-icon">
+            <v-icon color="white" size="22">mdi-image-filter-tilt-shift</v-icon>
+          </div>
+          <div>
+            <div class="guide-header-title">Quy trình tạo video AI</div>
+            <div class="guide-header-sub">Chỉ vài phút để có video chuyên nghiệp</div>
+          </div>
+        </div>
+
+        <div class="guide-steps">
+          <div class="guide-step">
+            <div class="guide-step-num">1</div>
+            <div class="guide-step-body">
+              <div class="guide-step-title">Điền thông tin & Prompt</div>
+              <div class="guide-step-desc">Chọn mô hình, tỷ lệ khung hình, chế độ, phong cách, thời lượng và viết nội dung mô tả video</div>
+            </div>
+          </div>
+          <div class="guide-step-connector" />
+          <div class="guide-step">
+            <div class="guide-step-num">2</div>
+            <div class="guide-step-body">
+              <div class="guide-step-title">AI phân tích & tạo kịch bản</div>
+              <div class="guide-step-desc">Hệ thống tự động phân tích prompt và tạo kịch bản từng cảnh quay</div>
+            </div>
+          </div>
+          <div class="guide-step-connector" />
+          <div class="guide-step">
+            <div class="guide-step-num">3</div>
+            <div class="guide-step-body">
+              <div class="guide-step-title">Xử lý & render video</div>
+              <div class="guide-step-desc">AI tiến hành tạo từng cảnh quay và ghép thành video hoàn chỉnh</div>
+            </div>
+          </div>
+          <div class="guide-step-connector" />
+          <div class="guide-step">
+            <div class="guide-step-num">4</div>
+            <div class="guide-step-body">
+              <div class="guide-step-title">Tải video về máy</div>
+              <div class="guide-step-desc">Video hoàn tất, bạn có thể xem, chia sẻ hoặc tải xuống ngay</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Timeline khi đã có video -->
+      <div v-else ref="myTimeline" class="steps-timeline">
         <div
-          v-for="(item, index) in productId
-            ? formData.messages
-            : [{ title: 'Hoàn tất thông tin', dateTime: '', color: 'grey' }]"
+          v-for="(item, index) in formData.messages"
           :key="index"
           class="step-item"
           :class="`step-${item.color}`"
@@ -975,6 +1022,98 @@ definePageMeta({ middleware: "auth" });
 </template>
 
 <style scoped>
+/* ─── Guide panel ────────────────────────────────────── */
+.guide-panel {
+  background: #fff;
+  border: 1px solid #d0dae6;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+}
+
+.guide-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 18px 20px;
+  background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 55%, #1565c0 100%);
+}
+
+.guide-header-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: rgba(255,255,255,0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.guide-header-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.guide-header-sub {
+  font-size: 0.78rem;
+  color: rgba(255,255,255,0.65);
+  margin-top: 2px;
+}
+
+.guide-steps {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+.guide-step {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.guide-step-connector {
+  width: 2px;
+  height: 20px;
+  background: #d0dae6;
+  margin-left: 15px;
+}
+
+.guide-step-num {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #eff6ff;
+  border: 2px solid #bfdbfe;
+  color: #1e88e5;
+  font-size: 0.85rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.guide-step-body {
+  padding-top: 4px;
+  padding-bottom: 12px;
+}
+
+.guide-step-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin-bottom: 3px;
+}
+
+.guide-step-desc {
+  font-size: 0.78rem;
+  color: #6b7280;
+  line-height: 1.5;
+}
+
 .auto-grow-textarea ::v-deep(textarea) {
   max-height: 450px;
   overflow-y: auto;
@@ -994,8 +1133,9 @@ definePageMeta({ middleware: "auth" });
   gap: 3px;
   padding: 10px 12px;
   border-radius: 10px;
-  background: #f8f9fa;
-  border: 1px solid #eeeeee;
+  background: #fff;
+  border: 1px solid #d0dae6;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
 }
 
 .info-label {
@@ -1083,8 +1223,9 @@ definePageMeta({ middleware: "auth" });
 .flow-status-bar {
   padding: 12px 14px;
   border-radius: 10px;
-  background: #f9f9f9;
-  border: 1px solid #efefef;
+  background: #fff;
+  border: 1px solid #d0dae6;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
 }
 
 .flow-status-header {
@@ -1154,9 +1295,10 @@ definePageMeta({ middleware: "auth" });
   padding: 10px 14px;
   min-height: 56px;
   border-radius: 10px;
-  background: #f9f9f9;
-  border: 1px solid #efefef;
+  background: #fff;
+  border: 1px solid #d0dae6;
   margin-bottom: 8px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
   transition: background 0.15s;
 }
 

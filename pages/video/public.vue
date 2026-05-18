@@ -216,8 +216,13 @@ useSeo({
 <style scoped>
 /* ─── Header ─────────────────────────────────────────── */
 .page-header {
-  padding-bottom: 20px;
-  border-bottom: 1px solid #f0f0f0;
+  padding: 18px 20px;
+  margin-top: 23px;
+  margin-bottom: 6px;
+  border-radius: 12px;
+  background: #fff;
+  border: 1px solid #d0dae6;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
 }
 
 .page-title-row {
@@ -243,7 +248,7 @@ useSeo({
 
 .page-desc {
   font-size: 0.82rem;
-  color: #9e9e9e;
+  color: #6b7280;
   margin: 0;
 }
 

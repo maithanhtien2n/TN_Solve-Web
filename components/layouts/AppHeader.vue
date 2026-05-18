@@ -28,6 +28,10 @@ const pillStyle = ref({ left: "4px", width: "0px" });
 const updatePill = () => {
   if (!navTrackRef.value) return;
   const activeIndex = navItems.findIndex((i) => isActive(i.path));
+  if (activeIndex === -1) {
+    pillStyle.value = { left: "4px", width: "0px" };
+    return;
+  }
   const items = navTrackRef.value.querySelectorAll<HTMLElement>(".nav-item");
   const el = items[activeIndex];
   if (el) {
