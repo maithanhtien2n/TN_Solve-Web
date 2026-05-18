@@ -38,54 +38,108 @@ useSeo({
     <div class="hero-glow" />
 
     <div class="hero-inner">
-    <div class="hero-content">
-      <template v-if="isSubscribed">
-        <div class="hero-label">
-          <span class="dot-live" />
-          Hệ thống đang hoạt động
-        </div>
-        <h1 class="hero-heading">
-          Xin chào,
-          <span class="hero-name">{{ userData?.name?.split(" ").pop() }}</span>
-          👋
-        </h1>
-        <p class="hero-sub">
-          Sẵn sàng tạo video AI chuyên nghiệp ngay hôm nay?
-        </p>
-        <div class="hero-ctas" style="margin-top: 8px;">
-          <button class="cta-primary" @click="router.push('/video/create')">
-            <span class="cta-primary__glow" />
-            <svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
-            Tạo video
-          </button>
-        </div>
-      </template>
-
-      <template v-else>
-        <h1 class="hero-heading">
-          Tạo video AI <br />
-          chuyên nghiệp
-        </h1>
-        <div class="hero-price-block">
-          <span class="hero-price-only">139.000đ</span>
-          <div class="hero-price-right">
-            <span class="hero-price-per">/tháng</span>
-            <span class="hero-price-desc">không giới hạn tính năng cao cấp</span>
+      <div class="hero-content">
+        <template v-if="isSubscribed">
+          <div class="hero-label">
+            <span class="dot-live" />
+            Hệ thống đang hoạt động
           </div>
-        </div>
-        <div class="hero-ctas">
-          <button class="cta-primary" @click="router.push('/payment')">
-            <span class="cta-primary__glow" />
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.76.71-1.96-.05-2.71a2.03 2.03 0 0 0-2.95-.29z"/><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/></svg>
-            Đăng ký ngay
-          </button>
-          <a href="https://zalo.me/0343027232" target="_blank" class="cta-ghost">
-            <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-            Tư vấn Zalo
-          </a>
-        </div>
-      </template>
-    </div>
+          <h1 class="hero-heading">
+            Xin chào,
+            <span class="hero-name">{{
+              userData?.name?.split(" ").pop()
+            }}</span>
+            👋
+          </h1>
+          <p class="hero-sub">
+            Sẵn sàng tạo video AI chuyên nghiệp ngay hôm nay?
+          </p>
+          <div class="hero-ctas" style="margin-top: 8px">
+            <button class="cta-primary" @click="router.push('/video/create')">
+              <span class="cta-primary__glow" />
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="19"
+                height="19"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="12" cy="12" r="3" />
+                <path
+                  d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"
+                />
+              </svg>
+              Tạo video
+            </button>
+          </div>
+        </template>
+
+        <template v-else>
+          <h1 class="hero-heading">
+            Tạo video AI <br />
+            chuyên nghiệp
+          </h1>
+          <div class="hero-price-block">
+            <span class="hero-price-only">139.000đ</span>
+            <div class="hero-price-right">
+              <span class="hero-price-per">/tháng</span>
+              <span class="hero-price-desc">không giới hạn tính năng</span>
+            </div>
+          </div>
+          <div class="hero-ctas">
+            <button class="cta-primary" @click="router.push('/payment')">
+              <span class="cta-primary__glow" />
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path
+                  d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.76.71-1.96-.05-2.71a2.03 2.03 0 0 0-2.95-.29z"
+                />
+                <path
+                  d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"
+                />
+                <path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0" />
+                <path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5" />
+              </svg>
+              Đăng ký ngay
+            </button>
+            <a
+              href="https://zalo.me/0343027232"
+              target="_blank"
+              class="cta-ghost"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="17"
+                height="17"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path
+                  d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
+                />
+              </svg>
+              Tư vấn Zalo
+            </a>
+          </div>
+        </template>
+      </div>
 
       <!-- Right visual -->
       <div class="hero-visual">
@@ -93,7 +147,15 @@ useSeo({
           <div class="hv-screen">
             <div class="hv-screen-bg" />
             <div class="hv-play">
-              <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="28"
+                height="28"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+              >
+                <polygon points="5 3 19 12 5 21 5 3" />
+              </svg>
             </div>
             <div class="hv-bar">
               <div class="hv-bar-fill" />
@@ -109,7 +171,6 @@ useSeo({
             <span class="hv-tag">Xuất nhanh</span>
           </div>
         </div>
-
       </div>
     </div>
 
@@ -121,15 +182,24 @@ useSeo({
   <!-- ── Quick cards ─────────────────────────────────────── -->
   <div class="quick-grid">
     <router-link v-if="isSubscribed" to="/video" class="quick-card qc-blue">
-      <div class="quick-icon"><v-icon color="#1e88e5" size="22">mdi-play-circle-outline</v-icon></div>
+      <div class="quick-icon">
+        <v-icon color="#1e88e5" size="22">mdi-play-circle-outline</v-icon>
+      </div>
       <div class="quick-card-body">
         <div class="quick-label">Thư viện</div>
         <div class="quick-desc">Xem lại các video đã tạo</div>
       </div>
     </router-link>
 
-    <div v-else class="quick-card qc-blue" @click="showCredit = true" style="cursor:pointer">
-      <div class="quick-icon"><v-icon color="#1e88e5" size="22">mdi-diamond-stone</v-icon></div>
+    <div
+      v-else
+      class="quick-card qc-blue"
+      @click="showCredit = true"
+      style="cursor: pointer"
+    >
+      <div class="quick-icon">
+        <v-icon color="#1e88e5" size="22">mdi-diamond-stone</v-icon>
+      </div>
       <div class="quick-card-body">
         <div class="quick-label">Gói 139k/tháng</div>
         <div class="quick-desc">Xem chi tiết gói & tín dụng</div>
@@ -137,23 +207,37 @@ useSeo({
     </div>
 
     <router-link to="/video/public" class="quick-card qc-green">
-      <div class="quick-icon"><v-icon color="#10b981" size="22">mdi-earth</v-icon></div>
+      <div class="quick-icon">
+        <v-icon color="#10b981" size="22">mdi-earth</v-icon>
+      </div>
       <div class="quick-card-body">
         <div class="quick-label">Cộng đồng</div>
         <div class="quick-desc">Thước phim từ mọi người</div>
       </div>
     </router-link>
 
-    <a href="https://zalo.me/g/p8hls5tonlfkqmyfndmx" target="_blank" class="quick-card qc-orange">
-      <div class="quick-icon"><v-icon color="#f59e0b" size="22">mdi-account-group-outline</v-icon></div>
+    <a
+      href="https://zalo.me/g/p8hls5tonlfkqmyfndmx"
+      target="_blank"
+      class="quick-card qc-orange"
+    >
+      <div class="quick-icon">
+        <v-icon color="#f59e0b" size="22">mdi-account-group-outline</v-icon>
+      </div>
       <div class="quick-card-body">
         <div class="quick-label">Nhóm Zalo</div>
         <div class="quick-desc">Tin tức & hỗ trợ mỗi ngày</div>
       </div>
     </a>
 
-    <router-link v-if="!isSubscribed" to="/payment" class="quick-card qc-purple">
-      <div class="quick-icon"><v-icon color="#8b5cf6" size="22">mdi-crown-outline</v-icon></div>
+    <router-link
+      v-if="!isSubscribed"
+      to="/payment"
+      class="quick-card qc-purple"
+    >
+      <div class="quick-icon">
+        <v-icon color="#8b5cf6" size="22">mdi-crown-outline</v-icon>
+      </div>
       <div class="quick-card-body">
         <div class="quick-label">Nâng cấp</div>
         <div class="quick-desc">Chỉ 139.000đ/tháng</div>
@@ -161,7 +245,9 @@ useSeo({
     </router-link>
 
     <router-link v-else to="/documents" class="quick-card qc-purple">
-      <div class="quick-icon"><v-icon color="#8b5cf6" size="22">mdi-book-open-outline</v-icon></div>
+      <div class="quick-icon">
+        <v-icon color="#8b5cf6" size="22">mdi-book-open-outline</v-icon>
+      </div>
       <div class="quick-card-body">
         <div class="quick-label">Trợ lý AI</div>
         <div class="quick-desc">Gợi ý & viết prompt video thông minh</div>
@@ -299,15 +385,15 @@ useSeo({
   background:
     repeating-linear-gradient(
       45deg,
-      rgba(255,255,255,0.035) 0px,
-      rgba(255,255,255,0.035) 1px,
+      rgba(255, 255, 255, 0.035) 0px,
+      rgba(255, 255, 255, 0.035) 1px,
       transparent 1px,
       transparent 28px
     ),
     repeating-linear-gradient(
       -45deg,
-      rgba(255,255,255,0.035) 0px,
-      rgba(255,255,255,0.035) 1px,
+      rgba(255, 255, 255, 0.035) 0px,
+      rgba(255, 255, 255, 0.035) 1px,
       transparent 1px,
       transparent 28px
     ),
@@ -330,12 +416,18 @@ useSeo({
 }
 
 @media (max-width: 900px) {
-  .hero-inner { gap: 28px; }
-  .hero-visual { display: none; }
+  .hero-inner {
+    gap: 28px;
+  }
+  .hero-visual {
+    display: none;
+  }
 }
 
 @media (max-width: 600px) {
-  .hero-inner { padding: 36px 16px; }
+  .hero-inner {
+    padding: 36px 16px;
+  }
 }
 
 .hero-glow {
@@ -390,8 +482,8 @@ useSeo({
 }
 
 .hv-card {
-  background: rgba(255,255,255,0.07);
-  border: 1px solid rgba(255,255,255,0.15);
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: 16px;
   padding: 14px;
   backdrop-filter: blur(8px);
@@ -423,18 +515,25 @@ useSeo({
   display: flex;
   align-items: center;
   justify-content: center;
-  color: rgba(255,255,255,0.9);
+  color: rgba(255, 255, 255, 0.9);
   z-index: 1;
 }
 
 .hv-play svg {
-  filter: drop-shadow(0 0 12px rgba(255,255,255,0.4));
+  filter: drop-shadow(0 0 12px rgba(255, 255, 255, 0.4));
   animation: pulse-play 2s ease-in-out infinite;
 }
 
 @keyframes pulse-play {
-  0%, 100% { transform: scale(1);    opacity: 0.85; }
-  50%       { transform: scale(1.12); opacity: 1;   }
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.85;
+  }
+  50% {
+    transform: scale(1.12);
+    opacity: 1;
+  }
 }
 
 /* progress bar */
@@ -444,7 +543,7 @@ useSeo({
   left: 0;
   right: 0;
   height: 3px;
-  background: rgba(255,255,255,0.15);
+  background: rgba(255, 255, 255, 0.15);
   z-index: 1;
 }
 
@@ -457,8 +556,12 @@ useSeo({
 }
 
 @keyframes progress-fill {
-  from { width: 30%; }
-  to   { width: 85%; }
+  from {
+    width: 30%;
+  }
+  to {
+    width: 85%;
+  }
 }
 
 /* info row */
@@ -467,7 +570,7 @@ useSeo({
   align-items: center;
   gap: 8px;
   font-size: 0.78rem;
-  color: rgba(255,255,255,0.7);
+  color: rgba(255, 255, 255, 0.7);
 }
 
 .hv-info-dot {
@@ -491,20 +594,20 @@ useSeo({
   font-weight: 600;
   padding: 3px 9px;
   border-radius: 999px;
-  background: rgba(56,189,248,0.15);
+  background: rgba(56, 189, 248, 0.15);
   color: #7dd3fc;
-  border: 1px solid rgba(56,189,248,0.25);
+  border: 1px solid rgba(56, 189, 248, 0.25);
 }
 
 /* floating stats */
 .hv-stat {
   position: absolute;
-  background: rgba(255,255,255,0.95);
+  background: rgba(255, 255, 255, 0.95);
   border-radius: 12px;
   padding: 8px 14px;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
   animation: float-stat 4s ease-in-out infinite;
 }
 
@@ -521,8 +624,13 @@ useSeo({
 }
 
 @keyframes float-stat {
-  0%, 100% { transform: translateY(0); }
-  50%       { transform: translateY(-6px); }
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
 }
 
 .hv-stat-num {
@@ -628,7 +736,9 @@ useSeo({
 }
 
 @media (max-width: 600px) {
-  .hero-price-only { font-size: 1.9rem; }
+  .hero-price-only {
+    font-size: 1.9rem;
+  }
 }
 
 .hero-ctas {
@@ -653,16 +763,25 @@ useSeo({
   font-weight: 700;
   color: #0f172a;
   background: #fff;
-  box-shadow: 0 4px 20px rgba(255,255,255,0.25), inset 0 1px 0 rgba(255,255,255,0.9);
+  box-shadow:
+    0 4px 20px rgba(255, 255, 255, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
   overflow: hidden;
-  transition: transform 0.18s, box-shadow 0.18s;
+  transition:
+    transform 0.18s,
+    box-shadow 0.18s;
   letter-spacing: -0.2px;
 }
 
 .cta-primary__glow {
   position: absolute;
   inset: 0;
-  background: linear-gradient(120deg, transparent 40%, rgba(255,255,255,0.35) 50%, transparent 60%);
+  background: linear-gradient(
+    120deg,
+    transparent 40%,
+    rgba(255, 255, 255, 0.35) 50%,
+    transparent 60%
+  );
   transform: translateX(-100%);
   transition: transform 1.4s ease;
   pointer-events: none;
@@ -670,7 +789,9 @@ useSeo({
 
 .cta-primary:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 28px rgba(255,255,255,0.35), inset 0 1px 0 rgba(255,255,255,0.9);
+  box-shadow:
+    0 8px 28px rgba(255, 255, 255, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
 }
 
 .cta-primary:hover .cta-primary__glow {
@@ -695,7 +816,10 @@ useSeo({
   background: rgba(255, 255, 255, 0.06);
   text-decoration: none;
   backdrop-filter: blur(4px);
-  transition: border-color 0.18s, background 0.18s, transform 0.18s;
+  transition:
+    border-color 0.18s,
+    background 0.18s,
+    transform 0.18s;
   letter-spacing: -0.2px;
 }
 
@@ -718,11 +842,16 @@ useSeo({
 }
 
 @media (max-width: 800px) {
-  .quick-grid { grid-template-columns: repeat(2, 1fr); }
+  .quick-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
 @media (max-width: 480px) {
-  .quick-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .quick-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
 }
 
 .quick-card {
@@ -734,8 +863,10 @@ useSeo({
   text-decoration: none;
   color: inherit;
   border: 1px solid transparent;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
-  transition: transform 0.18s, box-shadow 0.18s;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
+  transition:
+    transform 0.18s,
+    box-shadow 0.18s;
   position: relative;
   overflow: hidden;
 }
@@ -744,10 +875,16 @@ useSeo({
 .quick-card::after {
   content: "";
   position: absolute;
-  top: 0; left: 0;
+  top: 0;
+  left: 0;
   width: 45%;
   height: 100%;
-  background: linear-gradient(120deg, transparent 0%, rgba(255,255,255,0.6) 50%, transparent 100%);
+  background: linear-gradient(
+    120deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.6) 50%,
+    transparent 100%
+  );
   transform: skewX(-15deg) translateX(-250%);
   pointer-events: none;
 }
@@ -757,23 +894,47 @@ useSeo({
 }
 
 @keyframes card-shimmer {
-  from { transform: skewX(-15deg) translateX(-250%); }
-  to   { transform: skewX(-15deg) translateX(500%); }
+  from {
+    transform: skewX(-15deg) translateX(-250%);
+  }
+  to {
+    transform: skewX(-15deg) translateX(500%);
+  }
 }
 
 .quick-card:hover {
-  box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
 }
 
-.qc-blue   { background: #eff6ff; border-color: #bfdbfe; }
-.qc-green  { background: #ecfdf5; border-color: #a7f3d0; }
-.qc-orange { background: #fffbeb; border-color: #fde68a; }
-.qc-purple { background: #f5f3ff; border-color: #ddd6fe; }
+.qc-blue {
+  background: #eff6ff;
+  border-color: #bfdbfe;
+}
+.qc-green {
+  background: #ecfdf5;
+  border-color: #a7f3d0;
+}
+.qc-orange {
+  background: #fffbeb;
+  border-color: #fde68a;
+}
+.qc-purple {
+  background: #f5f3ff;
+  border-color: #ddd6fe;
+}
 
-.qc-blue:hover   { box-shadow: 0 8px 24px rgba(30,136,229,0.18); }
-.qc-green:hover  { box-shadow: 0 8px 24px rgba(16,185,129,0.18); }
-.qc-orange:hover { box-shadow: 0 8px 24px rgba(245,158,11,0.18); }
-.qc-purple:hover { box-shadow: 0 8px 24px rgba(139,92,246,0.18); }
+.qc-blue:hover {
+  box-shadow: 0 8px 24px rgba(30, 136, 229, 0.18);
+}
+.qc-green:hover {
+  box-shadow: 0 8px 24px rgba(16, 185, 129, 0.18);
+}
+.qc-orange:hover {
+  box-shadow: 0 8px 24px rgba(245, 158, 11, 0.18);
+}
+.qc-purple:hover {
+  box-shadow: 0 8px 24px rgba(139, 92, 246, 0.18);
+}
 
 .quick-icon {
   width: 46px;
@@ -784,10 +945,18 @@ useSeo({
   justify-content: center;
 }
 
-.qc-blue   .quick-icon { background: #dbeafe; }
-.qc-green  .quick-icon { background: #d1fae5; }
-.qc-orange .quick-icon { background: #fef3c7; }
-.qc-purple .quick-icon { background: #ede9fe; }
+.qc-blue .quick-icon {
+  background: #dbeafe;
+}
+.qc-green .quick-icon {
+  background: #d1fae5;
+}
+.qc-orange .quick-icon {
+  background: #fef3c7;
+}
+.qc-purple .quick-icon {
+  background: #ede9fe;
+}
 
 .quick-card-body {
   display: flex;
@@ -832,15 +1001,15 @@ useSeo({
   background:
     repeating-linear-gradient(
       45deg,
-      rgba(255,255,255,0.035) 0px,
-      rgba(255,255,255,0.035) 1px,
+      rgba(255, 255, 255, 0.035) 0px,
+      rgba(255, 255, 255, 0.035) 1px,
       transparent 1px,
       transparent 28px
     ),
     repeating-linear-gradient(
       -45deg,
-      rgba(255,255,255,0.035) 0px,
-      rgba(255,255,255,0.035) 1px,
+      rgba(255, 255, 255, 0.035) 0px,
+      rgba(255, 255, 255, 0.035) 1px,
       transparent 1px,
       transparent 28px
     ),

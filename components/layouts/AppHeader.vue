@@ -149,55 +149,49 @@ const onClickMenuItem = (value: string) => {
                 </button>
               </template>
 
-              <v-card min-width="230" rounded="xl" elevation="8" class="menu-card">
+              <v-card min-width="270" rounded="xl" elevation="12" class="menu-card">
+                <!-- Header gradient -->
                 <div class="menu-header">
-                  <v-avatar size="44" class="menu-avatar">
-                    <v-img loading="lazy" :src="userData.avatar || '/images/avatar-default.jpg'" />
-                  </v-avatar>
+                  <div class="menu-avatar-wrap">
+                    <v-avatar size="52" class="menu-avatar">
+                      <v-img loading="lazy" :src="userData.avatar || '/images/avatar-default.jpg'" />
+                    </v-avatar>
+                    <div class="menu-avatar-ring" />
+                  </div>
                   <div>
                     <div class="menu-name">{{ userData.name }}</div>
                     <div class="menu-credit" v-if="userData?.role !== EnumAccountRole.ADMIN">
-                      <span v-if="userData.settings?.unlimitedVideo">
-                        💎 <v-icon size="12">mdi-infinity</v-icon> {{ userData.settings.unlimitedVideo }} ngày
+                      <span class="menu-credit-badge" v-if="userData.settings?.unlimitedVideo">
+                        <v-icon size="11" color="#f59e0b">mdi-infinity</v-icon>
+                        {{ userData.settings.unlimitedVideo }} ngày
                       </span>
-                      <span v-else>
+                      <span class="menu-credit-badge" v-else>
                         💎 {{ (userData.settings?.credit || 0).toLocaleString("vi-VN") }} tín dụng
                       </span>
                     </div>
                   </div>
                 </div>
 
-                <v-divider />
-
-                <v-list density="compact" class="menu-list py-1">
-                  <v-list-item
+                <!-- Items -->
+                <div class="menu-items">
+                  <button
                     v-for="item in menus"
                     :key="item.value"
-                    rounded="lg"
-                    class="mx-2 my-0"
+                    class="menu-item"
+                    :class="item.value === 'logout' ? 'menu-item--danger' : ''"
                     @click="onClickMenuItem(item.value)"
                   >
-                    <template #prepend>
-                      <v-icon
-                        :icon="item.icon"
-                        :size="item.size || 18"
-                        :color="item.value === 'logout' ? '#ef4444' : '#475569'"
-                      />
-                    </template>
-                    <v-list-item-title
-                      :class="item.value === 'logout' ? 'logout-item' : 'menu-item-title'"
-                    >
-                      {{ item.title }}
-                    </v-list-item-title>
-                  </v-list-item>
-                </v-list>
+                    <v-icon :icon="item.icon" :size="item.size || 20" />
+                    <span>{{ item.title }}</span>
+                  </button>
+                </div>
               </v-card>
             </v-menu>
           </template>
 
           <!-- Login -->
           <button v-else class="login-btn" @click="displayLogin = true">
-            Đăng nhập
+            ĐĂNG NHẬP
           </button>
         </div>
       </div>
@@ -354,60 +348,138 @@ const onClickMenuItem = (value: string) => {
 
 /* ─── Dropdown menu ──────────────────────────────────── */
 .menu-card {
-  border: 1px solid #f0f0f0 !important;
+  border: 1px solid #e8eef6 !important;
   overflow: hidden;
 }
 
 .menu-header {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 16px;
+  gap: 14px;
+  padding: 18px 16px 16px;
+  background: linear-gradient(135deg, #1e3a5f 0%, #1565c0 100%);
+  position: relative;
 }
 
-.menu-avatar {
-  border: 2px solid #e5e7eb;
+.menu-avatar-wrap {
+  position: relative;
   flex-shrink: 0;
 }
 
+.menu-avatar {
+  border: 2.5px solid rgba(255,255,255,0.5) !important;
+}
+
+.menu-avatar-ring {
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(255,255,255,0.2);
+  pointer-events: none;
+}
+
 .menu-name {
-  font-size: 0.9rem;
+  font-size: 0.95rem;
   font-weight: 700;
-  color: #1a1a1a;
+  color: #fff;
   line-height: 1.3;
 }
 
 .menu-credit {
-  font-size: 0.75rem;
-  color: #64748b;
-  margin-top: 2px;
+  margin-top: 5px;
 }
 
-.menu-item-title {
-  font-size: 0.875rem !important;
+.menu-credit-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #fcd34d;
+  background: rgba(252,211,77,0.15);
+  border: 1px solid rgba(252,211,77,0.3);
+  padding: 2px 8px;
+  border-radius: 999px;
+}
+
+/* ─── Menu items ─────────────────────────────────────── */
+.menu-items {
+  padding: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.menu-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 11px 14px;
+  border-radius: 10px;
+  border: none;
+  background: transparent;
+  font-size: 0.95rem;
   color: #374151;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.15s, color 0.15s;
 }
 
-.logout-item {
-  font-size: 0.875rem !important;
+.menu-item:hover {
+  background: #f1f5f9;
+  color: #1e293b;
+}
+
+.menu-item--danger {
   color: #ef4444;
+  margin-top: 2px;
+  border-top: 1px solid #f3f4f6;
+  border-radius: 0 0 10px 10px;
+}
+
+.menu-item--danger:hover {
+  background: #fff5f5;
+  color: #dc2626;
 }
 
 /* ─── Login ──────────────────────────────────────────── */
 .login-btn {
-  padding: 7px 18px;
-  border-radius: 8px;
-  background: #1e88e5;
-  color: #fff;
-  font-size: 0.875rem;
-  font-weight: 600;
+  position: relative;
+  padding: 10px 22px;
+  border-radius: 10px;
+  background: #fff;
+  color: #1565c0;
+  font-size: 1.05rem;
+  font-weight: 500;
   border: none;
   cursor: pointer;
-  transition: background 0.18s, transform 0.15s;
+  letter-spacing: 0.2px;
+  box-shadow: none;
+  transition: transform 0.18s, box-shadow 0.18s;
+  overflow: hidden;
+}
+
+.login-btn::after {
+  content: "";
+  position: absolute;
+  top: 0; left: 0;
+  width: 40%;
+  height: 100%;
+  background: linear-gradient(120deg, transparent, rgba(30,136,229,0.12), transparent);
+  transform: skewX(-15deg) translateX(-200%);
 }
 
 .login-btn:hover {
-  background: #1565c0;
-  transform: translateY(-1px);
+  box-shadow: none;
+}
+
+.login-btn:hover::after {
+  animation: login-shimmer 1.2s ease forwards;
+}
+
+@keyframes login-shimmer {
+  from { transform: skewX(-15deg) translateX(-200%); }
+  to   { transform: skewX(-15deg) translateX(500%); }
 }
 </style>
