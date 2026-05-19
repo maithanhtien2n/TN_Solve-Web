@@ -41,7 +41,7 @@ onMounted(async () => {
 
 <template>
   <footer class="app-footer">
-    <v-container max-width="1200">
+    <v-container max-width="1400">
       <!-- Brand header — centered -->
       <div class="footer-brand">
         <v-img
