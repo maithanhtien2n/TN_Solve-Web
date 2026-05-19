@@ -1,4 +1,4 @@
-<script setup lang="ts">
+﻿<script setup lang="ts">
 import { appService } from "~/services/app";
 import { couponService } from "~/services/app";
 
@@ -6,6 +6,7 @@ const { isMobile } = useDevice();
 const { onGetterMasterData } = useMasterDataStore();
 
 const loading = ref<string>("");
+const agreedToTerms = ref<boolean>(false);
 const formData = ref<any>({
   rentalMonths: 1,
   discountCode: "",
@@ -13,10 +14,10 @@ const formData = ref<any>({
 const couponDetail = ref<any>(null);
 
 const planOptions = [
-  { months: 1,  label: "1 tháng",  save: null,  price: 139000,  days: 30,  credits: 5000 },
-  { months: 3,  label: "3 tháng",  save: "−7%", price: 388000,  days: 90,  credits: 15000, popular: true },
-  { months: 6,  label: "6 tháng",  save: "−16%",price: 701000,  days: 180, credits: 30000 },
-  { months: 12, label: "1 năm",    save: "−25%",price: 1251000, days: 365, credits: 60000 },
+  { months: 1,  label: "1 thÃ¡ng",  save: null,  price: 139000,  days: 30,  credits: 5000 },
+  { months: 3,  label: "3 thÃ¡ng",  save: "âˆ’7%", price: 388000,  days: 90,  credits: 15000, popular: true },
+  { months: 6,  label: "6 thÃ¡ng",  save: "âˆ’16%",price: 701000,  days: 180, credits: 30000 },
+  { months: 12, label: "1 nÄƒm",    save: "âˆ’25%",price: 1251000, days: 365, credits: 60000 },
 ];
 
 const selectedPlan = computed(() =>
@@ -86,10 +87,10 @@ const onChangeDiscountCode = async (event: any) => {
 };
 
 useSeo({
-  title: "Đăng ký dịch vụ",
-  description: "Đăng ký dịch vụ TN Solve - Tạo video AI không giới hạn từ 139.000đ/tháng.",
+  title: "ÄÄƒng kÃ½ dá»‹ch vá»¥",
+  description: "ÄÄƒng kÃ½ dá»‹ch vá»¥ TN Solve - Táº¡o video AI khÃ´ng giá»›i háº¡n tá»« 139.000Ä‘/thÃ¡ng.",
   image: "/images/page-home.png",
-  keywords: "đăng ký TN Solve, mua gói tạo video AI, giá 139k",
+  keywords: "Ä‘Äƒng kÃ½ TN Solve, mua gÃ³i táº¡o video AI, giÃ¡ 139k",
 });
 
 definePageMeta({ middleware: "auth" });
@@ -100,8 +101,8 @@ definePageMeta({ middleware: "auth" });
     <!-- Left: Plans -->
     <div class="pay-left">
       <div class="pay-left-header">
-        <h2 class="pay-left-title">Chọn gói phù hợp</h2>
-        <p class="pay-left-sub">Tiết kiệm hơn khi đăng ký gói dài hạn</p>
+        <h2 class="pay-left-title">Chá»n gÃ³i phÃ¹ há»£p</h2>
+        <p class="pay-left-sub">Tiáº¿t kiá»‡m hÆ¡n khi Ä‘Äƒng kÃ½ gÃ³i dÃ i háº¡n</p>
       </div>
 
       <div class="plan-list">
@@ -115,7 +116,7 @@ definePageMeta({ middleware: "auth" });
           }"
           @click="formData.rentalMonths = plan.months"
         >
-          <div v-if="plan.popular" class="plan-popular-badge">Phổ biến nhất</div>
+          <div v-if="plan.popular" class="plan-popular-badge">Phá»• biáº¿n nháº¥t</div>
 
           <div class="plan-item-top">
             <div class="plan-radio">
@@ -127,7 +128,7 @@ definePageMeta({ middleware: "auth" });
             </div>
             <div class="plan-item-right">
               <div v-if="plan.save" class="plan-save-badge">{{ plan.save }}</div>
-              <div class="plan-item-per">{{ formatCurrency(Math.round(plan.price / plan.months)) }}/tháng</div>
+              <div class="plan-item-per">{{ formatCurrency(Math.round(plan.price / plan.months)) }}/thÃ¡ng</div>
             </div>
           </div>
         </div>
@@ -135,19 +136,19 @@ definePageMeta({ middleware: "auth" });
 
       <!-- Included features -->
       <div class="includes">
-        <div class="includes-title">Bao gồm</div>
+        <div class="includes-title">Bao gá»“m</div>
         <div class="includes-list">
           <div class="include-item">
             <v-icon size="16" color="#1e88e5">mdi-calendar-check-outline</v-icon>
-            <span><strong>{{ selectedDays }} ngày</strong> sử dụng</span>
+            <span><strong>{{ selectedDays }} ngÃ y</strong> sá»­ dá»¥ng</span>
           </div>
           <div class="include-item">
             <v-icon size="16" color="#10b981">mdi-check-circle</v-icon>
-            <span><strong>{{ selectedCredits.toLocaleString("vi-VN") }} tín dụng</strong> khởi đầu</span>
+            <span><strong>{{ selectedCredits.toLocaleString("vi-VN") }} tÃ­n dá»¥ng</strong> khá»Ÿi Ä‘áº§u</span>
           </div>
 <div class="include-item">
             <v-icon size="16" color="#10b981">mdi-check-circle</v-icon>
-            Kích hoạt ngay sau thanh toán
+            KÃ­ch hoáº¡t ngay sau thanh toÃ¡n
           </div>
         </div>
       </div>
@@ -156,16 +157,16 @@ definePageMeta({ middleware: "auth" });
     <!-- Right: Checkout -->
     <div class="pay-right">
       <div class="checkout-card">
-        <div class="checkout-title">Thông tin thanh toán</div>
+        <div class="checkout-title">ThÃ´ng tin thanh toÃ¡n</div>
 
         <!-- Discount -->
         <div class="checkout-field">
-          <label class="field-label">Mã giảm giá</label>
+          <label class="field-label">MÃ£ giáº£m giÃ¡</label>
           <v-text-field
             v-model="formData.discountCode"
             variant="outlined"
             density="compact"
-            placeholder="Nhập mã (nếu có)"
+            placeholder="Nháº­p mÃ£ (náº¿u cÃ³)"
             hide-details
             @change="onChangeDiscountCode"
           />
@@ -173,7 +174,7 @@ definePageMeta({ middleware: "auth" });
           <div v-if="couponDetail" class="coupon-ok">
             <v-icon size="15" color="#10b981">mdi-check-circle</v-icon>
             <span>
-              <strong>{{ couponDetail.name }}</strong> — Giảm
+              <strong>{{ couponDetail.name }}</strong> â€” Giáº£m
               <span v-if="couponDetail.discountType === EnumDiscountType.PERCENTAGE">{{ couponDetail.discountValue }}%</span>
               <span v-else>{{ formatCurrency(couponDetail.discountValue) }}</span>
             </span>
@@ -184,39 +185,46 @@ definePageMeta({ middleware: "auth" });
         <div class="checkout-summary">
           <template v-if="typeof totalPrice === 'object'">
             <div class="sum-row">
-              <span>Giá gốc</span>
+              <span>GiÃ¡ gá»‘c</span>
               <span class="sum-original">{{ totalPrice.originalPrice }}</span>
             </div>
             <div class="sum-row">
-              <span>Giảm giá</span>
-              <span class="sum-off">−{{ totalPrice.discountRate }}</span>
+              <span>Giáº£m giÃ¡</span>
+              <span class="sum-off">âˆ’{{ totalPrice.discountRate }}</span>
             </div>
             <div class="sum-sep" />
             <div class="sum-row sum-row--total">
-              <span>Tổng cộng</span>
+              <span>Tá»•ng cá»™ng</span>
               <span class="sum-total">{{ totalPrice.finalPrice }}</span>
             </div>
           </template>
           <template v-else>
             <div class="sum-row sum-row--total">
-              <span>Tổng cộng</span>
+              <span>Tá»•ng cá»™ng</span>
               <span class="sum-total">{{ totalPrice }}</span>
             </div>
           </template>
+          <div class="sum-vat">ÄÃ£ bao gá»“m thuáº¿ VAT</div>
         </div>
 
+        <!-- Agree checkbox -->
+        <label class="agree-check">
+          <input v-model="agreedToTerms" type="checkbox" />
+          <span>TÃ´i Ä‘Ã£ Ä‘á»c vÃ  Ä‘á»“ng Ã½ vá»›i <a href="/dieu-khoan" target="_blank"><strong>Äiá»u khoáº£n dá»‹ch vá»¥</strong></a> vÃ  <a href="/chinh-sach-bao-mat" target="_blank"><strong>ChÃ­nh sÃ¡ch báº£o máº­t</strong></a></span>
+        </label>
+
         <!-- Pay button -->
-        <button class="checkout-btn" :disabled="Boolean(loading === 'create-url')" @click="onClickPayment">
+        <button class="checkout-btn" :disabled="Boolean(loading === 'create-url') || !agreedToTerms" @click="onClickPayment">
           <v-progress-circular v-if="Boolean(loading === 'create-url')" width="2" size="18" color="white" indeterminate />
           <template v-else>
             <v-icon size="18">mdi-credit-card-outline</v-icon>
-            Thanh toán ngay
+            Thanh toÃ¡n ngay
           </template>
         </button>
 
         <div class="checkout-secure">
           <v-icon size="13">mdi-lock-outline</v-icon>
-          Thanh toán bảo mật · Kích hoạt tức thì
+          Thanh toÃ¡n báº£o máº­t Â· KÃ­ch hoáº¡t tá»©c thÃ¬
         </div>
       </div>
 
@@ -224,7 +232,7 @@ definePageMeta({ middleware: "auth" });
       <div class="contact-box">
         <v-icon size="16" color="#1e88e5">mdi-chat-processing-outline</v-icon>
         <span>
-          Cần hỗ trợ? Liên hệ Zalo
+          Cáº§n há»— trá»£? LiÃªn há»‡ Zalo
           <a href="https://zalo.me/0343027232" target="_blank" class="contact-link">034 302 7232</a>
         </span>
       </div>
@@ -233,7 +241,7 @@ definePageMeta({ middleware: "auth" });
 </template>
 
 <style scoped>
-/* ─── Layout ─────────────────────────────────────────── */
+/* â”€â”€â”€ Layout â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .pay-wrap {
   display: grid;
   grid-template-columns: 1fr 380px;
@@ -248,7 +256,7 @@ definePageMeta({ middleware: "auth" });
   .pay-wrap { grid-template-columns: 1fr; }
 }
 
-/* ─── Left ───────────────────────────────────────────── */
+/* â”€â”€â”€ Left â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .pay-left {
   background: #fff;
   border-radius: 16px;
@@ -274,7 +282,7 @@ definePageMeta({ middleware: "auth" });
   margin: 0;
 }
 
-/* ─── Plan list ──────────────────────────────────────── */
+/* â”€â”€â”€ Plan list â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .plan-list {
   display: flex;
   flex-direction: column;
@@ -392,7 +400,7 @@ definePageMeta({ middleware: "auth" });
   color: #9e9e9e;
 }
 
-/* ─── Includes ───────────────────────────────────────── */
+/* â”€â”€â”€ Includes â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .includes {
   background: #f8fafc;
   border-radius: 12px;
@@ -422,7 +430,7 @@ definePageMeta({ middleware: "auth" });
   color: #374151;
 }
 
-/* ─── Checkout card ──────────────────────────────────── */
+/* â”€â”€â”€ Checkout card â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .checkout-card {
   background: #fff;
   border-radius: 16px;
@@ -464,7 +472,7 @@ definePageMeta({ middleware: "auth" });
   border-radius: 8px;
 }
 
-/* ─── Summary ────────────────────────────────────────── */
+/* â”€â”€â”€ Summary â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .checkout-summary {
   background: #f8fafc;
   border-radius: 10px;
@@ -507,7 +515,7 @@ definePageMeta({ middleware: "auth" });
   font-weight: 800;
 }
 
-/* ─── Button ─────────────────────────────────────────── */
+/* â”€â”€â”€ Button â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .checkout-btn {
   width: 100%;
   height: 48px;
@@ -546,7 +554,42 @@ definePageMeta({ middleware: "auth" });
   color: #9e9e9e;
 }
 
-/* ─── Contact ────────────────────────────────────────── */
+/* â”€â”€â”€ VAT + Agree â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+.sum-vat {
+  font-size: 0.72rem;
+  color: #94a3b8;
+  text-align: right;
+  margin-top: 4px;
+}
+
+.agree-check {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 0.8rem;
+  color: #475569;
+  line-height: 1.5;
+  cursor: pointer;
+  margin-bottom: 4px;
+}
+
+.agree-check input[type="checkbox"] {
+  margin-top: 2px;
+  flex-shrink: 0;
+  accent-color: #1565c0;
+  width: 15px;
+  height: 15px;
+  cursor: pointer;
+}
+
+.agree-check a {
+  color: #1565c0;
+  text-decoration: none;
+}
+
+.agree-check a:hover { text-decoration: underline; }
+
+/* â”€â”€â”€ Contact â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .contact-box {
   display: flex;
   align-items: center;

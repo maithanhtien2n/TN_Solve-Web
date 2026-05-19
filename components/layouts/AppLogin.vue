@@ -114,7 +114,7 @@ useHead({
 
           <p class="lc-terms">
             Bằng cách đăng nhập, bạn đồng ý với
-            <a href="/terms" target="_blank">Điều khoản dịch vụ</a>
+            <a href="/dieu-khoan" target="_blank">Điều khoản dịch vụ</a>
           </p>
         </div>
       </div>
@@ -131,7 +131,7 @@ useHead({
   min-height: 480px;
 }
 
-/* ─── BG patterns ────────────────────────────────────── */
+/* ─── BG patterns ──────────────────────────────────────── */
 .lc-left::before {
   content: "";
   position: absolute;
@@ -166,7 +166,7 @@ useHead({
   background-position: 0 0, 50px 50px;
 }
 
-/* ─── Left ───────────────────────────────────────────── */
+/* ─── Left ───────────────────────────────────────────────── */
 .lc-left {
   flex: 1;
   background: #f8faff;
@@ -209,55 +209,7 @@ useHead({
   filter: drop-shadow(0 4px 12px rgba(21,101,192,0.2));
 }
 
-.lc-brand {
-  font-size: 1.7rem;
-  font-weight: 800;
-  color: #0f172a;
-  margin: 0;
-  letter-spacing: -0.5px;
-}
-
-.lc-tagline {
-  font-size: 0.82rem;
-  color: #64748b;
-  margin: 0;
-  line-height: 1.6;
-}
-
-/* ─── Hero icon ──────────────────────────────────────── */
-.lc-hero-icon {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  height: 80px;
-}
-
-.lc-hero-icon__ring {
-  position: absolute;
-  border-radius: 50%;
-  border: 1.5px solid rgba(21,101,192,0.15);
-}
-
-.lc-hero-icon__ring--1 { width: 64px;  height: 64px; }
-.lc-hero-icon__ring--2 { width: 88px;  height: 88px; border-color: rgba(21,101,192,0.09); }
-.lc-hero-icon__ring--3 { width: 110px; height: 110px; border-color: rgba(21,101,192,0.05); }
-
-.lc-hero-icon__core {
-  position: relative;
-  z-index: 1;
-  width: 52px;
-  height: 52px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #1565c0, #42a5f5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 8px 24px rgba(21,101,192,0.3);
-}
-
-/* ─── Features ───────────────────────────────────────── */
+/* ─── Features ──────────────────────────────────────────── */
 .lc-feat-title {
   font-size: 0.72rem;
   font-weight: 700;
@@ -266,6 +218,7 @@ useHead({
   letter-spacing: 0.08em;
   margin: 0;
 }
+
 .lc-features {
   display: flex;
   flex-direction: column;
@@ -293,50 +246,7 @@ useHead({
   flex-shrink: 0;
 }
 
-/* ─── Security note ──────────────────────────────────── */
-.lc-security {
-  display: flex;
-  align-items: flex-start;
-  gap: 6px;
-  font-size: 0.72rem;
-  color: #64748b;
-  line-height: 1.5;
-  padding: 8px 10px;
-  background: rgba(21,101,192,0.06);
-  border: 1px solid rgba(21,101,192,0.12);
-  border-radius: 8px;
-}
-
-.lc-security svg {
-  flex-shrink: 0;
-  margin-top: 1px;
-  color: #1565c0;
-}
-
-/* ─── Price chip ─────────────────────────────────────── */
-.lc-price-chip {
-  display: inline-flex;
-  align-items: baseline;
-  gap: 4px;
-  background: linear-gradient(135deg, #1565c0, #42a5f5);
-  border-radius: 10px;
-  padding: 8px 16px;
-  align-self: flex-start;
-}
-
-.lc-price-chip__num {
-  font-size: 1.15rem;
-  font-weight: 800;
-  color: #fff;
-}
-
-.lc-price-chip__per {
-  font-size: 0.75rem;
-  font-weight: 500;
-  color: rgba(255,255,255,0.75);
-}
-
-/* ─── Right ──────────────────────────────────────────── */
+/* ─── Right ─────────────────────────────────────────────── */
 .lc-right {
   flex: 1;
   background: linear-gradient(135deg, #fcc8d6, #b2ebf2);
@@ -408,7 +318,7 @@ useHead({
   line-height: 1.5;
 }
 
-/* ─── Google btn ─────────────────────────────────────── */
+/* ─── Google btn ─────────────────────────────────────────── */
 .lc-google {
   position: relative;
   display: flex;
@@ -436,7 +346,7 @@ useHead({
 
 .lc-google--busy { opacity: 0.65; cursor: not-allowed; }
 
-/* ─── Terms ──────────────────────────────────────────── */
+/* ─── Terms ──────────────────────────────────────────────── */
 .lc-terms {
   font-size: 0.78rem;
   color: #94a3b8;
@@ -447,7 +357,7 @@ useHead({
 .lc-terms a { color: #1e88e5; text-decoration: none; }
 .lc-terms a:hover { text-decoration: underline; }
 
-/* ─── Mobile ─────────────────────────────────────────── */
+/* ─── Mobile ─────────────────────────────────────────────── */
 @media (max-width: 600px) {
   .lc-left { display: none; }
   .lc-right { padding: 40px 28px; border-radius: 24px; }

@@ -50,8 +50,20 @@ const onReturnTitle = (title: string) => {
     case "setting": {
       return "Cài đặt";
     }
-    case "terms": {
-      return "Chính sách";
+    case "dieu-khoan": {
+      return "Điều khoản & quy định";
+    }
+    case "chinh-sach-bao-mat": {
+      return "Chính sách bảo mật";
+    }
+    case "hinh-thuc-thanh-toan": {
+      return "Hình thức thanh toán";
+    }
+    case "chinh-sach-giao-nhan": {
+      return "Chính sách giao nhận";
+    }
+    case "chinh-sach-bao-hanh": {
+      return "Chính sách bảo hành & đổi trả";
     }
     case "payment": {
       return "Đăng ký dịch vụ";

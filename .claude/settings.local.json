@@ -35,7 +35,11 @@
       "Bash(Remove-Item -Recurse -Force .nuxt -ErrorAction SilentlyContinue)",
       "Bash(Remove-Item -Recurse -Force .output -ErrorAction SilentlyContinue)",
       "Bash(findstr /R /S \"UploadImage\\\\|UploadImages\" components pages --include=\"*.vue\")",
-      "Bash(powershell -Command \"Get-ChildItem -Path . -Recurse -Filter '*.vue' -File | Select-Object -ExpandProperty FullName | head -15\")"
+      "Bash(powershell -Command \"Get-ChildItem -Path . -Recurse -Filter '*.vue' -File | Select-Object -ExpandProperty FullName | head -15\")",
+      "Bash(ls \"D:\\\\2266-tnsolve.com\")",
+      "Read(//d/2266-tnsolve.com/**)",
+      "Bash(powershell -Command \"\\(Get-Content 'pages\\\\payment.vue'\\) -replace 'href=\\\\\"/terms\\\\\"', 'href=\\\\\"/dieu-khoan\\\\\"' | Set-Content 'pages\\\\payment.vue' -Encoding utf8; \\(Get-Content 'components\\\\layouts\\\\AppLogin.vue'\\) -replace 'href=\\\\\"/terms\\\\\"', 'href=\\\\\"/dieu-khoan\\\\\"' | Set-Content 'components\\\\layouts\\\\AppLogin.vue' -Encoding utf8\")",
+      "Bash(powershell -Command \"[System.IO.File]::ReadAllText\\('components\\\\layouts\\\\AppLogin.vue', [System.Text.Encoding]::UTF8\\)\")"
     ]
   }
 }
