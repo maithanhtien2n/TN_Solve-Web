@@ -47,7 +47,7 @@ onMounted(async () => {
         <v-img
           src="/images/tn-solve-icon.png"
           lazy-src="/images/tn-solve-logo.png"
-          width="200"
+          width="170"
           height="74"
           class="mb-3"
         />
@@ -165,7 +165,7 @@ onMounted(async () => {
   background: #fff;
   border-top: 1px solid #e2e8f0;
   margin-top: 3rem;
-  padding-top: 2.5rem;
+  padding-top: 1rem;
 }
 
 /* ─── Brand header ───────────────────────────────────── */
@@ -245,7 +245,7 @@ onMounted(async () => {
 
 @media (max-width: 900px) {
   .app-footer {
-    padding-top: 1.5rem;
+    padding-top: 0.8rem;
   }
   .footer-brand {
     padding-bottom: 1.5rem;
