@@ -6,7 +6,10 @@ const version = ref<string | null>(null);
 
 const onClickNavigate = (value: string) => {
   if (!value) {
-    useAppStore().onActionSetSystemPopup({ type: "info", content: "Tính năng đang được phát triển!" });
+    useAppStore().onActionSetSystemPopup({
+      type: "info",
+      content: "Tính năng đang được phát triển!",
+    });
     return;
   } else if (value === "tutorial") {
     window.open("https://youtu.be/dCb8hL7wLAM", "_blank");
@@ -19,7 +22,10 @@ const onClickNavigate = (value: string) => {
   } else if (value === "facebook-group") {
     window.open("https://www.facebook.com/groups/1175744533986396", "_blank");
   } else if (value === "download-tool") {
-    window.open("https://github.com/maithanhtien2n/tnsolve_release/releases", "_blank");
+    window.open(
+      "https://github.com/maithanhtien2n/tnsolve_release/releases",
+      "_blank",
+    );
   } else {
     router.push(`/${value}`);
   }
@@ -36,7 +42,6 @@ onMounted(async () => {
 <template>
   <footer class="app-footer">
     <v-container max-width="1200">
-
       <!-- Brand header — centered -->
       <div class="footer-brand">
         <v-img
@@ -50,21 +55,41 @@ onMounted(async () => {
           Nền tảng AI giúp bạn tạo video chuyên nghiệp chỉ trong vài phút.
         </p>
         <div class="social-row">
-          <a href="https://www.tiktok.com/@tnsolve" target="_blank" class="social-icon">
-            <img src="/images/icon-tiktok.png" style="width:16px;height:16px;object-fit:contain" />
+          <a
+            href="https://www.tiktok.com/@tnsolve"
+            target="_blank"
+            class="social-icon"
+          >
+            <img
+              src="/images/icon-tiktok.png"
+              style="width: 16px; height: 16px; object-fit: contain"
+            />
           </a>
-          <a href="https://www.facebook.com/tnsolve2025" target="_blank" class="social-icon">
-            <img src="/images/icon-facebook.png" style="width:16px;height:16px;object-fit:contain" />
+          <a
+            href="https://www.facebook.com/tnsolve2025"
+            target="_blank"
+            class="social-icon"
+          >
+            <img
+              src="/images/icon-facebook.png"
+              style="width: 16px; height: 16px; object-fit: contain"
+            />
           </a>
-          <a href="https://www.youtube.com/@tiencodeweb" target="_blank" class="social-icon">
-            <img src="/images/icon-youtube.png" style="width:16px;height:16px;object-fit:contain" />
+          <a
+            href="https://www.youtube.com/@tiencodeweb"
+            target="_blank"
+            class="social-icon"
+          >
+            <img
+              src="/images/icon-youtube.png"
+              style="width: 16px; height: 16px; object-fit: contain"
+            />
           </a>
         </div>
       </div>
 
       <!-- 4-column grid -->
       <div class="footer-grid">
-
         <!-- Thông tin doanh nghiệp -->
         <div class="footer-col">
           <div class="col-title">HỘ KINH DOANH TN SOLVE</div>
@@ -72,9 +97,8 @@ onMounted(async () => {
             <p class="biz-line">GPKD số 054200002629</p>
             <p class="biz-line">Đăng ký ngày 26/04/2026</p>
             <p class="biz-line">113 Đường Võ Văn Tần, P. Bình Kiến, Đắk Lắk</p>
-            <a class="col-link" href="tel:0343027232">0343 027 232</a>
-            <a class="col-link" href="mailto:maithanhtien0612@gmail.com">maithanhtien0612@gmail.com</a>
-            <p class="biz-line">Đại diện: MAI THANH TIỆN</p>
+            <a class="biz-line">0343 027 232</a>
+            <a class="biz-line">maithanhtien0612@gmail.com</a>
           </div>
         </div>
 
@@ -82,11 +106,21 @@ onMounted(async () => {
         <div class="footer-col">
           <div class="col-title">CHÍNH SÁCH</div>
           <div class="col-links">
-            <a class="col-link" @click="onClickNavigate('dieu-khoan')">Điều khoản & quy định chung</a>
-            <a class="col-link" @click="onClickNavigate('chinh-sach-bao-mat')">Chính sách bảo mật</a>
-            <a class="col-link" @click="onClickNavigate('hinh-thuc-thanh-toan')">Hình thức thanh toán</a>
-            <a class="col-link" @click="onClickNavigate('chinh-sach-giao-nhan')">Chính sách giao nhận</a>
-            <a class="col-link" @click="onClickNavigate('chinh-sach-bao-hanh')">Chính sách bảo hành & đổi trả</a>
+            <a class="col-link" @click="onClickNavigate('dieu-khoan')"
+              >Điều khoản & quy định chung</a
+            >
+            <a class="col-link" @click="onClickNavigate('chinh-sach-bao-mat')"
+              >Chính sách bảo mật</a
+            >
+            <a class="col-link" @click="onClickNavigate('hinh-thuc-thanh-toan')"
+              >Hình thức thanh toán</a
+            >
+            <a class="col-link" @click="onClickNavigate('chinh-sach-giao-nhan')"
+              >Chính sách giao nhận</a
+            >
+            <a class="col-link" @click="onClickNavigate('chinh-sach-bao-hanh')"
+              >Chính sách bảo hành & đổi trả</a
+            >
           </div>
         </div>
 
@@ -94,23 +128,33 @@ onMounted(async () => {
         <div class="footer-col">
           <div class="col-title">HỖ TRỢ</div>
           <div class="col-links">
-            <a class="col-link" @click="onClickNavigate('tutorial')">Video hướng dẫn</a>
-            <a class="col-link" @click="onClickNavigate('')">Câu hỏi thường gặp</a>
-            <a class="col-link" @click="onClickNavigate('contact')">Liên hệ Zalo</a>
-            <a class="col-link" @click="onClickNavigate('zalo-group')">Nhóm hỗ trợ Zalo</a>
-            <a class="col-link" @click="onClickNavigate('facebook-group')">Nhóm Facebook</a>
+            <a class="col-link" @click="onClickNavigate('tutorial')"
+              >Video hướng dẫn</a
+            >
+            <a class="col-link" @click="onClickNavigate('')"
+              >Câu hỏi thường gặp</a
+            >
+            <a class="col-link" @click="onClickNavigate('contact')"
+              >Liên hệ Zalo</a
+            >
+            <a class="col-link" @click="onClickNavigate('zalo-group')"
+              >Nhóm hỗ trợ Zalo</a
+            >
+            <a class="col-link" @click="onClickNavigate('facebook-group')"
+              >Nhóm Facebook</a
+            >
           </div>
         </div>
-
-
       </div>
 
       <!-- Bottom -->
       <div class="footer-bottom">
-        <span class="footer-copy">© {{ currentYear }} <strong>TN Solve</strong> — Tất cả quyền được bảo lưu.</span>
+        <span class="footer-copy"
+          >© {{ currentYear }} <strong>TN Solve</strong> — Tất cả quyền được bảo
+          lưu.</span
+        >
         <span v-if="version" class="footer-version">v{{ version }}</span>
       </div>
-
     </v-container>
   </footer>
 </template>
@@ -135,7 +179,7 @@ onMounted(async () => {
 }
 
 .footer-brand::after {
-  content: '';
+  content: "";
   position: absolute;
   bottom: 0;
   left: 50%;
@@ -169,7 +213,10 @@ onMounted(async () => {
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background 0.15s, border-color 0.15s, box-shadow 0.15s;
+  transition:
+    background 0.15s,
+    border-color 0.15s,
+    box-shadow 0.15s;
   cursor: pointer;
   text-decoration: none;
 }
@@ -177,7 +224,7 @@ onMounted(async () => {
 .social-icon:hover {
   background: #eff6ff;
   border-color: #bfdbfe;
-  box-shadow: 0 2px 8px rgba(21,101,192,0.1);
+  box-shadow: 0 2px 8px rgba(21, 101, 192, 0.1);
 }
 
 /* ─── Grid ───────────────────────────────────────────── */
@@ -190,16 +237,27 @@ onMounted(async () => {
 }
 
 @media (max-width: 1024px) {
-  .footer-grid { grid-template-columns: 1fr 1fr; gap: 28px; }
+  .footer-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 28px;
+  }
 }
 
 @media (max-width: 900px) {
-  .app-footer { padding-top: 1.5rem; }
-  .footer-brand { padding-bottom: 1.5rem; margin-bottom: 1.5rem; }
+  .app-footer {
+    padding-top: 1.5rem;
+  }
+  .footer-brand {
+    padding-bottom: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
 }
 
 @media (max-width: 480px) {
-  .footer-grid { grid-template-columns: 1fr; gap: 20px; }
+  .footer-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
 }
 
 /* ─── Columns ────────────────────────────────────────── */
@@ -225,7 +283,9 @@ onMounted(async () => {
   line-height: 1.4;
 }
 
-.col-link:hover { color: #1e88e5; }
+.col-link:hover {
+  color: #1e88e5;
+}
 
 .col-link--social {
   display: flex;
@@ -241,7 +301,9 @@ onMounted(async () => {
   line-height: 1.55;
 }
 
-.biz-line strong { color: #1e293b; }
+.biz-line strong {
+  color: #1e293b;
+}
 
 /* ─── Bottom ─────────────────────────────────────────── */
 .footer-bottom {
@@ -258,7 +320,9 @@ onMounted(async () => {
   color: #64748b;
 }
 
-.footer-copy strong { color: #334155; }
+.footer-copy strong {
+  color: #334155;
+}
 
 .footer-version {
   background: #f8fafc;
@@ -271,6 +335,11 @@ onMounted(async () => {
 }
 
 @media (max-width: 768px) {
-  .footer-bottom { justify-content: center; flex-direction: column; gap: 6px; text-align: center; }
+  .footer-bottom {
+    justify-content: center;
+    flex-direction: column;
+    gap: 6px;
+    text-align: center;
+  }
 }
 </style>
