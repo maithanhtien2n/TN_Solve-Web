@@ -7,6 +7,7 @@ const { onGetterMasterData } = useMasterDataStore();
 
 const loading = ref<string>("");
 const agreedToTerms = ref<boolean>(false);
+const showTermsError = ref<boolean>(false);
 const formData = ref<any>({
   rentalMonths: 1,
   discountCode: "",
@@ -14,7 +15,7 @@ const formData = ref<any>({
 const couponDetail = ref<any>(null);
 
 const planOptions = [
-  { months: 1,  label: "1 tháng",  save: null,   price: 139000,  days: 30,  credits: 5000 },
+  { months: 1,  label: "1 tháng",  save: null,   tag: "Linh hoạt", price: 139000,  days: 30,  credits: 5000 },
   { months: 3,  label: "3 tháng",  save: "−7%",  price: 388000,  days: 90,  credits: 15000, popular: true },
   { months: 6,  label: "6 tháng",  save: "−16%", price: 701000,  days: 180, credits: 30000 },
   { months: 12, label: "1 năm",    save: "−25%", price: 1251000, days: 365, credits: 60000 },
@@ -72,6 +73,11 @@ const totalPrice = computed(() => {
 });
 
 const onClickPayment = async () => {
+  if (!agreedToTerms.value) {
+    showTermsError.value = true;
+    return;
+  }
+  showTermsError.value = false;
   loading.value = "create-url";
   await appService
     .createPaymentUrl({ rentalMonths: formData.value.rentalMonths, discountCode: formData.value.discountCode })
@@ -97,7 +103,46 @@ definePageMeta({ middleware: "auth" });
 </script>
 
 <template>
-  <div class="pay-wrap">
+  <div class="pay-page">
+    <!-- Hero -->
+    <div class="pay-hero">
+      <div class="hero-blob" />
+      <div class="hero-blob2" />
+      <div class="hero-inner">
+        <div class="hero-left">
+          <div class="hero-badge">
+            <v-icon size="13" color="rgba(255,255,255,0.85)">mdi-crown</v-icon>
+            TN Solve
+          </div>
+          <h1 class="hero-title">Đăng ký dịch vụ</h1>
+          <div class="hero-checks">
+            <div class="hero-check">
+              <v-icon size="14" color="rgba(255,255,255,0.9)">mdi-check-circle</v-icon>
+              Kích hoạt ngay sau thanh toán
+            </div>
+          </div>
+        </div>
+        <div class="hero-stats">
+          <div class="hero-stat">
+            <span class="hero-stat-num">139.000đ</span>
+            <span class="hero-stat-label">chỉ từ / tháng</span>
+          </div>
+          <div class="hero-stat-sep" />
+          <div class="hero-stat">
+            <span class="hero-stat-num">5.000+</span>
+            <span class="hero-stat-label">tín dụng khởi đầu</span>
+          </div>
+          <div class="hero-stat-sep" />
+          <div class="hero-stat">
+            <span class="hero-stat-num">100%</span>
+            <span class="hero-stat-label">bảo mật thanh toán</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Plans + Checkout -->
+    <div class="pay-wrap">
     <!-- Left: Plans -->
     <div class="pay-left">
       <div class="pay-left-header">
@@ -116,20 +161,13 @@ definePageMeta({ middleware: "auth" });
           }"
           @click="formData.rentalMonths = plan.months"
         >
+          <div class="plan-item-label">{{ plan.label }}</div>
           <div v-if="plan.popular" class="plan-popular-badge">Phổ biến nhất</div>
-
-          <div class="plan-item-top">
-            <div class="plan-radio">
-              <div class="plan-radio-dot" :class="{ 'plan-radio-dot--on': formData.rentalMonths === plan.months }" />
-            </div>
-            <div class="plan-item-info">
-              <div class="plan-item-label">{{ plan.label }}</div>
-              <div class="plan-item-price">{{ formatCurrency(plan.price) }}</div>
-            </div>
-            <div class="plan-item-right">
-              <div v-if="plan.save" class="plan-save-badge">{{ plan.save }}</div>
-              <div class="plan-item-per">{{ formatCurrency(Math.round(plan.price / plan.months)) }}/tháng</div>
-            </div>
+          <div class="plan-item-price">{{ formatCurrency(plan.price) }}</div>
+          <div v-if="plan.save" class="plan-save-badge">{{ plan.save }}</div>
+          <div v-else-if="plan.tag" class="plan-tag-badge">
+            <v-icon size="11" color="#fff">mdi-lightning-bolt</v-icon>
+            {{ plan.tag }}
           </div>
         </div>
       </div>
@@ -143,15 +181,12 @@ definePageMeta({ middleware: "auth" });
             <span><strong>{{ selectedDays }} ngày</strong> sử dụng</span>
           </div>
           <div class="include-item">
-            <v-icon size="16" color="#10b981">mdi-check-circle</v-icon>
+            <v-icon size="16" color="#7c3aed">mdi-diamond-stone</v-icon>
             <span><strong>{{ selectedCredits.toLocaleString("vi-VN") }} tín dụng</strong> khởi đầu</span>
-          </div>
-          <div class="include-item">
-            <v-icon size="16" color="#10b981">mdi-check-circle</v-icon>
-            Kích hoạt ngay sau thanh toán
           </div>
         </div>
       </div>
+
     </div>
 
     <!-- Right: Checkout -->
@@ -208,13 +243,19 @@ definePageMeta({ middleware: "auth" });
         </div>
 
         <!-- Agree checkbox -->
-        <label class="agree-check">
-          <input v-model="agreedToTerms" type="checkbox" />
-          <span>Tôi đã đọc và đồng ý với <a href="/dieu-khoan" target="_blank"><strong>Điều khoản dịch vụ</strong></a> và <a href="/chinh-sach-bao-mat" target="_blank"><strong>Chính sách bảo mật</strong></a></span>
-        </label>
+        <div>
+          <label class="agree-check" @click="showTermsError = false">
+            <input v-model="agreedToTerms" type="checkbox" />
+            <span>Tôi đã đọc và đồng ý với <a href="/dieu-khoan" target="_blank"><strong>Điều khoản dịch vụ</strong></a> và <a href="/chinh-sach-bao-mat" target="_blank"><strong>Chính sách bảo mật</strong></a></span>
+          </label>
+          <p v-if="showTermsError" class="terms-error">
+            <v-icon size="13" color="#ef4444">mdi-alert-circle-outline</v-icon>
+            Vui lòng tích vào ô trên để đồng ý với điều khoản!
+          </p>
+        </div>
 
         <!-- Pay button -->
-        <button class="checkout-btn" :disabled="Boolean(loading === 'create-url') || !agreedToTerms" @click="onClickPayment">
+        <button class="checkout-btn" :disabled="Boolean(loading === 'create-url')" @click="onClickPayment">
           <v-progress-circular v-if="Boolean(loading === 'create-url')" width="2" size="18" color="white" indeterminate />
           <template v-else>
             <v-icon size="18">mdi-credit-card-outline</v-icon>
@@ -237,22 +278,146 @@ definePageMeta({ middleware: "auth" });
         </span>
       </div>
     </div>
+    </div>
   </div>
 </template>
 
 <style scoped>
-/* ─── Layout ─────────────────────────────────────────────── */
-.pay-wrap {
-  display: grid;
-  grid-template-columns: 1fr 380px;
-  gap: 28px;
-  align-items: start;
-  max-width: 900px;
-  margin: 0 auto;
+/* ─── Page wrapper ───────────────────────────────────────── */
+.pay-page {
+  width: 100%;
   padding-bottom: 60px;
 }
 
-@media (max-width: 750px) {
+/* ─── Hero ───────────────────────────────────────────────── */
+.pay-hero {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, #0d47a1 0%, #1565c0 40%, #1e88e5 80%, #42a5f5 100%);
+  border-radius: 16px;
+  padding: 28px 36px;
+  margin-bottom: 24px;
+  color: #fff;
+}
+
+.hero-blob {
+  position: absolute;
+  width: 260px; height: 260px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+  top: -80px; right: -40px;
+  pointer-events: none;
+}
+
+.hero-blob2 {
+  position: absolute;
+  width: 160px; height: 160px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,255,255,0.07) 0%, transparent 70%);
+  bottom: -50px; left: 200px;
+  pointer-events: none;
+}
+
+.hero-inner {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 32px;
+}
+
+.hero-left { display: flex; flex-direction: column; gap: 6px; }
+
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(255,255,255,0.18);
+  border: 1px solid rgba(255,255,255,0.3);
+  border-radius: 999px;
+  padding: 3px 10px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  color: rgba(255,255,255,0.95);
+  text-transform: uppercase;
+  width: fit-content;
+}
+
+.hero-title {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: #fff;
+  margin: 0;
+  letter-spacing: -0.3px;
+}
+
+.hero-checks {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.hero-check {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  color: rgba(255,255,255,0.85);
+}
+
+.hero-stats {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-shrink: 0;
+}
+
+.hero-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.hero-stat-num {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: #fff;
+  line-height: 1;
+}
+
+.hero-stat-label {
+  font-size: 0.68rem;
+  color: rgba(255,255,255,0.7);
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.hero-stat-sep {
+  width: 1px;
+  height: 28px;
+  background: rgba(255,255,255,0.25);
+  flex-shrink: 0;
+}
+
+@media (max-width: 700px) {
+  .pay-hero { padding: 24px 20px; border-radius: 12px; }
+  .hero-inner { flex-direction: column; align-items: flex-start; gap: 16px; }
+  .hero-title { font-size: 1.3rem; }
+  .hero-stat-sep { display: none; }
+}
+
+/* ─── Layout ─────────────────────────────────────────────── */
+.pay-wrap {
+  display: grid;
+  grid-template-columns: 1fr 500px;
+  gap: 28px;
+  align-items: stretch;
+}
+
+@media (max-width: 900px) {
   .pay-wrap { grid-template-columns: 1fr; }
 }
 
@@ -261,8 +426,14 @@ definePageMeta({ middleware: "auth" });
   background: #fff;
   border-radius: 16px;
   border: 1px solid #e5e7eb;
-  padding: 22px;
+  padding: 24px;
   box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+}
+
+.pay-right {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
 .pay-left-header { margin-bottom: 18px; }
@@ -282,89 +453,80 @@ definePageMeta({ middleware: "auth" });
 
 /* ─── Plan list ──────────────────────────────────────────── */
 .plan-list {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
   margin-bottom: 24px;
 }
 
 .plan-item {
   position: relative;
-  padding: 14px 16px;
-  border-radius: 12px;
-  border: 1.5px solid #e5e7eb;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 6px;
+  padding: 22px 14px;
+  justify-content: center;
+  min-height: 110px;
+  border-radius: 14px;
+  border: 2px solid #e5e7eb;
   background: #fff;
   cursor: pointer;
   transition: border-color 0.15s, background 0.15s, box-shadow 0.15s;
 }
 
-.plan-item:hover { border-color: #90caf9; }
-.plan-item--active { border-color: #1e88e5; background: #f0f7ff; }
-.plan-item--popular { border-color: #1e88e5; margin-top: 8px; padding-top: 20px; }
+.plan-item:hover { border-color: #90caf9; box-shadow: 0 4px 16px rgba(30,136,229,0.1); }
+.plan-item--active { border-color: #1e88e5; background: #f0f7ff; box-shadow: 0 4px 16px rgba(30,136,229,0.15); }
+.plan-item--popular { padding-top: 24px; }
 
 .plan-popular-badge {
   position: absolute;
-  top: -10px; left: 16px;
-  font-size: 0.65rem;
+  top: -11px; left: 50%; transform: translateX(-50%);
+  font-size: 0.63rem;
   font-weight: 700;
   color: #fff;
   background: linear-gradient(135deg, #1565c0, #1e88e5);
-  padding: 2px 10px;
+  padding: 3px 12px;
   border-radius: 999px;
   letter-spacing: 0.3px;
+  white-space: nowrap;
 }
 
-.plan-item-top {
-  display: flex;
-  align-items: center;
-  gap: 12px;
+@media (max-width: 600px) {
+  .plan-list { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+  .plan-item,
+  .plan-item--popular { padding: 16px 10px; }
 }
 
-.plan-radio {
-  width: 18px; height: 18px;
-  border-radius: 50%;
-  border: 2px solid #d1d5db;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  transition: border-color 0.15s;
-}
 
-.plan-item--active .plan-radio { border-color: #1e88e5; }
-
-.plan-radio-dot {
-  width: 8px; height: 8px;
-  border-radius: 50%;
-  background: transparent;
-  transition: background 0.15s;
-}
-
-.plan-radio-dot--on { background: #1e88e5; }
-
-.plan-item-info { flex: 1; }
-
-.plan-item-label { font-size: 0.88rem; font-weight: 600; color: #1a1a1a; }
-.plan-item-price { font-size: 0.8rem; color: #64748b; margin-top: 2px; }
-
-.plan-item-right {
-  text-align: right;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 3px;
-}
+.plan-item-label { font-size: 1rem; font-weight: 700; color: #0f172a; }
+.plan-item-price { font-size: 0.95rem; font-weight: 600; color: #1e88e5; }
 
 .plan-save-badge {
-  font-size: 0.68rem;
-  font-weight: 700;
-  color: #10b981;
-  background: #ecfdf5;
-  padding: 2px 8px;
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: #fff;
+  background: linear-gradient(135deg, #059669, #10b981, #34d399);
+  padding: 4px 12px;
   border-radius: 999px;
+  box-shadow: 0 3px 10px rgba(16,185,129,0.45);
+  letter-spacing: 0.2px;
 }
 
-.plan-item-per { font-size: 0.75rem; color: #9e9e9e; }
+.plan-tag-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  background: linear-gradient(135deg, #f59e0b, #fbbf24);
+  color: #fff;
+  padding: 4px 12px;
+  border-radius: 999px;
+  box-shadow: 0 3px 10px rgba(245,158,11,0.45);
+  letter-spacing: 0.2px;
+}
 
 /* ─── Includes ───────────────────────────────────────────── */
 .includes {
@@ -402,6 +564,7 @@ definePageMeta({ middleware: "auth" });
   display: flex;
   flex-direction: column;
   gap: 18px;
+  flex: 1;
 }
 
 .checkout-title {
@@ -503,7 +666,7 @@ definePageMeta({ middleware: "auth" });
 
 .agree-check {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: 8px;
   font-size: 0.8rem;
   color: #475569;
@@ -523,6 +686,15 @@ definePageMeta({ middleware: "auth" });
 
 .agree-check a { color: #1565c0; text-decoration: none; }
 .agree-check a:hover { text-decoration: underline; }
+
+.terms-error {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.75rem;
+  color: #ef4444;
+  margin: 6px 0 0;
+}
 
 /* ─── Contact ────────────────────────────────────────────── */
 .contact-box {
