@@ -1,4 +1,4 @@
-﻿<script setup lang="ts">
+<script setup lang="ts">
 import { appService } from "~/services/app";
 import { couponService } from "~/services/app";
 
@@ -14,10 +14,10 @@ const formData = ref<any>({
 const couponDetail = ref<any>(null);
 
 const planOptions = [
-  { months: 1,  label: "1 thÃ¡ng",  save: null,  price: 139000,  days: 30,  credits: 5000 },
-  { months: 3,  label: "3 thÃ¡ng",  save: "âˆ’7%", price: 388000,  days: 90,  credits: 15000, popular: true },
-  { months: 6,  label: "6 thÃ¡ng",  save: "âˆ’16%",price: 701000,  days: 180, credits: 30000 },
-  { months: 12, label: "1 nÄƒm",    save: "âˆ’25%",price: 1251000, days: 365, credits: 60000 },
+  { months: 1,  label: "1 tháng",  save: null,   price: 139000,  days: 30,  credits: 5000 },
+  { months: 3,  label: "3 tháng",  save: "−7%",  price: 388000,  days: 90,  credits: 15000, popular: true },
+  { months: 6,  label: "6 tháng",  save: "−16%", price: 701000,  days: 180, credits: 30000 },
+  { months: 12, label: "1 năm",    save: "−25%", price: 1251000, days: 365, credits: 60000 },
 ];
 
 const selectedPlan = computed(() =>
@@ -87,10 +87,10 @@ const onChangeDiscountCode = async (event: any) => {
 };
 
 useSeo({
-  title: "ÄÄƒng kÃ½ dá»‹ch vá»¥",
-  description: "ÄÄƒng kÃ½ dá»‹ch vá»¥ TN Solve - Táº¡o video AI khÃ´ng giá»›i háº¡n tá»« 139.000Ä‘/thÃ¡ng.",
+  title: "Đăng ký dịch vụ",
+  description: "Đăng ký dịch vụ TN Solve - Tạo video AI không giới hạn từ 139.000đ/tháng.",
   image: "/images/page-home.png",
-  keywords: "Ä‘Äƒng kÃ½ TN Solve, mua gÃ³i táº¡o video AI, giÃ¡ 139k",
+  keywords: "đăng ký TN Solve, mua gói tạo video AI, giá 139k",
 });
 
 definePageMeta({ middleware: "auth" });
@@ -101,8 +101,8 @@ definePageMeta({ middleware: "auth" });
     <!-- Left: Plans -->
     <div class="pay-left">
       <div class="pay-left-header">
-        <h2 class="pay-left-title">Chá»n gÃ³i phÃ¹ há»£p</h2>
-        <p class="pay-left-sub">Tiáº¿t kiá»‡m hÆ¡n khi Ä‘Äƒng kÃ½ gÃ³i dÃ i háº¡n</p>
+        <h2 class="pay-left-title">Chọn gói phù hợp</h2>
+        <p class="pay-left-sub">Tiết kiệm hơn khi đăng ký gói dài hạn</p>
       </div>
 
       <div class="plan-list">
@@ -116,7 +116,7 @@ definePageMeta({ middleware: "auth" });
           }"
           @click="formData.rentalMonths = plan.months"
         >
-          <div v-if="plan.popular" class="plan-popular-badge">Phá»• biáº¿n nháº¥t</div>
+          <div v-if="plan.popular" class="plan-popular-badge">Phổ biến nhất</div>
 
           <div class="plan-item-top">
             <div class="plan-radio">
@@ -128,7 +128,7 @@ definePageMeta({ middleware: "auth" });
             </div>
             <div class="plan-item-right">
               <div v-if="plan.save" class="plan-save-badge">{{ plan.save }}</div>
-              <div class="plan-item-per">{{ formatCurrency(Math.round(plan.price / plan.months)) }}/thÃ¡ng</div>
+              <div class="plan-item-per">{{ formatCurrency(Math.round(plan.price / plan.months)) }}/tháng</div>
             </div>
           </div>
         </div>
@@ -136,19 +136,19 @@ definePageMeta({ middleware: "auth" });
 
       <!-- Included features -->
       <div class="includes">
-        <div class="includes-title">Bao gá»“m</div>
+        <div class="includes-title">Bao gồm</div>
         <div class="includes-list">
           <div class="include-item">
             <v-icon size="16" color="#1e88e5">mdi-calendar-check-outline</v-icon>
-            <span><strong>{{ selectedDays }} ngÃ y</strong> sá»­ dá»¥ng</span>
+            <span><strong>{{ selectedDays }} ngày</strong> sử dụng</span>
           </div>
           <div class="include-item">
             <v-icon size="16" color="#10b981">mdi-check-circle</v-icon>
-            <span><strong>{{ selectedCredits.toLocaleString("vi-VN") }} tÃ­n dá»¥ng</strong> khá»Ÿi Ä‘áº§u</span>
+            <span><strong>{{ selectedCredits.toLocaleString("vi-VN") }} tín dụng</strong> khởi đầu</span>
           </div>
-<div class="include-item">
+          <div class="include-item">
             <v-icon size="16" color="#10b981">mdi-check-circle</v-icon>
-            KÃ­ch hoáº¡t ngay sau thanh toÃ¡n
+            Kích hoạt ngay sau thanh toán
           </div>
         </div>
       </div>
@@ -157,16 +157,16 @@ definePageMeta({ middleware: "auth" });
     <!-- Right: Checkout -->
     <div class="pay-right">
       <div class="checkout-card">
-        <div class="checkout-title">ThÃ´ng tin thanh toÃ¡n</div>
+        <div class="checkout-title">Thông tin thanh toán</div>
 
         <!-- Discount -->
         <div class="checkout-field">
-          <label class="field-label">MÃ£ giáº£m giÃ¡</label>
+          <label class="field-label">Mã giảm giá</label>
           <v-text-field
             v-model="formData.discountCode"
             variant="outlined"
             density="compact"
-            placeholder="Nháº­p mÃ£ (náº¿u cÃ³)"
+            placeholder="Nhập mã (nếu có)"
             hide-details
             @change="onChangeDiscountCode"
           />
@@ -174,7 +174,7 @@ definePageMeta({ middleware: "auth" });
           <div v-if="couponDetail" class="coupon-ok">
             <v-icon size="15" color="#10b981">mdi-check-circle</v-icon>
             <span>
-              <strong>{{ couponDetail.name }}</strong> â€” Giáº£m
+              <strong>{{ couponDetail.name }}</strong> — Giảm
               <span v-if="couponDetail.discountType === EnumDiscountType.PERCENTAGE">{{ couponDetail.discountValue }}%</span>
               <span v-else>{{ formatCurrency(couponDetail.discountValue) }}</span>
             </span>
@@ -185,32 +185,32 @@ definePageMeta({ middleware: "auth" });
         <div class="checkout-summary">
           <template v-if="typeof totalPrice === 'object'">
             <div class="sum-row">
-              <span>GiÃ¡ gá»‘c</span>
+              <span>Giá gốc</span>
               <span class="sum-original">{{ totalPrice.originalPrice }}</span>
             </div>
             <div class="sum-row">
-              <span>Giáº£m giÃ¡</span>
-              <span class="sum-off">âˆ’{{ totalPrice.discountRate }}</span>
+              <span>Giảm giá</span>
+              <span class="sum-off">−{{ totalPrice.discountRate }}</span>
             </div>
             <div class="sum-sep" />
             <div class="sum-row sum-row--total">
-              <span>Tá»•ng cá»™ng</span>
+              <span>Tổng cộng</span>
               <span class="sum-total">{{ totalPrice.finalPrice }}</span>
             </div>
           </template>
           <template v-else>
             <div class="sum-row sum-row--total">
-              <span>Tá»•ng cá»™ng</span>
+              <span>Tổng cộng</span>
               <span class="sum-total">{{ totalPrice }}</span>
             </div>
           </template>
-          <div class="sum-vat">ÄÃ£ bao gá»“m thuáº¿ VAT</div>
+          <div class="sum-vat">Đã bao gồm thuế VAT</div>
         </div>
 
         <!-- Agree checkbox -->
         <label class="agree-check">
           <input v-model="agreedToTerms" type="checkbox" />
-          <span>TÃ´i Ä‘Ã£ Ä‘á»c vÃ  Ä‘á»“ng Ã½ vá»›i <a href="/dieu-khoan" target="_blank"><strong>Äiá»u khoáº£n dá»‹ch vá»¥</strong></a> vÃ  <a href="/chinh-sach-bao-mat" target="_blank"><strong>ChÃ­nh sÃ¡ch báº£o máº­t</strong></a></span>
+          <span>Tôi đã đọc và đồng ý với <a href="/dieu-khoan" target="_blank"><strong>Điều khoản dịch vụ</strong></a> và <a href="/chinh-sach-bao-mat" target="_blank"><strong>Chính sách bảo mật</strong></a></span>
         </label>
 
         <!-- Pay button -->
@@ -218,13 +218,13 @@ definePageMeta({ middleware: "auth" });
           <v-progress-circular v-if="Boolean(loading === 'create-url')" width="2" size="18" color="white" indeterminate />
           <template v-else>
             <v-icon size="18">mdi-credit-card-outline</v-icon>
-            Thanh toÃ¡n ngay
+            Thanh toán ngay
           </template>
         </button>
 
         <div class="checkout-secure">
           <v-icon size="13">mdi-lock-outline</v-icon>
-          Thanh toÃ¡n báº£o máº­t Â· KÃ­ch hoáº¡t tá»©c thÃ¬
+          Thanh toán bảo mật · Kích hoạt tức thì
         </div>
       </div>
 
@@ -232,7 +232,7 @@ definePageMeta({ middleware: "auth" });
       <div class="contact-box">
         <v-icon size="16" color="#1e88e5">mdi-chat-processing-outline</v-icon>
         <span>
-          Cáº§n há»— trá»£? LiÃªn há»‡ Zalo
+          Cần hỗ trợ? Liên hệ Zalo
           <a href="https://zalo.me/0343027232" target="_blank" class="contact-link">034 302 7232</a>
         </span>
       </div>
@@ -241,7 +241,7 @@ definePageMeta({ middleware: "auth" });
 </template>
 
 <style scoped>
-/* â”€â”€â”€ Layout â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ─── Layout ─────────────────────────────────────────────── */
 .pay-wrap {
   display: grid;
   grid-template-columns: 1fr 380px;
@@ -256,7 +256,7 @@ definePageMeta({ middleware: "auth" });
   .pay-wrap { grid-template-columns: 1fr; }
 }
 
-/* â”€â”€â”€ Left â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ─── Left ───────────────────────────────────────────────── */
 .pay-left {
   background: #fff;
   border-radius: 16px;
@@ -265,9 +265,7 @@ definePageMeta({ middleware: "auth" });
   box-shadow: 0 4px 20px rgba(0,0,0,0.06);
 }
 
-.pay-left-header {
-  margin-bottom: 18px;
-}
+.pay-left-header { margin-bottom: 18px; }
 
 .pay-left-title {
   font-size: 1.3rem;
@@ -282,7 +280,7 @@ definePageMeta({ middleware: "auth" });
   margin: 0;
 }
 
-/* â”€â”€â”€ Plan list â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ─── Plan list ──────────────────────────────────────────── */
 .plan-list {
   display: flex;
   flex-direction: column;
@@ -300,25 +298,13 @@ definePageMeta({ middleware: "auth" });
   transition: border-color 0.15s, background 0.15s, box-shadow 0.15s;
 }
 
-.plan-item:hover {
-  border-color: #90caf9;
-}
-
-.plan-item--active {
-  border-color: #1e88e5;
-  background: #f0f7ff;
-}
-
-.plan-item--popular {
-  border-color: #1e88e5;
-  margin-top: 8px;
-  padding-top: 20px;
-}
+.plan-item:hover { border-color: #90caf9; }
+.plan-item--active { border-color: #1e88e5; background: #f0f7ff; }
+.plan-item--popular { border-color: #1e88e5; margin-top: 8px; padding-top: 20px; }
 
 .plan-popular-badge {
   position: absolute;
-  top: -10px;
-  left: 16px;
+  top: -10px; left: 16px;
   font-size: 0.65rem;
   font-weight: 700;
   color: #fff;
@@ -335,8 +321,7 @@ definePageMeta({ middleware: "auth" });
 }
 
 .plan-radio {
-  width: 18px;
-  height: 18px;
+  width: 18px; height: 18px;
   border-radius: 50%;
   border: 2px solid #d1d5db;
   display: flex;
@@ -346,37 +331,21 @@ definePageMeta({ middleware: "auth" });
   transition: border-color 0.15s;
 }
 
-.plan-item--active .plan-radio {
-  border-color: #1e88e5;
-}
+.plan-item--active .plan-radio { border-color: #1e88e5; }
 
 .plan-radio-dot {
-  width: 8px;
-  height: 8px;
+  width: 8px; height: 8px;
   border-radius: 50%;
   background: transparent;
   transition: background 0.15s;
 }
 
-.plan-radio-dot--on {
-  background: #1e88e5;
-}
+.plan-radio-dot--on { background: #1e88e5; }
 
-.plan-item-info {
-  flex: 1;
-}
+.plan-item-info { flex: 1; }
 
-.plan-item-label {
-  font-size: 0.88rem;
-  font-weight: 600;
-  color: #1a1a1a;
-}
-
-.plan-item-price {
-  font-size: 0.8rem;
-  color: #64748b;
-  margin-top: 2px;
-}
+.plan-item-label { font-size: 0.88rem; font-weight: 600; color: #1a1a1a; }
+.plan-item-price { font-size: 0.8rem; color: #64748b; margin-top: 2px; }
 
 .plan-item-right {
   text-align: right;
@@ -395,12 +364,9 @@ definePageMeta({ middleware: "auth" });
   border-radius: 999px;
 }
 
-.plan-item-per {
-  font-size: 0.75rem;
-  color: #9e9e9e;
-}
+.plan-item-per { font-size: 0.75rem; color: #9e9e9e; }
 
-/* â”€â”€â”€ Includes â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ─── Includes ───────────────────────────────────────────── */
 .includes {
   background: #f8fafc;
   border-radius: 12px;
@@ -416,11 +382,7 @@ definePageMeta({ middleware: "auth" });
   margin-bottom: 10px;
 }
 
-.includes-list {
-  display: flex;
-  flex-direction: column;
-  gap: 7px;
-}
+.includes-list { display: flex; flex-direction: column; gap: 7px; }
 
 .include-item {
   display: flex;
@@ -430,7 +392,7 @@ definePageMeta({ middleware: "auth" });
   color: #374151;
 }
 
-/* â”€â”€â”€ Checkout card â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ─── Checkout card ──────────────────────────────────────── */
 .checkout-card {
   background: #fff;
   border-radius: 16px;
@@ -472,7 +434,7 @@ definePageMeta({ middleware: "auth" });
   border-radius: 8px;
 }
 
-/* â”€â”€â”€ Summary â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ─── Summary ────────────────────────────────────────────── */
 .checkout-summary {
   background: #f8fafc;
   border-radius: 10px;
@@ -489,33 +451,13 @@ definePageMeta({ middleware: "auth" });
   color: #374151;
 }
 
-.sum-original {
-  color: #9e9e9e;
-  text-decoration: line-through;
-}
+.sum-original { color: #9e9e9e; text-decoration: line-through; }
+.sum-off { color: #10b981; font-weight: 600; }
+.sum-sep { border-top: 1px dashed #e5e7eb; margin: 4px 0; }
+.sum-row--total { font-weight: 700; font-size: 0.95rem; }
+.sum-total { color: #e53935; font-size: 1.25rem; font-weight: 800; }
 
-.sum-off {
-  color: #10b981;
-  font-weight: 600;
-}
-
-.sum-sep {
-  border-top: 1px dashed #e5e7eb;
-  margin: 4px 0;
-}
-
-.sum-row--total {
-  font-weight: 700;
-  font-size: 0.95rem;
-}
-
-.sum-total {
-  color: #e53935;
-  font-size: 1.25rem;
-  font-weight: 800;
-}
-
-/* â”€â”€â”€ Button â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ─── Button ─────────────────────────────────────────────── */
 .checkout-btn {
   width: 100%;
   height: 48px;
@@ -540,10 +482,7 @@ definePageMeta({ middleware: "auth" });
   box-shadow: 0 6px 20px rgba(30,136,229,0.45);
 }
 
-.checkout-btn:disabled {
-  opacity: 0.7;
-  cursor: not-allowed;
-}
+.checkout-btn:disabled { opacity: 0.7; cursor: not-allowed; }
 
 .checkout-secure {
   display: flex;
@@ -554,7 +493,7 @@ definePageMeta({ middleware: "auth" });
   color: #9e9e9e;
 }
 
-/* â”€â”€â”€ VAT + Agree â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ─── VAT + Agree ────────────────────────────────────────── */
 .sum-vat {
   font-size: 0.72rem;
   color: #94a3b8;
@@ -582,14 +521,10 @@ definePageMeta({ middleware: "auth" });
   cursor: pointer;
 }
 
-.agree-check a {
-  color: #1565c0;
-  text-decoration: none;
-}
-
+.agree-check a { color: #1565c0; text-decoration: none; }
 .agree-check a:hover { text-decoration: underline; }
 
-/* â”€â”€â”€ Contact â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ─── Contact ────────────────────────────────────────────── */
 .contact-box {
   display: flex;
   align-items: center;
@@ -609,7 +544,5 @@ definePageMeta({ middleware: "auth" });
   text-decoration: none;
 }
 
-.contact-link:hover {
-  text-decoration: underline;
-}
+.contact-link:hover { text-decoration: underline; }
 </style>
