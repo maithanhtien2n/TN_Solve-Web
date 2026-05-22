@@ -389,7 +389,7 @@ onMounted(async () => {
       </v-card-text>
     </CommonDialog>
 
-    <PopupAnnouncement />
+    <!-- <PopupAnnouncement /> -->
     <PopupBuyCredit />
     <PopupMessage />
 
