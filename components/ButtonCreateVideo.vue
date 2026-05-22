@@ -2,7 +2,7 @@
 const router = useRouter();
 
 const handleClick = async () => {
-  router.push("/video/create");
+  router.push("/thu-vien-cua-toi/tao-moi");
 };
 // ----------------
 </script>

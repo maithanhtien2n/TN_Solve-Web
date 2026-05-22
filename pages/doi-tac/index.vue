@@ -8,7 +8,7 @@ const dashboard = computed(() => onGetterMasterData.value["dashboard"]);
 
 const onClickViewDashboardPartnerDetail = (id: string) => {
   if (userData.value?.role !== EnumAccountRole.ADMIN) return;
-  router.push(`/partner?id=${id}`);
+  router.push(`/doi-tac?id=${id}`);
   // window.location.href = `https://tnsolve.com/partner?id=${id}`;
 };
 

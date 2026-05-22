@@ -42,7 +42,22 @@
       "Bash(powershell -Command \"[System.IO.File]::ReadAllText\\('components\\\\layouts\\\\AppLogin.vue', [System.Text.Encoding]::UTF8\\)\")",
       "Bash(Get-ChildItem -Path \"d:\\\\Project Cá Nhân\\\\TN_Solve-Project\\\\TN_Solve-Web\\\\pages\" -Recurse -Filter \"*.vue\")",
       "Bash(Get-ChildItem -Path \"D:\\\\Project Cá Nhân\\\\TN_Solve-Project\\\\TN_Solve-Web\" -Directory)",
-      "Bash(Select-Object Name)"
+      "Bash(Select-Object Name)",
+      "Bash(mv account.vue tai-khoan.vue)",
+      "Bash(mv documents.vue tai-lieu.vue)",
+      "Bash(mv payment.vue thanh-toan.vue)",
+      "Bash(mv setting.vue tai-nguyen.vue)",
+      "Bash(mv settings.vue cai-dat.vue)",
+      "PowerShell(Copy-Item -Path \"d:\\\\Project C� Nh�n\\\\TN_Solve-Project\\\\TN_Solve-Web\\\\pages\\\\partner\" -Destination \"d:\\\\Project C� Nh�n\\\\TN_Solve-Project\\\\TN_Solve-Web\\\\pages\\\\doi-tac\" -Recurse)",
+      "Bash(mv doi-tac/my-referral doi-tac/gioi-thieu-cua-toi)",
+      "Bash(mv \"doi-tac/gioi-thieu-cua-toi/customer.vue\" \"doi-tac/gioi-thieu-cua-toi/khach-hang.vue\")",
+      "Bash(mv \"doi-tac/gioi-thieu-cua-toi/user.vue\" \"doi-tac/gioi-thieu-cua-toi/nguoi-dung.vue\")",
+      "Bash(mv \"doi-tac/transaction-history.vue\" \"doi-tac/lich-su-giao-dich.vue\")",
+      "Bash(mv \"doi-tac/payment.vue\" \"doi-tac/thanh-toan.vue\")",
+      "Bash(sed -i \\\\ *)"
+    ],
+    "additionalDirectories": [
+      "d:\\Project Cá Nhân\\TN_Solve-Project\\TN_Solve-Web\\pages\\thu-vien-cua-toi"
     ]
   }
 }

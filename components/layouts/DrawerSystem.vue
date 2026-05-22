@@ -124,21 +124,21 @@ const menus = computed<any>(() => {
       role: [EnumAccountRole.PARTNER],
       title: "Tổng quan",
       icon: "mdi-view-dashboard-outline",
-      route: "/partner",
+      route: "/doi-tac",
     },
     {
       role: [EnumAccountRole.PARTNER],
       title: "Quản lý giới thiệu",
       icon: "mdi-account-group-outline",
-      route: "my-referral",
+      route: "gioi-thieu-cua-toi",
       children: [
         {
           title: "Người dùng",
-          route: "/partner/my-referral/user",
+          route: "/doi-tac/gioi-thieu-cua-toi/nguoi-dung",
         },
         {
           title: "Khách hàng",
-          route: "/partner/my-referral/customer",
+          route: "/doi-tac/gioi-thieu-cua-toi/khach-hang",
         },
       ],
     },
@@ -146,13 +146,13 @@ const menus = computed<any>(() => {
       role: [EnumAccountRole.PARTNER],
       title: "Lịch sử giao dịch",
       icon: "mdi-cash-clock",
-      route: "/partner/transaction-history",
+      route: "/doi-tac/lich-su-giao-dich",
     },
     {
       role: [EnumAccountRole.PARTNER],
       title: "Thanh toán",
       icon: "mdi-credit-card-outline",
-      route: "/partner/payment",
+      route: "/doi-tac/thanh-toan",
     },
     {
       role: [EnumAccountRole.ADMIN, EnumAccountRole.PARTNER],

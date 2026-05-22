@@ -10,7 +10,6 @@ const { isMobile } = useDevice();
 
 const {
   onActionGetUserData,
-  onGetterSystemPopup,
   onGetterUserData: userData,
   onGetterDisplayPopupBuyCredit,
   onGetterDisplayLogin: displayLogin,
@@ -20,7 +19,6 @@ const { onGetterMasterData, onActionAllMasterDataClient } =
 
 const loading = ref(true);
 const mounted = ref(false);
-const commonDialogRef = ref<any>(null);
 const commonDialogPaymentRef = ref<any>(null);
 
 const client = computed<boolean>(() => {
@@ -38,18 +36,41 @@ const appVersionDownload = computed(
 
 const onReturnTitle = (title: string) => {
   switch (title) {
-    case "account": {
+    case "tai-khoan": {
       return "Tài khoản";
     }
-    case "create": {
-      return "Tạo video";
+    case "tao-moi": {
+      return "Tạo mới";
     }
-    case "video": {
+    case "thu-vien-cua-toi": {
       return "Thư viện của tôi";
     }
-    case "setting":
-    case "settings": {
+    case "cong-dong": {
+      return "Cộng đồng";
+    }
+    case "cai-dat": {
       return "Cài đặt";
+    }
+    case "tro-ly-ai": {
+      return "Trợ lý AI";
+    }
+    case "dang-ky-dich-vu": {
+      return "Đăng ký dịch vụ";
+    }
+    case "doi-tac": {
+      return "Cộng tác viên";
+    }
+    case "gioi-thieu-cua-toi": {
+      return "Giới thiệu của tôi";
+    }
+    case "lich-su-giao-dich": {
+      return "Lịch sử giao dịch";
+    }
+    case "khach-hang": {
+      return "Khách hàng";
+    }
+    case "nguoi-dung": {
+      return "Người dùng";
     }
     case "dieu-khoan": {
       return "Điều khoản & quy định";
@@ -65,15 +86,6 @@ const onReturnTitle = (title: string) => {
     }
     case "chinh-sach-bao-hanh": {
       return "Chính sách bảo hành & đổi trả";
-    }
-    case "payment": {
-      return "Đăng ký dịch vụ";
-    }
-    case "tutorial": {
-      return "Hướng dẫn";
-    }
-    case "documents": {
-      return "Tài liệu";
     }
     default: {
       return "Chi tiết";
@@ -400,7 +412,7 @@ onMounted(async () => {
         <div :class="{ 'mx-4': isMobile }">
           <v-breadcrumbs
             v-show="
-              !['/', '/video/public'].includes(route.path) &&
+              !['/', '/cong-dong'].includes(route.path) &&
               breadcrumbsItems &&
               breadcrumbsItems.length
             "

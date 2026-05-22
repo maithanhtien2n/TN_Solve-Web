@@ -42,7 +42,7 @@ const formData = reactive<any>({
 });
 
 const productId = computed(() =>
-  route.params.id !== "create" ? route.params.id : null,
+  route.params.id !== "tao-moi" ? route.params.id : null,
 );
 
 const isError = computed(() =>
@@ -338,11 +338,11 @@ const onGetProductDetail = async (loadingType: string = "") => {
           }
         }, 100);
       } else {
-        router.replace("/video/create");
+        router.replace("/thu-vien-cua-toi/tao-moi");
       }
     })
     .catch(() => {
-      router.replace("/video/create");
+      router.replace("/thu-vien-cua-toi/tao-moi");
     })
     .finally(() => {
       loading.value = "";
@@ -377,7 +377,7 @@ const onSubmit = async () => {
         formData.messages = formData.messages?.length
           ? formData.messages
           : [{ title: 'Đang xử lý...', dateTime: '', color: 'primary' }];
-        router.replace(`/video/${productId}`);
+        router.replace(`/thu-vien-cua-toi/${productId}`);
       }
     })
     .catch(() => {
@@ -986,7 +986,7 @@ definePageMeta({ middleware: "auth" });
                 class="step-note"
               >
                 Vui lòng cập nhật cookies mới
-                <a target="_blank" rel="noopener noreferrer" href="https://tnsolve.com/setting">tại đây</a>
+                <a target="_blank" rel="noopener noreferrer" href="https://tnsolve.com/cai-dat">tại đây</a>
               </div>
               <div
                 v-if="onGetterUserData?.role === EnumAccountRole.ADMIN && item.errorMsg"

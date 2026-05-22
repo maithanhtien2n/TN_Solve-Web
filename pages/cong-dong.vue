@@ -109,7 +109,7 @@ useSeo({
         v-for="(item, index) in products.docs"
         :key="item._id"
         class="video-card"
-        :to="`/video/${item._id}`"
+        :to="`/thu-vien-cua-toi/${item._id}`"
         @mouseenter="onCardMouseEnter"
         @mouseleave="onCardMouseLeave"
       >
@@ -204,7 +204,7 @@ useSeo({
       <h3 class="empty-title">Chưa có thước phim nào</h3>
       <p class="empty-desc">Cộng đồng chưa có video nào. Hãy là người đầu tiên chia sẻ tác phẩm của bạn!</p>
     </div>
-    <button class="empty-cta" @click="$router.push('/video/create')">
+    <button class="empty-cta" @click="$router.push('/thu-vien-cua-toi/tao-moi')">
       <v-icon size="17">mdi-image-filter-tilt-shift</v-icon>
       Tạo video ngay
     </button>

@@ -173,7 +173,7 @@ definePageMeta({ middleware: "auth" });
           v-for="(item, index) in products.docs"
           :key="index"
           class="video-card"
-          :to="`/video/${item._id}`"
+          :to="`/thu-vien-cua-toi/${item._id}`"
           @mouseenter="onCardMouseEnter"
           @mouseleave="onCardMouseLeave"
         >
@@ -347,7 +347,7 @@ definePageMeta({ middleware: "auth" });
           <h3 class="empty-title">Chưa có thước phim nào</h3>
           <p class="empty-desc">Tạo video AI đầu tiên của bạn chỉ trong vài phút.</p>
         </div>
-        <button class="empty-cta" @click="$router.push('/video/create')">
+        <button class="empty-cta" @click="$router.push('/thu-vien-cua-toi/tao-moi')">
           <v-icon size="17">mdi-image-filter-tilt-shift</v-icon>
           Tạo video ngay
         </button>

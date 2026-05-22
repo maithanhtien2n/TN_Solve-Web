@@ -16,8 +16,8 @@ const {
 
 const navItems = [
   { title: "Trang chủ", path: "/", icon: "mdi-home-outline" },
-  { title: "Cộng đồng", path: "/video/public", icon: "mdi-earth" },
-  { title: "Đăng ký", path: "/payment", icon: "mdi-tag-outline" },
+  { title: "Cộng đồng", path: "/cong-dong", icon: "mdi-earth" },
+  { title: "Đăng ký", path: "/dang-ky-dich-vu", icon: "mdi-tag-outline" },
 ];
 
 const isActive = (path: string) => route.path === path;
@@ -44,15 +44,15 @@ onMounted(() => nextTick(updatePill));
 
 const menus = computed(() => {
   let items = [
-    { title: "Tài khoản", value: "account", icon: "mdi-account-circle-outline" },
-    { title: "Thư viện của tôi", value: "video", icon: "mdi-image-multiple-outline" },
+    { title: "Tài khoản", value: "tai-khoan", icon: "mdi-account-circle-outline" },
+    { title: "Thư viện của tôi", value: "thu-vien-cua-toi", icon: "mdi-image-multiple-outline" },
     {
       title: userData.value?.serviceExpiry ? "Gia hạn dịch vụ" : "Đăng ký dịch vụ",
-      value: "payment",
+      value: "dang-ky-dich-vu",
       icon: userData.value?.serviceExpiry ? "mdi-calendar-sync" : "mdi-tag-plus-outline",
     },
     { title: "Mua tín dụng", value: "buy-credit", icon: "mdi-credit-card-outline" },
-    { title: "Cài đặt", value: "settings", icon: "mdi-cog-outline" },
+    { title: "Cài đặt", value: "cai-dat", icon: "mdi-cog-outline" },
     { title: "Đăng xuất", value: "logout", icon: "mdi-logout", size: 21 },
   ];
 
@@ -61,9 +61,9 @@ const menus = computed(() => {
 
   if (userData.value?.role === EnumAccountRole.ADMIN) {
     items.splice(1, 0, { title: "Trang quản trị", value: "admin", icon: "mdi-shield-account-outline" });
-    items = items.filter((i) => i.value !== "account");
+    items = items.filter((i) => i.value !== "tai-khoan");
   } else if (userData.value?.role === "partner") {
-    items.splice(4, 0, { title: "Cộng tác viên", value: "partner", icon: "mdi-account-multiple-outline" });
+    items.splice(4, 0, { title: "Cộng tác viên", value: "doi-tac", icon: "mdi-account-multiple-outline" });
   }
 
   return items;

@@ -47,10 +47,10 @@ const breadcrumbs = computed<any>(() => {
 
   if (
     matched.length === 1 &&
-    matched[0].path.includes("/partner/my-referral")
+    matched[0].path.includes("/doi-tac/gioi-thieu-cua-toi")
   ) {
     matched.unshift({
-      path: "/partner/my-referral",
+      path: "/doi-tac/gioi-thieu-cua-toi",
       meta: { title: "Quản lý giới thiệu" },
     } as unknown as any);
   }
