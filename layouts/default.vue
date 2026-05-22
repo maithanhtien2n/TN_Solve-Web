@@ -47,7 +47,8 @@ const onReturnTitle = (title: string) => {
     case "video": {
       return "Thư viện của tôi";
     }
-    case "setting": {
+    case "setting":
+    case "settings": {
       return "Cài đặt";
     }
     case "dieu-khoan": {

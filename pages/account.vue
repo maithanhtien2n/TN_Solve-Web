@@ -16,11 +16,6 @@ const tab = ref("packages");
 const packageHistory = ref<any>([]);
 const creditHistory = ref<any>([]);
 
-const apiKey = ref("");
-const apiKeyLoading = ref(false);
-const apiKeyCopied = ref(false);
-const showApiKey = ref(false);
-
 const formatDate = (iso: string) => {
   if (!iso) return "—";
   const d = new Date(iso);
@@ -36,24 +31,6 @@ const serviceStatus = computed(() => {
       : { label: "Đã hết hạn", color: "#dc2626", bg: "#fef2f2" };
   return { label: "Chưa đăng ký", color: "#64748b", bg: "#f1f5f9" };
 });
-
-const onGetPersonalToken = async () => {
-  apiKeyLoading.value = true;
-  await accountService
-    .getPersonalToken()
-    .then((res) => {
-      apiKey.value = res?.data?.token || "";
-      if (apiKey.value) showApiKey.value = true;
-    })
-    .finally(() => { apiKeyLoading.value = false; });
-};
-
-const onCopyApiKey = () => {
-  if (!apiKey.value) return;
-  navigator.clipboard.writeText(apiKey.value);
-  apiKeyCopied.value = true;
-  setTimeout(() => (apiKeyCopied.value = false), 2000);
-};
 
 onMounted(async () => {
   await accountService.getMyPackageHistory({}).then((res) => { packageHistory.value = res.data; });
@@ -150,14 +127,6 @@ definePageMeta({ middleware: "auth" });
           <v-icon size="16">mdi-database-clock-outline</v-icon>
           Lịch sử tín dụng
         </div>
-        <div
-          class="tab-item"
-          :class="{ 'tab-item--active': tab === 'api' }"
-          @click="tab = 'api'"
-        >
-          <v-icon size="16">mdi-key-outline</v-icon>
-          API Key
-        </div>
       </div>
 
       <!-- Package history -->
@@ -231,51 +200,7 @@ definePageMeta({ middleware: "auth" });
         </table>
       </div>
 
-      <!-- API Key -->
-      <div v-show="tab === 'api'" class="tab-content">
-        <div class="api-section">
-          <div class="api-desc">
-            <v-icon size="20" color="#1e88e5">mdi-information-outline</v-icon>
-            <span>Token cá nhân dùng để xác thực API. Không chia sẻ cho người khác.</span>
-          </div>
-          <button class="api-btn" :disabled="apiKeyLoading" @click="onGetPersonalToken">
-            <v-progress-circular v-if="apiKeyLoading" width="2" size="16" color="white" indeterminate />
-            <template v-else>
-              <v-icon size="16">mdi-key-outline</v-icon>
-              Lấy API Key
-            </template>
-          </button>
-        </div>
-      </div>
     </div>
-
-    <!-- API Key Dialog -->
-    <v-dialog v-model="showApiKey" max-width="480">
-      <v-card rounded="xl" class="api-dialog">
-        <v-card-title class="api-dialog-header">
-          <div class="api-dialog-title">
-            <div class="api-dialog-icon">
-              <v-icon color="white" size="18">mdi-key-outline</v-icon>
-            </div>
-            <div>
-              <div class="api-dialog-name">API Key của bạn</div>
-              <div class="api-dialog-sub">Không chia sẻ token này cho người khác</div>
-            </div>
-          </div>
-          <v-btn icon="mdi-close" variant="text" size="small" @click="showApiKey = false" />
-        </v-card-title>
-
-        <v-card-text class="pt-2 pb-5 px-5">
-          <div class="api-key-box">
-            <code class="api-key-code">{{ apiKey }}</code>
-            <button class="api-copy-btn" :class="{ 'api-copy-btn--ok': apiKeyCopied }" @click="onCopyApiKey">
-              <v-icon size="16">{{ apiKeyCopied ? "mdi-check" : "mdi-content-copy" }}</v-icon>
-              Sao chép
-            </button>
-          </div>
-        </v-card-text>
-      </v-card>
-    </v-dialog>
   </div>
 </template>
 
@@ -529,123 +454,4 @@ definePageMeta({ middleware: "auth" });
   font-size: 0.875rem;
 }
 
-/* ─── API section ────────────────────────────────────── */
-.api-section {
-  padding: 28px 24px;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.api-desc {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 0.875rem;
-  color: #475569;
-  background: #eff6ff;
-  border: 1px solid #bfdbfe;
-  border-radius: 10px;
-  padding: 12px 16px;
-}
-
-.api-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 22px;
-  border-radius: 10px;
-  background: #1e88e5;
-  color: #fff;
-  font-size: 0.875rem;
-  font-weight: 600;
-  border: none;
-  cursor: pointer;
-  width: fit-content;
-  transition: background 0.18s, transform 0.15s;
-}
-
-.api-btn:hover:not(:disabled) { background: #1565c0; transform: translateY(-1px); }
-.api-btn:disabled { opacity: 0.7; cursor: not-allowed; }
-
-/* ─── API Key dialog ─────────────────────────────────── */
-.api-dialog { overflow: hidden; }
-
-.api-dialog-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 20px 20px 16px;
-  border-bottom: 1px solid #f0f0f0;
-}
-
-.api-dialog-title {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-}
-
-.api-dialog-icon {
-  width: 40px;
-  height: 40px;
-  border-radius: 11px;
-  background: linear-gradient(135deg, #1565c0, #1e88e5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  box-shadow: 0 4px 12px rgba(30,136,229,0.3);
-}
-
-.api-dialog-name {
-  font-size: 1rem;
-  font-weight: 700;
-  color: #0f172a;
-}
-
-.api-dialog-sub {
-  font-size: 0.775rem;
-  color: #94a3b8;
-  margin-top: 2px;
-}
-
-.api-key-box {
-  margin-top: 8px;
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
-  border-radius: 10px;
-  padding: 14px 16px;
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-}
-
-.api-key-code {
-  flex: 1;
-  font-size: 0.78rem;
-  word-break: break-all;
-  color: #334155;
-  font-family: monospace;
-  line-height: 1.6;
-}
-
-.api-copy-btn {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  padding: 6px 12px;
-  border-radius: 8px;
-  font-size: 0.8rem;
-  font-weight: 600;
-  border: 1px solid #e2e8f0;
-  background: #fff;
-  color: #475569;
-  cursor: pointer;
-  white-space: nowrap;
-  flex-shrink: 0;
-  transition: all 0.18s;
-}
-
-.api-copy-btn:hover { background: #f1f5f9; }
-.api-copy-btn--ok { background: #ecfdf5; color: #059669; border-color: #a7f3d0; }
 </style>

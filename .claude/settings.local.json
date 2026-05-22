@@ -39,7 +39,10 @@
       "Bash(ls \"D:\\\\2266-tnsolve.com\")",
       "Read(//d/2266-tnsolve.com/**)",
       "Bash(powershell -Command \"\\(Get-Content 'pages\\\\payment.vue'\\) -replace 'href=\\\\\"/terms\\\\\"', 'href=\\\\\"/dieu-khoan\\\\\"' | Set-Content 'pages\\\\payment.vue' -Encoding utf8; \\(Get-Content 'components\\\\layouts\\\\AppLogin.vue'\\) -replace 'href=\\\\\"/terms\\\\\"', 'href=\\\\\"/dieu-khoan\\\\\"' | Set-Content 'components\\\\layouts\\\\AppLogin.vue' -Encoding utf8\")",
-      "Bash(powershell -Command \"[System.IO.File]::ReadAllText\\('components\\\\layouts\\\\AppLogin.vue', [System.Text.Encoding]::UTF8\\)\")"
+      "Bash(powershell -Command \"[System.IO.File]::ReadAllText\\('components\\\\layouts\\\\AppLogin.vue', [System.Text.Encoding]::UTF8\\)\")",
+      "Bash(Get-ChildItem -Path \"d:\\\\Project Cá Nhân\\\\TN_Solve-Project\\\\TN_Solve-Web\\\\pages\" -Recurse -Filter \"*.vue\")",
+      "Bash(Get-ChildItem -Path \"D:\\\\Project Cá Nhân\\\\TN_Solve-Project\\\\TN_Solve-Web\" -Directory)",
+      "Bash(Select-Object Name)"
     ]
   }
 }

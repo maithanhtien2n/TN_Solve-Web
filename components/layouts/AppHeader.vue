@@ -52,6 +52,7 @@ const menus = computed(() => {
       icon: userData.value?.serviceExpiry ? "mdi-calendar-sync" : "mdi-tag-plus-outline",
     },
     { title: "Mua tín dụng", value: "buy-credit", icon: "mdi-credit-card-outline" },
+    { title: "Cài đặt", value: "settings", icon: "mdi-cog-outline" },
     { title: "Đăng xuất", value: "logout", icon: "mdi-logout", size: 21 },
   ];
 
