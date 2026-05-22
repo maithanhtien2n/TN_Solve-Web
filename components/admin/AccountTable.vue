@@ -147,7 +147,7 @@ const onClickSettingAccount = (item: any) => {
 };
 
 const onClickViewInfoPartner = (item: any) => {
-  window.open(`https://tnsolve.com/partner?id=${item?._id}`, "_blank");
+  window.open(`/doi-tac?id=${item?._id}`, "_blank");
 };
 
 const onClickSaveSetting = async () => {

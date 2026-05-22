@@ -86,11 +86,10 @@ const videoStyleItems = computed(() => {
 });
 
 const videoDurationItems = computed(() => {
-  const allOptions =
-    [
-      { title: "Tất cả", value: null },
-      ...onGetterMasterData.value["video-duration"],
-    ] || [];
+  const allOptions = [
+    { title: "Tất cả", value: null },
+    ...(onGetterMasterData.value["video-duration"] || []),
+  ];
 
   if (params.videoMode === "movie") {
     return allOptions;
@@ -151,8 +150,8 @@ const onAction = async (event: any) => {
   if (event.action == "reload") {
     onClickRestartVideo(event.item);
   } else if (event.action == "view") {
-    if (event?.item?.link) {
-      window.open(event?.item?.link, "_blank");
+    if (event?.item?._id) {
+      window.open(`/thu-vien-cua-toi/${event.item._id}`, "_blank");
     } else {
       useAppStore().onActionSetSystemPopup({
         type: "error",
