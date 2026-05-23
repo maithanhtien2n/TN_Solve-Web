@@ -105,20 +105,35 @@ definePageMeta({ middleware: "auth" });
               </div>
             </div>
           </div>
-          <div style="display: flex; align-items: center; gap: 8px;">
-            <div class="sw-chrome-url" @click="onCopyExtensionUrl" :title="extensionUrlCopied ? 'Đã sao chép!' : 'Nhấn để sao chép'">
-              <v-icon size="13" style="color: #7c3aed;">mdi-google-chrome</v-icon>
-              <span>chrome://extensions</span>
-              <v-icon size="13" :color="extensionUrlCopied ? '#059669' : '#94a3b8'">{{ extensionUrlCopied ? 'mdi-check' : 'mdi-content-copy' }}</v-icon>
-            </div>
-            <button class="sw-btn-primary" style="background: #7c3aed;" @click="onDownloadExtension">
-              <v-icon size="14">mdi-download</v-icon>
-              Tải xuống
-            </button>
+          <button class="sw-btn-primary" style="background: #7c3aed;" @click="onDownloadExtension">
+            <v-icon size="14">mdi-download</v-icon>
+            Tải xuống
+          </button>
+        </div>
+        <div class="sw-chrome-row sw-row--desktop-only">
+          <div class="sw-chrome-url" style="line-height: 1;" @click="onCopyExtensionUrl" :title="extensionUrlCopied ? 'Đã sao chép!' : 'Nhấn để sao chép'">
+            <v-icon size="13" style="color: #7c3aed; line-height: 1; vertical-align: middle;">mdi-google-chrome</v-icon>
+            <span style="line-height: 1; vertical-align: middle;">chrome://extensions</span>
+            <v-icon size="13" style="line-height: 1; vertical-align: middle;" :color="extensionUrlCopied ? '#059669' : '#94a3b8'">{{ extensionUrlCopied ? 'mdi-check' : 'mdi-content-copy' }}</v-icon>
           </div>
         </div>
         <div class="sw-sep sw-row--desktop-only" />
       </template>
+
+      <!-- TN Solve Gen row -->
+      <div class="sw-row sw-row--desktop-only">
+        <div class="sw-row-left">
+          <div class="sw-row-icon" style="background: linear-gradient(135deg, #5b21b6, #8b5cf6);">
+            <v-icon color="white" size="15">mdi-open-in-new</v-icon>
+          </div>
+          <div class="sw-row-label">TN Solve Gen</div>
+        </div>
+        <a href="https://gen.tnsolve.com" target="_blank" class="sw-btn-primary" style="background: #7c3aed; text-decoration: none;">
+          <v-icon size="14">mdi-open-in-new</v-icon>
+          Mở
+        </a>
+      </div>
+      <div class="sw-sep sw-row--desktop-only" />
 
       <!-- Toggle row -->
       <div class="sw-row">
@@ -128,7 +143,7 @@ definePageMeta({ middleware: "auth" });
           </div>
           <div class="sw-row-label">Sử dụng tài nguyên cá nhân</div>
         </div>
-        <v-switch
+        <v-checkbox
           v-model="usePersonalResource"
           color="#1e88e5"
           density="compact"
@@ -264,8 +279,16 @@ definePageMeta({ middleware: "auth" });
 }
 
 /* ── Chrome URL chip ─────────────────────────────────── */
+.sw-chrome-row {
+  padding: 0 20px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
 .sw-chrome-url {
   display: inline-flex;
+  width: fit-content;
   align-items: center;
   gap: 5px;
   padding: 6px 10px;
