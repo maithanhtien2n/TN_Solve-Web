@@ -18,7 +18,6 @@ const { onGetterMasterData, onActionAllMasterDataClient } =
   useMasterDataStore();
 
 const loading = ref(true);
-const mounted = ref(false);
 const commonDialogPaymentRef = ref<any>(null);
 
 const client = computed<boolean>(() => {
@@ -109,7 +108,6 @@ const breadcrumbsItems = computed(() => {
 });
 
 onMounted(async () => {
-  mounted.value = true;
   try {
     const { state, code, scope, authuser } = route.query;
 
@@ -273,7 +271,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <AppLoading v-if="mounted && (loading || !breadcrumbsItems?.length)" />
+  <AppLoading v-if="loading || !breadcrumbsItems?.length" />
 
   <v-app>
     <CommonDialog
