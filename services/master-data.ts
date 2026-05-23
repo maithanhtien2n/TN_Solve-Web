@@ -65,4 +65,15 @@ export const masterDataService = {
   async settingAction(payload: any) {
     return await api.put(`/common/setting-action`, payload);
   },
+
+  async settingFileAction(payload: { _id: string; file: File }) {
+    const formData = new FormData();
+    formData.append("_id", payload._id);
+    formData.append("file", payload.file);
+    return await api.put(`/common/setting-file-action`, formData);
+  },
+
+  async deleteSettingFile(payload: { _id: string }) {
+    return await api.delete(`/common/setting-file-action`, { data: payload });
+  },
 };

@@ -26,6 +26,40 @@ async function loadItems(event: any) {
     });
 }
 
+async function onFileDelete(item: any) {
+  loading.value = `delete-${item._id}`;
+  try {
+    await masterDataService.deleteSettingFile({ _id: item._id });
+    dataTableRef.value?.loadItems();
+  } catch (error) {
+    console.log("Lỗi khi xóa file!", error);
+  } finally {
+    loading.value = "";
+  }
+}
+
+function triggerFileInput(id: string) {
+  const input = document.getElementById(`file-input-${id}`) as HTMLInputElement;
+  input?.click();
+}
+
+async function onFileUpload(event: Event, item: any) {
+  const input = event.target as HTMLInputElement;
+  const file = input.files?.[0];
+  if (!file) return;
+
+  loading.value = `upload-${item._id}`;
+  try {
+    await masterDataService.settingFileAction({ _id: item._id, file });
+    dataTableRef.value?.loadItems();
+  } catch (error) {
+    console.log("Lỗi khi tải tệp!", error);
+  } finally {
+    loading.value = "";
+    input.value = "";
+  }
+}
+
 const onClickAction = async (data?: any | null, action?: string) => {
   try {
     switch (action) {
@@ -161,7 +195,16 @@ definePageMeta({ layout: "admin", title: "Thông tin chung" });
         </span>
       </template>
 
-      <span v-else>{{ (item as any).value }}</span>
+      <template v-else>
+        <a
+          v-if="(item as any).value?.startsWith('http')"
+          :href="(item as any).value"
+          target="_blank"
+        >
+          {{ (item as any).value.split('/').pop().replace(/^\d+-/, '') }}
+        </a>
+        <span v-else>{{ (item as any).value }}</span>
+      </template>
     </template>
 
     <template #row-action="{ item }">
@@ -413,6 +456,38 @@ definePageMeta({ layout: "admin", title: "Thông tin chung" });
                 { title: '20', value: '20' },
               ]"
               @update:model-value="onClickAction(item)"
+            />
+          </div>
+        </template>
+
+        <template v-else>
+          <div class="my-4 d-flex align-center w-10rem" style="gap: 10px;">
+            <input
+              :id="`file-input-${(item as any)._id}`"
+              type="file"
+              class="d-none"
+              @change="(e: Event) => onFileUpload(e, item)"
+            />
+            <v-btn
+              variant="tonal"
+              color="primary"
+              height="36"
+              rounded="lg"
+              :loading="loading === `upload-${(item as any)._id}`"
+              class="flex-grow-1"
+              icon="mdi-upload"
+              @click="triggerFileInput((item as any)._id)"
+            />
+            <v-btn
+              v-if="(item as any).value?.startsWith('http')"
+              variant="tonal"
+              color="error"
+              height="36"
+              rounded="lg"
+              :loading="loading === `delete-${(item as any)._id}`"
+              class="flex-grow-1"
+              icon="mdi-trash-can-outline"
+              @click="onFileDelete(item)"
             />
           </div>
         </template>

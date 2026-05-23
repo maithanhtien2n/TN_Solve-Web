@@ -42,6 +42,35 @@ const onTogglePersonalResource = async (val: boolean) => {
   await appService.saveSetting({ usePersonalResource: val });
 };
 
+const hasExtensionFile = ref(false);
+const extensionUpdatedAt = ref<string | null>(null);
+
+function timeAgo(dateStr: string): string {
+  const diff = Math.floor((Date.now() - new Date(dateStr).getTime()) / 1000);
+  if (diff < 10) return "Vừa xong";
+  if (diff < 60) return `${diff} giây trước`;
+  if (diff < 3600) return `${Math.floor(diff / 60)} phút trước`;
+  if (diff < 86400) return `${Math.floor(diff / 3600)} giờ trước`;
+  if (diff < 7 * 86400) return `${Math.floor(diff / 86400)} ngày trước`;
+  if (diff < 30 * 86400) return `${Math.floor(diff / (7 * 86400))} tuần trước`;
+  if (diff < 365 * 86400) return `${Math.floor(diff / (30 * 86400))} tháng trước`;
+  return `${Math.floor(diff / (365 * 86400))} năm trước`;
+}
+
+onMounted(async () => {
+  const base = import.meta.env.VITE_API_URL;
+  const res = await fetch(`${base}/api/common/setting-file-info?title=${encodeURIComponent("File build Extensions TN Solve")}`);
+  const json = await res.json();
+  hasExtensionFile.value = json?.data?.hasFile ?? false;
+  extensionUpdatedAt.value = json?.data?.updatedAt ?? null;
+});
+
+const onDownloadExtension = () => {
+  const base = import.meta.env.VITE_API_URL;
+  const url = `${base}/api/common/setting-file-download?title=${encodeURIComponent("File build Extensions TN Solve")}`;
+  window.open(url, "_blank");
+};
+
 definePageMeta({ middleware: "auth" });
 </script>
 
@@ -53,6 +82,29 @@ definePageMeta({ middleware: "auth" });
 
   <div v-else class="sw">
     <div class="sw-card">
+
+      <!-- Extension download row -->
+      <template v-if="hasExtensionFile">
+        <div class="sw-row sw-row--desktop-only">
+          <div class="sw-row-left">
+            <div class="sw-row-icon" style="background: linear-gradient(135deg, #5b21b6, #8b5cf6);">
+              <v-icon color="white" size="15">mdi-puzzle-outline</v-icon>
+            </div>
+            <div>
+              <div class="sw-row-label">Extensions TN Solve</div>
+              <div v-if="extensionUpdatedAt" class="sw-row-sub" style="display: flex; align-items: center; gap: 3px; line-height: 1;">
+                <v-icon size="11" style="margin-top: 1px;">mdi-clock-outline</v-icon>
+                <span>{{ timeAgo(extensionUpdatedAt) }}</span>
+              </div>
+            </div>
+          </div>
+          <button class="sw-btn-primary" style="background: #7c3aed;" @click="onDownloadExtension">
+            <v-icon size="14">mdi-download</v-icon>
+            Tải xuống
+          </button>
+        </div>
+        <div class="sw-sep sw-row--desktop-only" />
+      </template>
 
       <!-- Toggle row -->
       <div class="sw-row">
@@ -185,6 +237,16 @@ definePageMeta({ middleware: "auth" });
   font-size: 0.875rem;
   font-weight: 600;
   color: #1e293b;
+}
+
+.sw-row-sub {
+  font-size: 0.775rem;
+  color: #94a3b8;
+  margin-top: 1px;
+}
+
+@media (max-width: 768px) {
+  .sw-row--desktop-only { display: none; }
 }
 
 /* ── API Key ─────────────────────────────────────────── */
