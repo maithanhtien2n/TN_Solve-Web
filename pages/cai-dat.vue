@@ -186,6 +186,19 @@ definePageMeta({ middleware: "auth" });
         </button>
       </div>
 
+      <div class="sw-sep" />
+
+      <!-- YouTube tutorial -->
+      <div class="sw-youtube">
+        <iframe
+          src="https://www.youtube.com/embed/EUTa7K9PMuU"
+          title="Hướng dẫn sử dụng TN Solve"
+          frameborder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen
+        />
+      </div>
+
     </div>
   </div>
 
@@ -403,6 +416,18 @@ definePageMeta({ middleware: "auth" });
 }
 
 .sw-btn-ghost:hover { background: #f1f5f9; }
+
+/* ── YouTube ─────────────────────────────────────────── */
+.sw-youtube {
+  padding: 16px 20px;
+}
+
+.sw-youtube iframe {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: 10px;
+  display: block;
+}
 
 /* ── Dialog ──────────────────────────────────────────── */
 .sw-dialog-head {
