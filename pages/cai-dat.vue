@@ -74,7 +74,7 @@ definePageMeta({ middleware: "auth" });
       <div class="sw-sep" />
 
       <!-- API Key row -->
-      <div class="sw-row sw-row--col">
+      <div class="sw-row sw-row--apikey">
         <div class="sw-row-left">
           <div class="sw-row-icon">
             <v-icon color="white" size="15">mdi-key-outline</v-icon>
@@ -82,9 +82,11 @@ definePageMeta({ middleware: "auth" });
           <div class="sw-row-label">API Key</div>
         </div>
 
-        <div v-if="displayApiKey" class="sw-apikey">
-          <v-icon size="14" color="#94a3b8">mdi-key-variant</v-icon>
-          <code class="sw-apikey-val">{{ maskedApiKey }}</code>
+        <div v-if="displayApiKey" class="sw-apikey-wrap">
+          <div class="sw-apikey">
+            <v-icon size="14" color="#94a3b8">mdi-key-variant</v-icon>
+            <code class="sw-apikey-val">{{ maskedApiKey }}</code>
+          </div>
           <button class="sw-apikey-btn" :class="{ 'sw-apikey-btn--ok': apiKeyCopied }" title="Sao chép" @click="onCopyApiKey">
             <v-icon size="15">{{ apiKeyCopied ? "mdi-check" : "mdi-content-copy" }}</v-icon>
           </button>
@@ -186,11 +188,20 @@ definePageMeta({ middleware: "auth" });
 }
 
 /* ── API Key ─────────────────────────────────────────── */
+.sw-apikey-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+  min-width: 0;
+}
+
 .sw-apikey {
   display: flex;
   align-items: center;
   gap: 8px;
-  width: 100%;
+  flex: 1;
+  min-width: 0;
   background: #f8fafc;
   border: 1px solid #e8ecf0;
   border-radius: 9px;
@@ -202,8 +213,22 @@ definePageMeta({ middleware: "auth" });
   font-size: 0.78rem;
   font-family: 'Fira Code', 'Courier New', monospace;
   color: #334155;
-  word-break: break-all;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   line-height: 1.5;
+}
+
+@media (max-width: 480px) {
+  .sw-row--apikey {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .sw-apikey-wrap {
+    width: 100%;
+  }
 }
 
 .sw-apikey-btn {
