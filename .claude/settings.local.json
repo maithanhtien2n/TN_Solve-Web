@@ -54,7 +54,8 @@
       "Bash(mv \"doi-tac/gioi-thieu-cua-toi/user.vue\" \"doi-tac/gioi-thieu-cua-toi/nguoi-dung.vue\")",
       "Bash(mv \"doi-tac/transaction-history.vue\" \"doi-tac/lich-su-giao-dich.vue\")",
       "Bash(mv \"doi-tac/payment.vue\" \"doi-tac/thanh-toan.vue\")",
-      "Bash(sed -i \\\\ *)"
+      "Bash(sed -i \\\\ *)",
+      "Bash(Get-ChildItem \"d:\\\\Project Cá Nhân\\\\TN_Solve-Project\\\\TN_Solve-Web\\\\pages\" -Recurse -Name)"
     ],
     "additionalDirectories": [
       "d:\\Project Cá Nhân\\TN_Solve-Project\\TN_Solve-Web\\pages\\thu-vien-cua-toi"

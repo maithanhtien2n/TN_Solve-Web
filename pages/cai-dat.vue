@@ -44,6 +44,13 @@ const onTogglePersonalResource = async (val: boolean) => {
 
 const hasExtensionFile = ref(false);
 const extensionUpdatedAt = ref<string | null>(null);
+const extensionUrlCopied = ref(false);
+
+const onCopyExtensionUrl = () => {
+  navigator.clipboard.writeText("chrome://extensions");
+  extensionUrlCopied.value = true;
+  setTimeout(() => (extensionUrlCopied.value = false), 2000);
+};
 
 function timeAgo(dateStr: string): string {
   const diff = Math.floor((Date.now() - new Date(dateStr).getTime()) / 1000);
@@ -98,10 +105,17 @@ definePageMeta({ middleware: "auth" });
               </div>
             </div>
           </div>
-          <button class="sw-btn-primary" style="background: #7c3aed;" @click="onDownloadExtension">
-            <v-icon size="14">mdi-download</v-icon>
-            Tải xuống
-          </button>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <div class="sw-chrome-url" @click="onCopyExtensionUrl" :title="extensionUrlCopied ? 'Đã sao chép!' : 'Nhấn để sao chép'">
+              <v-icon size="13" style="color: #7c3aed;">mdi-google-chrome</v-icon>
+              <span>chrome://extensions</span>
+              <v-icon size="13" :color="extensionUrlCopied ? '#059669' : '#94a3b8'">{{ extensionUrlCopied ? 'mdi-check' : 'mdi-content-copy' }}</v-icon>
+            </div>
+            <button class="sw-btn-primary" style="background: #7c3aed;" @click="onDownloadExtension">
+              <v-icon size="14">mdi-download</v-icon>
+              Tải xuống
+            </button>
+          </div>
         </div>
         <div class="sw-sep sw-row--desktop-only" />
       </template>
@@ -248,6 +262,26 @@ definePageMeta({ middleware: "auth" });
 @media (max-width: 768px) {
   .sw-row--desktop-only { display: none; }
 }
+
+/* ── Chrome URL chip ─────────────────────────────────── */
+.sw-chrome-url {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  border: 1px solid #ede9fe;
+  background: #f5f3ff;
+  color: #6d28d9;
+  font-size: 0.775rem;
+  font-family: 'Fira Code', 'Courier New', monospace;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all .13s;
+  white-space: nowrap;
+}
+
+.sw-chrome-url:hover { background: #ede9fe; border-color: #c4b5fd; }
 
 /* ── API Key ─────────────────────────────────────────── */
 .sw-apikey-wrap {
