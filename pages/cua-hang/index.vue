@@ -31,6 +31,13 @@ const countdownText = computed(() => {
   return `${m}:${s}`;
 });
 
+const copiedField = ref("");
+const copyText = async (text: string, key: string) => {
+  await navigator.clipboard.writeText(text);
+  copiedField.value = key;
+  setTimeout(() => { copiedField.value = ""; }, 1500);
+};
+
 const quantities = ref<Record<string, number>>({});
 const getQty = (uid: string) => quantities.value[uid] ?? 1;
 const setQty = (uid: string, val: number, max: number) => {
@@ -252,28 +259,34 @@ if (import.meta.client) {
           <!-- Spacer -->
           <div style="flex:1" />
 
-          <!-- Số lượng + Mua ngay -->
-          <div class="card-buy-row">
-            <div class="qty-stepper">
-              <button
-                class="qty-btn"
-                :disabled="getQty(product.uid) <= 1"
-                @click.stop="setQty(product.uid, getQty(product.uid) - 1, product.available)"
-              >−</button>
-              <input
-                class="qty-input"
-                type="number"
-                min="1"
-                :max="product.available"
-                :value="getQty(product.uid)"
-                @input="onQtyInput(product.uid, $event, product.available)"
-                @blur="setQty(product.uid, getQty(product.uid), product.available)"
-              />
-              <button
-                class="qty-btn"
-                :disabled="getQty(product.uid) >= product.available"
-                @click.stop="setQty(product.uid, getQty(product.uid) + 1, product.available)"
-              >+</button>
+          <!-- Số lượng + Tổng tiền + Mua ngay -->
+          <div class="card-footer">
+            <div class="card-buy-row">
+              <div class="qty-stepper">
+                <button
+                  class="qty-btn"
+                  :disabled="getQty(product.uid) <= 1"
+                  @click.stop="setQty(product.uid, getQty(product.uid) - 1, product.available)"
+                >−</button>
+                <input
+                  class="qty-input"
+                  type="number"
+                  min="1"
+                  :max="product.available"
+                  :value="getQty(product.uid)"
+                  @input="onQtyInput(product.uid, $event, product.available)"
+                  @blur="setQty(product.uid, getQty(product.uid), product.available)"
+                />
+                <button
+                  class="qty-btn"
+                  :disabled="getQty(product.uid) >= product.available"
+                  @click.stop="setQty(product.uid, getQty(product.uid) + 1, product.available)"
+                >+</button>
+              </div>
+              <div v-if="getQty(product.uid) > 1" class="card-total">
+                <span class="card-total-label">Tổng</span>
+                <span class="card-total-amount">{{ (getQty(product.uid) * product.sellingPrice).toLocaleString('vi-VN') }}₫</span>
+              </div>
             </div>
             <button class="btn-buy" :disabled="loadingUid === product.uid" @click="onBuyNow(product)">
               <v-progress-circular v-if="loadingUid === product.uid" indeterminate size="15" width="2" color="white" />
@@ -332,7 +345,7 @@ if (import.meta.client) {
   </v-dialog>
 
   <!-- Popup thanh toán QR -->
-  <v-dialog v-model="paymentDialog" max-width="420" persistent rounded="xl">
+  <v-dialog v-model="paymentDialog" max-width="480" persistent rounded="xl" scrollable>
     <v-card rounded="xl" elevation="0">
       <!-- Header -->
       <div class="pay-header">
@@ -394,36 +407,50 @@ if (import.meta.client) {
           </div>
 
           <!-- Thông tin đơn hàng -->
-          <div class="pay-order-summary">
-            <div class="pay-order-row">
-              <span>Sản phẩm</span>
-              <strong>{{ paymentData?.product_name }}</strong>
-            </div>
-            <div class="pay-order-row">
-              <span>Số lượng</span>
-              <strong>{{ deliveredAccounts.length }} tài khoản</strong>
-            </div>
-            <div class="pay-order-row">
-              <span>Tổng tiền</span>
-              <strong class="text-primary">{{ paymentData?.amount?.toLocaleString('vi-VN') }}₫</strong>
-            </div>
-            <div class="pay-order-row">
-              <span>Mã đơn</span>
-              <strong class="pay-order-code">{{ paymentData?.orderCode }}</strong>
-            </div>
+          <div class="od-summary">
+            <div class="od-row"><span>Sản phẩm</span><strong>{{ paymentData?.product_name }}</strong></div>
+            <div class="od-row"><span>Số lượng</span><strong>{{ deliveredAccounts.length }} tài khoản</strong></div>
+            <div class="od-row"><span>Tổng tiền</span><strong class="text-primary">{{ paymentData?.amount?.toLocaleString('vi-VN') }}₫</strong></div>
+            <div class="od-row"><span>Mã đơn</span><strong class="mono small">{{ paymentData?.orderCode }}</strong></div>
           </div>
 
           <!-- Danh sách tài khoản -->
-          <div v-for="(acc, i) in deliveredAccounts" :key="i" class="pay-account-card">
-            <div class="pay-account-label">Tài khoản {{ i + 1 }}</div>
-            <div v-if="acc.user" class="pay-account-row">
-              <span>Tài khoản</span><strong>{{ acc.user }}</strong>
-            </div>
-            <div v-if="acc.password" class="pay-account-row">
-              <span>Mật khẩu</span><strong>{{ acc.password }}</strong>
-            </div>
-            <div v-if="acc.verifyEmail" class="pay-account-row">
-              <span>Email xác thực</span><strong>{{ acc.verifyEmail }}</strong>
+          <div class="od-accounts">
+            <div v-for="(acc, i) in deliveredAccounts" :key="i" class="od-acc-card">
+              <div class="od-acc-header">
+                <v-icon size="13" color="#059669">mdi-account-circle-outline</v-icon>
+                Tài khoản {{ i + 1 }}
+              </div>
+
+              <div v-if="acc.user" class="od-acc-row">
+                <span class="od-acc-label">Email / User</span>
+                <div class="od-acc-val-wrap">
+                  <span class="od-acc-val">{{ acc.user }}</span>
+                  <button class="od-copy-btn" :class="{ 'od-copy-btn--ok': copiedField === `u${i}` }" @click="copyText(acc.user, `u${i}`)">
+                    <v-icon size="13">{{ copiedField === `u${i}` ? 'mdi-check' : 'mdi-content-copy' }}</v-icon>
+                  </button>
+                </div>
+              </div>
+
+              <div v-if="acc.password" class="od-acc-row">
+                <span class="od-acc-label">Mật khẩu</span>
+                <div class="od-acc-val-wrap">
+                  <span class="od-acc-val">{{ acc.password }}</span>
+                  <button class="od-copy-btn" :class="{ 'od-copy-btn--ok': copiedField === `p${i}` }" @click="copyText(acc.password, `p${i}`)">
+                    <v-icon size="13">{{ copiedField === `p${i}` ? 'mdi-check' : 'mdi-content-copy' }}</v-icon>
+                  </button>
+                </div>
+              </div>
+
+              <div v-if="acc.verifyEmail" class="od-acc-row">
+                <span class="od-acc-label">Email xác minh</span>
+                <div class="od-acc-val-wrap">
+                  <span class="od-acc-val">{{ acc.verifyEmail }}</span>
+                  <button class="od-copy-btn" :class="{ 'od-copy-btn--ok': copiedField === `v${i}` }" @click="copyText(acc.verifyEmail, `v${i}`)">
+                    <v-icon size="13">{{ copiedField === `v${i}` ? 'mdi-check' : 'mdi-content-copy' }}</v-icon>
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -589,13 +616,12 @@ if (import.meta.client) {
   display: flex;
   flex-direction: column;
   gap: 12px;
-  transition: box-shadow 0.2s, transform 0.2s;
+  transition: box-shadow 0.2s;
   cursor: default;
 }
 
 .product-card:hover {
   box-shadow: 0 12px 32px rgba(21, 101, 192, 0.1);
-  transform: translateY(-3px);
   border-color: #bfdbfe;
 }
 
@@ -689,10 +715,40 @@ if (import.meta.client) {
 .btn-see-more:hover { text-decoration: underline; }
 
 /* ── Quantity stepper ───────────────────── */
+.card-footer {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
 .card-buy-row {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 12px;
+}
+
+.card-total {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  flex: 1;
+}
+
+.card-total-label {
+  font-size: 0.68rem;
+  color: #94a3b8;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  line-height: 1;
+}
+
+.card-total-amount {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #1565c0;
+  line-height: 1.2;
+  white-space: nowrap;
 }
 
 .qty-stepper {
@@ -737,7 +793,6 @@ if (import.meta.client) {
 .qty-input::-webkit-inner-spin-button,
 .qty-input::-webkit-outer-spin-button { -webkit-appearance: none; }
 
-.card-buy-row .btn-buy { flex: 1; min-width: 0; }
 
 /* ── Button ─────────────────────────────── */
 .btn-buy {
@@ -853,7 +908,7 @@ if (import.meta.client) {
   padding: 16px 20px;
 }
 .pay-header-title { font-size: 1rem; font-weight: 700; color: #1e293b; }
-.pay-body { padding: 16px 20px 24px; display: flex; flex-direction: column; gap: 12px; }
+.pay-body { padding: 16px 20px 24px; display: flex; flex-direction: column; gap: 12px; overflow-y: auto; }
 .pay-center { display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 16px 0; }
 .pay-hint { font-size: 0.85rem; color: #64748b; margin: 0; }
 .pay-product-name { font-size: 0.9rem; color: #475569; text-align: center; margin: 0; }
@@ -993,6 +1048,94 @@ if (import.meta.client) {
   margin-top: 4px;
 }
 .pay-contact-btn:hover { opacity: 0.88; }
+
+/* ── Order detail (od-*) ────────────────── */
+.od-summary {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+.od-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.82rem;
+  color: #374151;
+  gap: 12px;
+}
+.od-row span { color: #94a3b8; flex-shrink: 0; }
+.od-row strong { text-align: right; }
+.mono { font-family: monospace; }
+.small { font-size: 0.75rem; color: #64748b !important; font-weight: 400 !important; }
+
+.od-accounts { display: flex; flex-direction: column; gap: 10px; }
+
+.od-acc-card {
+  background: #f8fffe;
+  border: 1px solid #d1fae5;
+  border-radius: 10px;
+  overflow: hidden;
+}
+.od-acc-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 12px;
+  background: #ecfdf5;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #059669;
+  border-bottom: 1px solid #d1fae5;
+}
+.od-acc-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-bottom: 1px solid #f0fdf4;
+}
+.od-acc-row:last-child { border-bottom: none; }
+.od-acc-label {
+  font-size: 0.72rem;
+  color: #94a3b8;
+  width: 90px;
+  flex-shrink: 0;
+  font-weight: 500;
+}
+.od-acc-val-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+  min-width: 0;
+}
+.od-acc-val {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #0f172a;
+  font-family: monospace;
+  word-break: break-all;
+  flex: 1;
+}
+.od-copy-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px; height: 26px;
+  border: none;
+  background: transparent;
+  border-radius: 6px;
+  cursor: pointer;
+  flex-shrink: 0;
+  color: #94a3b8;
+  transition: all 0.15s;
+}
+.od-copy-btn:hover { background: #d1fae5; color: #059669; }
+.od-copy-btn--ok { background: #d1fae5 !important; color: #059669 !important; }
 
 /* ── Close button ───────────────────────── */
 .popup-close {
