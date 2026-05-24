@@ -17,12 +17,25 @@ const selected = ref<string[]>([]);
 const balances = ref<any[]>([]);
 const balanceLoading = ref(false);
 
+// Filter theo shop
+const shopFilter = ref("");
+const shopOptions = computed(() => {
+  const names = [...new Set(products.value.map((p) => p.shopName).filter(Boolean))];
+  return [{ title: "Tất cả shop", value: "" }, ...names.map((n) => ({ title: n, value: n }))];
+});
+const filteredProducts = computed(() =>
+  shopFilter.value
+    ? products.value.filter((p) => p.shopName === shopFilter.value)
+    : products.value
+);
+watch(shopFilter, () => { page.value = 1; selected.value = []; });
+
 // Phân trang
 const page = ref(1);
 const perPage = 10;
-const totalPages = computed(() => Math.ceil(products.value.length / perPage));
+const totalPages = computed(() => Math.ceil(filteredProducts.value.length / perPage));
 const paginated = computed(() =>
-  products.value.slice((page.value - 1) * perPage, page.value * perPage)
+  filteredProducts.value.slice((page.value - 1) * perPage, page.value * perPage)
 );
 
 const allPageSelected = computed(() =>
@@ -245,7 +258,18 @@ onMounted(() => { fetchProducts(true); fetchBalances(); });
           </template>
         </div>
         <div class="toolbar-right">
-          <span class="table-count">{{ products.length }} sản phẩm</span>
+          <v-select
+            v-model="shopFilter"
+            :items="shopOptions"
+            item-title="title"
+            item-value="value"
+            density="compact"
+            variant="outlined"
+            hide-details
+            rounded="lg"
+            style="min-width: 150px"
+          />
+          <span class="table-count">{{ filteredProducts.length }} sản phẩm</span>
         </div>
       </div>
 
@@ -381,8 +405,8 @@ onMounted(() => { fetchProducts(true); fetchBalances(); });
 
       <div class="pagination">
         <span class="pagination-info">
-          Hiển thị {{ (page - 1) * perPage + 1 }}–{{ Math.min(page * perPage, products.length) }}
-          / {{ products.length }} sản phẩm
+          Hiển thị {{ (page - 1) * perPage + 1 }}–{{ Math.min(page * perPage, filteredProducts.length) }}
+          / {{ filteredProducts.length }} sản phẩm
         </span>
         <v-pagination
           v-model="page"
