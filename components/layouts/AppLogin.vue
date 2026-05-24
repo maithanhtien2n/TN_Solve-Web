@@ -62,13 +62,10 @@ useHead({
         <div class="lc-left__blob" />
         <div class="lc-left__blob2" />
 
-        <div class="lc-left__top">
-          <v-img src="/images/tn-solve-icon.png" lazy-src="/images/tn-solve-icon.png" class="lc-logo" />
-        </div>
+        <div class="lc-center-content">
+          <p class="lc-feat-title">Thông tin được lấy từ Google</p>
 
-        <p class="lc-feat-title">Thông tin được lấy từ Google</p>
-
-        <div class="lc-features">
+          <div class="lc-features">
           <div class="lc-feat">
             <span class="lc-feat__check"><svg width="11" height="11" viewBox="0 0 12 12" fill="none"><polyline points="1.5,6 4.5,9 10.5,3" stroke="#1565c0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
             <span>Tên & ảnh đại diện từ tài khoản Google</span>
@@ -83,6 +80,8 @@ useHead({
           </div>
         </div>
 
+        </div>
+
       </div>
 
       <!-- Right panel -->
@@ -95,8 +94,11 @@ useHead({
         </button>
 
         <div class="lc-form">
-          <h2 class="lc-title">CHÀO MỪNG!</h2>
-          <p class="lc-sub">Đăng nhập để bắt đầu tạo video AI</p>
+          <div class="lc-form-header">
+            <v-img src="/images/tn-solve-icon.png" lazy-src="/images/tn-solve-icon.png" width="170" height="64" class="lc-logo" />
+            <h2 class="lc-title">CHÀO MỪNG!</h2>
+            <p class="lc-sub">Đăng nhập để bắt đầu với TN Solve</p>
+          </div>
 
           <button
             class="lc-google"
@@ -173,11 +175,19 @@ useHead({
   padding: 40px 36px;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  gap: 16px;
+  justify-content: flex-start;
+  gap: 0;
   position: relative;
   overflow: hidden;
   border-right: 1px solid #e8eef6;
+}
+
+.lc-center-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 16px;
 }
 
 .lc-left__blob {
@@ -204,9 +214,17 @@ useHead({
   gap: 10px;
 }
 
+.lc-form-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
 .lc-logo {
-  width: 140px;
   filter: drop-shadow(0 4px 12px rgba(21,101,192,0.2));
+  flex-shrink: 0;
 }
 
 /* ─── Features ──────────────────────────────────────────── */
@@ -264,6 +282,7 @@ useHead({
   background: radial-gradient(circle, rgba(66,165,245,0.25) 0%, transparent 70%);
   top: -80px; right: -80px;
   pointer-events: none;
+  animation: floatOrb 6s ease-in-out infinite;
 }
 
 .lc-right__orb2 {
@@ -273,6 +292,7 @@ useHead({
   background: radial-gradient(circle, rgba(99,179,237,0.15) 0%, transparent 70%);
   bottom: -40px; left: -40px;
   pointer-events: none;
+  animation: floatOrb 8s 1s ease-in-out infinite reverse;
 }
 
 .lc-close {
@@ -307,15 +327,31 @@ useHead({
   font-size: 1.8rem;
   font-weight: 800;
   color: #0f172a;
-  margin: 0 0 4px;
+  margin: 0;
   letter-spacing: -0.4px;
+  text-align: center;
+  animation: fadeSlideUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+  line-height: 1.1;
 }
 
 .lc-sub {
   font-size: 0.85rem;
   color: #64748b;
-  margin: 0 0 24px;
+  margin: 0;
   line-height: 1.5;
+  text-align: center;
+  animation: fadeSlideUp 0.5s 0.08s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* ─── Keyframes ──────────────────────────────────────────── */
+@keyframes fadeSlideUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes floatOrb {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50%       { transform: translateY(-16px) scale(1.04); }
 }
 
 /* ─── Google btn ─────────────────────────────────────────── */
@@ -336,12 +372,13 @@ useHead({
   cursor: pointer;
   overflow: hidden;
   box-shadow: 0 2px 12px rgba(0,0,0,0.08);
-  transition: border-color 0.18s, box-shadow 0.18s;
+  transition: border-color 0.18s, box-shadow 0.18s, transform 0.18s;
 }
 
 .lc-google:hover {
   border-color: #93c5fd;
   box-shadow: 0 4px 16px rgba(30,136,229,0.15);
+  transform: translateY(-1px);
 }
 
 .lc-google--busy { opacity: 0.65; cursor: not-allowed; }

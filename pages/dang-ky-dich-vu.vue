@@ -2,8 +2,11 @@
 import { appService } from "~/services/app";
 import { couponService } from "~/services/app";
 
+const route = useRoute();
+const router = useRouter();
 const { isMobile } = useDevice();
 const { onGetterMasterData } = useMasterDataStore();
+const { onGetterUserData: userData, onGetterDisplayLogin: displayLogin } = useAppStore();
 
 const loading = ref<string>("");
 const agreedToTerms = ref<boolean>(false);
@@ -73,6 +76,11 @@ const totalPrice = computed(() => {
 });
 
 const onClickPayment = async () => {
+  if (!userData.value?.email) {
+    router.replace({ query: { redirect: route.path } });
+    displayLogin.value = true;
+    return;
+  }
   if (!agreedToTerms.value) {
     showTermsError.value = true;
     return;
@@ -99,7 +107,7 @@ useSeo({
   keywords: "đăng ký TN Solve, mua gói tạo video AI, giá 139k",
 });
 
-definePageMeta({ middleware: "auth" });
+definePageMeta({});
 </script>
 
 <template>

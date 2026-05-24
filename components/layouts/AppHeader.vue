@@ -192,7 +192,7 @@ const onClickMenuItem = (value: string) => {
           </template>
 
           <!-- Login -->
-          <button v-else class="login-btn" @click="displayLogin = true">
+          <button v-else class="login-btn" @click="() => { router.replace({ query: { redirect: route.path } }); displayLogin = true; }">
             ĐĂNG NHẬP
           </button>
         </div>
@@ -447,41 +447,23 @@ const onClickMenuItem = (value: string) => {
 
 /* ─── Login ──────────────────────────────────────────── */
 .login-btn {
-  position: relative;
-  padding: 10px 22px;
+  padding: 6px 18px;
   border-radius: 10px;
   background: #fff;
   color: #1565c0;
-  font-size: 1.05rem;
-  font-weight: 500;
+  font-size: 1rem;
+  font-weight: 700;
   border: none;
   cursor: pointer;
-  letter-spacing: 0.2px;
-  box-shadow: none;
-  transition: transform 0.18s, box-shadow 0.18s;
-  overflow: hidden;
-}
-
-.login-btn::after {
-  content: "";
-  position: absolute;
-  top: 0; left: 0;
-  width: 40%;
-  height: 100%;
-  background: linear-gradient(120deg, transparent, rgba(30,136,229,0.12), transparent);
-  transform: skewX(-15deg) translateX(-200%);
+  letter-spacing: 0;
+  box-shadow: 0 2px 8px rgba(21, 101, 192, 0.15);
+  transition: box-shadow 0.18s, background 0.18s;
+  white-space: nowrap;
+  user-select: none;
 }
 
 .login-btn:hover {
-  box-shadow: none;
-}
-
-.login-btn:hover::after {
-  animation: login-shimmer 1.2s ease forwards;
-}
-
-@keyframes login-shimmer {
-  from { transform: skewX(-15deg) translateX(-200%); }
-  to   { transform: skewX(-15deg) translateX(500%); }
+  background: #f0f6ff;
+  box-shadow: 0 4px 14px rgba(21, 101, 192, 0.22);
 }
 </style>

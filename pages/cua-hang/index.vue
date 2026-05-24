@@ -3,6 +3,10 @@ import { shopService } from "~/services/shop";
 
 useHead({ title: "Cửa hàng | TN Solve" });
 
+const route = useRoute();
+const router = useRouter();
+const { onGetterUserData: userData, onGetterDisplayLogin: displayLogin } = useAppStore();
+
 const loading = ref(false);
 const products = ref<any[]>([]);
 const shopErrors = ref<any[]>([]);
@@ -18,9 +22,37 @@ const deliveredAccounts = ref<any[]>([]);
 const paymentError = ref('');
 const paymentIsContactAdmin = ref(false);
 let pollTimer: ReturnType<typeof setInterval> | null = null;
+let countdownTimer: ReturnType<typeof setInterval> | null = null;
+const countdown = ref(10 * 60); // giây
+
+const countdownText = computed(() => {
+  const m = Math.floor(countdown.value / 60).toString().padStart(2, '0');
+  const s = (countdown.value % 60).toString().padStart(2, '0');
+  return `${m}:${s}`;
+});
+
+const quantities = ref<Record<string, number>>({});
+const getQty = (uid: string) => quantities.value[uid] ?? 1;
+const setQty = (uid: string, val: number, max: number) => {
+  quantities.value[uid] = Math.min(Math.max(1, isNaN(val) ? 1 : val), max);
+};
+const onQtyInput = (uid: string, event: Event, max: number) => {
+  const el = event.target as HTMLInputElement;
+  const raw = parseInt(el.value, 10);
+  const clamped = Math.min(Math.max(1, isNaN(raw) ? 1 : raw), max);
+  quantities.value[uid] = clamped;
+  // Directly update DOM to prevent displaying value beyond stock
+  el.value = String(clamped);
+};
 
 const onBuyNow = async (product: any) => {
   if (loadingUid.value) return;
+  if (!userData.value?.email) {
+    router.replace({ query: { redirect: route.path } });
+    displayLogin.value = true;
+    return;
+  }
+  const quantity = getQty(product.uid);
   selectedProduct.value = null;
   paymentData.value = null;
   paymentStatus.value = 'idle';
@@ -30,7 +62,7 @@ const onBuyNow = async (product: any) => {
   loadingUid.value = product.uid;
 
   try {
-    const res = await shopService.createShopPayment({ uid: product.uid, quantity: 1 });
+    const res = await shopService.createShopPayment({ uid: product.uid, quantity });
     paymentDialog.value = true;
     if (res?.data?.contactAdmin) {
       paymentStatus.value = 'failed';
@@ -41,11 +73,8 @@ const onBuyNow = async (product: any) => {
       paymentStatus.value = 'pending';
       startPolling(res?.data?.orderCode);
     }
-  } catch (e: any) {
-    paymentDialog.value = true;
-    paymentStatus.value = 'failed';
-    paymentError.value = e?.response?.data?.message || e?.message || 'Có lỗi xảy ra';
-    paymentIsContactAdmin.value = false;
+  } catch {
+    // Axios interceptor đã hiển thị toast lỗi tự động — không cần mở dialog
   } finally {
     loadingUid.value = null;
   }
@@ -53,6 +82,22 @@ const onBuyNow = async (product: any) => {
 
 const startPolling = (orderCode: string) => {
   stopPolling();
+
+  // Countdown
+  countdown.value = 10 * 60;
+  countdownTimer = setInterval(() => {
+    if (countdown.value > 0) {
+      countdown.value--;
+    } else {
+      stopPolling();
+      if (paymentStatus.value === 'pending') {
+        paymentStatus.value = 'failed';
+        paymentError.value = 'Hết thời gian chờ. Vui lòng liên hệ hỗ trợ.';
+      }
+    }
+  }, 1000);
+
+  // Polling trạng thái
   pollTimer = setInterval(async () => {
     try {
       const res = await shopService.getOrderStatus(orderCode);
@@ -68,23 +113,21 @@ const startPolling = (orderCode: string) => {
       }
     } catch {}
   }, 3000);
-  // Timeout sau 10 phút
-  setTimeout(() => {
-    if (paymentStatus.value === 'pending') {
-      paymentStatus.value = 'failed';
-      paymentError.value = 'Hết thời gian chờ. Vui lòng liên hệ hỗ trợ.';
-      stopPolling();
-    }
-  }, 10 * 60 * 1000);
 };
 
 const stopPolling = () => {
   if (pollTimer) { clearInterval(pollTimer); pollTimer = null; }
+  if (countdownTimer) { clearInterval(countdownTimer); countdownTimer = null; }
 };
 
-const onClosePayment = () => {
+const onClosePayment = async () => {
+  const orderCode = paymentData.value?.orderCode;
   stopPolling();
   paymentDialog.value = false;
+  // Huỷ đơn nếu đang pending
+  if (paymentStatus.value === 'pending' && orderCode) {
+    try { await shopService.cancelOrder(orderCode); } catch {}
+  }
 };
 
 const fetchProducts = async () => {
@@ -95,14 +138,27 @@ const fetchProducts = async () => {
       (p: any) => p.available > 0
     );
     shopErrors.value = res?.data?.shopErrors || [];
-  } catch (e) {
-    console.error(e);
+  } catch {
+    // Axios interceptor xử lý toast lỗi
   } finally {
     loading.value = false;
   }
 };
 
 onMounted(fetchProducts);
+
+// Huỷ đơn pending khi user thoát trang (đóng tab, reload, navigate)
+const cancelPendingOnLeave = () => {
+  const orderCode = paymentData.value?.orderCode;
+  if (orderCode && paymentStatus.value === 'pending') {
+    shopService.cancelOrder(orderCode).catch(() => {});
+  }
+};
+onUnmounted(cancelPendingOnLeave);
+if (import.meta.client) {
+  window.addEventListener('beforeunload', cancelPendingOnLeave);
+  onUnmounted(() => window.removeEventListener('beforeunload', cancelPendingOnLeave));
+}
 </script>
 
 <template>
@@ -154,8 +210,7 @@ onMounted(fetchProducts);
         class="mb-6"
         density="compact"
       >
-        Một số nhà cung cấp đang gián đoạn:
-        <strong>{{ shopErrors.map((e) => e.shopName).join(", ") }}</strong>
+        Một số sản phẩm tạm thời không khả dụng. Vui lòng thử lại sau hoặc liên hệ hỗ trợ.
       </v-alert>
 
       <!-- Loading -->
@@ -197,12 +252,35 @@ onMounted(fetchProducts);
           <!-- Spacer -->
           <div style="flex:1" />
 
-          <!-- Nút mua -->
-          <button class="btn-buy" :disabled="loadingUid === product.uid" @click="onBuyNow(product)">
-            <v-progress-circular v-if="loadingUid === product.uid" indeterminate size="15" width="2" color="white" />
-            <v-icon v-else size="15">mdi-lightning-bolt</v-icon>
-            {{ loadingUid === product.uid ? 'Đang xử lý...' : 'Mua ngay' }}
-          </button>
+          <!-- Số lượng + Mua ngay -->
+          <div class="card-buy-row">
+            <div class="qty-stepper">
+              <button
+                class="qty-btn"
+                :disabled="getQty(product.uid) <= 1"
+                @click.stop="setQty(product.uid, getQty(product.uid) - 1, product.available)"
+              >−</button>
+              <input
+                class="qty-input"
+                type="number"
+                min="1"
+                :max="product.available"
+                :value="getQty(product.uid)"
+                @input="onQtyInput(product.uid, $event, product.available)"
+                @blur="setQty(product.uid, getQty(product.uid), product.available)"
+              />
+              <button
+                class="qty-btn"
+                :disabled="getQty(product.uid) >= product.available"
+                @click.stop="setQty(product.uid, getQty(product.uid) + 1, product.available)"
+              >+</button>
+            </div>
+            <button class="btn-buy" :disabled="loadingUid === product.uid" @click="onBuyNow(product)">
+              <v-progress-circular v-if="loadingUid === product.uid" indeterminate size="15" width="2" color="white" />
+              <v-icon v-else size="15">mdi-lightning-bolt</v-icon>
+              {{ loadingUid === product.uid ? 'Đang xử lý...' : 'Mua ngay' }}
+            </button>
+          </div>
 
         </div>
       </div>
@@ -297,16 +375,47 @@ onMounted(fetchProducts);
           <div class="pay-polling">
             <v-progress-circular indeterminate size="14" width="2" color="primary" />
             <span>Đang chờ xác nhận thanh toán...</span>
+            <span class="pay-countdown" :class="countdown < 60 ? 'pay-countdown-urgent' : ''">
+              {{ countdownText }}
+            </span>
+          </div>
+
+          <div class="pay-warning-note">
+            <v-icon size="13" color="#92400e">mdi-alert-outline</v-icon>
+            Giữ nguyên cửa sổ này sau khi chuyển khoản để nhận tài khoản ngay. Đóng popup sẽ huỷ đơn hàng.
           </div>
         </template>
 
         <!-- Thành công -->
         <template v-else-if="paymentStatus === 'completed'">
           <div class="pay-center">
-            <v-icon size="56" color="success">mdi-check-circle-outline</v-icon>
+            <v-icon size="52" color="success">mdi-check-circle-outline</v-icon>
             <p class="pay-success-msg">Tài khoản đã được giao</p>
           </div>
+
+          <!-- Thông tin đơn hàng -->
+          <div class="pay-order-summary">
+            <div class="pay-order-row">
+              <span>Sản phẩm</span>
+              <strong>{{ paymentData?.product_name }}</strong>
+            </div>
+            <div class="pay-order-row">
+              <span>Số lượng</span>
+              <strong>{{ deliveredAccounts.length }} tài khoản</strong>
+            </div>
+            <div class="pay-order-row">
+              <span>Tổng tiền</span>
+              <strong class="text-primary">{{ paymentData?.amount?.toLocaleString('vi-VN') }}₫</strong>
+            </div>
+            <div class="pay-order-row">
+              <span>Mã đơn</span>
+              <strong class="pay-order-code">{{ paymentData?.orderCode }}</strong>
+            </div>
+          </div>
+
+          <!-- Danh sách tài khoản -->
           <div v-for="(acc, i) in deliveredAccounts" :key="i" class="pay-account-card">
+            <div class="pay-account-label">Tài khoản {{ i + 1 }}</div>
             <div v-if="acc.user" class="pay-account-row">
               <span>Tài khoản</span><strong>{{ acc.user }}</strong>
             </div>
@@ -316,6 +425,15 @@ onMounted(fetchProducts);
             <div v-if="acc.verifyEmail" class="pay-account-row">
               <span>Email xác thực</span><strong>{{ acc.verifyEmail }}</strong>
             </div>
+          </div>
+
+          <!-- Link trang tài khoản -->
+          <div class="pay-history-tip">
+            <v-icon size="14" color="#64748b">mdi-information-outline</v-icon>
+            Xem lại thông tin bất cứ lúc nào tại
+            <nuxt-link to="/tai-khoan" class="pay-history-link" @click="paymentDialog = false">
+              Tài khoản → Lịch sử mua hàng
+            </nuxt-link>
           </div>
         </template>
 
@@ -570,6 +688,57 @@ onMounted(fetchProducts);
 
 .btn-see-more:hover { text-decoration: underline; }
 
+/* ── Quantity stepper ───────────────────── */
+.card-buy-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.qty-stepper {
+  display: flex;
+  align-items: center;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 10px;
+  overflow: hidden;
+  flex: 1;
+  background: #fff;
+}
+
+.qty-btn {
+  width: 32px;
+  height: 40px;
+  border: none;
+  background: #f8fafc;
+  color: #374151;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+  flex-shrink: 0;
+}
+.qty-btn:hover:not(:disabled) { background: #e2e8f0; }
+.qty-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+
+.qty-input {
+  flex: 1;
+  min-width: 0;
+  height: 40px;
+  border: none;
+  border-left: 1.5px solid #e2e8f0;
+  border-right: 1.5px solid #e2e8f0;
+  text-align: center;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #0f172a;
+  outline: none;
+  -moz-appearance: textfield;
+}
+.qty-input::-webkit-inner-spin-button,
+.qty-input::-webkit-outer-spin-button { -webkit-appearance: none; }
+
+.card-buy-row .btn-buy { flex: 1; min-width: 0; }
+
 /* ── Button ─────────────────────────────── */
 .btn-buy {
   display: flex;
@@ -716,8 +885,83 @@ onMounted(fetchProducts);
   font-size: 0.78rem;
   color: #64748b;
 }
+
+.pay-countdown {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #1565c0;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.5px;
+}
+
+.pay-countdown-urgent { color: #dc2626; }
+
+.pay-warning-note {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.75rem;
+  color: #92400e;
+  background: #fffbeb;
+  border: 1px solid #fde68a;
+  border-radius: 8px;
+  padding: 8px 10px;
+  line-height: 1.5;
+}
 .pay-success-msg { font-size: 0.95rem; font-weight: 600; color: #16a34a; margin: 0; }
 .pay-error-msg { font-size: 0.9rem; color: #dc2626; text-align: center; margin: 0; }
+
+/* ─── Order summary ─── */
+.pay-order-summary {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 10px 14px;
+  margin-bottom: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.pay-order-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.82rem;
+  color: #374151;
+}
+.pay-order-row span { color: #94a3b8; }
+.pay-order-code { font-family: monospace; font-size: 0.78rem; color: #64748b; }
+
+/* ─── History tip ─── */
+.pay-history-tip {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-wrap: wrap;
+  font-size: 0.75rem;
+  color: #94a3b8;
+  margin-top: 4px;
+  padding: 8px 10px;
+  background: #f8fafc;
+  border-radius: 8px;
+}
+.pay-history-link {
+  color: #1e88e5;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.pay-history-link:hover { text-decoration: underline; }
+
+.pay-account-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #059669;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  margin-bottom: 6px;
+}
+
 .pay-account-card {
   background: #f0fdf4;
   border: 1px solid #bbf7d0;

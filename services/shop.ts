@@ -22,6 +22,14 @@ export const shopService = {
     return await api.get(`/telegram-buyer/order-status/${orderCode}`);
   },
 
+  async cancelOrder(orderCode: string) {
+    return await api.post(`/telegram-buyer/cancel-order/${orderCode}`);
+  },
+
+  async getMyShopOrders() {
+    return await api.get("/telegram-buyer/my-orders");
+  },
+
   // ADMIN
   async adminGetProducts() {
     return await api.get("/telegram-buyer/admin/products");
