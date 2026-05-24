@@ -208,7 +208,7 @@ onMounted(() => { fetchProducts(true); fetchBalances(); });
         <v-icon size="15" color="#64748b">mdi-wallet-outline</v-icon>
         <span class="balance-shop">{{ b.shopName }}</span>
         <div class="balance-sep" />
-        <span class="balance-label">Số dư</span>
+
         <span class="balance-amount" :class="b.balance > 0 ? 'balance-ok' : 'balance-empty'">
           {{ b.balance?.toLocaleString("vi-VN") }}<span class="balance-unit">₫</span>
         </span>
@@ -522,7 +522,7 @@ onMounted(() => { fetchProducts(true); fetchBalances(); });
 .col-toggle { width: 100px; }
 .shop-table th.col-toggle,
 .shop-table td.col-toggle { text-align: center; }
-.col-action { width: 200px; }
+.col-action { width: 220px; min-width: 220px; }
 .shop-table th.col-action,
 .shop-table td.col-action { text-align: right; }
 .col-action .v-field__input { text-align: right; }

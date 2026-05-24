@@ -45,6 +45,13 @@ const breadcrumbs = computed<any>(() => {
     } as unknown as any);
   }
 
+  if (matched.length === 1 && (matched[0].path.includes("/admin/shop"))) {
+    matched.unshift({
+      path: "/admin/shop",
+      meta: { title: "Cửa hàng" },
+    } as unknown as any);
+  }
+
   if (
     matched.length === 1 &&
     matched[0].path.includes("/doi-tac/gioi-thieu-cua-toi")

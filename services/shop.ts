@@ -31,6 +31,10 @@ export const shopService = {
   },
 
   // ADMIN
+  async adminGetShopOrders(params?: { status?: string; search?: string; page?: number; limit?: number }) {
+    return await api.get("/telegram-buyer/admin/orders", { params });
+  },
+
   async adminGetProducts() {
     return await api.get("/telegram-buyer/admin/products");
   },
