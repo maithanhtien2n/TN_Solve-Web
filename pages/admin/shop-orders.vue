@@ -69,6 +69,19 @@ const copyText = async (text: string, key: string) => {
   copiedField.value = key;
   setTimeout(() => { copiedField.value = ""; }, 1500);
 };
+
+const processingOrder = ref("");
+const onProcessOrder = async (order: any) => {
+  if (!confirm(`Xử lý thủ công đơn ${order.orderCode}?\nHệ thống sẽ mua tài khoản từ shop và giao cho khách.`)) return;
+  processingOrder.value = order.orderCode;
+  try {
+    await shopService.adminProcessOrder(order.orderCode);
+    await fetchOrders();
+  } catch {
+  } finally {
+    processingOrder.value = "";
+  }
+};
 </script>
 
 <template>
@@ -164,6 +177,16 @@ const copyText = async (text: string, key: string) => {
                   @click="selectedOrder = order"
                 >
                   <v-icon size="13">mdi-text-box-outline</v-icon> Chi tiết đơn hàng
+                </button>
+                <button
+                  v-else-if="order.status === 'pending'"
+                  class="btn-action btn-process"
+                  :disabled="processingOrder === order.orderCode"
+                  @click="onProcessOrder(order)"
+                >
+                  <v-progress-circular v-if="processingOrder === order.orderCode" indeterminate size="11" width="2" />
+                  <v-icon v-else size="13">mdi-cog-play-outline</v-icon>
+                  Xử lý thủ công
                 </button>
                 <span v-else-if="order.errorMessage" class="error-inline" :title="order.errorMessage">
                   <v-icon size="13" color="#ef4444">mdi-alert-circle-outline</v-icon>
@@ -304,7 +327,8 @@ const copyText = async (text: string, key: string) => {
 }
 
 .btn-action:hover { opacity: 0.8; }
-.btn-show { color: #059669; background: #f0fdf4; border-color: #bbf7d0; }
+.btn-show    { color: #059669; background: #f0fdf4; border-color: #bbf7d0; }
+.btn-process { color: #d97706; background: #fffbeb; border-color: #fde68a; }
 
 /* ── Table ──────────────────────── */
 .table-wrap { overflow-x: auto; }

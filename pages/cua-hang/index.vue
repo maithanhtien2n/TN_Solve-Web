@@ -127,14 +127,24 @@ const stopPolling = () => {
   if (countdownTimer) { clearInterval(countdownTimer); countdownTimer = null; }
 };
 
-const onClosePayment = async () => {
-  const orderCode = paymentData.value?.orderCode;
+// Đóng dialog — KHÔNG huỷ đơn, chỉ dừng polling
+const onClosePayment = () => {
   stopPolling();
   paymentDialog.value = false;
-  // Huỷ đơn nếu đang pending
-  if (paymentStatus.value === 'pending' && orderCode) {
-    try { await shopService.cancelOrder(orderCode); } catch {}
-  }
+};
+
+// Huỷ đơn — chỉ khi user chủ động bấm nút "Huỷ đơn hàng"
+const cancelingOrder = ref(false);
+const onCancelOrder = async () => {
+  const orderCode = paymentData.value?.orderCode;
+  if (!orderCode) return;
+  cancelingOrder.value = true;
+  try {
+    await shopService.cancelOrder(orderCode);
+  } catch {}
+  cancelingOrder.value = false;
+  stopPolling();
+  paymentDialog.value = false;
 };
 
 const fetchProducts = async () => {
@@ -154,18 +164,8 @@ const fetchProducts = async () => {
 
 onMounted(fetchProducts);
 
-// Huỷ đơn pending khi user thoát trang (đóng tab, reload, navigate)
-const cancelPendingOnLeave = () => {
-  const orderCode = paymentData.value?.orderCode;
-  if (orderCode && paymentStatus.value === 'pending') {
-    shopService.cancelOrder(orderCode).catch(() => {});
-  }
-};
-onUnmounted(cancelPendingOnLeave);
-if (import.meta.client) {
-  window.addEventListener('beforeunload', cancelPendingOnLeave);
-  onUnmounted(() => window.removeEventListener('beforeunload', cancelPendingOnLeave));
-}
+// Dừng polling khi rời trang (không huỷ đơn)
+onUnmounted(stopPolling);
 </script>
 
 <template>
@@ -395,8 +395,14 @@ if (import.meta.client) {
 
           <div class="pay-warning-note">
             <v-icon size="13" color="#92400e">mdi-alert-outline</v-icon>
-            Giữ nguyên cửa sổ này sau khi chuyển khoản để nhận tài khoản ngay. Đóng popup sẽ huỷ đơn hàng.
+            Có thể đóng popup và quay lại sau — đơn hàng vẫn được xử lý sau khi thanh toán thành công.
           </div>
+
+          <button class="btn-cancel-order" :disabled="cancelingOrder" @click="onCancelOrder">
+            <v-progress-circular v-if="cancelingOrder" indeterminate size="13" width="2" color="#dc2626" />
+            <v-icon v-else size="14">mdi-close-circle-outline</v-icon>
+            Huỷ đơn hàng
+          </button>
         </template>
 
         <!-- Thành công -->
@@ -1048,6 +1054,25 @@ if (import.meta.client) {
   margin-top: 4px;
 }
 .pay-contact-btn:hover { opacity: 0.88; }
+
+.btn-cancel-order {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  padding: 9px;
+  border-radius: 10px;
+  border: 1px solid #fecaca;
+  background: #fef2f2;
+  color: #dc2626;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+.btn-cancel-order:hover:not(:disabled) { opacity: 0.8; }
+.btn-cancel-order:disabled { opacity: 0.5; cursor: not-allowed; }
 
 /* ── Order detail (od-*) ────────────────── */
 .od-summary {
