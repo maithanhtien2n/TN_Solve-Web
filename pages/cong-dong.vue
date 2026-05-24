@@ -78,15 +78,37 @@ useSeo({
 </script>
 
 <template>
-  <!-- Header -->
-  <div class="page-header mb-6">
-    <div class="page-title-row">
-      <div class="page-icon">
-        <v-icon size="28" color="#1e88e5">mdi-earth</v-icon>
+  <!-- Hero -->
+  <div class="page-hero">
+    <div class="hero-blob" />
+    <div class="hero-blob2" />
+    <div class="hero-inner">
+      <div class="hero-left">
+        <div class="hero-badge">
+          <v-icon size="13" color="rgba(255,255,255,0.85)">mdi-earth</v-icon>
+          Cộng đồng
+        </div>
+        <h1 class="hero-title">Thước phim cộng đồng</h1>
+        <div class="hero-check">
+          <v-icon size="14" color="rgba(255,255,255,0.9)">mdi-check-circle</v-icon>
+          Các thước phim được chia sẻ từ cộng đồng để cùng xem và học tập
+        </div>
       </div>
-      <div>
-        <h2 class="page-title">Thước phim cộng đồng</h2>
-        <p class="page-desc">Các thước phim đã được chia sẻ từ cộng đồng để mọi người cùng xem và học tập.</p>
+      <div class="hero-stats">
+        <div class="hero-stat">
+          <span class="hero-stat-num">{{ products?.totalDocs || 0 }}</span>
+          <span class="hero-stat-label">thước phim</span>
+        </div>
+        <div class="hero-stat-sep" />
+        <div class="hero-stat">
+          <span class="hero-stat-num">AI</span>
+          <span class="hero-stat-label">được tạo bởi</span>
+        </div>
+        <div class="hero-stat-sep" />
+        <div class="hero-stat">
+          <span class="hero-stat-num">Miễn phí</span>
+          <span class="hero-stat-label">xem & học tập</span>
+        </div>
       </div>
     </div>
   </div>
@@ -215,41 +237,109 @@ useSeo({
 
 <style scoped>
 /* ─── Header ─────────────────────────────────────────── */
-.page-header {
-  padding: 18px 20px;
-  margin-top: 23px;
-  margin-bottom: 6px;
-  border-radius: 12px;
-  background: #fff;
-  border: 1px solid #d0dae6;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+.page-hero {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, #1a237e 0%, #283593 40%, #1565c0 80%, #1e88e5 100%);
+  border-radius: 16px;
+  padding: 28px 36px;
+  margin-bottom: 24px;
+  color: #fff;
 }
 
-.page-title-row {
+.hero-blob {
+  position: absolute;
+  width: 260px; height: 260px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+  top: -80px; right: -40px;
+  pointer-events: none;
+}
+
+.hero-blob2 {
+  position: absolute;
+  width: 160px; height: 160px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,255,255,0.07) 0%, transparent 70%);
+  bottom: -50px; left: 200px;
+  pointer-events: none;
+}
+
+.hero-inner {
+  position: relative;
+  z-index: 1;
   display: flex;
   align-items: center;
-  gap: 14px;
+  justify-content: space-between;
+  gap: 32px;
+  flex-wrap: wrap;
 }
 
-.page-icon {
-  flex-shrink: 0;
-  display: flex;
+.hero-left { display: flex; flex-direction: column; gap: 6px; }
+
+.hero-badge {
+  display: inline-flex;
   align-items: center;
-  justify-content: center;
-}
-
-.page-title {
-  font-size: 1.35rem;
+  gap: 5px;
+  background: rgba(255,255,255,0.18);
+  border: 1px solid rgba(255,255,255,0.3);
+  border-radius: 999px;
+  padding: 3px 10px;
+  font-size: 0.65rem;
   font-weight: 700;
-  color: #1a1a1a;
-  margin: 0 0 3px;
-  letter-spacing: -0.2px;
+  letter-spacing: 0.5px;
+  color: rgba(255,255,255,0.95);
+  text-transform: uppercase;
+  width: fit-content;
 }
 
-.page-desc {
-  font-size: 0.82rem;
-  color: #6b7280;
+.hero-title {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: #fff;
   margin: 0;
+  letter-spacing: -0.3px;
+}
+
+.hero-check {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  color: rgba(255,255,255,0.85);
+}
+
+.hero-stats {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-shrink: 0;
+}
+
+.hero-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.hero-stat-num {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: #fff;
+  line-height: 1;
+}
+
+.hero-stat-label {
+  font-size: 0.68rem;
+  color: rgba(255,255,255,0.75);
+  white-space: nowrap;
+}
+
+.hero-stat-sep {
+  width: 1px;
+  height: 32px;
+  background: rgba(255,255,255,0.25);
 }
 
 /* ─── Grid ───────────────────────────────────────────── */

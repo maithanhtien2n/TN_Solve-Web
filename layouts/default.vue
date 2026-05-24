@@ -71,6 +71,12 @@ const onReturnTitle = (title: string) => {
     case "nguoi-dung": {
       return "Người dùng";
     }
+    case "cua-hang": {
+      return "Cửa hàng";
+    }
+    case "cong-dong": {
+      return "Cộng đồng";
+    }
     case "dieu-khoan": {
       return "Điều khoản & quy định";
     }
@@ -389,7 +395,7 @@ onMounted(async () => {
         <div :class="{ 'mx-4': isMobile }">
           <v-breadcrumbs
             v-show="
-              !['/', '/cong-dong'].includes(route.path) &&
+              !['/'].includes(route.path) &&
               breadcrumbsItems &&
               breadcrumbsItems.length
             "

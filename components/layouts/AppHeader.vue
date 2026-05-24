@@ -17,6 +17,7 @@ const {
 const navItems = [
   { title: "Trang chủ", path: "/", icon: "mdi-home-outline" },
   { title: "Cộng đồng", path: "/cong-dong", icon: "mdi-earth" },
+  { title: "Cửa hàng", path: "/cua-hang", icon: "mdi-store-outline" },
   { title: "Đăng ký", path: "/dang-ky-dich-vu", icon: "mdi-tag-outline" },
 ];
 
