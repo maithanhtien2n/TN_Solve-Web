@@ -158,6 +158,14 @@ const onAction = async (event: any) => {
         content: "Thước phim không tồn tại!",
       });
     }
+  } else if (event.action == "delete") {
+    loading.value = "load-table";
+    await productService
+      .actionProduct({ ids: event.ids, action: "delete" })
+      .finally(() => {
+        loading.value = "";
+      });
+    await dataTableRef.value?.loadItems();
   }
 };
 
@@ -212,7 +220,9 @@ const onChangeFilter = (event: any) => {
     :showSelect="false"
     :actions="[]"
     :rowActions="
-      route.path?.split('/')?.pop() === 'error' ? ['reload', 'view'] : ['view']
+      route.path?.split('/')?.pop() === 'error'
+        ? ['delete', 'reload', 'view']
+        : ['delete', 'view']
     "
     :headers="headers"
     :data="data"

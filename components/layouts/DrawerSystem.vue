@@ -51,6 +51,10 @@ const menus = computed<any>(() => {
       route: "videos",
       children: [
         {
+          title: "Đang chờ",
+          route: "/admin/videos/pending",
+        },
+        {
           title: "Đang tạo",
           route: "/admin/videos/in-progress",
         },

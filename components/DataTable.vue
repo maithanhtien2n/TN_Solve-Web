@@ -123,7 +123,9 @@ const onConfirmAction = (action: string, item?: any | null) => {
       message = `Bạn có chắc chắn muốn tạm dừng ${amount} dữ liệu?`;
       break;
     case "delete":
-      message = `Bạn có chắc chắn muốn xóa ${amount} dữ liệu?`;
+      message = item?._id
+        ? `Bạn có chắc chắn muốn xóa dữ liệu này?`
+        : `Bạn có chắc chắn muốn xóa ${amount} dữ liệu?`;
       break;
     default:
       break;
@@ -451,6 +453,17 @@ defineExpose({ params, selected, loadItems, resetSelected });
 
         <div v-else-if="h.key == 'action'" class="d-flex justify-center">
           <v-btn
+            v-if="props.rowActions.includes('delete')"
+            icon
+            size="40"
+            variant="text"
+            color="error"
+            @click="onConfirmAction('delete', slotProps.item)"
+          >
+            <v-icon size="20">mdi-trash-can-outline</v-icon>
+          </v-btn>
+
+          <v-btn
             v-if="props.rowActions.includes('reload')"
             icon
             size="40"
@@ -489,17 +502,6 @@ defineExpose({ params, selected, loadItems, resetSelected });
             @click="emits('action', { action: 'update', item: slotProps.item })"
           >
             <v-icon size="20">mdi-pencil-outline</v-icon>
-          </v-btn>
-
-          <v-btn
-            v-if="props.rowActions.includes('delete')"
-            icon
-            size="40"
-            variant="text"
-            color="error"
-            @click="onConfirmAction('delete', slotProps.item)"
-          >
-            <v-icon size="20">mdi-trash-can-outline</v-icon>
           </v-btn>
         </div>
 

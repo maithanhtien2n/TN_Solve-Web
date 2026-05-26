@@ -3,6 +3,7 @@ import { productService } from "~/services/product";
 import { useIntersectionObserver } from "@vueuse/core";
 
 const { onGetterUserData } = useAppStore();
+const { $socket } = useNuxtApp() as any;
 
 const params = reactive<any>({
   search: "",
@@ -28,6 +29,9 @@ const onGetProducts = async (loadingType: string = "") => {
           docs: [...(products.value?.docs || []), ...(res.data?.docs || [])],
         };
       }
+      // Re-register sau mỗi lần list thay đổi để đảm bảo video primary/grey mới
+      // (thêm sau delete/refresh) cũng được lắng nghe socket update
+      _registerSocketListeners();
     })
     .finally(() => {
       loading.value = "";
@@ -46,7 +50,7 @@ const onClickDotMenuItem = (type: string, data: any) => {
     } else if (type === "private") {
       message = "Bạn có chắc chắn muốn riêng tư video này không?";
     } else if (type === "delete-video") {
-      if (data.state === "primary") {
+      if (["primary", "grey"].includes(data.state)) {
         message =
           "Xóa thước phim đang tạo sẽ tốn 10 tín dụng. Bạn có muốn tiếp tục?";
       } else {
@@ -59,7 +63,7 @@ const onClickDotMenuItem = (type: string, data: any) => {
       noTransMsg: true,
       onConfirm: async () => {
         try {
-          if (data.state === "primary") {
+          if (["primary", "grey"].includes(data.state)) {
             await productService.deleteVideoProcess({ _id: data._id });
           } else {
             await productService.actionProduct({
@@ -98,8 +102,51 @@ const onCardMouseLeave = (event: MouseEvent) => {
   });
 };
 
+// ── Socket: cập nhật card khi product có active state đổi ────────────────
+// Track các id đang lắng nghe để dọn đúng khi unmount
+const _socketIds = new Set<string>();
+
+const _registerSocketListeners = () => {
+  // Dọn listener cũ
+  _socketIds.forEach((id) => $socket.off(`server:product-detail:${id}`));
+  _socketIds.clear();
+
+  const docs: any[] = products.value?.docs || [];
+  docs.forEach((item: any) => {
+    if (!['primary', 'grey'].includes(item.state)) return;
+    const id = item._id as string;
+    _socketIds.add(id);
+
+    $socket.on(`server:product-detail:${id}`, (updated: any) => {
+      // Tính state từ lastMessage (giống server)
+      const msgs: any[] = updated?.messages || [];
+      const newState = msgs.length ? (msgs[msgs.length - 1]?.color || 'success') : 'success';
+
+      // Cập nhật item in-place (không re-fetch toàn list để tránh flicker)
+      const idx = (products.value?.docs as any[])?.findIndex((d: any) => d._id === id);
+      if (idx !== -1) {
+        products.value.docs[idx] = {
+          ...products.value.docs[idx],
+          messages: msgs,
+          state: newState,
+          // video URL cần getFileS3Url — khi done, user click vào detail sẽ thấy đúng
+          ...(updated.video ? {} : {}),
+        };
+      }
+
+      // Khi không còn active → dọn listener (tránh leak)
+      if (!['primary', 'grey'].includes(newState)) {
+        $socket.off(`server:product-detail:${id}`);
+        _socketIds.delete(id);
+        // Refresh nhẹ để lấy video URL đúng từ API
+        onGetProducts();
+      }
+    });
+  });
+};
+
 onMounted(async () => {
-  await onGetProducts("list");
+  await onGetProducts("list"); // _registerSocketListeners() được gọi bên trong
 
   if (
     onGetterUserData.value?._id !== "68fdcb8002e4f0f894bc201e" &&
@@ -143,7 +190,21 @@ useSeo({
     "thư viện video AI, video đã tạo, quản lý video TN Solve, tải video AI",
 });
 
+onUnmounted(() => {
+  _socketIds.forEach((id) => $socket.off(`server:product-detail:${id}`));
+  _socketIds.clear();
+});
+
 definePageMeta({ middleware: "auth" });
+
+// Trả về message queue cuối cùng (grey + "hàng đợi") nếu có
+const getQueueMsg = (item: any): { title: string } | null => {
+  const msgs = item?.messages;
+  if (!Array.isArray(msgs) || msgs.length === 0) return null;
+  const last = msgs[msgs.length - 1];
+  if (last?.color === "grey" && /hàng đợi/.test(last?.title ?? "")) return last;
+  return null;
+};
 </script>
 
 <template>
@@ -206,6 +267,22 @@ definePageMeta({ middleware: "auth" });
               <span v-if="item.videoDuration" class="duration-badge">
                 {{ item.videoDuration }}
               </span>
+            </template>
+
+            <!-- Queue waiting (state = 'grey' khi lastMessage.color = 'grey') -->
+            <template v-else-if="item.state === 'grey'">
+              <div class="queue-state">
+                <v-progress-circular
+                  indeterminate
+                  color="rgba(255,255,255,0.85)"
+                  size="38"
+                  width="2"
+                />
+                <span class="queue-label">Đang chờ</span>
+                <span class="queue-hint">
+                  {{ (getQueueMsg(item)?.title ?? 'Đang chờ trong hàng đợi').replace('⏳ ', '') }}
+                </span>
+              </div>
             </template>
 
             <!-- Processing -->
@@ -555,6 +632,48 @@ definePageMeta({ middleware: "auth" });
 
 .video-card:hover .menu-btn {
   opacity: 1;
+}
+
+/* ─── Queue waiting state ───────────────────────────── */
+.queue-state {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: linear-gradient(135deg, #111827 0%, #1e1b2e 100%);
+}
+
+.queue-icon-wrap {
+  position: relative;
+  width: 46px;
+  height: 46px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.queue-clock-icon {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.queue-label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: rgba(167, 139, 250, 0.9);
+  letter-spacing: 0.2px;
+}
+
+.queue-hint {
+  font-size: 0.68rem;
+  color: rgba(255, 255, 255, 0.4);
+  text-align: center;
+  padding: 0 8px;
 }
 
 /* ─── Processing state ──────────────────────────────── */

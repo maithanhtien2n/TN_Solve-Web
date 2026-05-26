@@ -53,6 +53,55 @@ const isError = computed(() =>
   ),
 );
 
+// Đang chờ trong hàng đợi: message cuối là grey (chưa có primary/success nào sau đó)
+const queueMessage = computed(() => {
+  if (!formData.messages.length) return null;
+  const last = formData.messages[formData.messages.length - 1];
+  if (last?.color === "grey" && last?.title?.includes("hàng đợi")) return last;
+  return null;
+});
+
+const queuePosition = computed(() => {
+  if (!queueMessage.value) return null;
+  const match = queueMessage.value.title?.match(/#(\d+)/);
+  return match ? parseInt(match[1]) : null;
+});
+
+// Phần trăm và màu cho thanh cảnh của user
+const userScenePct = computed(() => {
+  const s = videoFlow.value?.userScene;
+  if (!s || !s.budget) return 0;
+  return Math.min(100, Math.round((s.used / s.budget) * 100));
+});
+
+const userSceneColor = computed(() => {
+  const pct = userScenePct.value;
+  if (pct >= 100) return '#c62828';   // đỏ đậm — hết budget
+  if (pct >= 67)  return 'deep-orange'; // cam đậm
+  if (pct >= 34)  return 'orange';      // cam
+  return 'green';                        // còn thoải mái
+});
+
+// videoFlow nhưng điều chỉnh title theo trạng thái video hiện tại
+const displayFlow = computed(() => {
+  if (!videoFlow.value || !Object.keys(videoFlow.value).length) return videoFlow.value;
+
+  const msgs: any[] = formData.messages;
+  const lastColor = msgs.length ? msgs[msgs.length - 1]?.color : null;
+
+  // Video đang xử lý (primary) → bỏ thông báo "sẽ vào hàng đợi", chỉ báo tải
+  if (lastColor === 'primary' && videoFlow.value.value >= 100) {
+    return { ...videoFlow.value, title: 'Hệ thống đang chạy hết công suất!' };
+  }
+
+  // Video đang trong queue (grey) → thay bằng thông báo "đang trong hàng đợi"
+  if (lastColor === 'grey' && videoFlow.value.value >= 100) {
+    return { ...videoFlow.value, title: 'Hệ thống đang đầy tải — video của bạn đang trong hàng đợi' };
+  }
+
+  return videoFlow.value;
+});
+
 const modelVideoOptions = computed(() => {
   let list = onGetterMasterData.value["model-video"] || [];
 
@@ -474,21 +523,43 @@ definePageMeta({ middleware: "auth" });
 
   <v-row v-else align="start">
     <v-col
-      v-if="videoFlow && Object.values(videoFlow || {})?.length"
+      v-if="displayFlow && Object.values(displayFlow || {})?.length"
       cols="12"
     >
-      <div class="flow-status-bar mb-2">
-        <div class="flow-status-header">
-          <span class="flow-status-title">{{ videoFlow.title }}</span>
-          <span class="flow-status-pct">{{ videoFlow.value }}%</span>
+      <div class="flow-compact-bar mb-2">
+        <!-- Cột trái: Tải hệ thống — chấm tròn -->
+        <div class="flow-col-circle">
+          <v-progress-circular
+            :color="displayFlow.color"
+            :modelValue="displayFlow.value"
+            size="44"
+            width="3"
+          >
+            <span class="flow-circle-pct" :style="{ color: displayFlow.color }">{{ displayFlow.value }}%</span>
+          </v-progress-circular>
         </div>
-        <v-progress-linear
-          :color="videoFlow.color"
-          :modelValue="videoFlow.value"
-          height="9"
-          rounded
-          bg-color="#96a8be"
-        />
+
+        <!-- Divider dọc -->
+        <div v-if="displayFlow.userScene" class="flow-vdivider" />
+
+        <!-- Cột phải: Ngân sách cảnh của user (chính) -->
+        <div v-if="displayFlow.userScene" class="flow-col">
+          <div class="flow-col-header">
+            <span class="flow-col-title flow-col-title--main">
+              <span class="flow-col-label-inline">Tổng số cảnh đang dùng</span>
+            </span>
+            <span class="flow-col-pct flow-col-pct--main" :style="{ color: userSceneColor }">
+{{ displayFlow.userScene.used }}/{{ displayFlow.userScene.budget }}
+            </span>
+          </div>
+          <v-progress-linear
+            :color="userSceneColor"
+            :modelValue="userScenePct"
+            height="8"
+            rounded
+            bg-color="#e0e0e0"
+          />
+        </div>
       </div>
     </v-col>
 
@@ -940,6 +1011,22 @@ definePageMeta({ middleware: "auth" });
         </div>
       </div>
 
+      <!-- Banner hàng đợi -->
+      <div v-if="queueMessage && !formData.video" class="queue-banner mb-4">
+        <div class="queue-banner__icon">
+          <v-progress-circular color="white" width="2" size="20" indeterminate />
+        </div>
+        <div class="queue-banner__body">
+          <div class="queue-banner__title">
+            Đang chờ trong hàng đợi
+            <span v-if="queuePosition" class="queue-banner__pos">— Vị trí #{{ queuePosition }}</span>
+          </div>
+          <div class="queue-banner__sub">
+            Video của bạn sẽ được xử lý ngay khi đến lượt. Vui lòng giữ nguyên trang này.
+          </div>
+        </div>
+      </div>
+
       <!-- Timeline khi đã có video -->
       <div v-else ref="myTimeline" class="steps-timeline">
         <div
@@ -1218,51 +1305,115 @@ definePageMeta({ middleware: "auth" });
   font-size: 0.9rem;
 }
 
-/* ─── Flow Status Bar ───────────────────────────────── */
-.flow-status-bar {
-  padding: 12px 14px;
+/* ─── Queue Banner ──────────────────────────────────── */
+.queue-banner {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.35);
+}
+.queue-banner__icon {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background: rgba(255,255,255,0.2);
+  border-radius: 50%;
+}
+.queue-banner__body { flex: 1; }
+.queue-banner__title {
+  font-weight: 600;
+  font-size: 0.95rem;
+  margin-bottom: 3px;
+}
+.queue-banner__pos {
+  opacity: 0.9;
+  font-size: 0.9rem;
+}
+.queue-banner__sub {
+  font-size: 0.8rem;
+  opacity: 0.8;
+  line-height: 1.4;
+}
+
+/* ─── Flow Compact Bar (2 cột ngang) ────────────────── */
+.flow-compact-bar {
+  display: flex;
+  align-items: stretch;
+  padding: 9px 14px;
   border-radius: 10px;
   background: #fff;
   border: 1px solid #d0dae6;
   box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  gap: 0;
 }
 
-.flow-status-header {
+.flow-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+  padding: 0 10px;
+}
+
+.flow-col:first-child { padding-left: 0; }
+.flow-col:last-child  { padding-right: 0; }
+
+.flow-col-label-inline { font-size: 0.72rem; color: #757575; font-weight: 400; }
+.flow-col-title--main  { font-size: 0.85rem; font-weight: 600; color: #212121; }
+.flow-col-pct--main    { font-size: 0.82rem; font-weight: 700; }
+
+/* Chấm tròn hệ thống */
+.flow-col-circle {
+  flex-shrink: 0;
   display: flex;
   align-items: center;
-  gap: 8px;
-  margin-bottom: 8px;
+  justify-content: center;
+  padding-right: 12px;
 }
 
-.flow-status-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  flex-shrink: 0;
-  animation: pulse-dot 1.5s ease-in-out infinite;
+.flow-circle-pct {
+  font-size: 0.65rem;
+  font-weight: 700;
+  line-height: 1;
 }
 
-.flow-dot--success { background: #43a047; animation: none; }
-.flow-dot--primary { background: #1e88e5; }
-.flow-dot--error   { background: #e53935; animation: none; }
-.flow-dot--grey    { background: #bdbdbd; animation: none; }
-
-@keyframes pulse-dot {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50%       { opacity: 0.5; transform: scale(1.3); }
+.flow-col-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
 }
 
-.flow-status-title {
-  font-size: 0.85rem;
+.flow-col-title {
+  font-size: 0.8rem;
   font-weight: 500;
-  color: #212121;
+  color: #374151;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   flex: 1;
 }
 
-.flow-status-pct {
-  font-size: 0.78rem;
+.flow-col-pct {
+  font-size: 0.75rem;
   font-weight: 600;
   color: #9e9e9e;
+  flex-shrink: 0;
+}
+
+.flow-vdivider {
+  width: 1px;
+  background: #e2e8f0;
+  margin: 2px 0;
+  flex-shrink: 0;
 }
 
 /* ─── Steps Timeline ─────────────────────────────────── */
