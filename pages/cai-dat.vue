@@ -2,7 +2,7 @@
 import { accountService } from "~/services/account";
 import { appService } from "~/services/app";
 
-const { onGetterUserData: userData } = useAppStore();
+const { onGetterUserData: userData, onActionGetUserData } = useAppStore();
 
 useSeo({ title: "Cài đặt", description: "Cài đặt tài khoản TN Solve" });
 useHead({ meta: [{ name: "robots", content: "noindex, nofollow" }] });
@@ -40,6 +40,7 @@ const onCopyApiKey = () => {
 
 const onTogglePersonalResource = async (val: boolean) => {
   await appService.saveSetting({ usePersonalResource: val });
+  await onActionGetUserData();
 };
 
 const hasExtensionFile = ref(false);

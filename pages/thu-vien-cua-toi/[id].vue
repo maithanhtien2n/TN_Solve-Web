@@ -546,7 +546,7 @@ definePageMeta({ middleware: "auth" });
         <div v-if="displayFlow.userScene" class="flow-col">
           <div class="flow-col-header">
             <span class="flow-col-title flow-col-title--main">
-              <span class="flow-col-label-inline">Tổng số cảnh đang dùng</span>
+              <span class="flow-col-label-inline">{{ displayFlow.userScene.label || 'Tổng số cảnh đang dùng' }}</span>
             </span>
             <span class="flow-col-pct flow-col-pct--main" :style="{ color: userSceneColor }">
 {{ displayFlow.userScene.used }}/{{ displayFlow.userScene.budget }}
@@ -557,7 +557,7 @@ definePageMeta({ middleware: "auth" });
             :modelValue="userScenePct"
             height="8"
             rounded
-            bg-color="#e0e0e0"
+            bg-color="#9e9e9e"
           />
         </div>
       </div>
