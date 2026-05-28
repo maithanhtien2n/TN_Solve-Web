@@ -92,7 +92,10 @@ onMounted(async () => {
       <div class="footer-grid">
         <!-- Thông tin doanh nghiệp -->
         <div class="footer-col">
-          <div class="col-title">HỘ KINH DOANH TN SOLVE</div>
+          <div class="col-title">
+            <span class="col-title__accent" />
+            HỘ KINH DOANH TN SOLVE
+          </div>
           <div class="col-links">
             <p class="biz-line">GPKD số 054200002629</p>
             <p class="biz-line">Đăng ký ngày: 26 - 04 - 2026</p>
@@ -106,45 +109,31 @@ onMounted(async () => {
 
         <!-- Chính sách -->
         <div class="footer-col">
-          <div class="col-title">CHÍNH SÁCH</div>
+          <div class="col-title">
+            <span class="col-title__accent" />
+            CHÍNH SÁCH
+          </div>
           <div class="col-links">
-            <a class="col-link" @click="onClickNavigate('dieu-khoan')"
-              >Điều khoản & quy định chung</a
-            >
-            <a class="col-link" @click="onClickNavigate('chinh-sach-bao-mat')"
-              >Chính sách bảo mật</a
-            >
-            <a class="col-link" @click="onClickNavigate('hinh-thuc-thanh-toan')"
-              >Hình thức thanh toán</a
-            >
-            <a class="col-link" @click="onClickNavigate('chinh-sach-giao-nhan')"
-              >Chính sách giao nhận</a
-            >
-            <a class="col-link" @click="onClickNavigate('chinh-sach-bao-hanh')"
-              >Chính sách bảo hành & đổi trả</a
-            >
+            <a class="col-link" @click="onClickNavigate('dieu-khoan')">Điều khoản & quy định chung</a>
+            <a class="col-link" @click="onClickNavigate('chinh-sach-bao-mat')">Chính sách bảo mật</a>
+            <a class="col-link" @click="onClickNavigate('hinh-thuc-thanh-toan')">Hình thức thanh toán</a>
+            <a class="col-link" @click="onClickNavigate('chinh-sach-giao-nhan')">Chính sách giao nhận</a>
+            <a class="col-link" @click="onClickNavigate('chinh-sach-bao-hanh')">Chính sách bảo hành & đổi trả</a>
           </div>
         </div>
 
         <!-- Hỗ trợ -->
         <div class="footer-col">
-          <div class="col-title">HỖ TRỢ</div>
+          <div class="col-title">
+            <span class="col-title__accent" />
+            HỖ TRỢ
+          </div>
           <div class="col-links">
-            <a class="col-link" @click="onClickNavigate('tutorial')"
-              >Video hướng dẫn</a
-            >
-            <a class="col-link" @click="onClickNavigate('')"
-              >Câu hỏi thường gặp</a
-            >
-            <a class="col-link" @click="onClickNavigate('contact')"
-              >Liên hệ Zalo</a
-            >
-            <a class="col-link" @click="onClickNavigate('zalo-group')"
-              >Nhóm hỗ trợ Zalo</a
-            >
-            <a class="col-link" @click="onClickNavigate('facebook-group')"
-              >Nhóm Facebook</a
-            >
+            <a class="col-link" @click="onClickNavigate('tutorial')">Video hướng dẫn</a>
+            <a class="col-link" @click="onClickNavigate('')">Câu hỏi thường gặp</a>
+            <a class="col-link" @click="onClickNavigate('contact')">Liên hệ Zalo</a>
+            <a class="col-link" @click="onClickNavigate('zalo-group')">Nhóm hỗ trợ Zalo</a>
+            <a class="col-link" @click="onClickNavigate('facebook-group')">Nhóm Facebook</a>
           </div>
         </div>
       </div>
@@ -268,6 +257,18 @@ onMounted(async () => {
   font-weight: 600;
   color: #1e293b;
   margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.col-title__accent {
+  display: inline-block;
+  width: 3px;
+  height: 16px;
+  background: linear-gradient(180deg, #1565c0, #1e88e5);
+  border-radius: 2px;
+  flex-shrink: 0;
 }
 
 .col-links {
@@ -287,12 +288,6 @@ onMounted(async () => {
 
 .col-link:hover {
   color: #1e88e5;
-}
-
-.col-link--social {
-  display: flex;
-  align-items: center;
-  gap: 8px;
 }
 
 /* ─── Biz lines ──────────────────────────────────────── */
