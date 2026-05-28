@@ -114,11 +114,11 @@ onMounted(async () => {
             CHÍNH SÁCH
           </div>
           <div class="col-links">
-            <a class="col-link" @click="onClickNavigate('dieu-khoan')">Điều khoản & quy định chung</a>
-            <a class="col-link" @click="onClickNavigate('chinh-sach-bao-mat')">Chính sách bảo mật</a>
-            <a class="col-link" @click="onClickNavigate('hinh-thuc-thanh-toan')">Hình thức thanh toán</a>
-            <a class="col-link" @click="onClickNavigate('chinh-sach-giao-nhan')">Chính sách giao nhận</a>
-            <a class="col-link" @click="onClickNavigate('chinh-sach-bao-hanh')">Chính sách bảo hành & đổi trả</a>
+            <a class="col-link" @click="onClickNavigate('dieu-khoan')">Điều khoản và quy định chung</a>
+            <a class="col-link" @click="onClickNavigate('chinh-sach-bao-mat')">Chính sách bảo mật thông tin</a>
+            <a class="col-link" @click="onClickNavigate('hinh-thuc-thanh-toan')">Phương thức thanh toán</a>
+            <a class="col-link" @click="onClickNavigate('chinh-sach-giao-nhan')">Chính sách giao nhận dịch vụ</a>
+            <a class="col-link" @click="onClickNavigate('chinh-sach-bao-hanh')">Chính sách bảo hành và đổi trả</a>
           </div>
         </div>
 

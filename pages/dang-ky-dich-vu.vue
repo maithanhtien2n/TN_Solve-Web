@@ -9,6 +9,7 @@ const { onGetterMasterData } = useMasterDataStore();
 const { onGetterUserData: userData, onGetterDisplayLogin: displayLogin } = useAppStore();
 
 const loading = ref<string>("");
+const showProductInfo = ref<boolean>(false);
 const agreedToTerms = ref<boolean>(false);
 const showTermsError = ref<boolean>(false);
 const formData = ref<any>({
@@ -29,6 +30,22 @@ const selectedPlan = computed(() =>
 );
 const selectedDays = computed(() => selectedPlan.value.days);
 const selectedCredits = computed(() => selectedPlan.value.credits);
+
+const packageOriginalPrice = computed(() => 139000 * formData.value.rentalMonths);
+const hasPackageDiscount = computed(() => packageOriginalPrice.value !== selectedPlan.value.price);
+
+const couponDiscountAmt = computed(() => {
+  const coupon = couponDetail.value;
+  if (!coupon) return 0;
+  let amount = 0;
+  if (coupon.discountType === EnumDiscountType.PERCENTAGE)
+    amount = Math.round((selectedPlan.value.price * coupon.discountValue) / 100);
+  else if (coupon.discountType === EnumDiscountType.FIXED)
+    amount = coupon.discountValue;
+  return Math.ceil(amount / 500) * 500;
+});
+
+const checkoutTotal = computed(() => Math.max(selectedPlan.value.price - couponDiscountAmt.value, 0));
 
 const totalPrice = computed(() => {
   const rentalMonths = formData.value.rentalMonths;
@@ -180,17 +197,46 @@ definePageMeta({});
         </div>
       </div>
 
-      <!-- Included features -->
-      <div class="includes">
-        <div class="includes-title">Bao gồm</div>
-        <div class="includes-list">
-          <div class="include-item">
-            <v-icon size="16" color="#1e88e5">mdi-calendar-check-outline</v-icon>
-            <span><strong>{{ selectedDays }} ngày</strong> sử dụng</span>
+      <!-- Thông tin sản phẩm (A3) -->
+      <div class="product-info">
+        <div class="product-info-title" @click="showProductInfo = !showProductInfo">
+          Thông tin sản phẩm
+          <v-icon class="pi-toggle-icon" size="18" color="#475569">
+            {{ showProductInfo ? 'mdi-chevron-up' : 'mdi-chevron-down' }}
+          </v-icon>
+        </div>
+        <div class="product-info-list" :class="{ 'pi-collapsed': !showProductInfo }">
+          <div class="pi-row">
+            <span class="pi-label">Dịch vụ</span>
+            <span class="pi-val">Sử dụng nền tảng TN Solve để tạo và xử lý video bằng AI</span>
           </div>
-          <div class="include-item">
-            <v-icon size="16" color="#7c3aed">mdi-diamond-stone</v-icon>
-            <span><strong>{{ selectedCredits.toLocaleString("vi-VN") }} tín dụng</strong> khởi đầu</span>
+          <div class="pi-row">
+            <span class="pi-label">Nguồn gốc/xuất xứ</span>
+            <span class="pi-val">Sản phẩm/dịch vụ do TN Solve phát triển và cung cấp</span>
+          </div>
+          <div class="pi-row">
+            <span class="pi-label">Thời hạn sử dụng</span>
+            <span class="pi-val"><strong>{{ selectedDays }} ngày</strong> kể từ khi thanh toán/kích hoạt thành công</span>
+          </div>
+          <div class="pi-row">
+            <span class="pi-label">Tín dụng</span>
+            <span class="pi-val">Bao gồm <strong>{{ selectedCredits.toLocaleString("vi-VN") }} tín dụng</strong> khởi đầu</span>
+          </div>
+          <div class="pi-row">
+            <span class="pi-label">Phạm vi sử dụng</span>
+            <span class="pi-val">Tín dụng dùng để sử dụng các tính năng tạo video, xử lý video trên hệ thống TN Solve</span>
+          </div>
+          <div class="pi-row">
+            <span class="pi-label">Giá gói</span>
+            <span class="pi-val"><strong>{{ formatCurrency(selectedPlan.price) }} VNĐ</strong>, đã bao gồm VAT</span>
+          </div>
+          <div class="pi-row">
+            <span class="pi-label">Trước khi thanh toán</span>
+            <span class="pi-val">Khách hàng được kiểm tra lại thông tin gói, thời hạn sử dụng, số tín dụng và tổng số tiền cần thanh toán</span>
+          </div>
+          <div class="pi-row">
+            <span class="pi-label">Giao hàng</span>
+            <span class="pi-val">Tài khoản khách hàng sẽ nhận được sản phẩm ngay tức thì sau khi thanh toán thành công</span>
           </div>
         </div>
       </div>
@@ -226,27 +272,26 @@ definePageMeta({});
 
         <!-- Summary -->
         <div class="checkout-summary">
-          <template v-if="typeof totalPrice === 'object'">
-            <div class="sum-row">
-              <span>Giá gốc</span>
-              <span class="sum-original">{{ totalPrice.originalPrice }}</span>
+          <div class="sum-product">
+            <span class="sum-product-name">TN Solve {{ selectedPlan.label }}</span>
+            <div class="sum-product-price">
+              <span v-if="hasPackageDiscount" class="sum-original">{{ formatCurrency(packageOriginalPrice) }}</span>
+              <span class="sum-pkg-price">{{ formatCurrency(selectedPlan.price) }}</span>
             </div>
-            <div class="sum-row">
-              <span>Giảm giá</span>
-              <span class="sum-off">−{{ totalPrice.discountRate }}</span>
-            </div>
-            <div class="sum-sep" />
-            <div class="sum-row sum-row--total">
-              <span>Tổng cộng</span>
-              <span class="sum-total">{{ totalPrice.finalPrice }}</span>
-            </div>
-          </template>
-          <template v-else>
-            <div class="sum-row sum-row--total">
-              <span>Tổng cộng</span>
-              <span class="sum-total">{{ totalPrice }}</span>
-            </div>
-          </template>
+          </div>
+          <div class="sum-row">
+            <span>Số lượng</span>
+            <span>1</span>
+          </div>
+          <div v-if="couponDetail" class="sum-row">
+            <span>Giảm giá</span>
+            <span class="sum-off">−{{ formatCurrency(couponDiscountAmt) }}</span>
+          </div>
+          <div class="sum-sep" />
+          <div class="sum-row sum-row--total">
+            <span>Thành tiền</span>
+            <span class="sum-total">{{ formatCurrency(checkoutTotal) }}</span>
+          </div>
           <div class="sum-vat">Đã bao gồm thuế VAT</div>
         </div>
 
@@ -627,6 +672,68 @@ definePageMeta({});
 .sum-sep { border-top: 1px dashed #e5e7eb; margin: 4px 0; }
 .sum-row--total { font-weight: 700; font-size: 0.95rem; }
 .sum-total { color: #e53935; font-size: 1.25rem; font-weight: 800; }
+
+.sum-product {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid #f1f5f9;
+  margin-bottom: 2px;
+}
+.sum-product-name { font-size: 0.88rem; font-weight: 600; color: #1e293b; }
+.sum-product-price { display: flex; align-items: center; gap: 6px; }
+.sum-pkg-price { font-size: 0.9rem; font-weight: 700; color: #1565c0; }
+.sum-original { font-size: 0.78rem; color: #94a3b8; text-decoration: line-through; }
+
+/* ─── Product info (A3) ──────────────────────────────────── */
+.product-info {
+  margin-top: 16px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  overflow: hidden;
+}
+.product-info-title {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #475569;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 10px 14px;
+  background: #f1f5f9;
+  border-bottom: 1px solid #e2e8f0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.pi-toggle-icon { display: none; }
+
+/* Mobile: collapse by default, show toggle */
+@media (max-width: 768px) {
+  .pi-toggle-icon { display: inline-flex; }
+  .product-info-title { cursor: pointer; }
+  .product-info-list.pi-collapsed { display: none; }
+}
+.product-info-list { padding: 4px 0; }
+.pi-row {
+  display: flex;
+  gap: 8px;
+  padding: 7px 14px;
+  font-size: 0.82rem;
+  line-height: 1.5;
+  border-bottom: 1px solid #f1f5f9;
+}
+.pi-row:last-child { border-bottom: none; }
+.pi-label {
+  flex-shrink: 0;
+  width: 140px;
+  color: #64748b;
+  font-weight: 500;
+}
+.pi-val { color: #334155; }
 
 /* ─── Button ─────────────────────────────────────────────── */
 .checkout-btn {
