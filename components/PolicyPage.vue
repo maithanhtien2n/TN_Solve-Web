@@ -41,7 +41,7 @@ defineProps<{
 .pol-hero {
   position: relative;
   background: linear-gradient(135deg, color-mix(in srgb, var(--c) 85%, #000), var(--c));
-  border-radius: 0;
+  border-radius: 16px;
   padding: 36px 40px;
   margin-bottom: 32px;
   overflow: hidden;
@@ -107,6 +107,6 @@ defineProps<{
 
 @media (max-width: 768px) {
   .pol-body { grid-template-columns: 1fr; }
-  .pol-hero { padding: 24px 20px; }
+  .pol-hero { padding: 24px 20px; border-radius: 12px; }
 }
 </style>

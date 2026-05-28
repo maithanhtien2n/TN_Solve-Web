@@ -95,10 +95,12 @@ onMounted(async () => {
           <div class="col-title">HỘ KINH DOANH TN SOLVE</div>
           <div class="col-links">
             <p class="biz-line">GPKD số 054200002629</p>
-            <p class="biz-line">Đăng ký ngày 26/04/2026</p>
-            <p class="biz-line">113 Đường Võ Văn Tần, P. Bình Kiến, Đắk Lắk</p>
-            <a class="biz-line">0343 027 232</a>
-            <a class="biz-line">maithanhtien0612@gmail.com</a>
+            <p class="biz-line">Đăng ký ngày: 26 - 04 - 2026</p>
+            <p class="biz-line">Nơi cấp: UBND PHƯỜNG BÌNH KIẾN</p>
+            <p class="biz-line">Địa chỉ: 113 Đường Võ Văn Tần, Phường Bình Kiến, Tỉnh Đắk Lắk, Việt Nam</p>
+            <a class="biz-line">Điện thoại: 0343027232</a>
+            <a class="biz-line">Email: maithanhtien0612@gmail.com</a>
+            <p class="biz-line">Người đại diện: MAI THANH TIỆN</p>
           </div>
         </div>
 

@@ -302,30 +302,15 @@ const onChangeFilter = (event: any) => {
     </template>
 
     <template #row-account.name="{ item }">
-      <div class="d-flex flex-column ga-1">
+      <div class="d-flex align-center ga-1">
+        <v-icon
+          v-if="(item as any)?.usePersonalResource"
+          size="16"
+          color="amber-darken-2"
+        >mdi-key</v-icon>
         <span class="text-nowrap line-clamp-1" style="max-width: 170px">
           {{ `${(item as any)?.account?.name}` }}
         </span>
-        <v-chip
-          v-if="(item as any)?.usePersonalResource"
-          size="x-small"
-          color="blue"
-          variant="tonal"
-          class="text-nowrap"
-          style="width: fit-content"
-        >
-          Key riêng
-        </v-chip>
-        <v-chip
-          v-else
-          size="x-small"
-          color="grey"
-          variant="tonal"
-          class="text-nowrap"
-          style="width: fit-content"
-        >
-          Key chung
-        </v-chip>
       </div>
     </template>
   </DataTable>
