@@ -16,6 +16,7 @@ const routeName = computed(() => route.name?.toString().split("___")[0]);
 const menus = computed<any>(() => {
   const items = [
     {
+      role: [EnumAccountRole.ADMIN],
       title: "Tổng quan",
       icon: "mdi-view-dashboard-outline",
       route: "/admin",
@@ -82,8 +83,20 @@ const menus = computed<any>(() => {
     },
     {
       role: [EnumAccountRole.ADMIN],
-      title: "Lịch sử giao dịch",
-      icon: "mdi-cash-clock",
+      title: "Lịch sử mua tín dụng",
+      icon: "mdi-database-clock-outline",
+      route: "/admin/credit-history",
+    },
+    {
+      role: [EnumAccountRole.ADMIN],
+      title: "Yêu cầu hoàn tiền",
+      icon: "mdi-cash-refund",
+      route: "/admin/refund-requests",
+    },
+    {
+      role: [EnumAccountRole.ADMIN],
+      title: "Hoa hồng CTV",
+      icon: "mdi-account-cash-outline",
       route: "/admin/transaction-history",
     },
     {
@@ -200,7 +213,7 @@ const onClickLogout = () => {
   });
 };
 
-onMounted(() => {
+function syncOpenMenu() {
   for (const menu of menus.value) {
     if (menu.children) {
       const match = menu.children.find(
@@ -208,11 +221,15 @@ onMounted(() => {
       );
       if (match) {
         open.value = [menu.route];
-        break;
+        return;
       }
     }
   }
-});
+  open.value = [];
+}
+
+onMounted(syncOpenMenu);
+watch(() => route.fullPath, syncOpenMenu);
 
 defineExpose({ onDisplay });
 </script>

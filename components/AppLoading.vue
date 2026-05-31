@@ -115,12 +115,6 @@
 .logo {
   width: 14rem;
   height: auto;
-  animation: pulse 1.5s infinite ease-in-out;
-}
-
-@keyframes pulse {
-  0%, 100% { opacity: 0.6; transform: scale(1); }
-  50%       { opacity: 1;   transform: scale(1.1); }
 }
 
 /* ─── Dots ──────────────────────────────────────────── */

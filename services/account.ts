@@ -22,6 +22,18 @@ export const accountService = {
     return await api.get("/accounts/my-package-history", { params });
   },
 
+  async getDashboardStats() {
+    return await api.get("/accounts/dashboard-stats");
+  },
+
+  async getCreditRevenueByMonth() {
+    return await api.get("/accounts/credit-revenue-by-month");
+  },
+
+  async getAllCreditHistory(params: any) {
+    return await api.get("/accounts/all-credit-history", { params });
+  },
+
   async getMyCreditHistory(params: any) {
     return await api.get("/accounts/my-credit-history", { params });
   },
@@ -33,6 +45,10 @@ export const accountService = {
   // Dịch vụ thuê ---------------------
   async getAllServiceRental(params: any) {
     return await api.get(`/service-rentals`, { params });
+  },
+
+  async getServiceRentalRevenueByMonth() {
+    return await api.get(`/service-rentals/revenue-by-month`);
   },
 
   async serviceRegistration(payload: any) {

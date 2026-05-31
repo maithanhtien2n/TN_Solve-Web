@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { accountService } from "~/services/account";
 import { shopService } from "~/services/shop";
+import { refundRequestService } from "~/services/refund-request";
 
 const { isMobile } = useDevice();
 const { onGetterUserData: userData } = useAppStore();
@@ -25,6 +26,25 @@ const selectTab = (name: string) => {
 const packageHistory = ref<any>([]);
 const creditHistory = ref<any>([]);
 const shopOrders = ref<any[]>([]);
+const myRefunds = ref<any[]>([]);
+
+const refundPopup = ref(false);
+
+async function onRefundSubmitted() {
+  const res = await refundRequestService.getMy({}).catch(() => null);
+  if (res?.data?.docs) myRefunds.value = res.data.docs;
+}
+
+const refundStatusMap: Record<string, { label: string; color: string }> = {
+  pending:  { label: "Chờ duyệt", color: "#d97706" },
+  approved: { label: "Đã hoàn tiền", color: "#059669" },
+  rejected: { label: "Từ chối", color: "#dc2626" },
+};
+
+const refundTypeMap: Record<string, string> = {
+  subscription: "Gói dịch vụ",
+  credit: "Tín dụng",
+};
 
 const formatDate = (iso: string) => {
   if (!iso) return "—";
@@ -57,14 +77,16 @@ const copyText = async (text: string, field: string) => {
 };
 
 onMounted(async () => {
-  const [pkg, credit, shop] = await Promise.allSettled([
+  const [pkg, credit, shop, refunds] = await Promise.allSettled([
     accountService.getMyPackageHistory({}),
     accountService.getMyCreditHistory({}),
     shopService.getMyShopOrders(),
+    refundRequestService.getMy({}),
   ]);
-  if (pkg.status === "fulfilled")    packageHistory.value = pkg.value?.data   || [];
-  if (credit.status === "fulfilled") creditHistory.value  = credit.value?.data || [];
-  if (shop.status === "fulfilled")   shopOrders.value     = shop.value?.data   || [];
+  if (pkg.status === "fulfilled")     packageHistory.value = pkg.value?.data          || [];
+  if (credit.status === "fulfilled")  creditHistory.value  = credit.value?.data       || [];
+  if (shop.status === "fulfilled")    shopOrders.value     = shop.value?.data          || [];
+  if (refunds.status === "fulfilled") myRefunds.value      = refunds.value?.data?.docs || [];
 });
 
 definePageMeta({ middleware: "auth" });
@@ -93,6 +115,11 @@ definePageMeta({ middleware: "auth" });
             {{ serviceStatus.label }}
           </div>
         </div>
+
+        <button class="refund-all-btn" @click="refundPopup = true">
+          <v-icon size="14">mdi-cash-refund</v-icon>
+          Yêu cầu hoàn tiền
+        </button>
       </div>
 
       <!-- Stats -->
@@ -164,6 +191,14 @@ definePageMeta({ middleware: "auth" });
         >
           <v-icon size="16">mdi-shopping-outline</v-icon>
           Lịch sử mua hàng
+        </div>
+        <div
+          class="tab-item"
+          :class="{ 'tab-item--active': tab === 'refunds' }"
+          @click="selectTab('refunds')"
+        >
+          <v-icon size="16">mdi-cash-refund</v-icon>
+          Hoàn tiền
         </div>
       </div>
 
@@ -238,6 +273,57 @@ definePageMeta({ middleware: "auth" });
         </table>
       </div>
 
+      <!-- Refund history -->
+      <div v-show="tab === 'refunds'" class="tab-content">
+        <div v-if="!myRefunds.length" class="empty-state">
+          <v-icon size="40" color="#cbd5e1">mdi-cash-refund</v-icon>
+          <div>Chưa có yêu cầu hoàn tiền nào</div>
+        </div>
+        <table v-else class="data-table">
+          <thead>
+            <tr>
+              <th>Loại</th>
+              <th>Tiền gốc</th>
+              <th>Tiền hoàn</th>
+              <th>Ngân hàng</th>
+              <th>Lý do</th>
+              <th class="text-right">Trạng thái</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="item in myRefunds" :key="item._id">
+              <td>
+                <div class="cell-title">{{ refundTypeMap[item.type] || item.type }}</div>
+                <div class="cell-sub">{{ item.createdAt }}</div>
+              </td>
+              <td><div class="cell-price">{{ formatCurrency(item.originalAmount) }}</div></td>
+              <td><div class="cell-price" style="color:#059669">{{ formatCurrency(item.refundAmount) }}</div></td>
+              <td>
+                <div class="cell-title" style="font-size:0.8rem">{{ item.bankName }}</div>
+                <div class="cell-sub">{{ item.bankAccount }}</div>
+              </td>
+              <td>
+                <div class="cell-sub" style="max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" :title="item.reason">{{ item.reason }}</div>
+                <div v-if="item.adminNote" class="cell-sub" style="color:#f59e0b">{{ item.adminNote }}</div>
+              </td>
+              <td class="text-right">
+                <div>
+                  <span
+                    class="status-chip"
+                    :style="{ background: refundStatusMap[item.status]?.color + '18', color: refundStatusMap[item.status]?.color }"
+                  >
+                    {{ refundStatusMap[item.status]?.label || item.status }}
+                  </span>
+                </div>
+                <div v-if="item.status === 'approved'" class="cell-sub mt-1" style="color:#059669;font-size:0.72rem">
+                  Vui lòng kiểm tra tài khoản ngân hàng của bạn
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
       <!-- Shop order history -->
       <div v-show="tab === 'shop'" class="tab-content">
         <div v-if="!shopOrders.length" class="empty-state">
@@ -290,6 +376,13 @@ definePageMeta({ middleware: "auth" });
 
     </div>
   </div>
+
+  <!-- Popup hoàn tiền: v-if để remount sạch mỗi lần mở -->
+  <PopupRefundRequest
+    v-if="refundPopup"
+    v-model="refundPopup"
+    @submitted="onRefundSubmitted"
+  />
 
   <!-- Popup chi tiết đơn hàng -->
   <v-dialog v-model="selectedOrder" max-width="480" scrollable>
@@ -629,6 +722,27 @@ definePageMeta({ middleware: "auth" });
 .status-warning { background: #fffbeb; color: #d97706; }
 .status-error   { background: #fef2f2; color: #dc2626; }
 .status-grey    { background: #f1f5f9; color: #64748b; }
+
+/* ─── Refund all button ──────────────────────────────── */
+.refund-all-btn {
+  margin-left: auto;
+  flex-shrink: 0;
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 13px;
+  border-radius: 8px;
+  border: 1px solid #fde68a;
+  background: #fffbeb;
+  color: #d97706;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+  white-space: nowrap;
+}
+.refund-all-btn:hover { background: #fef3c7; }
 
 /* ─── Empty state ────────────────────────────────────── */
 .empty-state {
