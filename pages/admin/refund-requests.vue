@@ -278,7 +278,7 @@ definePageMeta({ layout: "admin", title: "Yêu cầu hoàn tiền" });
 
     <!-- Lý do -->
     <template #row-reason="{ item }">
-      <div style="max-width: 260px">
+      <div>
         <div class="text-caption">{{ (item as any).reason }}</div>
         <div v-if="(item as any).adminNote" class="text-caption text-warning mt-1">
           ↳ {{ (item as any).adminNote }}

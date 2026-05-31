@@ -153,6 +153,14 @@ definePageMeta({ layout: "admin", title: "Thông tin chung" });
         <span v-else class="text-red text-nowrap">Không cho phép</span>
       </template>
 
+      <template v-else-if="(item as any).title === 'Cho phép hoàn tiền'">
+        <span v-if="(item as any).value" class="text-green text-nowrap">
+          Cho phép
+        </span>
+
+        <span v-else class="text-red text-nowrap">Không cho phép</span>
+      </template>
+
       <template v-else-if="(item as any).title === 'Mô hình ưu tiên'">
         <span v-if="(item as any).value === 'grok'" class="text-nowrap">
           🥉 TNS - 6s / 5💎
@@ -267,6 +275,16 @@ definePageMeta({ layout: "admin", title: "Thông tin chung" });
         <template
           v-else-if="(item as any).title === 'Xóa hồ sơ khi mở ứng dụng'"
         >
+          <v-checkbox
+            readonly
+            hide-details
+            class="my-1"
+            :model-value="Boolean((item as any).value)"
+            @click="onClickAction(item)"
+          />
+        </template>
+
+        <template v-else-if="(item as any).title === 'Cho phép hoàn tiền'">
           <v-checkbox
             readonly
             hide-details

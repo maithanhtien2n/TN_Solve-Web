@@ -8,7 +8,8 @@ const { onGetterUserData: userData } = useAppStore();
 
 useSeo({
   title: "Tài khoản",
-  description: "Quản lý tài khoản TN Solve - Xem lịch sử gói dịch vụ, tín dụng và thông tin cá nhân của bạn.",
+  description:
+    "Quản lý tài khoản TN Solve - Xem lịch sử gói dịch vụ, tín dụng và thông tin cá nhân của bạn.",
   keywords: "tài khoản TN Solve, quản lý tài khoản, lịch sử dịch vụ",
 });
 
@@ -19,8 +20,14 @@ const tabBarRef = ref<HTMLElement | null>(null);
 const selectTab = (name: string) => {
   tab.value = name;
   nextTick(() => {
-    const active = tabBarRef.value?.querySelector(".tab-item--active") as HTMLElement;
-    active?.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+    const active = tabBarRef.value?.querySelector(
+      ".tab-item--active",
+    ) as HTMLElement;
+    active?.scrollIntoView({
+      behavior: "smooth",
+      inline: "center",
+      block: "nearest",
+    });
   });
 };
 const packageHistory = ref<any>([]);
@@ -29,6 +36,7 @@ const shopOrders = ref<any[]>([]);
 const myRefunds = ref<any[]>([]);
 
 const refundPopup = ref(false);
+const refundEnabled = ref(true);
 
 async function onRefundSubmitted() {
   const res = await refundRequestService.getMy({}).catch(() => null);
@@ -36,12 +44,13 @@ async function onRefundSubmitted() {
 }
 
 const refundStatusMap: Record<string, { label: string; color: string }> = {
-  pending:  { label: "Chờ duyệt", color: "#d97706" },
+  pending: { label: "Chờ duyệt", color: "#d97706" },
   approved: { label: "Đã hoàn tiền", color: "#059669" },
   rejected: { label: "Từ chối", color: "#dc2626" },
 };
 
 const refundTypeMap: Record<string, string> = {
+  all: "Hoàn toàn bộ",
   subscription: "Gói dịch vụ",
   credit: "Tín dụng",
 };
@@ -49,7 +58,13 @@ const refundTypeMap: Record<string, string> = {
 const formatDate = (iso: string) => {
   if (!iso) return "—";
   const d = new Date(iso);
-  return d.toLocaleString("vi-VN", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" });
+  return d.toLocaleString("vi-VN", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
 };
 
 const serviceStatus = computed(() => {
@@ -57,15 +72,19 @@ const serviceStatus = computed(() => {
     return { label: "Quản trị viên", color: "#7c3aed", bg: "#f3e8ff" };
   if (userData.value?.serviceExpiry)
     return userData.value?.remainingTime
-      ? { label: `Còn ${userData.value.remainingTime}`, color: "#059669", bg: "#ecfdf5" }
+      ? {
+          label: `Còn ${userData.value.remainingTime}`,
+          color: "#059669",
+          bg: "#ecfdf5",
+        }
       : { label: "Đã hết hạn", color: "#dc2626", bg: "#fef2f2" };
   return { label: "Chưa đăng ký", color: "#64748b", bg: "#f1f5f9" };
 });
 
 const shopStatusMap: Record<string, { label: string; cls: string }> = {
-  pending:   { label: "Chờ thanh toán", cls: "status-warning" },
-  completed: { label: "Hoàn thành",     cls: "status-success" },
-  failed:    { label: "Thất bại",        cls: "status-error"   },
+  pending: { label: "Chờ thanh toán", cls: "status-warning" },
+  completed: { label: "Hoàn thành", cls: "status-success" },
+  failed: { label: "Thất bại", cls: "status-error" },
 };
 
 const selectedOrder = ref<any>(null);
@@ -73,33 +92,42 @@ const copiedField = ref<string>("");
 const copyText = async (text: string, field: string) => {
   await navigator.clipboard.writeText(text);
   copiedField.value = field;
-  setTimeout(() => { copiedField.value = ""; }, 1500);
+  setTimeout(() => {
+    copiedField.value = "";
+  }, 1500);
 };
 
 onMounted(async () => {
-  const [pkg, credit, shop, refunds] = await Promise.allSettled([
+  const [pkg, credit, shop, refunds, refundCheck] = await Promise.allSettled([
     accountService.getMyPackageHistory({}),
     accountService.getMyCreditHistory({}),
     shopService.getMyShopOrders(),
     refundRequestService.getMy({}),
+    refundRequestService.previewAll(),
   ]);
-  if (pkg.status === "fulfilled")     packageHistory.value = pkg.value?.data          || [];
-  if (credit.status === "fulfilled")  creditHistory.value  = credit.value?.data       || [];
-  if (shop.status === "fulfilled")    shopOrders.value     = shop.value?.data          || [];
-  if (refunds.status === "fulfilled") myRefunds.value      = refunds.value?.data?.docs || [];
+  if (pkg.status === "fulfilled") packageHistory.value = pkg.value?.data || [];
+  if (credit.status === "fulfilled")
+    creditHistory.value = credit.value?.data || [];
+  if (shop.status === "fulfilled") shopOrders.value = shop.value?.data || [];
+  if (refunds.status === "fulfilled")
+    myRefunds.value = refunds.value?.data?.docs || [];
+  if (refundCheck.status === "fulfilled")
+    refundEnabled.value = !refundCheck.value?.data?.error?.includes("không khả dụng");
 });
 
 definePageMeta({ middleware: "auth" });
 </script>
 
 <template>
-  <div v-if="!userData?.email" class="d-flex justify-center flex-column align-center ga-3 pt-10 pb-16">
+  <div
+    v-if="!userData?.email"
+    class="d-flex justify-center flex-column align-center ga-3 pt-10 pb-16"
+  >
     <v-progress-circular width="2" size="40" color="primary" indeterminate />
     Đang tải dữ liệu...
   </div>
 
   <div v-else class="account-wrap">
-
     <!-- Profile card -->
     <div class="profile-card">
       <div class="profile-main">
@@ -110,13 +138,22 @@ definePageMeta({ middleware: "auth" });
         <div class="profile-info">
           <div class="profile-name">{{ userData?.name }}</div>
           <div class="profile-email">{{ userData?.email }}</div>
-          <div class="profile-badge" :style="{ color: serviceStatus.color, background: serviceStatus.bg }">
-            <span class="badge-dot" :style="{ background: serviceStatus.color }" />
+          <div
+            class="profile-badge"
+            :style="{
+              color: serviceStatus.color,
+              background: serviceStatus.bg,
+            }"
+          >
+            <span
+              class="badge-dot"
+              :style="{ background: serviceStatus.color }"
+            />
             {{ serviceStatus.label }}
           </div>
         </div>
 
-        <button class="refund-all-btn" @click="refundPopup = true">
+        <button v-if="refundEnabled" class="refund-all-btn" @click="refundPopup = true">
           <v-icon size="14">mdi-cash-refund</v-icon>
           Yêu cầu hoàn tiền
         </button>
@@ -126,15 +163,20 @@ definePageMeta({ middleware: "auth" });
       <div class="profile-stats">
         <div class="stat-item">
           <div class="stat-icon" style="background: #eff6ff">
-            <v-icon size="18" color="#1e88e5">mdi-circle-multiple-outline</v-icon>
+            <v-icon size="18" color="#1e88e5"
+              >mdi-circle-multiple-outline</v-icon
+            >
           </div>
           <div>
             <div class="stat-label">Tín dụng</div>
             <div class="stat-value">
               <template v-if="userData?.settings?.unlimitedVideo">
-                <v-icon size="14">mdi-infinity</v-icon> {{ userData.settings.unlimitedVideo }} ngày
+                <v-icon size="14">mdi-infinity</v-icon>
+                {{ userData.settings.unlimitedVideo }} ngày
               </template>
-              <template v-else>{{ (userData?.settings?.credit || 0).toLocaleString("vi-VN") }}</template>
+              <template v-else>{{
+                (userData?.settings?.credit || 0).toLocaleString("vi-VN")
+              }}</template>
             </div>
           </div>
         </div>
@@ -143,11 +185,15 @@ definePageMeta({ middleware: "auth" });
 
         <div class="stat-item">
           <div class="stat-icon" style="background: #f0fdf4">
-            <v-icon size="18" color="#059669">mdi-calendar-check-outline</v-icon>
+            <v-icon size="18" color="#059669"
+              >mdi-calendar-check-outline</v-icon
+            >
           </div>
           <div>
             <div class="stat-label">Hết hạn</div>
-            <div class="stat-value">{{ formatDate(userData?.serviceExpiry) }}</div>
+            <div class="stat-value">
+              {{ formatDate(userData?.serviceExpiry) }}
+            </div>
           </div>
         </div>
 
@@ -155,7 +201,9 @@ definePageMeta({ middleware: "auth" });
 
         <div class="stat-item">
           <div class="stat-icon" style="background: #fdf4ff">
-            <v-icon size="18" color="#9333ea">mdi-package-variant-closed</v-icon>
+            <v-icon size="18" color="#9333ea"
+              >mdi-package-variant-closed</v-icon
+            >
           </div>
           <div>
             <div class="stat-label">Lịch sử gói</div>
@@ -220,14 +268,22 @@ definePageMeta({ middleware: "auth" });
             <tr v-for="item in packageHistory" :key="item.id">
               <td>
                 <div class="cell-title">{{ item.note }}</div>
-                <div class="cell-sub">{{ item.serviceStartDate }} → {{ item.serviceExpiry }}</div>
+                <div class="cell-sub">
+                  {{ item.serviceStartDate }} → {{ item.serviceExpiry }}
+                </div>
               </td>
               <td>
                 <div class="cell-price">{{ formatCurrency(item.price) }}</div>
-                <div v-if="+item.discount" class="cell-discount">Giảm {{ formatCurrency(+item.discount) }}</div>
+                <div v-if="+item.discount" class="cell-discount">
+                  Giảm {{ formatCurrency(+item.discount) }}
+                </div>
               </td>
               <td class="text-right">
-                <span class="status-chip" :class="`status-${item.statusColor}`">{{ item.statusText }}</span>
+                <span
+                  class="status-chip"
+                  :class="`status-${item.statusColor}`"
+                  >{{ item.statusText }}</span
+                >
               </td>
             </tr>
           </tbody>
@@ -252,8 +308,15 @@ definePageMeta({ middleware: "auth" });
             <tr v-for="item in creditHistory" :key="item.id">
               <td>
                 <div class="cell-title">
-                  {{ item.creditAmount === -1 ? "Không giới hạn 💎" : `Mua ${item.creditAmount} 💎` }}
-                  <span v-if="[11000, 24000].includes(item.creditAmount)" class="cell-bonus">
+                  {{
+                    item.creditAmount === -1
+                      ? "Không giới hạn 💎"
+                      : `Mua ${item.creditAmount} 💎`
+                  }}
+                  <span
+                    v-if="[11000, 24000].includes(item.creditAmount)"
+                    class="cell-bonus"
+                  >
                     +{{ item.creditAmount === 11000 ? "1,000" : "4,000" }} KM
                   </span>
                 </div>
@@ -263,7 +326,9 @@ definePageMeta({ middleware: "auth" });
               </td>
               <td>
                 <div class="cell-price">{{ formatCurrency(item.price) }}</div>
-                <div v-if="+item.discount" class="cell-discount">Giảm {{ formatCurrency(+item.discount) }}</div>
+                <div v-if="+item.discount" class="cell-discount">
+                  Giảm {{ formatCurrency(+item.discount) }}
+                </div>
               </td>
               <td class="text-right">
                 <div class="cell-date">{{ item.serviceStartDate }}</div>
@@ -282,7 +347,7 @@ definePageMeta({ middleware: "auth" });
         <table v-else class="data-table">
           <thead>
             <tr>
-              <th>Loại</th>
+              <th>Ngày gửi</th>
               <th>Tiền gốc</th>
               <th>Tiền hoàn</th>
               <th>Ngân hàng</th>
@@ -293,29 +358,53 @@ definePageMeta({ middleware: "auth" });
           <tbody>
             <tr v-for="item in myRefunds" :key="item._id">
               <td>
-                <div class="cell-title">{{ refundTypeMap[item.type] || item.type }}</div>
                 <div class="cell-sub">{{ item.createdAt }}</div>
               </td>
-              <td><div class="cell-price">{{ formatCurrency(item.originalAmount) }}</div></td>
-              <td><div class="cell-price" style="color:#059669">{{ formatCurrency(item.refundAmount) }}</div></td>
               <td>
-                <div class="cell-title" style="font-size:0.8rem">{{ item.bankName }}</div>
+                <div class="cell-price">
+                  {{ formatCurrency(item.originalAmount) }}
+                </div>
+              </td>
+              <td>
+                <div class="cell-price" style="color: #059669">
+                  {{ formatCurrency(item.refundAmount) }}
+                </div>
+              </td>
+              <td>
+                <div class="cell-title" style="font-size: 0.8rem">
+                  {{ item.bankName }}
+                </div>
                 <div class="cell-sub">{{ item.bankAccount }}</div>
               </td>
               <td>
-                <div class="cell-sub" style="max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" :title="item.reason">{{ item.reason }}</div>
-                <div v-if="item.adminNote" class="cell-sub" style="color:#f59e0b">{{ item.adminNote }}</div>
+                <div class="cell-sub">
+                  {{ item.reason }}
+                </div>
+                <div
+                  v-if="item.adminNote"
+                  class="cell-sub"
+                  style="color: #f59e0b"
+                >
+                  {{ item.adminNote }}
+                </div>
               </td>
               <td class="text-right">
                 <div>
                   <span
                     class="status-chip"
-                    :style="{ background: refundStatusMap[item.status]?.color + '18', color: refundStatusMap[item.status]?.color }"
+                    :style="{
+                      background: refundStatusMap[item.status]?.color + '18',
+                      color: refundStatusMap[item.status]?.color,
+                    }"
                   >
                     {{ refundStatusMap[item.status]?.label || item.status }}
                   </span>
                 </div>
-                <div v-if="item.status === 'approved'" class="cell-sub mt-1" style="color:#059669;font-size:0.72rem">
+                <div
+                  v-if="item.status === 'approved'"
+                  class="cell-sub mt-1"
+                  style="color: #059669; font-size: 0.72rem"
+                >
                   Vui lòng kiểm tra tài khoản ngân hàng của bạn
                 </div>
               </td>
@@ -341,7 +430,10 @@ definePageMeta({ middleware: "auth" });
             <!-- Row 1: name + badge -->
             <div class="order-row-top">
               <div class="order-name">{{ order.productName }}</div>
-              <span class="status-chip" :class="shopStatusMap[order.status]?.cls || 'status-grey'">
+              <span
+                class="status-chip"
+                :class="shopStatusMap[order.status]?.cls || 'status-grey'"
+              >
                 {{ shopStatusMap[order.status]?.label || order.status }}
               </span>
             </div>
@@ -352,18 +444,24 @@ definePageMeta({ middleware: "auth" });
                 {{ formatDate(order.createdAt) }}
                 · {{ order.quantity }} tài khoản
               </span>
-              <span class="order-amount">{{ formatCurrency(order.totalAmount) }}</span>
+              <span class="order-amount">{{
+                formatCurrency(order.totalAmount)
+              }}</span>
             </div>
 
             <!-- Error (failed) -->
             <div v-if="order.errorMessage" class="order-error-inline">
-              <v-icon size="13" color="#ef4444">mdi-alert-circle-outline</v-icon>
+              <v-icon size="13" color="#ef4444"
+                >mdi-alert-circle-outline</v-icon
+              >
               {{ order.errorMessage }}
             </div>
 
             <!-- Xem tài khoản (completed) -->
             <div
-              v-if="order.status === 'completed' && order.deliveredAccounts?.length"
+              v-if="
+                order.status === 'completed' && order.deliveredAccounts?.length
+              "
               class="order-toggle"
               @click="selectedOrder = order"
             >
@@ -373,7 +471,6 @@ definePageMeta({ middleware: "auth" });
           </div>
         </div>
       </div>
-
     </div>
   </div>
 
@@ -408,7 +505,9 @@ definePageMeta({ middleware: "auth" });
           </div>
           <div class="od-summary-row">
             <span>Tổng tiền</span>
-            <strong class="od-amount">{{ formatCurrency(selectedOrder.totalAmount) }}</strong>
+            <strong class="od-amount">{{
+              formatCurrency(selectedOrder.totalAmount)
+            }}</strong>
           </div>
           <div class="od-summary-row">
             <span>Ngày mua</span>
@@ -428,8 +527,10 @@ definePageMeta({ middleware: "auth" });
             class="od-acc-card"
           >
             <div class="od-acc-header">
-              <v-icon size="13" color="#059669">mdi-account-circle-outline</v-icon>
-              Tài khoản {{ i + 1 }}
+              <v-icon size="13" color="#059669"
+                >mdi-account-circle-outline</v-icon
+              >
+              Tài khoản {{ (i as number) + 1 }}
             </div>
 
             <div class="od-acc-row">
@@ -441,7 +542,11 @@ definePageMeta({ middleware: "auth" });
                   :class="{ 'od-copy-btn--ok': copiedField === `user-${i}` }"
                   @click="copyText(acc.user, `user-${i}`)"
                 >
-                  <v-icon size="13">{{ copiedField === `user-${i}` ? 'mdi-check' : 'mdi-content-copy' }}</v-icon>
+                  <v-icon size="13">{{
+                    copiedField === `user-${i}`
+                      ? "mdi-check"
+                      : "mdi-content-copy"
+                  }}</v-icon>
                 </button>
               </div>
             </div>
@@ -455,7 +560,9 @@ definePageMeta({ middleware: "auth" });
                   :class="{ 'od-copy-btn--ok': copiedField === `pw-${i}` }"
                   @click="copyText(acc.password, `pw-${i}`)"
                 >
-                  <v-icon size="13">{{ copiedField === `pw-${i}` ? 'mdi-check' : 'mdi-content-copy' }}</v-icon>
+                  <v-icon size="13">{{
+                    copiedField === `pw-${i}` ? "mdi-check" : "mdi-content-copy"
+                  }}</v-icon>
                 </button>
               </div>
             </div>
@@ -469,7 +576,9 @@ definePageMeta({ middleware: "auth" });
                   :class="{ 'od-copy-btn--ok': copiedField === `ve-${i}` }"
                   @click="copyText(acc.verifyEmail, `ve-${i}`)"
                 >
-                  <v-icon size="13">{{ copiedField === `ve-${i}` ? 'mdi-check' : 'mdi-content-copy' }}</v-icon>
+                  <v-icon size="13">{{
+                    copiedField === `ve-${i}` ? "mdi-check" : "mdi-content-copy"
+                  }}</v-icon>
                 </button>
               </div>
             </div>
@@ -493,7 +602,7 @@ definePageMeta({ middleware: "auth" });
   background: #fff;
   border-radius: 16px;
   border: 1px solid #f0f0f0;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
   overflow: hidden;
 }
 
@@ -592,9 +701,19 @@ definePageMeta({ middleware: "auth" });
 }
 
 @media (max-width: 600px) {
-  .profile-stats { flex-direction: column; align-items: flex-start; padding: 0 16px; }
-  .stat-divider { width: 100%; height: 1px; margin: 0; }
-  .stat-item { width: 100%; }
+  .profile-stats {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 0 16px;
+  }
+  .stat-divider {
+    width: 100%;
+    height: 1px;
+    margin: 0;
+  }
+  .stat-item {
+    width: 100%;
+  }
 }
 
 /* ─── Tabs ───────────────────────────────────────────── */
@@ -602,7 +721,7 @@ definePageMeta({ middleware: "auth" });
   background: #fff;
   border-radius: 16px;
   border: 1px solid #f0f0f0;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
   overflow: hidden;
 }
 
@@ -614,7 +733,9 @@ definePageMeta({ middleware: "auth" });
   scrollbar-width: none;
   -ms-overflow-style: none;
 }
-.tab-bar::-webkit-scrollbar { display: none; }
+.tab-bar::-webkit-scrollbar {
+  display: none;
+}
 
 .tab-item {
   display: flex;
@@ -627,11 +748,15 @@ definePageMeta({ middleware: "auth" });
   cursor: pointer;
   border-bottom: 2px solid transparent;
   margin-bottom: -1px;
-  transition: color 0.18s, border-color 0.18s;
+  transition:
+    color 0.18s,
+    border-color 0.18s;
   white-space: nowrap;
 }
 
-.tab-item:hover { color: #1e88e5; }
+.tab-item:hover {
+  color: #1e88e5;
+}
 
 .tab-item--active {
   color: #1e88e5;
@@ -639,7 +764,9 @@ definePageMeta({ middleware: "auth" });
   font-weight: 600;
 }
 
-.tab-content { padding: 0; }
+.tab-content {
+  padding: 0;
+}
 
 /* ─── Table ──────────────────────────────────────────── */
 .data-table {
@@ -665,8 +792,12 @@ definePageMeta({ middleware: "auth" });
   vertical-align: middle;
 }
 
-.data-table tr:last-child td { border-bottom: none; }
-.data-table tr:hover td { background: #fafcff; }
+.data-table tr:last-child td {
+  border-bottom: none;
+}
+.data-table tr:hover td {
+  background: #fafcff;
+}
 
 .cell-title {
   font-size: 0.875rem;
@@ -718,10 +849,22 @@ definePageMeta({ middleware: "auth" });
   font-weight: 600;
 }
 
-.status-success { background: #ecfdf5; color: #059669; }
-.status-warning { background: #fffbeb; color: #d97706; }
-.status-error   { background: #fef2f2; color: #dc2626; }
-.status-grey    { background: #f1f5f9; color: #64748b; }
+.status-success {
+  background: #ecfdf5;
+  color: #059669;
+}
+.status-warning {
+  background: #fffbeb;
+  color: #d97706;
+}
+.status-error {
+  background: #fef2f2;
+  color: #dc2626;
+}
+.status-grey {
+  background: #f1f5f9;
+  color: #64748b;
+}
 
 /* ─── Refund all button ──────────────────────────────── */
 .refund-all-btn {
@@ -742,7 +885,9 @@ definePageMeta({ middleware: "auth" });
   transition: background 0.15s;
   white-space: nowrap;
 }
-.refund-all-btn:hover { background: #fef3c7; }
+.refund-all-btn:hover {
+  background: #fef3c7;
+}
 
 /* ─── Empty state ────────────────────────────────────── */
 .empty-state {
@@ -767,11 +912,21 @@ definePageMeta({ middleware: "auth" });
   border-left: 3px solid transparent;
   transition: background 0.12s;
 }
-.shop-order-card:last-child { border-bottom: none; }
-.shop-order-card:hover { background: #fafcff; }
-.order--completed { border-left-color: #059669; }
-.order--failed    { border-left-color: #ef4444; }
-.order--pending   { border-left-color: #f59e0b; }
+.shop-order-card:last-child {
+  border-bottom: none;
+}
+.shop-order-card:hover {
+  background: #fafcff;
+}
+.order--completed {
+  border-left-color: #059669;
+}
+.order--failed {
+  border-left-color: #ef4444;
+}
+.order--pending {
+  border-left-color: #f59e0b;
+}
 
 .order-row-top {
   display: flex;
@@ -836,7 +991,9 @@ definePageMeta({ middleware: "auth" });
   border: 1px solid #d1fae5;
   transition: background 0.15s;
 }
-.order-toggle:hover { background: #dcfce7; }
+.order-toggle:hover {
+  background: #dcfce7;
+}
 
 /* ─── Account cards ──────────────────────────────────── */
 .account-cards {
@@ -872,7 +1029,9 @@ definePageMeta({ middleware: "auth" });
   padding: 8px 12px;
   border-bottom: 1px solid #f0fdf4;
 }
-.account-row:last-child { border-bottom: none; }
+.account-row:last-child {
+  border-bottom: none;
+}
 
 .account-label {
   font-size: 0.72rem;
@@ -913,7 +1072,10 @@ definePageMeta({ middleware: "auth" });
   color: #94a3b8;
   transition: all 0.15s;
 }
-.copy-btn:hover { background: #d1fae5; color: #059669; }
+.copy-btn:hover {
+  background: #d1fae5;
+  color: #059669;
+}
 
 /* ─── Order detail popup ─────────────────────────────── */
 .od-header {
@@ -954,12 +1116,29 @@ definePageMeta({ middleware: "auth" });
   color: #374151;
   gap: 12px;
 }
-.od-summary-row span { color: #94a3b8; flex-shrink: 0; }
-.od-summary-row strong { text-align: right; }
-.od-amount { color: #1e88e5 !important; font-size: 0.95rem; }
-.od-code { font-family: monospace; font-size: 0.78rem; color: #64748b !important; font-weight: 400 !important; }
+.od-summary-row span {
+  color: #94a3b8;
+  flex-shrink: 0;
+}
+.od-summary-row strong {
+  text-align: right;
+}
+.od-amount {
+  color: #1e88e5 !important;
+  font-size: 0.95rem;
+}
+.od-code {
+  font-family: monospace;
+  font-size: 0.78rem;
+  color: #64748b !important;
+  font-weight: 400 !important;
+}
 
-.od-accounts { display: flex; flex-direction: column; gap: 10px; }
+.od-accounts {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
 
 .od-acc-card {
   background: #f8fffe;
@@ -985,7 +1164,9 @@ definePageMeta({ middleware: "auth" });
   padding: 8px 12px;
   border-bottom: 1px solid #f0fdf4;
 }
-.od-acc-row:last-child { border-bottom: none; }
+.od-acc-row:last-child {
+  border-bottom: none;
+}
 .od-acc-label {
   font-size: 0.72rem;
   color: #94a3b8;
@@ -1022,15 +1203,22 @@ definePageMeta({ middleware: "auth" });
   color: #94a3b8;
   transition: all 0.15s;
 }
-.od-copy-btn:hover { background: #d1fae5; color: #059669; }
-.od-copy-btn--ok { background: #d1fae5 !important; color: #059669 !important; }
+.od-copy-btn:hover {
+  background: #d1fae5;
+  color: #059669;
+}
+.od-copy-btn--ok {
+  background: #d1fae5 !important;
+  color: #059669 !important;
+}
 
 /* reuse popup-close from account page if not defined */
 .popup-close {
-  width: 36px; height: 36px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
   border: none;
-  background: rgba(0,0,0,0.06);
+  background: rgba(0, 0, 0, 0.06);
   color: #475569;
   display: flex;
   align-items: center;
@@ -1039,6 +1227,7 @@ definePageMeta({ middleware: "auth" });
   transition: background 0.15s;
   flex-shrink: 0;
 }
-.popup-close:hover { background: rgba(0,0,0,0.12); }
-
+.popup-close:hover {
+  background: rgba(0, 0, 0, 0.12);
+}
 </style>
