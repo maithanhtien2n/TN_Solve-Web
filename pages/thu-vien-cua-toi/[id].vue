@@ -76,27 +76,31 @@ const userScenePct = computed(() => {
 
 const userSceneColor = computed(() => {
   const pct = userScenePct.value;
-  if (pct >= 100) return '#c62828';   // đỏ đậm — hết budget
-  if (pct >= 67)  return 'deep-orange'; // cam đậm
-  if (pct >= 34)  return 'orange';      // cam
-  return 'green';                        // còn thoải mái
+  if (pct >= 100) return "#c62828"; // đỏ đậm — hết budget
+  if (pct >= 67) return "deep-orange"; // cam đậm
+  if (pct >= 34) return "orange"; // cam
+  return "green"; // còn thoải mái
 });
 
 // videoFlow nhưng điều chỉnh title theo trạng thái video hiện tại
 const displayFlow = computed(() => {
-  if (!videoFlow.value || !Object.keys(videoFlow.value).length) return videoFlow.value;
+  if (!videoFlow.value || !Object.keys(videoFlow.value).length)
+    return videoFlow.value;
 
   const msgs: any[] = formData.messages;
   const lastColor = msgs.length ? msgs[msgs.length - 1]?.color : null;
 
   // Video đang xử lý (primary) → bỏ thông báo "sẽ vào hàng đợi", chỉ báo tải
-  if (lastColor === 'primary' && videoFlow.value.value >= 100) {
-    return { ...videoFlow.value, title: 'Hệ thống đang chạy hết công suất!' };
+  if (lastColor === "primary" && videoFlow.value.value >= 100) {
+    return { ...videoFlow.value, title: "Hệ thống đang chạy hết công suất!" };
   }
 
   // Video đang trong queue (grey) → thay bằng thông báo "đang trong hàng đợi"
-  if (lastColor === 'grey' && videoFlow.value.value >= 100) {
-    return { ...videoFlow.value, title: 'Hệ thống đang đầy tải — video của bạn đang trong hàng đợi' };
+  if (lastColor === "grey" && videoFlow.value.value >= 100) {
+    return {
+      ...videoFlow.value,
+      title: "Hệ thống đang đầy tải — video của bạn đang trong hàng đợi",
+    };
   }
 
   return videoFlow.value;
@@ -111,8 +115,7 @@ const modelVideoOptions = computed(() => {
 });
 
 const videoModeOptions = computed(() => {
-  let list =
-    onGetterMasterData.value["video-mode"] || [];
+  let list = onGetterMasterData.value["video-mode"] || [];
 
   list = list.filter((x: any) => !["sync_process"].includes(x.value));
 
@@ -128,6 +131,8 @@ const videoModeOptions = computed(() => {
     );
   }
 
+  list = list?.filter((x: any) => ["movie"].includes(x.value));
+
   return list;
 });
 
@@ -136,8 +141,7 @@ const frameRateOptions = computed(
 );
 
 const videoStyleOptions = computed(() => {
-  let list =
-    onGetterMasterData.value["video-style"] || [];
+  let list = onGetterMasterData.value["video-style"] || [];
 
   switch (formData.videoMode) {
     case "movie":
@@ -425,7 +429,7 @@ const onSubmit = async () => {
         await onGetProductDetail();
         formData.messages = formData.messages?.length
           ? formData.messages
-          : [{ title: 'Đang xử lý...', dateTime: '', color: 'primary' }];
+          : [{ title: "Đang xử lý...", dateTime: "", color: "primary" }];
         router.replace(`/thu-vien-cua-toi/${productId}`);
       }
     })
@@ -535,7 +539,9 @@ definePageMeta({ middleware: "auth" });
             size="44"
             width="3"
           >
-            <span class="flow-circle-pct" :style="{ color: displayFlow.color }">{{ displayFlow.value }}%</span>
+            <span class="flow-circle-pct" :style="{ color: displayFlow.color }"
+              >{{ displayFlow.value }}%</span
+            >
           </v-progress-circular>
         </div>
 
@@ -546,10 +552,17 @@ definePageMeta({ middleware: "auth" });
         <div v-if="displayFlow.userScene" class="flow-col">
           <div class="flow-col-header">
             <span class="flow-col-title flow-col-title--main">
-              <span class="flow-col-label-inline">{{ displayFlow.userScene.label || 'Tổng số cảnh đang dùng' }}</span>
+              <span class="flow-col-label-inline">{{
+                displayFlow.userScene.label || "Tổng số cảnh đang dùng"
+              }}</span>
             </span>
-            <span class="flow-col-pct flow-col-pct--main" :style="{ color: userSceneColor }">
-{{ displayFlow.userScene.used }}/{{ displayFlow.userScene.budget }}
+            <span
+              class="flow-col-pct flow-col-pct--main"
+              :style="{ color: userSceneColor }"
+            >
+              {{ displayFlow.userScene.used }}/{{
+                displayFlow.userScene.budget
+              }}
             </span>
           </div>
           <v-progress-linear
@@ -629,7 +642,7 @@ definePageMeta({ middleware: "auth" });
             @click="onClickLikeVideo()"
           >
             <v-icon size="16">
-              {{ formData?.isLiked ? 'mdi-thumb-up' : 'mdi-thumb-up-outline' }}
+              {{ formData?.isLiked ? "mdi-thumb-up" : "mdi-thumb-up-outline" }}
             </v-icon>
             <span>{{ formData?.likesCount }}</span>
           </button>
@@ -638,27 +651,47 @@ definePageMeta({ middleware: "auth" });
         <div class="info-grid">
           <div class="info-card">
             <span class="info-label">Mô hình</span>
-            <span class="info-value">{{ modelVideoOptions.find((i: any) => i.value === formData.modelVideo)?.title || "Chưa có" }}</span>
+            <span class="info-value">{{
+              modelVideoOptions.find(
+                (i: any) => i.value === formData.modelVideo,
+              )?.title || "Chưa có"
+            }}</span>
           </div>
           <div class="info-card">
             <span class="info-label">Tỷ lệ khung hình</span>
-            <span class="info-value">{{ frameRateOptions.find((i: any) => i.value === formData.frameRate)?.title || "Chưa có" }}</span>
+            <span class="info-value">{{
+              frameRateOptions.find((i: any) => i.value === formData.frameRate)
+                ?.title || "Chưa có"
+            }}</span>
           </div>
           <div class="info-card">
             <span class="info-label">Chế độ</span>
-            <span class="info-value">{{ videoModeOptions.find((i: any) => i.value === formData.videoMode)?.title || "Chưa có" }}</span>
+            <span class="info-value">{{
+              videoModeOptions.find((i: any) => i.value === formData.videoMode)
+                ?.title || "Chưa có"
+            }}</span>
           </div>
           <div class="info-card">
             <span class="info-label">Phong cách</span>
-            <span class="info-value">{{ videoStyleOptions.find((i: any) => i.value === formData.videoStyle)?.title || "Chưa có" }}</span>
+            <span class="info-value">{{
+              videoStyleOptions.find(
+                (i: any) => i.value === formData.videoStyle,
+              )?.title || "Chưa có"
+            }}</span>
           </div>
           <div class="info-card">
             <span class="info-label">Thời lượng</span>
-            <span class="info-value">{{ videoDurationOptions.find((i: any) => i.value === formData.videoDuration)?.title || "Chưa có" }}</span>
+            <span class="info-value">{{
+              videoDurationOptions.find(
+                (i: any) => i.value === formData.videoDuration,
+              )?.title || "Chưa có"
+            }}</span>
           </div>
           <div class="info-card">
             <span class="info-label">Tác giả</span>
-            <span class="info-value">{{ formData?.account?.name || "Chưa có" }}</span>
+            <span class="info-value">{{
+              formData?.account?.name || "Chưa có"
+            }}</span>
           </div>
         </div>
 
@@ -721,7 +754,11 @@ definePageMeta({ middleware: "auth" });
           <v-col cols="12">
             <div class="info-card">
               <span class="info-label">Prompt</span>
-              <span v-html="formData.value" class="info-value" style="white-space: pre-line" />
+              <span
+                v-html="formData.value"
+                class="info-value"
+                style="white-space: pre-line"
+              />
             </div>
           </v-col>
         </v-row>
@@ -963,7 +1000,6 @@ definePageMeta({ middleware: "auth" });
     </v-col>
 
     <v-col lg="6" md="6" cols="12">
-
       <!-- Guide panel khi chưa tạo video -->
       <div v-if="!productId" class="guide-panel">
         <div class="guide-header">
@@ -972,7 +1008,9 @@ definePageMeta({ middleware: "auth" });
           </div>
           <div>
             <div class="guide-header-title">Quy trình tạo video AI</div>
-            <div class="guide-header-sub">Chỉ vài phút để có video chuyên nghiệp</div>
+            <div class="guide-header-sub">
+              Chỉ vài phút để có video chuyên nghiệp
+            </div>
           </div>
         </div>
 
@@ -981,7 +1019,10 @@ definePageMeta({ middleware: "auth" });
             <div class="guide-step-num">1</div>
             <div class="guide-step-body">
               <div class="guide-step-title">Điền thông tin & Prompt</div>
-              <div class="guide-step-desc">Chọn mô hình, tỷ lệ khung hình, chế độ, phong cách, thời lượng và viết nội dung mô tả video</div>
+              <div class="guide-step-desc">
+                Chọn mô hình, tỷ lệ khung hình, chế độ, phong cách, thời lượng
+                và viết nội dung mô tả video
+              </div>
             </div>
           </div>
           <div class="guide-step-connector" />
@@ -989,7 +1030,9 @@ definePageMeta({ middleware: "auth" });
             <div class="guide-step-num">2</div>
             <div class="guide-step-body">
               <div class="guide-step-title">AI phân tích & tạo kịch bản</div>
-              <div class="guide-step-desc">Hệ thống tự động phân tích prompt và tạo kịch bản từng cảnh quay</div>
+              <div class="guide-step-desc">
+                Hệ thống tự động phân tích prompt và tạo kịch bản từng cảnh quay
+              </div>
             </div>
           </div>
           <div class="guide-step-connector" />
@@ -997,7 +1040,9 @@ definePageMeta({ middleware: "auth" });
             <div class="guide-step-num">3</div>
             <div class="guide-step-body">
               <div class="guide-step-title">Xử lý & render video</div>
-              <div class="guide-step-desc">AI tiến hành tạo từng cảnh quay và ghép thành video hoàn chỉnh</div>
+              <div class="guide-step-desc">
+                AI tiến hành tạo từng cảnh quay và ghép thành video hoàn chỉnh
+              </div>
             </div>
           </div>
           <div class="guide-step-connector" />
@@ -1005,7 +1050,9 @@ definePageMeta({ middleware: "auth" });
             <div class="guide-step-num">4</div>
             <div class="guide-step-body">
               <div class="guide-step-title">Tải video về máy</div>
-              <div class="guide-step-desc">Video hoàn tất, bạn có thể xem, chia sẻ hoặc tải xuống ngay</div>
+              <div class="guide-step-desc">
+                Video hoàn tất, bạn có thể xem, chia sẻ hoặc tải xuống ngay
+              </div>
             </div>
           </div>
         </div>
@@ -1014,15 +1061,23 @@ definePageMeta({ middleware: "auth" });
       <!-- Banner hàng đợi -->
       <div v-if="queueMessage && !formData.video" class="queue-banner mb-4">
         <div class="queue-banner__icon">
-          <v-progress-circular color="white" width="2" size="20" indeterminate />
+          <v-progress-circular
+            color="white"
+            width="2"
+            size="20"
+            indeterminate
+          />
         </div>
         <div class="queue-banner__body">
           <div class="queue-banner__title">
             Đang chờ trong hàng đợi
-            <span v-if="queuePosition" class="queue-banner__pos">— Vị trí #{{ queuePosition }}</span>
+            <span v-if="queuePosition" class="queue-banner__pos"
+              >— Vị trí #{{ queuePosition }}</span
+            >
           </div>
           <div class="queue-banner__sub">
-            Video của bạn sẽ được xử lý ngay khi đến lượt. Vui lòng giữ nguyên trang này.
+            Video của bạn sẽ được xử lý ngay khi đến lượt. Vui lòng giữ nguyên
+            trang này.
           </div>
         </div>
       </div>
@@ -1041,16 +1096,28 @@ definePageMeta({ middleware: "auth" });
           <div class="step-row">
             <!-- icon -->
             <div class="step-icon" :class="`step-icon--${item.color}`">
-              <v-icon v-if="item.color === 'success'" color="white" size="16">mdi-check</v-icon>
-              <v-progress-circular v-else-if="item.color === 'primary'" color="white" width="2" size="14" indeterminate />
-              <v-icon v-else-if="item.color === 'error'" color="white" size="16">mdi-close</v-icon>
+              <v-icon v-if="item.color === 'success'" color="white" size="16"
+                >mdi-check</v-icon
+              >
+              <v-progress-circular
+                v-else-if="item.color === 'primary'"
+                color="white"
+                width="2"
+                size="14"
+                indeterminate
+              />
+              <v-icon v-else-if="item.color === 'error'" color="white" size="16"
+                >mdi-close</v-icon
+              >
               <v-icon v-else color="white" size="14">mdi-clock-outline</v-icon>
             </div>
 
             <!-- content -->
             <div class="step-content">
               <div class="step-title">{{ item.title }}</div>
-              <div v-if="item.dateTime" class="step-time">{{ item.dateTime }}</div>
+              <div v-if="item.dateTime" class="step-time">
+                {{ item.dateTime }}
+              </div>
               <div
                 v-if="item.note"
                 class="step-note"
@@ -1069,14 +1136,27 @@ definePageMeta({ middleware: "auth" });
                 {{ item.note }}
               </div>
               <div
-                v-if="['❌ Cookies flow (veo3) của bạn không hợp lệ!', '❌ Cookies flow (veo3) của bạn đã hết hạn!'].includes(item.note)"
+                v-if="
+                  [
+                    '❌ Cookies flow (veo3) của bạn không hợp lệ!',
+                    '❌ Cookies flow (veo3) của bạn đã hết hạn!',
+                  ].includes(item.note)
+                "
                 class="step-note"
               >
                 Vui lòng cập nhật cookies mới
-                <a target="_blank" rel="noopener noreferrer" href="https://tnsolve.com/cai-dat">tại đây</a>
+                <a
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  href="https://tnsolve.com/cai-dat"
+                  >tại đây</a
+                >
               </div>
               <div
-                v-if="onGetterUserData?.role === EnumAccountRole.ADMIN && item.errorMsg"
+                v-if="
+                  onGetterUserData?.role === EnumAccountRole.ADMIN &&
+                  item.errorMsg
+                "
                 class="step-note step-note--error"
               >
                 {{ item.errorMsg }}
@@ -1114,7 +1194,7 @@ definePageMeta({ middleware: "auth" });
   border: 1px solid #d0dae6;
   border-radius: 14px;
   overflow: hidden;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
 }
 
 .guide-header {
@@ -1129,7 +1209,7 @@ definePageMeta({ middleware: "auth" });
   width: 44px;
   height: 44px;
   border-radius: 12px;
-  background: rgba(255,255,255,0.15);
+  background: rgba(255, 255, 255, 0.15);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1144,7 +1224,7 @@ definePageMeta({ middleware: "auth" });
 
 .guide-header-sub {
   font-size: 0.78rem;
-  color: rgba(255,255,255,0.65);
+  color: rgba(255, 255, 255, 0.65);
   margin-top: 2px;
 }
 
@@ -1221,7 +1301,7 @@ definePageMeta({ middleware: "auth" });
   border-radius: 10px;
   background: #fff;
   border: 1px solid #d0dae6;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 .info-label {
@@ -1272,7 +1352,10 @@ definePageMeta({ middleware: "auth" });
   font-size: 0.82rem;
   font-weight: 500;
   color: #616161;
-  transition: background 0.18s, color 0.18s, border-color 0.18s;
+  transition:
+    background 0.18s,
+    color 0.18s,
+    border-color 0.18s;
 }
 
 .like-btn:hover {
@@ -1323,10 +1406,12 @@ definePageMeta({ middleware: "auth" });
   justify-content: center;
   width: 40px;
   height: 40px;
-  background: rgba(255,255,255,0.2);
+  background: rgba(255, 255, 255, 0.2);
   border-radius: 50%;
 }
-.queue-banner__body { flex: 1; }
+.queue-banner__body {
+  flex: 1;
+}
 .queue-banner__title {
   font-weight: 600;
   font-size: 0.95rem;
@@ -1350,7 +1435,7 @@ definePageMeta({ middleware: "auth" });
   border-radius: 10px;
   background: #fff;
   border: 1px solid #d0dae6;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
   gap: 0;
 }
 
@@ -1363,12 +1448,27 @@ definePageMeta({ middleware: "auth" });
   padding: 0 10px;
 }
 
-.flow-col:first-child { padding-left: 0; }
-.flow-col:last-child  { padding-right: 0; }
+.flow-col:first-child {
+  padding-left: 0;
+}
+.flow-col:last-child {
+  padding-right: 0;
+}
 
-.flow-col-label-inline { font-size: 0.72rem; color: #757575; font-weight: 400; }
-.flow-col-title--main  { font-size: 0.85rem; font-weight: 600; color: #212121; }
-.flow-col-pct--main    { font-size: 0.82rem; font-weight: 700; }
+.flow-col-label-inline {
+  font-size: 0.72rem;
+  color: #757575;
+  font-weight: 400;
+}
+.flow-col-title--main {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #212121;
+}
+.flow-col-pct--main {
+  font-size: 0.82rem;
+  font-weight: 700;
+}
 
 /* Chấm tròn hệ thống */
 .flow-col-circle {
@@ -1448,7 +1548,7 @@ definePageMeta({ middleware: "auth" });
   background: #fff;
   border: 1px solid #d0dae6;
   margin-bottom: 20px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
   transition: background 0.15s;
 }
 
@@ -1478,10 +1578,18 @@ definePageMeta({ middleware: "auth" });
   margin-top: 1px;
 }
 
-.step-icon--success { background: #43a047; }
-.step-icon--primary { background: #1e88e5; }
-.step-icon--error   { background: #e53935; }
-.step-icon--grey    { background: #bdbdbd; }
+.step-icon--success {
+  background: #43a047;
+}
+.step-icon--primary {
+  background: #1e88e5;
+}
+.step-icon--error {
+  background: #e53935;
+}
+.step-icon--grey {
+  background: #bdbdbd;
+}
 
 .step-content {
   display: flex;
