@@ -131,7 +131,9 @@ const videoModeOptions = computed(() => {
     );
   }
 
-  list = list?.filter((x: any) => ["movie"].includes(x.value));
+  if (!onGetterUserData.value?.settings?.usePersonalResource) {
+    list = list?.filter((x: any) => ["movie"].includes(x.value));
+  }
 
   return list;
 });
