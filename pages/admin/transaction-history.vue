@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { accountService } from "~/services/app";
+import { accountService, appService } from "~/services/app";
 
 const route = useRoute();
 
@@ -74,6 +74,16 @@ async function loadItems(event: any) {
 const onAction = (event: any) => {
   commonDialogRef.value?.onDisplay(true);
 };
+
+const loadingCommission = ref(false);
+async function runMonthlyCommission() {
+  if (!confirm("Chạy quy trình chốt hoa hồng tháng? Thao tác này không thể hoàn tác.")) return;
+  loadingCommission.value = true;
+  await appService.runMonthlyCommission()
+    .then(() => { alert("Đã chạy xong! Tải lại trang để xem kết quả."); })
+    .catch((e: any) => alert(e?.response?.data?.message || "Có lỗi xảy ra!"))
+    .finally(() => { loadingCommission.value = false; });
+}
 
 definePageMeta({ layout: "admin", title: "Lịch sử giao dịch" });
 </script>
@@ -192,6 +202,29 @@ definePageMeta({ layout: "admin", title: "Lịch sử giao dịch" });
     @change="loadItems"
     @action="onAction"
   >
+    <template #action>
+      <div class="d-flex justify-end ga-2">
+        <v-btn
+          v-if="data?.partnerInfo"
+          text="Chi tiết"
+          style="height:48px"
+          variant="flat"
+          color="green"
+          @click="onAction(null)"
+        />
+        <v-btn
+          style="height:48px"
+          variant="outlined"
+          color="warning"
+          :loading="loadingCommission"
+          @click="runMonthlyCommission"
+        >
+          <v-icon start size="18">mdi-cash-clock</v-icon>
+          Chốt hoa hồng tháng
+        </v-btn>
+      </div>
+    </template>
+
     <template #row-basePrice="{ item }">
       <div class="text-red text-nowrap">
         {{ formatCurrency((item as any).basePrice) }}

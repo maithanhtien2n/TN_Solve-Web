@@ -36,4 +36,8 @@ export const appService = {
   async restartProcess() {
     return await api.post("/common/restart-process");
   },
+
+  async runMonthlyCommission() {
+    return await api.post("/common/run-monthly-commission");
+  },
 };
