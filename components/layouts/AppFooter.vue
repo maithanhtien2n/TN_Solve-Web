@@ -86,6 +86,7 @@ onMounted(async () => {
             />
           </a>
         </div>
+
       </div>
 
       <!-- 4-column grid -->
@@ -135,6 +136,27 @@ onMounted(async () => {
             <a class="col-link" @click="onClickNavigate('zalo-group')">Nhóm hỗ trợ Zalo</a>
             <a class="col-link" @click="onClickNavigate('facebook-group')">Nhóm Facebook</a>
           </div>
+        </div>
+
+        <!-- Chứng nhận -->
+        <div class="footer-col footer-col--cert">
+          <div class="col-title">
+            <span class="col-title__accent" />
+            CHỨNG NHẬN
+          </div>
+          <a
+            href="http://online.gov.vn/Home/WebDetails/143356"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="bct-badge"
+          >
+            <img
+              src="/images/logo-bct.png"
+              alt="Đã đăng ký Bộ Công Thương"
+              title="Đã đăng ký Bộ Công Thương"
+              class="bct-badge__img"
+            />
+          </a>
         </div>
       </div>
 
@@ -221,7 +243,7 @@ onMounted(async () => {
 /* ─── Grid ───────────────────────────────────────────── */
 .footer-grid {
   display: grid;
-  grid-template-columns: 1.2fr 1fr 1fr;
+  grid-template-columns: 1.2fr 1fr 1fr 0.8fr;
   gap: 36px;
   padding-bottom: 2rem;
   border-bottom: 1px solid #e9eef5;
@@ -232,6 +254,24 @@ onMounted(async () => {
     grid-template-columns: 1fr 1fr;
     gap: 28px;
   }
+}
+
+.bct-badge {
+  display: block;
+  margin: 0;
+  padding: 0;
+  transition: opacity 0.15s;
+}
+
+.bct-badge:hover {
+  opacity: 0.85;
+}
+
+.bct-badge__img {
+  width: 100%;
+  max-width: 220px;
+  height: auto;
+  object-fit: contain;
 }
 
 @media (max-width: 900px) {
