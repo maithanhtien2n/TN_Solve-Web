@@ -297,8 +297,8 @@ definePageMeta({ middleware: "auth" });
       <!-- YouTube tutorial -->
       <div class="sw-youtube">
         <iframe
-          src="https://www.youtube.com/embed/qsmmk_KipS4"
-          title="Hướng dẫn kết nối tài khoản VEO với tool TN SOLVE để tạo video AI tự động"
+          src="https://www.youtube.com/embed/R6btMZT1BmI"
+          title="Hướng dẫn kết nối tài khoản VEO với tool TN SOLVE"
           frameborder="0"
           allow="
             accelerometer;
