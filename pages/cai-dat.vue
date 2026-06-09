@@ -57,12 +57,14 @@ const onTogglePersonalResource = async (val: boolean) => {
 
 const hasExtensionFile = ref(false);
 const extensionUpdatedAt = ref<string | null>(null);
-const extensionUrlCopied = ref(false);
+const extensionDropdownOpen = ref(false);
 
-const onCopyExtensionUrl = () => {
-  navigator.clipboard.writeText("chrome://extensions");
-  extensionUrlCopied.value = true;
-  setTimeout(() => (extensionUrlCopied.value = false), 2000);
+const onToggleExtensionDropdown = () => {
+  extensionDropdownOpen.value = !extensionDropdownOpen.value;
+};
+
+const onClickOutsideExtension = () => {
+  extensionDropdownOpen.value = false;
 };
 
 function timeAgo(dateStr: string): string {
@@ -137,38 +139,51 @@ definePageMeta({ middleware: "auth" });
               </div>
             </div>
           </div>
-          <button
-            class="sw-btn-primary"
-            style="background: #7c3aed"
-            @click="onDownloadExtension"
-          >
-            <v-icon size="14">mdi-download</v-icon>
-            Tải xuống
-          </button>
-        </div>
-        <div class="sw-chrome-row sw-row--desktop-only">
           <div
-            class="sw-chrome-url"
-            style="line-height: 1"
-            @click="onCopyExtensionUrl"
-            :title="extensionUrlCopied ? 'Đã sao chép!' : 'Nhấn để sao chép'"
+            class="sw-ext-dropdown-wrap"
+            v-click-outside="onClickOutsideExtension"
           >
-            <v-icon
-              size="13"
-              style="color: #7c3aed; line-height: 1; vertical-align: middle"
-              >mdi-google-chrome</v-icon
+            <button
+              class="sw-btn-primary sw-ext-dropdown-btn"
+              style="background: #7c3aed"
+              @click="onToggleExtensionDropdown"
             >
-            <span style="line-height: 1; vertical-align: middle"
-              >chrome://extensions</span
-            >
-            <v-icon
-              size="13"
-              style="line-height: 1; vertical-align: middle"
-              :color="extensionUrlCopied ? '#059669' : '#94a3b8'"
-              >{{
-                extensionUrlCopied ? "mdi-check" : "mdi-content-copy"
-              }}</v-icon
-            >
+              <v-icon size="14">mdi-download</v-icon>
+              Tải xuống
+              <v-icon size="14" :style="{ transform: extensionDropdownOpen ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s' }">mdi-chevron-down</v-icon>
+            </button>
+            <div v-if="extensionDropdownOpen" class="sw-ext-dropdown-menu">
+              <div class="sw-ext-dropdown-caret" />
+              <a
+                href="https://chromewebstore.google.com/detail/iogenbenplmfmhbigimkkaddnapioflf?utm_source=item-share-cb"
+                target="_blank"
+                class="sw-ext-dropdown-item sw-ext-dropdown-item--online"
+                @click="extensionDropdownOpen = false"
+              >
+                <div class="sw-ext-dropdown-icon sw-ext-dropdown-icon--online">
+                  <v-icon size="14" color="white">mdi-web</v-icon>
+                </div>
+                <div class="sw-ext-dropdown-text">
+                  <div class="sw-ext-dropdown-item-title">Bản Online</div>
+                  <div class="sw-ext-dropdown-item-sub">Chrome Web Store</div>
+                </div>
+                <v-icon size="13" class="sw-ext-dropdown-arrow">mdi-arrow-right</v-icon>
+              </a>
+              <div class="sw-ext-dropdown-divider" />
+              <div
+                class="sw-ext-dropdown-item sw-ext-dropdown-item--offline"
+                @click="onDownloadExtension(); extensionDropdownOpen = false"
+              >
+                <div class="sw-ext-dropdown-icon sw-ext-dropdown-icon--offline">
+                  <v-icon size="14" color="white">mdi-download</v-icon>
+                </div>
+                <div class="sw-ext-dropdown-text">
+                  <div class="sw-ext-dropdown-item-title">Bản Offline</div>
+                  <div class="sw-ext-dropdown-item-sub">Tải file về máy</div>
+                </div>
+                <v-icon size="13" class="sw-ext-dropdown-arrow">mdi-arrow-right</v-icon>
+              </div>
+            </div>
           </div>
         </div>
         <div class="sw-sep sw-row--desktop-only" />
@@ -420,34 +435,124 @@ definePageMeta({ middleware: "auth" });
 }
 
 /* ── Chrome URL chip ─────────────────────────────────── */
-.sw-chrome-row {
-  padding: 0 20px 12px;
+.sw-ext-dropdown-wrap {
+  position: relative;
+}
+
+.sw-ext-dropdown-btn {
   display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.sw-chrome-url {
-  display: inline-flex;
-  width: fit-content;
   align-items: center;
-  gap: 5px;
-  padding: 6px 10px;
-  border-radius: 8px;
-  border: 1px solid #ede9fe;
-  background: #f5f3ff;
-  color: #6d28d9;
-  font-size: 0.775rem;
-  font-family: "Fira Code", "Courier New", monospace;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.13s;
-  white-space: nowrap;
+  gap: 6px;
 }
 
-.sw-chrome-url:hover {
-  background: #ede9fe;
-  border-color: #c4b5fd;
+.sw-ext-dropdown-menu {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  min-width: 210px;
+  background: #fff;
+  border: 1px solid #ede9fe;
+  border-radius: 14px;
+  box-shadow: 0 12px 32px rgba(124, 58, 237, 0.15), 0 2px 8px rgba(0,0,0,0.06);
+  z-index: 100;
+  overflow: hidden;
+  animation: extDropdownIn 0.15s ease;
+}
+
+@keyframes extDropdownIn {
+  from { opacity: 0; transform: translateY(-6px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.sw-ext-dropdown-caret {
+  position: absolute;
+  top: -5px;
+  right: 18px;
+  width: 10px;
+  height: 10px;
+  background: #fff;
+  border-left: 1px solid #ede9fe;
+  border-top: 1px solid #ede9fe;
+  transform: rotate(45deg);
+}
+
+.sw-ext-dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 11px 14px;
+  cursor: pointer;
+  text-decoration: none;
+  color: inherit;
+  transition: background 0.13s;
+  position: relative;
+}
+
+.sw-ext-dropdown-arrow {
+  margin-left: auto;
+  opacity: 0;
+  transform: translateX(-4px);
+  transition: opacity 0.15s, transform 0.15s;
+}
+
+.sw-ext-dropdown-item--online:hover {
+  background: #f0fdf4;
+}
+.sw-ext-dropdown-item--online:hover .sw-ext-dropdown-arrow {
+  opacity: 1;
+  transform: translateX(0);
+  color: #059669;
+}
+
+.sw-ext-dropdown-item--offline:hover {
+  background: #f5f3ff;
+}
+.sw-ext-dropdown-item--offline:hover .sw-ext-dropdown-arrow {
+  opacity: 1;
+  transform: translateX(0);
+  color: #7c3aed;
+}
+
+.sw-ext-dropdown-icon {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.sw-ext-dropdown-icon--online {
+  background: linear-gradient(135deg, #059669, #34d399);
+}
+
+.sw-ext-dropdown-icon--offline {
+  background: linear-gradient(135deg, #5b21b6, #8b5cf6);
+}
+
+.sw-ext-dropdown-text {
+  flex: 1;
+}
+
+.sw-ext-dropdown-item-title {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #1e1b4b;
+  line-height: 1.3;
+}
+
+.sw-ext-dropdown-item-sub {
+  font-size: 0.715rem;
+  color: #94a3b8;
+  line-height: 1.2;
+  margin-top: 2px;
+}
+
+.sw-ext-dropdown-divider {
+  height: 1px;
+  background: #f3f0ff;
+  margin: 0 14px;
 }
 
 /* ── API Key ─────────────────────────────────────────── */
@@ -533,14 +638,11 @@ definePageMeta({ middleware: "auth" });
   font-weight: 600;
   border: none;
   cursor: pointer;
-  transition:
-    background 0.13s,
-    transform 0.1s;
+  transition: background 0.13s;
 }
 
 .sw-btn-primary:hover:not(:disabled) {
   background: #1565c0;
-  transform: translateY(-1px);
 }
 .sw-btn-primary:disabled {
   opacity: 0.6;
