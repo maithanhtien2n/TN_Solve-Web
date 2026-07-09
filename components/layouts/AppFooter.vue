@@ -145,7 +145,7 @@ onMounted(async () => {
             CHỨNG NHẬN
           </div>
           <a
-            href="http://online.gov.vn/Home/WebDetails/143356"
+            href="http://online.gov.vn/nen-tang/5047937e-5690-4277-adb4-96906cbe9d29"
             target="_blank"
             rel="noopener noreferrer"
             class="bct-badge"
