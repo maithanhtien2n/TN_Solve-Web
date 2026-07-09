@@ -332,10 +332,10 @@ onMounted(async () => {
 
 /* ─── Biz lines ──────────────────────────────────────── */
 .biz-line {
-  font-size: 0.82rem;
-  color: #475569;
+  font-size: 0.855rem;
+  color: #334155;
   margin: 0;
-  line-height: 1.55;
+  line-height: 1.4;
 }
 
 .biz-line strong {
