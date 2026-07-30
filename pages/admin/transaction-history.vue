@@ -1,9 +1,11 @@
 <script setup lang="ts">
-import { accountService, appService } from "~/services/app";
+import { accountService, appService, masterDataService } from "~/services/app";
 
 const route = useRoute();
 
 const { onGetterMasterData } = useMasterDataStore();
+
+const dataTableRef = ref<any>(null);
 
 const headers = [
   { title: "Thông tin khách hàng", key: "customerInfo", sortable: false },
@@ -46,11 +48,54 @@ const partnerItems = computed(
   () => onGetterMasterData.value["my-partner"] || []
 );
 
+// Danh sách CTV hiển thị trong bộ lọc "Cộng tác viên": mặc định là tất cả CTV,
+// nhưng khi chọn 1 tháng cụ thể thì chỉ còn lại những CTV có phát sinh hoa hồng
+// trong đúng tháng đó (xem onChangeFilter bên dưới).
+const partnerItemsDynamic = ref<any[]>([]);
+
+watch(
+  partnerItems,
+  (val) => {
+    if (!dataTableRef.value?.params?.monthYear) {
+      partnerItemsDynamic.value = val;
+    }
+  },
+  { immediate: true }
+);
+
 const statusItems = computed(() => commissionStatusOptions);
 
 const transactionMonthsItems = computed(
   () => onGetterMasterData.value["transaction-months"] || []
 );
+
+async function onChangeFilter(event: any) {
+  if (event.field !== "monthYear") return;
+
+  if (!event.value) {
+    partnerItemsDynamic.value = partnerItems.value;
+  } else {
+    await masterDataService
+      .getMyPartnerByMonth({ monthYear: event.value })
+      .then((res: any) => {
+        partnerItemsDynamic.value = res.data || [];
+      })
+      .catch(() => {
+        partnerItemsDynamic.value = [];
+      });
+  }
+
+  // CTV đang chọn có thể không còn trong danh sách mới -> chọn lại CTV đầu tiên
+  if (dataTableRef.value) {
+    const stillValid = partnerItemsDynamic.value.some(
+      (x: any) => x.value === dataTableRef.value.params.accountId
+    );
+    if (!stillValid) {
+      dataTableRef.value.params.accountId =
+        partnerItemsDynamic.value[0]?.value ?? null;
+    }
+  }
+}
 
 function onGetBankName(code: string) {
   const bank = banks.value.find((x: any) => x.code === code);
@@ -175,16 +220,16 @@ definePageMeta({ layout: "admin", title: "Lịch sử giao dịch" });
     ref="dataTableRef"
     :filters="[
       {
-        label: 'Cộng tác viên',
-        field: 'accountId',
-        type: 'select',
-        items: partnerItems,
-      },
-      {
         label: 'Thời gian',
         field: 'monthYear',
         type: 'select',
         items: transactionMonthsItems,
+      },
+      {
+        label: 'Cộng tác viên',
+        field: 'accountId',
+        type: 'select',
+        items: partnerItemsDynamic,
       },
       {
         label: 'Trạng thái',
@@ -201,6 +246,7 @@ definePageMeta({ layout: "admin", title: "Lịch sử giao dịch" });
     :loading="Boolean(loading == 'load-table')"
     @change="loadItems"
     @action="onAction"
+    @change-filter="onChangeFilter"
   >
     <template #action>
       <div class="d-flex justify-end ga-2">

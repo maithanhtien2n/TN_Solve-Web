@@ -11,6 +11,25 @@ const headers = [
 const data = ref<any>({});
 const loading = ref<string>("");
 const dataTableRef = ref<any>(null);
+const newRevenuePassword = ref<string>("");
+
+async function onSaveRevenuePassword(item: any) {
+  if (!newRevenuePassword.value) return;
+
+  loading.value = `revenue-password-${item._id}`;
+  try {
+    await masterDataService.settingAction({
+      _id: item._id,
+      value: newRevenuePassword.value,
+    });
+    newRevenuePassword.value = "";
+    dataTableRef.value?.loadItems();
+  } catch (error) {
+    console.log("Lỗi khi đổi mật khẩu!", error);
+  } finally {
+    loading.value = "";
+  }
+}
 
 async function loadItems(event: any) {
   const params = { ...event };
@@ -63,22 +82,6 @@ async function onFileUpload(event: Event, item: any) {
 const onClickAction = async (data?: any | null, action?: string) => {
   try {
     switch (action) {
-      case "update_account": {
-        await fetch(
-          `${
-            import.meta.env.VITE_API_URL === "http://localhost:3000"
-              ? "http://localhost:3000/api/common/update-storage-state?secret=d98aeba92127b1cc2f7adfbe04dee7395fbebe84ec9052744b87ed5fa6a3bccc"
-              : "https://api.tnsolve.com/api/common/update-storage-state?secret=d98aeba92127b1cc2f7adfbe04dee7395fbebe84ec9052744b87ed5fa6a3bccc"
-          }`,
-          {
-            method: "GET",
-            headers: { "Content-Type": "application/json" },
-          },
-        );
-
-        break;
-      }
-
       default: {
         await masterDataService.settingAction({
           _id: data._id,
@@ -110,18 +113,7 @@ definePageMeta({ layout: "admin", title: "Thông tin chung" });
     @change="loadItems"
   >
     <template #row-value="{ item }">
-      <template v-if="(item as any).title === 'Cập nhật tài khoản'">
-        <span v-if="(item as any).value" class="text-blue text-nowrap">
-          {{ (item as any).value }}
-        </span>
-
-        <span v-else class="text-nowrap">
-          Vừa cập nhật xong
-          <v-icon size="17" color="green" class="mb-1">mdi-check</v-icon>
-        </span>
-      </template>
-
-      <template v-else-if="(item as any).title === 'Tạo thước phim ở website'">
+      <template v-if="(item as any).title === 'Tạo thước phim ở website'">
         <span v-if="(item as any).value" class="text-green text-nowrap">
           Cho phép
         </span>
@@ -159,6 +151,12 @@ definePageMeta({ layout: "admin", title: "Thông tin chung" });
         </span>
 
         <span v-else class="text-red text-nowrap">Không cho phép</span>
+      </template>
+
+      <template
+        v-else-if="(item as any).title === 'Mật khẩu xem doanh thu công khai'"
+      >
+        <span class="text-nowrap text-medium-emphasis">•••••••• (đã mã hóa)</span>
       </template>
 
       <template v-else-if="(item as any).title === 'Mô hình ưu tiên'">
@@ -225,21 +223,8 @@ definePageMeta({ layout: "admin", title: "Thông tin chung" });
 
     <template #row-action="{ item }">
       <div class="d-flex justify-center">
-        <template v-if="(item as any).title === 'Cập nhật tài khoản'">
-          <div class="my-3">
-            <v-btn
-              icon
-              size="40"
-              variant="text"
-              @click="onClickAction(item, 'update_account')"
-            >
-              <v-icon size="20">mdi-reload</v-icon>
-            </v-btn>
-          </div>
-        </template>
-
         <template
-          v-else-if="(item as any).title === 'Tạo thước phim ở website'"
+          v-if="(item as any).title === 'Tạo thước phim ở website'"
         >
           <v-checkbox
             readonly
@@ -292,6 +277,32 @@ definePageMeta({ layout: "admin", title: "Thông tin chung" });
             :model-value="Boolean((item as any).value)"
             @click="onClickAction(item)"
           />
+        </template>
+
+        <template
+          v-else-if="(item as any).title === 'Mật khẩu xem doanh thu công khai'"
+        >
+          <div class="d-flex align-center ga-2 my-2" style="min-width: 220px">
+            <v-text-field
+              v-model="newRevenuePassword"
+              type="password"
+              density="compact"
+              variant="outlined"
+              hide-details
+              placeholder="Mật khẩu mới"
+              @keyup.enter="onSaveRevenuePassword(item)"
+            />
+            <v-btn
+              icon
+              size="40"
+              variant="text"
+              color="primary"
+              :loading="loading === `revenue-password-${(item as any)._id}`"
+              @click="onSaveRevenuePassword(item)"
+            >
+              <v-icon size="20">mdi-content-save-outline</v-icon>
+            </v-btn>
+          </div>
         </template>
 
         <template v-else-if="(item as any).title === 'Mô hình ưu tiên'">

@@ -62,6 +62,7 @@ onMounted(async () => {
           >
             <img
               src="/images/icon-tiktok.png"
+              alt="TikTok TN Solve"
               style="width: 16px; height: 16px; object-fit: contain"
             />
           </a>
@@ -72,6 +73,7 @@ onMounted(async () => {
           >
             <img
               src="/images/icon-facebook.png"
+              alt="Facebook TN Solve"
               style="width: 16px; height: 16px; object-fit: contain"
             />
           </a>
@@ -82,6 +84,7 @@ onMounted(async () => {
           >
             <img
               src="/images/icon-youtube.png"
+              alt="YouTube TN Solve"
               style="width: 16px; height: 16px; object-fit: contain"
             />
           </a>

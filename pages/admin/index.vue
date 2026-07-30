@@ -70,23 +70,33 @@ definePageMeta({ layout: "admin", title: "Tổng quan" });
       <!-- Row 2: Chi tiết -->
       <div class="db-grid db-grid--3">
 
-        <div class="db-stat" @click="navigateTo('/admin/accounts/partner')" style="cursor:pointer">
-          <div class="db-stat-icon" style="background:#f3e8ff;color:#7c3aed">
-            <v-icon size="18">mdi-handshake-outline</v-icon>
+        <div class="db-stat" @click="navigateTo('/admin/accounts/user')" style="cursor:pointer">
+          <div class="db-stat-icon" style="background:#d1fae5;color:#059669">
+            <v-icon size="18">mdi-account-plus-outline</v-icon>
           </div>
           <div>
-            <div class="db-stat-label">Cộng tác viên</div>
-            <div class="db-stat-value" style="color:#7c3aed">{{ stats.totalPartners?.toLocaleString("vi-VN") }}</div>
+            <div class="db-stat-label">Người dùng mới hôm nay</div>
+            <div class="db-stat-value" style="color:#059669">{{ stats.newUsersToday?.toLocaleString("vi-VN") }}</div>
           </div>
         </div>
 
-        <div class="db-stat" @click="navigateTo('/admin/credit-history')" style="cursor:pointer">
+        <div class="db-stat">
+          <div class="db-stat-icon" style="background:#f3e8ff;color:#7c3aed">
+            <v-icon size="18">mdi-package-variant-closed</v-icon>
+          </div>
+          <div>
+            <div class="db-stat-label">Tiền gói hôm nay</div>
+            <div class="db-stat-value" style="color:#7c3aed">{{ formatCurrency(stats.revenueToday) }}</div>
+          </div>
+        </div>
+
+        <div class="db-stat">
           <div class="db-stat-icon" style="background:#e0f2fe;color:#0284c7">
             <v-icon size="18">mdi-circle-multiple-outline</v-icon>
           </div>
           <div>
-            <div class="db-stat-label">GD tín dụng {{ monthLabel }}</div>
-            <div class="db-stat-value" style="color:#0284c7">{{ stats.creditTxThisMonth?.toLocaleString("vi-VN") }} giao dịch</div>
+            <div class="db-stat-label">Tiền tín dụng hôm nay</div>
+            <div class="db-stat-value" style="color:#0284c7">{{ formatCurrency(stats.creditRevenueToday) }}</div>
           </div>
         </div>
 
@@ -104,16 +114,6 @@ definePageMeta({ layout: "admin", title: "Tổng quan" });
             <div class="db-stat-value" :style="{ color: stats.pendingRefunds > 0 ? '#dc2626' : '#64748b' }">
               {{ stats.pendingRefunds }} yêu cầu
             </div>
-          </div>
-        </div>
-
-        <div class="db-stat">
-          <div class="db-stat-icon" style="background:#d1fae5;color:#059669">
-            <v-icon size="18">mdi-check-circle-outline</v-icon>
-          </div>
-          <div>
-            <div class="db-stat-label">Đã duyệt hoàn tiền</div>
-            <div class="db-stat-value" style="color:#059669">{{ stats.approvedRefunds }} yêu cầu</div>
           </div>
         </div>
 

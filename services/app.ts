@@ -5,6 +5,7 @@ export * from "./coupon";
 export * from "./account";
 export * from "./product";
 export * from "./master-data";
+export * from "./public-revenue";
 
 export const appService = {
   async getUserData(params?: any) {

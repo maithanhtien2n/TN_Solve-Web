@@ -1,7 +1,13 @@
 <script setup lang="ts">
 import { shopService } from "~/services/shop";
 
-useHead({ title: "Cửa hàng | TN Solve" });
+useSeo({
+  title: "Cửa hàng - Tài khoản công nghệ số",
+  description:
+    "Mua tài khoản công nghệ số chính hãng, giá tốt tại TN Solve — thanh toán nhanh, giao hàng tự động, hỗ trợ 24/7.",
+  keywords:
+    "cửa hàng TN Solve, mua tài khoản công nghệ số, tài khoản premium, mua tài khoản online",
+});
 
 const route = useRoute();
 const router = useRouter();

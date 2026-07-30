@@ -7,6 +7,14 @@ export default defineNuxtConfig({
   devtools: { enabled: false },
   compatibilityDate: "2025-09-17",
   runtimeConfig: { public: { siteUrl } },
+  // Site config chuẩn của hệ sinh thái Nuxt SEO (nuxt-site-config) — nuxt-simple-sitemap
+  // và nuxt-simple-robots đều dựa vào đây để dựng URL tuyệt đối. Trước đây dự án chỉ có
+  // runtimeConfig.public.siteUrl (dùng riêng cho useSeo()), sitemap module không đọc được
+  // nên phải tự đoán host từ request -> ra URL sai dạng "http://[:5173/..." khi chạy dev.
+  site: {
+    url: siteUrl,
+    name: "TN Solve",
+  },
   modules: [
     "@pinia/nuxt",
     "nuxt-simple-robots",
@@ -14,7 +22,7 @@ export default defineNuxtConfig({
   ],
   sitemap: {
     autoLastmod: true,
-    exclude: ["/admin/**"],
+    exclude: ["/admin/**", "/doanh-thu"],
   },
   robots: {
     disallow: ["/admin"],

@@ -6,6 +6,10 @@ export const masterDataService = {
     return await api.get(`/master-data/${params.type}`, { params });
   },
 
+  async getMyPartnerByMonth(params: any) {
+    return await api.get(`/master-data/my-partner-by-month`, { params });
+  },
+
   async getAllMasterData(params: any) {
     if (params.isMyAccount) {
       return await api.get(`/common/get-account-info`, { params });
