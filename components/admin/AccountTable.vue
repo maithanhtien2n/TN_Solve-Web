@@ -15,7 +15,6 @@ const headers = computed(() => {
     { title: "Thời hạn còn lại", key: "remainingTime", sortable: false },
     { title: "Ngày tham gia", key: "createdAt", sortable: false },
     { title: "Người giới thiệu", key: "referral.name", sortable: false },
-    { title: "Phiên bản", key: "version", sortable: false },
     { title: "Cập nhật", key: "updatedAt", sortable: false },
     { title: "Trạng thái", key: "status", align: "center", sortable: false },
     { title: "Thao tác", key: "action", align: "center", sortable: false },
@@ -75,10 +74,6 @@ const rentalMonthsOptions = computed(
 );
 const totalPrice = computed(() =>
   formatCurrency(formData.price * formData.rentalMonths)
-);
-
-const appVersion = computed(
-  () => onGetterMasterData.value["app-version"] || null
 );
 
 async function loadItems(event: any) {
@@ -350,14 +345,6 @@ const onClickSaveSetting = async () => {
         {{ (item as any)?.settings?.unlimitedVideo }} ngày 💎
       </span>
       <span v-else> {{ (item as any)?.settings?.credit || 0 }} 💎</span>
-    </template>
-
-    <template #row-version="{ item }">
-      <span
-        :class="{ 'text-success': appVersion && appVersion ===(item as any).version  }"
-      >
-        {{ (item as any).version || "Chưa tải" }}
-      </span>
     </template>
 
     <template #row-action="{ item }">

@@ -27,8 +27,16 @@ const confirmDialogRef = ref<any>(null);
 
 const statusItems = computed(() => statusOptions);
 
+// Route thực tế dùng slug tiếng Việt (nguoi-dung/khach-hang), nhưng backend lọc
+// theo literal "user"/"customer" — map lại để đúng bộ lọc theo từng tab.
+const ROLE_SLUG_MAP: Record<string, string> = {
+  "nguoi-dung": "user",
+  "khach-hang": "customer",
+};
+
 async function loadItems(event: any) {
-  const params = { ...event, role: route.path?.split("/")?.pop() || "user" };
+  const slug = route.path?.split("/")?.pop() || "";
+  const params = { ...event, role: ROLE_SLUG_MAP[slug] || "user" };
 
   loading.value = "load-table";
   await accountService
