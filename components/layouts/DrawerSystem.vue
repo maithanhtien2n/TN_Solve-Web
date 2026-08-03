@@ -154,13 +154,13 @@ const menus = computed<any>(() => {
 
     // ------------------PARTNER--------------------
     {
-      role: [EnumAccountRole.PARTNER],
+      role: [EnumAccountRole.PARTNER, EnumAccountRole.USER],
       title: "Tổng quan",
       icon: "mdi-view-dashboard-outline",
       route: "/doi-tac",
     },
     {
-      role: [EnumAccountRole.PARTNER],
+      role: [EnumAccountRole.PARTNER, EnumAccountRole.USER],
       title: "Quản lý giới thiệu",
       icon: "mdi-account-group-outline",
       route: "gioi-thieu-cua-toi",
@@ -176,19 +176,20 @@ const menus = computed<any>(() => {
       ],
     },
     {
-      role: [EnumAccountRole.PARTNER],
+      role: [EnumAccountRole.PARTNER, EnumAccountRole.USER],
       title: "Lịch sử giao dịch",
       icon: "mdi-cash-clock",
       route: "/doi-tac/lich-su-giao-dich",
     },
     {
+      // Chỉ CTV thực sự (đã đủ điều kiện kiếm tiền) mới thấy trang Thanh toán
       role: [EnumAccountRole.PARTNER],
       title: "Thanh toán",
       icon: "mdi-credit-card-outline",
       route: "/doi-tac/thanh-toan",
     },
     {
-      role: [EnumAccountRole.ADMIN, EnumAccountRole.PARTNER],
+      role: [EnumAccountRole.ADMIN, EnumAccountRole.PARTNER, EnumAccountRole.USER],
       title: "TN SOLVE",
       icon: "mdi-video-stabilization",
       route: "home",

@@ -63,7 +63,10 @@ const menus = computed(() => {
   if (userData.value?.role === EnumAccountRole.ADMIN) {
     items.splice(1, 0, { title: "Trang quản trị", value: "admin", icon: "mdi-shield-account-outline" });
     items = items.filter((i) => i.value !== "tai-khoan");
-  } else if (userData.value?.role === "partner") {
+  } else if (
+    userData.value?.role === "partner" ||
+    userData.value?.role === EnumAccountRole.USER
+  ) {
     items.splice(4, 0, { title: "Cộng tác viên", value: "doi-tac", icon: "mdi-account-multiple-outline" });
   }
 

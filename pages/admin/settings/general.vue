@@ -191,22 +191,9 @@ definePageMeta({ layout: "admin", title: "Thông tin chung" });
       </template>
 
       <template
-        v-else-if="(item as any).title === 'Số lượt tạo cùng lúc trên website'"
+        v-else-if="(item as any).title === 'Điều kiện mở kiếm tiền'"
       >
-        <span v-if="(item as any).value === 'auto'" class="text-nowrap">
-          Tự động
-        </span>
-
-        <span v-else-if="(item as any).value === 'profile'" class="text-nowrap">
-          Có hồ sơ
-        </span>
-
-        <span
-          v-else-if="(item as any).value === 'anonymous'"
-          class="text-nowrap"
-        >
-          Ẩn danh
-        </span>
+        <span class="text-nowrap">{{ (item as any).value }} người</span>
       </template>
 
       <template v-else>
@@ -282,26 +269,27 @@ definePageMeta({ layout: "admin", title: "Thông tin chung" });
         <template
           v-else-if="(item as any).title === 'Mật khẩu xem doanh thu công khai'"
         >
-          <div class="d-flex align-center ga-2 my-2" style="min-width: 220px">
+          <div class="d-flex align-center ga-2 my-2 w-10rem">
             <v-text-field
               v-model="newRevenuePassword"
               type="password"
               density="compact"
               variant="outlined"
               hide-details
+              class="flex-grow-1"
               placeholder="Mật khẩu mới"
               @keyup.enter="onSaveRevenuePassword(item)"
             />
             <v-btn
-              icon
-              size="40"
-              variant="text"
+              variant="tonal"
               color="primary"
+              height="36"
+              rounded="lg"
+              :disabled="!newRevenuePassword"
               :loading="loading === `revenue-password-${(item as any)._id}`"
+              icon="mdi-content-save-outline"
               @click="onSaveRevenuePassword(item)"
-            >
-              <v-icon size="20">mdi-content-save-outline</v-icon>
-            </v-btn>
+            />
           </div>
         </template>
 
@@ -390,9 +378,7 @@ definePageMeta({ layout: "admin", title: "Thông tin chung" });
         </template>
 
         <template
-          v-else-if="
-            (item as any).title === 'Số lượt tạo cùng lúc trên website'
-          "
+          v-else-if="(item as any).title === 'Điều kiện mở kiếm tiền'"
         >
           <div>
             <v-select

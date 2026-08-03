@@ -5,6 +5,43 @@ const { onGetterUserData: userData } = useAppStore();
 const { onGetterMasterData } = useMasterDataStore();
 
 const dashboard = computed(() => onGetterMasterData.value["dashboard"]);
+// User thường (chưa mở khóa CTV) xem trang tiến độ; PARTNER/ADMIN xem dashboard đầy đủ
+const showFullDashboard = computed(() =>
+  [EnumAccountRole.PARTNER, EnumAccountRole.ADMIN].includes(
+    userData.value?.role
+  )
+);
+// Trùng với COMMISSION_TIER ở backend (src/core/constants/options.ts) — hiện
+// tĩnh ở đây vì bậc hoa hồng ít khi đổi, user thường chưa gọi được API dashboard.
+const commissionTiers = [
+  { name: "Tiêu chuẩn", requirement: "1-5 người/tháng", rate: "15%" },
+  { name: "Bạc", requirement: "6-15 người/tháng", rate: "20%" },
+  { name: "Vàng", requirement: "16-30 người/tháng", rate: "25%" },
+  { name: "Kim Cương", requirement: "31+ người/tháng", rate: "30%" },
+];
+
+const referralProgress = computed(() => userData.value?.referralProgress);
+const progressPercent = computed(() => {
+  if (!referralProgress.value?.required) return 0;
+  return Math.min(
+    100,
+    (referralProgress.value.count / referralProgress.value.required) * 100
+  );
+});
+
+const isCopied = ref<boolean>(false);
+const onCopyReferralLink = async () => {
+  if (!userData.value?.referralLink) return;
+  try {
+    await navigator.clipboard.writeText(userData.value.referralLink);
+    isCopied.value = true;
+    setTimeout(() => {
+      isCopied.value = false;
+    }, 2000);
+  } catch (err) {
+    console.error("Failed to copy referral link: ", err);
+  }
+};
 
 const onClickViewDashboardPartnerDetail = (id: string) => {
   if (userData.value?.role !== EnumAccountRole.ADMIN) return;
@@ -12,11 +49,114 @@ const onClickViewDashboardPartnerDetail = (id: string) => {
   // window.location.href = `https://tnsolve.com/partner?id=${id}`;
 };
 
-definePageMeta({ layout: "partner" });
+definePageMeta({ layout: "partner", title: "Tổng quan" });
 </script>
 
 <template>
-  <v-container class="ma-0 pa-0">
+  <v-container v-if="!showFullDashboard" class="ma-0 pa-0">
+    <v-row justify="center">
+      <v-col cols="12" md="9" lg="7">
+        <v-card class="ctv-card" elevation="3">
+          <div class="ctv-hero">
+            <div class="ctv-hero-glow"></div>
+            <div class="ctv-hero-badge">
+              <v-icon size="34" color="white">mdi-trophy-award</v-icon>
+            </div>
+            <h2 class="ctv-hero-title">Trở thành Cộng tác viên</h2>
+            <p class="ctv-hero-subtitle">
+              Chia sẻ link giới thiệu của bạn. Khi có đủ
+              {{ referralProgress?.required || 3 }} người đăng ký
+              <b>thuê gói</b> thành công, bạn sẽ chính thức trở thành
+              <b>Cộng tác viên</b> và bắt đầu nhận hoa hồng từ mỗi lượt giới
+              thiệu.
+            </p>
+          </div>
+
+          <v-card-text class="ctv-body">
+            <div class="ctv-progress-row">
+              <div class="ctv-ring">
+                <v-progress-circular
+                  :model-value="progressPercent"
+                  :size="104"
+                  :width="9"
+                  color="primary"
+                  bg-color="#e8ecf3"
+                >
+                  <span class="ctv-ring-count">
+                    {{ referralProgress?.count || 0 }}<small>/{{ referralProgress?.required || 3 }}</small>
+                  </span>
+                </v-progress-circular>
+              </div>
+
+              <div class="ctv-progress-info">
+                <div class="ctv-steps">
+                  <div
+                    v-for="i in referralProgress?.required || 3"
+                    :key="i"
+                    class="ctv-step"
+                    :class="{ done: i <= (referralProgress?.count || 0) }"
+                  >
+                    <v-icon size="18">
+                      {{ i <= (referralProgress?.count || 0) ? "mdi-check-bold" : "mdi-account-outline" }}
+                    </v-icon>
+                  </div>
+                </div>
+
+                <div class="ctv-hint">
+                  <template v-if="(referralProgress?.count || 0) >= (referralProgress?.required || 3)">
+                    🎉 Bạn đã đủ điều kiện — đang xử lý mở khóa!
+                  </template>
+                  <template v-else>
+                    Còn thiếu
+                    <b class="text-primary">{{
+                      Math.max(
+                        0,
+                        (referralProgress?.required || 3) - (referralProgress?.count || 0)
+                      )
+                    }}</b>
+                    người thuê gói nữa để mở khóa hoa hồng giới thiệu.
+                  </template>
+                </div>
+              </div>
+            </div>
+
+            <v-divider class="my-5" />
+
+            <h3 class="mb-1 font-bold">CÁC BẬC HOA HỒNG</h3>
+            <div class="ctv-tiers-note">
+              Hoa hồng được tính <b>vĩnh viễn</b> — người bạn giới thiệu càng
+              gia hạn thêm gói ở các tháng sau, bạn vẫn tiếp tục nhận hoa hồng
+              theo đúng mức này, không chỉ lần mua đầu tiên.
+            </div>
+            <div class="ctv-tiers">
+              <div v-for="tier in commissionTiers" :key="tier.name" class="ctv-tier">
+                <div class="ctv-tier-name">{{ tier.name }}</div>
+                <div class="ctv-tier-rate">{{ tier.rate }}</div>
+                <div class="ctv-tier-req">({{ tier.requirement }})</div>
+              </div>
+            </div>
+
+            <v-divider class="my-5" />
+
+            <h3 class="mb-2 font-bold">LINK GIỚI THIỆU CỦA BẠN</h3>
+            <v-text-field
+              readonly
+              hide-details
+              variant="outlined"
+              title="Sao chép link"
+              style="cursor: pointer"
+              :color="isCopied ? 'success' : 'default'"
+              :model-value="userData?.referralLink"
+              :append-inner-icon="isCopied ? 'mdi-check' : 'mdi-content-copy'"
+              @click:append-inner="onCopyReferralLink()"
+            />
+          </v-card-text>
+        </v-card>
+      </v-col>
+    </v-row>
+  </v-container>
+
+  <v-container v-else class="ma-0 pa-0">
     <v-row dense>
       <v-col cols="12" lg="5">
         <v-card variant="flat" color="primary" class="text-white" height="100%">
@@ -197,3 +337,175 @@ definePageMeta({ layout: "partner" });
     </v-row>
   </v-container>
 </template>
+
+<style scoped>
+.ctv-card {
+  overflow: hidden;
+  border-radius: 18px;
+}
+
+.ctv-hero {
+  position: relative;
+  padding: 34px 28px 30px;
+  text-align: center;
+  color: white;
+  overflow: hidden;
+  background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 55%, #3b82f6 100%);
+}
+
+.ctv-hero-glow {
+  position: absolute;
+  width: 240px;
+  height: 240px;
+  top: -90px;
+  right: -70px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.25), transparent 70%);
+}
+
+.ctv-hero-badge {
+  position: relative;
+  z-index: 1;
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 14px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.18);
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.18);
+}
+
+.ctv-hero-title {
+  position: relative;
+  z-index: 1;
+  font-size: 1.45rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.ctv-hero-subtitle {
+  position: relative;
+  z-index: 1;
+  font-size: 0.92rem;
+  line-height: 1.55;
+  opacity: 0.94;
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+.ctv-body {
+  padding: 28px !important;
+}
+
+.ctv-progress-row {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  flex-wrap: wrap;
+}
+
+.ctv-ring {
+  flex-shrink: 0;
+}
+
+.ctv-ring-count {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #1e3a8a;
+}
+
+.ctv-ring-count small {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #777;
+}
+
+.ctv-progress-info {
+  flex: 1;
+  min-width: 220px;
+}
+
+.ctv-steps {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.ctv-step {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #9aa5b1;
+  background: #eef1f6;
+  transition: all 0.25s ease;
+}
+
+.ctv-step.done {
+  color: white;
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+  box-shadow: 0 4px 12px rgba(34, 197, 94, 0.35);
+}
+
+.ctv-hint {
+  font-size: 0.92rem;
+  color: #555;
+}
+
+.ctv-tiers-note {
+  font-size: 0.85rem;
+  color: #666;
+  line-height: 1.5;
+  margin-bottom: 14px;
+}
+
+.ctv-tiers {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+
+.ctv-tier {
+  padding: 12px 8px;
+  border-radius: 10px;
+  text-align: center;
+  background: #eef3fc;
+}
+
+.ctv-tier-name {
+  font-size: 0.75rem;
+  color: #667;
+}
+
+.ctv-tier-rate {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #1e3a8a;
+  margin-top: 2px;
+}
+
+.ctv-tier-req {
+  font-size: 0.72rem;
+  color: #888;
+  margin-top: 2px;
+}
+
+@media only screen and (max-width: 600px) {
+  .ctv-hero {
+    padding: 28px 20px 24px;
+  }
+
+  .ctv-progress-row {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .ctv-tiers {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+</style>

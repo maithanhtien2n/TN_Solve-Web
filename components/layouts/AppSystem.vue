@@ -74,10 +74,20 @@ const breadcrumbs = computed<any>(() => {
   ];
 });
 
+// "dashboard" và "banks" chỉ dành cho ADMIN/PARTNER — user thường (chưa mở khóa
+// CTV) xem trang Tổng quan khác (thẻ tiến độ) và chưa được vào trang Thanh toán
+// (chỉ mở khi đã đủ điều kiện kiếm tiền) nên không cần 2 API này.
+// "transaction-months" đã mở cho cả user vì trang Lịch sử giao dịch vẫn cho xem.
+const isPartnerOrAdmin = computed(() =>
+  [EnumAccountRole.ADMIN, EnumAccountRole.PARTNER].includes(
+    userData.value?.role
+  )
+);
+
 watch(
   () => route.query.id,
   (newValue) => {
-    if (newValue) {
+    if (newValue && isPartnerOrAdmin.value) {
       onActionAllMasterDataClient({
         type: "dashboard",
         accountId:
@@ -87,21 +97,41 @@ watch(
   }
 );
 
+// Layout "partner" cho cả user thường vào để xem tiến độ mở khóa CTV và các
+// trang con (Quản lý giới thiệu, Lịch sử giao dịch) — riêng trang Thanh toán
+// vẫn chỉ dành cho CTV thực sự (đã đủ điều kiện kiếm tiền). Layout "admin" vẫn
+// giữ nguyên chỉ Admin/Partner như trước. Chạy lại khi đổi route vì layout
+// không remount khi chuyển giữa các trang cùng layout.
+const checkPagePermission = () => {
+  const allowedRoles =
+    layoutName.value === "partner" && route.path !== "/doi-tac/thanh-toan"
+      ? [EnumAccountRole.ADMIN, EnumAccountRole.PARTNER, EnumAccountRole.USER]
+      : [EnumAccountRole.ADMIN, EnumAccountRole.PARTNER];
+
+  if (!allowedRoles.includes(userData.value?.role)) router.push("/notfound");
+};
+
+watch(() => route.path, checkPagePermission);
+
 onMounted(async () => {
   try {
     await onActionGetUserData()
       .then(async () => {
         await Promise.all([
-          onActionAllMasterDataClient({
-            type: "dashboard",
-            accountId:
-              userData.value?.role === EnumAccountRole.ADMIN
-                ? route.query.id
-                : null,
-          }),
+          isPartnerOrAdmin.value
+            ? onActionAllMasterDataClient({
+                type: "dashboard",
+                accountId:
+                  userData.value?.role === EnumAccountRole.ADMIN
+                    ? route.query.id
+                    : null,
+              })
+            : Promise.resolve(),
           onActionAllMasterDataClient({ type: "transaction-months" }),
 
-          onActionAllMasterDataClient({ type: "banks" }).catch(() => {}),
+          isPartnerOrAdmin.value
+            ? onActionAllMasterDataClient({ type: "banks" }).catch(() => {})
+            : Promise.resolve(),
         ]);
 
         if (userData.value?.role === EnumAccountRole.ADMIN) {
@@ -119,14 +149,7 @@ onMounted(async () => {
           ]);
         }
       })
-      .finally(() => {
-        if (
-          ![EnumAccountRole.ADMIN, EnumAccountRole.PARTNER].includes(
-            userData.value?.role
-          )
-        )
-          router.push("/notfound");
-      });
+      .finally(checkPagePermission);
   } catch (error) {
     console.error(error);
   } finally {

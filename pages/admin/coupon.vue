@@ -196,6 +196,18 @@ const onAction = async (event: any) => {
       .finally(() => {
         loading.value = "";
       });
+  } else if (event.action === "delete") {
+    confirmDialogRef.value?.show({
+      title: "Xóa mã giảm giá",
+      message: `Bạn có chắc chắn muốn xóa mã "${event.item.code}" không? Hành động này không thể hoàn tác.`,
+      onConfirm: async () => {
+        await couponService.actionCoupon({
+          ids: [event.item._id],
+          action: "delete",
+        });
+        dataTableRef.value?.loadItems();
+      },
+    });
   }
 };
 
@@ -440,6 +452,16 @@ definePageMeta({ layout: "admin", title: "Mã giảm giá" });
           @click="onAction({ action: 'update', item })"
         >
           <v-icon size="20">mdi-pencil-outline</v-icon>
+        </v-btn>
+
+        <v-btn
+          icon
+          size="40"
+          variant="text"
+          color="error"
+          @click="onAction({ action: 'delete', item })"
+        >
+          <v-icon size="20">mdi-delete-outline</v-icon>
         </v-btn>
 
         <v-switch
