@@ -67,7 +67,15 @@ const menus = computed(() => {
     userData.value?.role === "partner" ||
     userData.value?.role === EnumAccountRole.USER
   ) {
-    items.splice(4, 0, { title: "Cộng tác viên", value: "doi-tac", icon: "mdi-account-multiple-outline" });
+    // Chèn ngay trước "Cài đặt" theo vị trí tương đối — không dùng số cứng vì
+    // "Mua tín dụng" có thể đã bị lọc bỏ ở trên (tài khoản hết hạn), khiến số
+    // cứng trỏ sai vị trí (lọt ra sau "Cài đặt" thay vì trước).
+    const settingsIndex = items.findIndex((i) => i.value === "cai-dat");
+    items.splice(settingsIndex === -1 ? items.length : settingsIndex, 0, {
+      title: "Kiếm tiền Affiliate",
+      value: "doi-tac",
+      icon: "mdi-cash-multiple",
+    });
   }
 
   return items;
