@@ -49,10 +49,33 @@ const onClickViewDashboardPartnerDetail = (id: string) => {
   // window.location.href = `https://tnsolve.com/partner?id=${id}`;
 };
 
+// Popup hướng dẫn kiếm tiền Affiliate — hiện mỗi lần vào trang /doi-tac
+const tutorialDialogRef = ref<any>(null);
+onMounted(() => {
+  tutorialDialogRef.value?.onDisplay(true);
+});
+
 definePageMeta({ layout: "partner", title: "Tổng quan" });
 </script>
 
 <template>
+  <CommonDialog
+    ref="tutorialDialogRef"
+    title="Hướng dẫn kiếm tiền Affiliate từ TN Solve"
+    width="900"
+  >
+    <div class="tutorial-video-wrapper">
+      <iframe
+        src="https://www.youtube.com/embed/xHkhOqqIaxE"
+        title="HƯỚNG DẪN KIẾM TIỀN AFFILIATE TỪ TOOL TN SOLVE"
+        frameborder="0"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+        referrerpolicy="strict-origin-when-cross-origin"
+        allowfullscreen
+      />
+    </div>
+  </CommonDialog>
+
   <v-container v-if="!showFullDashboard" class="ma-0 pa-0">
     <v-row justify="center">
       <v-col cols="12" md="9" lg="7">
@@ -339,6 +362,20 @@ definePageMeta({ layout: "partner", title: "Tổng quan" });
 </template>
 
 <style scoped>
+.tutorial-video-wrapper {
+  position: relative;
+  width: 100%;
+  padding-top: 56.25%; /* tỉ lệ 16:9 */
+}
+
+.tutorial-video-wrapper iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
 .ctv-card {
   overflow: hidden;
   border-radius: 18px;
