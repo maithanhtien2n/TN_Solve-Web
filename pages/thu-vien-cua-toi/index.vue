@@ -616,8 +616,6 @@ const getQueueMsg = (item: any): { title: string } | null => {
   right: 6px;
   top: 6px;
   z-index: 4;
-  opacity: 0;
-  transition: opacity 0.18s ease;
   background: rgba(0, 0, 0, 0.5) !important;
   backdrop-filter: blur(4px);
   width: 30px !important;
@@ -628,10 +626,6 @@ const getQueueMsg = (item: any): { title: string } | null => {
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
-}
-
-.video-card:hover .menu-btn {
-  opacity: 1;
 }
 
 /* ─── Queue waiting state ───────────────────────────── */
