@@ -55,7 +55,10 @@ useSeo({
             Sẵn sàng tạo video AI chuyên nghiệp ngay hôm nay?
           </p>
           <div class="hero-ctas" style="margin-top: 8px">
-            <button class="cta-primary" @click="router.push('/thu-vien-cua-toi/tao-moi')">
+            <button
+              class="cta-primary"
+              @click="router.push('/thu-vien-cua-toi/tao-moi')"
+            >
               <span class="cta-primary__glow" />
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -91,7 +94,10 @@ useSeo({
             </div>
           </div>
           <div class="hero-ctas">
-            <button class="cta-primary" @click="router.push('/dang-ky-dich-vu')">
+            <button
+              class="cta-primary"
+              @click="router.push('/dang-ky-dich-vu')"
+            >
               <span class="cta-primary__glow" />
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -181,7 +187,11 @@ useSeo({
 
   <!-- ── Quick cards ─────────────────────────────────────── -->
   <div class="quick-grid">
-    <router-link v-if="isSubscribed" to="/thu-vien-cua-toi" class="quick-card qc-blue">
+    <router-link
+      v-if="isSubscribed"
+      to="/thu-vien-cua-toi"
+      class="quick-card qc-blue"
+    >
       <div class="quick-icon">
         <v-icon color="#1e88e5" size="22">mdi-play-circle-outline</v-icon>
       </div>
@@ -356,7 +366,7 @@ useSeo({
     <div class="video-frame-wrap">
       <div class="video-frame-inner">
         <iframe
-          src="https://www.youtube.com/embed/AFyTHzDbUwA"
+          src="https://www.youtube.com/embed/v8OvU85tDLY"
           frameborder="0"
           allow="
             accelerometer;
