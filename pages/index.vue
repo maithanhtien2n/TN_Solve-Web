@@ -366,7 +366,7 @@ useSeo({
     <div class="video-frame-wrap">
       <div class="video-frame-inner">
         <iframe
-          src="https://www.youtube.com/embed/v8OvU85tDLY"
+          src="https://www.youtube.com/embed/AFyTHzDbUwA"
           frameborder="0"
           allow="
             accelerometer;
