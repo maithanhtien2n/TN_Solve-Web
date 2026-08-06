@@ -172,6 +172,15 @@ definePageMeta({ layout: "admin", title: "Thông tin chung" });
         </span>
       </template>
 
+      <template v-else-if="(item as any).title === 'Mô hình tạo ảnh'">
+        <span v-if="(item as any).value" class="text-nowrap">
+          {{ (item as any).value }}
+        </span>
+        <span v-else class="text-nowrap text-medium-emphasis">
+          nano_banana_2_lite (mặc định)
+        </span>
+      </template>
+
       <template v-else-if="(item as any).title === 'Chế độ tạo bối cảnh'">
         <span v-if="(item as any).value === 'api'" class="text-nowrap">
           API
@@ -304,6 +313,24 @@ definePageMeta({ layout: "admin", title: "Thông tin chung" });
               :items="[
                 { title: '🥉 TNS - 6s / 5💎', value: 'grok' },
                 { title: '🥈 TNS - 8s / 10💎', value: 'veo3_fast' },
+              ]"
+              @update:model-value="onClickAction(item)"
+            />
+          </div>
+        </template>
+
+        <template v-else-if="(item as any).title === 'Mô hình tạo ảnh'">
+          <div>
+            <v-select
+              v-model="(item as any).value"
+              hide-details
+              density="compact"
+              variant="outlined"
+              class="my-4 w-10rem"
+              :items="[
+                { title: 'nano_banana_pro', value: 'nano_banana_pro' },
+                { title: 'nano_banana_2', value: 'nano_banana_2' },
+                { title: 'nano_banana_2_lite', value: 'nano_banana_2_lite' },
               ]"
               @update:model-value="onClickAction(item)"
             />
