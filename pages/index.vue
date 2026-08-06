@@ -525,6 +525,12 @@ useSeo({
   font-weight: 600;
   color: #1e293b;
   line-height: 1.3;
+  min-height: calc(1.3em * 2);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 @media only screen and (max-width: 900px) {
