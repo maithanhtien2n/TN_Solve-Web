@@ -335,7 +335,7 @@ definePageMeta({ layout: "admin", title: "Thông tin chung" });
         <template
           v-else-if="(item as any).title === 'Video hướng dẫn (ID YouTube)'"
         >
-          <div class="d-flex align-center ga-2 my-2 w-12rem">
+          <div class="d-flex align-center ga-2 my-2 w-10rem">
             <v-text-field
               v-model="newVideoTutorialId"
               density="compact"
