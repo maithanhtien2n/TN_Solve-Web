@@ -12,6 +12,7 @@ const data = ref<any>({});
 const loading = ref<string>("");
 const dataTableRef = ref<any>(null);
 const newRevenuePassword = ref<string>("");
+const newVideoTutorialId = ref<string>("");
 
 async function onSaveRevenuePassword(item: any) {
   if (!newRevenuePassword.value) return;
@@ -26,6 +27,24 @@ async function onSaveRevenuePassword(item: any) {
     dataTableRef.value?.loadItems();
   } catch (error) {
     console.log("Lỗi khi đổi mật khẩu!", error);
+  } finally {
+    loading.value = "";
+  }
+}
+
+async function onSaveVideoTutorialId(item: any) {
+  if (!newVideoTutorialId.value) return;
+
+  loading.value = `video-tutorial-${item._id}`;
+  try {
+    await masterDataService.settingAction({
+      _id: item._id,
+      value: newVideoTutorialId.value,
+    });
+    newVideoTutorialId.value = "";
+    dataTableRef.value?.loadItems();
+  } catch (error) {
+    console.log("Lỗi khi đổi video hướng dẫn!", error);
   } finally {
     loading.value = "";
   }
@@ -157,6 +176,17 @@ definePageMeta({ layout: "admin", title: "Thông tin chung" });
         v-else-if="(item as any).title === 'Mật khẩu xem doanh thu công khai'"
       >
         <span class="text-nowrap text-medium-emphasis">•••••••• (đã mã hóa)</span>
+      </template>
+
+      <template
+        v-else-if="(item as any).title === 'Video hướng dẫn (ID YouTube)'"
+      >
+        <span v-if="(item as any).value" class="text-nowrap">
+          {{ (item as any).value }}
+        </span>
+        <span v-else class="text-nowrap text-medium-emphasis">
+          v8OvU85tDLY (mặc định)
+        </span>
       </template>
 
       <template v-else-if="(item as any).title === 'Mô hình ưu tiên'">
@@ -298,6 +328,32 @@ definePageMeta({ layout: "admin", title: "Thông tin chung" });
               :loading="loading === `revenue-password-${(item as any)._id}`"
               icon="mdi-content-save-outline"
               @click="onSaveRevenuePassword(item)"
+            />
+          </div>
+        </template>
+
+        <template
+          v-else-if="(item as any).title === 'Video hướng dẫn (ID YouTube)'"
+        >
+          <div class="d-flex align-center ga-2 my-2 w-12rem">
+            <v-text-field
+              v-model="newVideoTutorialId"
+              density="compact"
+              variant="outlined"
+              hide-details
+              class="flex-grow-1"
+              :placeholder="(item as any).value || 'v8OvU85tDLY'"
+              @keyup.enter="onSaveVideoTutorialId(item)"
+            />
+            <v-btn
+              variant="tonal"
+              color="primary"
+              height="36"
+              rounded="lg"
+              :disabled="!newVideoTutorialId"
+              :loading="loading === `video-tutorial-${(item as any)._id}`"
+              icon="mdi-content-save-outline"
+              @click="onSaveVideoTutorialId(item)"
             />
           </div>
         </template>

@@ -47,6 +47,9 @@ const onReturnTitle = (title: string) => {
     case "cong-dong": {
       return "Cộng đồng";
     }
+    case "huong-dan": {
+      return "Hướng dẫn";
+    }
     case "cai-dat": {
       return "Cài đặt";
     }

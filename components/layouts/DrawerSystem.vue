@@ -149,6 +149,10 @@ const menus = computed<any>(() => {
           title: "Thông tin chung",
           route: "/admin/settings/general",
         },
+        {
+          title: "Video hướng dẫn",
+          route: "/admin/tutorial-videos",
+        },
       ],
     },
 

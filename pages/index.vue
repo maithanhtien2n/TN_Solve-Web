@@ -1,9 +1,37 @@
 <script setup lang="ts">
+import { masterDataService } from "~/services/app";
+
 const router = useRouter();
 const { isMobile } = useDevice();
 
 const { onGetterUserData: userData } = useAppStore();
 const { onGetterMasterData } = useMasterDataStore();
+
+// ID video YouTube cho mục "Video hướng dẫn" — đọc từ System Setting (admin
+// chỉnh được ở Admin > Cài đặt chung), fallback giữ nguyên video cũ nếu lỗi.
+const videoTutorialId = ref("v8OvU85tDLY");
+onMounted(async () => {
+  try {
+    const res = await masterDataService.getVideoTutorial();
+    if (res.data?.videoId) videoTutorialId.value = res.data.videoId;
+  } catch (_) {}
+});
+
+// Lưới video hướng dẫn nhỏ (admin quản lý ở Admin > Cài đặt > Video hướng dẫn
+// nhỏ) — bấm vào video nào thì phát ngay tại chỗ (thay thumbnail bằng iframe),
+// độc lập hoàn toàn với video to ở trên (không đổi videoTutorialId).
+const smallTutorialVideos = ref<{ _id: string; title: string; youtubeId: string }[]>([]);
+onMounted(async () => {
+  try {
+    const res = await masterDataService.getTutorialVideos({ page: 1, limit: 6 });
+    smallTutorialVideos.value = res.data?.docs || [];
+  } catch (_) {}
+});
+
+const playingSmallVideoId = ref<string | null>(null);
+const onClickSmallTutorialVideo = (id: string) => {
+  playingSmallVideoId.value = id;
+};
 
 const client = computed<boolean>(() => {
   const win = window as any;
@@ -366,7 +394,7 @@ useSeo({
     <div class="video-frame-wrap">
       <div class="video-frame-inner">
         <iframe
-          src="https://www.youtube.com/embed/v8OvU85tDLY"
+          :src="`https://www.youtube.com/embed/${videoTutorialId}`"
           frameborder="0"
           allow="
             accelerometer;
@@ -383,9 +411,134 @@ useSeo({
       </div>
     </div>
   </div>
+
+  <!-- ── Lưới video hướng dẫn nhỏ ─────────────────────────── -->
+  <div v-if="smallTutorialVideos.length" class="small-video-grid">
+    <div v-for="video in smallTutorialVideos" :key="video._id" class="small-video-card">
+      <div class="small-video-title">{{ video.title }}</div>
+
+      <div
+        v-if="playingSmallVideoId !== video._id"
+        class="small-video-thumb-wrap"
+        @click="onClickSmallTutorialVideo(video._id)"
+      >
+        <img
+          :src="`https://img.youtube.com/vi/${video.youtubeId}/mqdefault.jpg`"
+          :alt="video.title"
+          class="small-video-thumb"
+        />
+        <div class="small-video-play">
+          <div class="small-video-play-circle">
+            <v-icon size="24" color="white">mdi-play</v-icon>
+          </div>
+        </div>
+      </div>
+      <div v-else class="small-video-thumb-wrap">
+        <iframe
+          :src="`https://www.youtube.com/embed/${video.youtubeId}?autoplay=1`"
+          class="small-video-iframe"
+          frameborder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          allowfullscreen
+        />
+      </div>
+    </div>
+  </div>
 </template>
 
 <style scoped>
+/* ─── Lưới video hướng dẫn nhỏ ───────────────────────── */
+.small-video-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  margin-top: 32px;
+}
+
+.small-video-card {
+  background: #fff;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+}
+
+.small-video-thumb-wrap {
+  position: relative;
+  width: 100%;
+  padding-top: 56.25%;
+  background: #000;
+  cursor: pointer;
+}
+
+.small-video-thumb {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.small-video-iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+.small-video-play {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.18);
+  transition: background 0.2s ease;
+}
+
+.small-video-play-circle {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.22);
+  border: 1.5px solid rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(2px);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.small-video-card:hover .small-video-play-circle {
+  transform: scale(1.1);
+  background: rgba(255, 255, 255, 0.32);
+}
+
+.small-video-card:hover .small-video-play {
+  background: rgba(0, 0, 0, 0.45);
+}
+
+.small-video-title {
+  padding: 16px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #1e293b;
+  line-height: 1.3;
+}
+
+@media only screen and (max-width: 900px) {
+  .small-video-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media only screen and (max-width: 600px) {
+  .small-video-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 /* ─── Hero banner ────────────────────────────────────── */
 .hero-banner {
   position: relative;

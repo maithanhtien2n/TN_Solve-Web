@@ -28,6 +28,24 @@ const headers = [
 const data = ref<any>({});
 const loading = ref<string>("");
 const dataTableRef = ref<any>(null);
+
+// Icon thể hiện loại tài nguyên đã dùng để tạo video (snapshot lúc tạo — xem
+// resourceType ở product.model.ts). Video tạo trước khi có field này sẽ
+// không có icon (không suy ngược từ trạng thái tài khoản hiện tại).
+function resourceTypeIcon(resourceType?: string): string {
+  switch (resourceType) {
+    case "trial":
+      return "🎁 ";
+    case "credit":
+      return "💎 ";
+    case "unlimited":
+      return "♾️ ";
+    case "personal_key":
+      return "🔑 ";
+    default:
+      return "";
+  }
+}
 const confirmDialogRef = ref<any>(null);
 
 const params = reactive<any>({
@@ -234,7 +252,7 @@ const onChangeFilter = (event: any) => {
     <template #row-title="{ item }">
       <div class="d-flex flex-column ga-1 py-4" style="max-width: 20rem">
         <span style="min-width: 14rem">
-          {{ `${(item as any)?.client ? "💻" : "🌐"} ${(item as any).title}` }}
+          {{ `${resourceTypeIcon((item as any).resourceType)}${(item as any).title}` }}
         </span>
 
         <div
@@ -303,11 +321,6 @@ const onChangeFilter = (event: any) => {
 
     <template #row-account.name="{ item }">
       <div class="d-flex align-center ga-1">
-        <v-icon
-          v-if="(item as any)?.usePersonalResource"
-          size="16"
-          color="amber-darken-2"
-        >mdi-key</v-icon>
         <span class="text-nowrap line-clamp-1" style="max-width: 170px">
           {{ `${(item as any)?.account?.name}` }}
         </span>

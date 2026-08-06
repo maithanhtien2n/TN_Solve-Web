@@ -10,6 +10,41 @@ export const masterDataService = {
     return await api.get(`/master-data/my-partner-by-month`, { params });
   },
 
+  async getVideoTutorial() {
+    return await api.get(`/master-data/video-tutorial`);
+  },
+
+  async getTutorialVideos(params?: { page?: number; limit?: number }) {
+    return await api.get(`/master-data/tutorial-videos`, { params });
+  },
+
+  async getTutorialVideosAdmin(params?: {
+    search?: string;
+    page?: number;
+    limit?: number;
+  }) {
+    return await api.get(`/master-data/tutorial-videos/admin`, { params });
+  },
+
+  async createTutorialVideo(payload: { title: string; value: string }) {
+    return await api.post(`/master-data/tutorial-videos/admin`, payload);
+  },
+
+  async updateTutorialVideo(payload: {
+    _id: string;
+    title?: string;
+    value?: string;
+    status?: string;
+  }) {
+    return await api.put(`/master-data/tutorial-videos/admin`, payload);
+  },
+
+  async deleteTutorialVideo(payload: { _id: string }) {
+    return await api.delete(`/master-data/tutorial-videos/admin`, {
+      data: payload,
+    });
+  },
+
   async getAllMasterData(params: any) {
     if (params.isMyAccount) {
       return await api.get(`/common/get-account-info`, { params });

@@ -452,57 +452,59 @@ defineExpose({ params, selected, loadItems, resetSelected });
         </div>
 
         <div v-else-if="h.key == 'action'" class="d-flex justify-center">
-          <v-btn
-            v-if="props.rowActions.includes('delete')"
-            icon
-            size="40"
-            variant="text"
-            color="error"
-            @click="onConfirmAction('delete', slotProps.item)"
-          >
-            <v-icon size="20">mdi-trash-can-outline</v-icon>
-          </v-btn>
+          <template v-for="action in props.rowActions" :key="action">
+            <v-btn
+              v-if="action === 'delete'"
+              icon
+              size="40"
+              variant="text"
+              color="error"
+              @click="onConfirmAction('delete', slotProps.item)"
+            >
+              <v-icon size="20">mdi-trash-can-outline</v-icon>
+            </v-btn>
 
-          <v-btn
-            v-if="props.rowActions.includes('reload')"
-            icon
-            size="40"
-            variant="text"
-            :disabled="
-              (slotProps.item as any).loading
-              || (slotProps.item as any).isDelete
-              || ['❌ Không nhận được phản hồi từ AI!'].includes((slotProps.item as any)?.lastMessage?.errorMsg)
-              || Boolean((slotProps.item as any)?.lastMessage?.note.includes('🚨') && (slotProps.item as any)?.lastMessage?.note !== '🚨 Thước phim gặp sự cố khi xử lý âm thanh cho kịch bản này.')
-            "
-            @click="
-              () => {
-                (slotProps.item as any).loading = true;
-                emits('action', { action: 'reload', item: slotProps.item });
-              }
-            "
-          >
-            <v-icon size="20">mdi-reload</v-icon>
-          </v-btn>
+            <v-btn
+              v-else-if="action === 'reload'"
+              icon
+              size="40"
+              variant="text"
+              :disabled="
+                (slotProps.item as any).loading
+                || (slotProps.item as any).isDelete
+                || ['❌ Không nhận được phản hồi từ AI!'].includes((slotProps.item as any)?.lastMessage?.errorMsg)
+                || Boolean((slotProps.item as any)?.lastMessage?.note.includes('🚨') && (slotProps.item as any)?.lastMessage?.note !== '🚨 Thước phim gặp sự cố khi xử lý âm thanh cho kịch bản này.')
+              "
+              @click="
+                () => {
+                  (slotProps.item as any).loading = true;
+                  emits('action', { action: 'reload', item: slotProps.item });
+                }
+              "
+            >
+              <v-icon size="20">mdi-reload</v-icon>
+            </v-btn>
 
-          <v-btn
-            v-if="props.rowActions.includes('view')"
-            icon
-            size="40"
-            variant="text"
-            @click="emits('action', { action: 'view', item: slotProps.item })"
-          >
-            <v-icon size="20">mdi-eye-outline</v-icon>
-          </v-btn>
+            <v-btn
+              v-else-if="action === 'view'"
+              icon
+              size="40"
+              variant="text"
+              @click="emits('action', { action: 'view', item: slotProps.item })"
+            >
+              <v-icon size="20">mdi-eye-outline</v-icon>
+            </v-btn>
 
-          <v-btn
-            v-if="props.rowActions.includes('update')"
-            icon
-            size="40"
-            variant="text"
-            @click="emits('action', { action: 'update', item: slotProps.item })"
-          >
-            <v-icon size="20">mdi-pencil-outline</v-icon>
-          </v-btn>
+            <v-btn
+              v-else-if="action === 'update'"
+              icon
+              size="40"
+              variant="text"
+              @click="emits('action', { action: 'update', item: slotProps.item })"
+            >
+              <v-icon size="20">mdi-pencil-outline</v-icon>
+            </v-btn>
+          </template>
         </div>
 
         <div
