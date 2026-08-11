@@ -125,7 +125,6 @@ useSeo({
           </h1>
 
           <div class="pricing-card">
-            <span class="pricing-card__ribbon">🔥 Phổ biến nhất</span>
             <div class="pricing-card__price">
               <span class="hero-price-only">139.000đ</span>
               <div class="hero-price-right">
@@ -910,29 +909,11 @@ useSeo({
   margin: 18px 0 4px;
   padding: 22px 26px 20px;
   border-radius: 18px;
-  background: linear-gradient(
-    160deg,
-    rgba(252, 211, 77, 0.16),
-    rgba(252, 211, 77, 0.05)
-  );
-  border: 1px solid rgba(252, 211, 77, 0.4);
+  background: linear-gradient(160deg, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.9));
+  border: 1.5px solid rgba(252, 211, 77, 0.55);
   box-shadow:
-    0 10px 34px rgba(252, 211, 77, 0.14),
-    inset 0 1px 0 rgba(255, 255, 255, 0.08);
-}
-
-.pricing-card__ribbon {
-  position: absolute;
-  top: -14px;
-  left: 22px;
-  font-size: 0.7rem;
-  font-weight: 800;
-  letter-spacing: 0.2px;
-  color: #0f172a;
-  background: linear-gradient(90deg, #fcd34d, #f59e0b);
-  padding: 4px 13px;
-  border-radius: 999px;
-  box-shadow: 0 4px 14px rgba(245, 158, 11, 0.45);
+    0 14px 40px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
 .pricing-card__price {
@@ -966,7 +947,7 @@ useSeo({
 
 .hero-price-desc {
   font-size: 0.75rem;
-  color: rgba(255, 255, 255, 0.55);
+  color: rgba(255, 255, 255, 0.68);
   line-height: 1.3;
 }
 
@@ -976,7 +957,7 @@ useSeo({
   gap: 9px;
   margin: 0;
   padding: 13px 0 0;
-  border-top: 1px dashed rgba(252, 211, 77, 0.3);
+  border-top: 1px dashed rgba(252, 211, 77, 0.4);
   list-style: none;
 }
 
@@ -984,9 +965,9 @@ useSeo({
   display: flex;
   align-items: center;
   gap: 9px;
-  font-size: 0.88rem;
+  font-size: 0.9rem;
   font-weight: 600;
-  color: rgba(255, 255, 255, 0.9);
+  color: #fff;
 }
 
 .pc-check {
