@@ -909,11 +909,8 @@ useSeo({
   margin: 18px 0 4px;
   padding: 22px 26px 20px;
   border-radius: 18px;
-  background: linear-gradient(160deg, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.9));
+  background: transparent;
   border: 1.5px solid rgba(252, 211, 77, 0.55);
-  box-shadow:
-    0 14px 40px rgba(0, 0, 0, 0.35),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
 .pricing-card__price {
