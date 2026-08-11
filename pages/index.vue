@@ -784,7 +784,7 @@ useSeo({
   font-size: clamp(1.7rem, 4vw, 2.6rem);
   font-weight: 800;
   color: #fff;
-  line-height: 1.2;
+  line-height: 1.05;
   letter-spacing: -0.5px;
   margin: 0;
 }
