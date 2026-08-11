@@ -910,7 +910,6 @@ useSeo({
   display: inline-flex;
   flex-direction: column;
   gap: 14px;
-  margin: 18px 0 4px;
   padding: 22px 26px 20px;
   border-radius: 18px;
   background: transparent;
@@ -996,7 +995,6 @@ useSeo({
   align-items: center;
   gap: 12px;
   flex-wrap: nowrap;
-  margin-top: 4px;
   max-width: 400px;
 }
 
