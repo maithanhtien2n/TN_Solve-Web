@@ -626,6 +626,10 @@ useSeo({
   .hero-inner {
     padding: 36px 16px;
   }
+  .hero-heading {
+    text-align: center;
+    width: 100%;
+  }
 }
 
 .hero-glow {
