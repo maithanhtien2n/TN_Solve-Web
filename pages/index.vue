@@ -669,8 +669,8 @@ useSeo({
 
 /* ─── Hero visual (right col) ────────────────────────── */
 .hero-visual {
-  flex-shrink: 0;
-  width: 320px;
+  flex: 1 1 0;
+  min-width: 0;
   position: relative;
 }
 
