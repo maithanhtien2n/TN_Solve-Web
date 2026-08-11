@@ -993,6 +993,7 @@ useSeo({
   gap: 12px;
   flex-wrap: nowrap;
   margin-top: 4px;
+  max-width: 400px;
 }
 
 /* ─── CTA primary ────────────────────────────────────── */
