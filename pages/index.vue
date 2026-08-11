@@ -44,6 +44,15 @@ const appVersionDownload = computed(
 
 const showCredit = ref(false);
 
+// Value stack hiển thị trong pricing card ở hero — sửa nội dung ở đây khi cần
+// đổi thông số gói, không cần đụng template.
+const heroFeatures = [
+  "5.000 tín dụng mỗi tháng",
+  "Tạo tới 5.000 video / tháng",
+  "Video dài lên đến 10 phút",
+  "Đồng nhất nhân vật xuyên suốt",
+];
+
 const isSubscribed = computed(
   () =>
     userData.value?.role === EnumAccountRole.ADMIN ||
@@ -112,15 +121,36 @@ useSeo({
         <template v-else>
           <h1 class="hero-heading">
             Tạo video AI <br />
-            chuyên nghiệp
+            <span class="hero-heading-accent">chuyên nghiệp</span>
           </h1>
-          <div class="hero-price-block">
-            <span class="hero-price-only">139.000đ</span>
-            <div class="hero-price-right">
-              <span class="hero-price-per">/tháng</span>
-              <span class="hero-price-desc">không giới hạn tính năng</span>
+
+          <div class="pricing-card">
+            <span class="pricing-card__ribbon">🔥 Phổ biến nhất</span>
+            <div class="pricing-card__price">
+              <span class="hero-price-only">139.000đ</span>
+              <div class="hero-price-right">
+                <span class="hero-price-per">/tháng</span>
+                <span class="hero-price-desc">không giới hạn tính năng</span>
+              </div>
             </div>
+            <ul class="pricing-card__features">
+              <li v-for="f in heroFeatures" :key="f">
+                <svg
+                  class="pc-check"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="3"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <polyline points="20 6 9 17 4 12" />
+                </svg>
+                <span>{{ f }}</span>
+              </li>
+            </ul>
           </div>
+
           <div class="hero-ctas">
             <button
               class="cta-primary"
@@ -853,6 +883,13 @@ useSeo({
   margin: 0;
 }
 
+.hero-heading-accent {
+  background: linear-gradient(90deg, #7dd3fc, #38bdf8, #818cf8);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
 .hero-name {
   color: #90caf9;
 }
@@ -864,15 +901,44 @@ useSeo({
   line-height: 1.6;
 }
 
-.hero-price-block {
+/* ─── Pricing card (hero) ────────────────────────────── */
+.pricing-card {
+  position: relative;
+  display: inline-flex;
+  flex-direction: column;
+  gap: 14px;
+  margin: 18px 0 4px;
+  padding: 22px 26px 20px;
+  border-radius: 18px;
+  background: linear-gradient(
+    160deg,
+    rgba(252, 211, 77, 0.16),
+    rgba(252, 211, 77, 0.05)
+  );
+  border: 1px solid rgba(252, 211, 77, 0.4);
+  box-shadow:
+    0 10px 34px rgba(252, 211, 77, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.pricing-card__ribbon {
+  position: absolute;
+  top: -14px;
+  left: 22px;
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.2px;
+  color: #0f172a;
+  background: linear-gradient(90deg, #fcd34d, #f59e0b);
+  padding: 4px 13px;
+  border-radius: 999px;
+  box-shadow: 0 4px 14px rgba(245, 158, 11, 0.45);
+}
+
+.pricing-card__price {
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  margin: 10px 0 4px;
-  background: rgba(252, 211, 77, 0.1);
-  border: 1px solid rgba(252, 211, 77, 0.35);
-  border-radius: 12px;
-  padding: 10px 18px 10px 14px;
 }
 
 .hero-price-only {
@@ -904,9 +970,42 @@ useSeo({
   line-height: 1.3;
 }
 
+.pricing-card__features {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  margin: 0;
+  padding: 13px 0 0;
+  border-top: 1px dashed rgba(252, 211, 77, 0.3);
+  list-style: none;
+}
+
+.pricing-card__features li {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.pc-check {
+  width: 15px;
+  height: 15px;
+  flex-shrink: 0;
+  color: #4ade80;
+  background: rgba(74, 222, 128, 0.16);
+  border-radius: 50%;
+  padding: 4px;
+  box-sizing: content-box;
+}
+
 @media (max-width: 600px) {
   .hero-price-only {
     font-size: 1.9rem;
+  }
+  .pricing-card {
+    padding: 20px 20px 18px;
   }
 }
 
