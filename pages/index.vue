@@ -671,7 +671,7 @@ useSeo({
 .hero-content {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 20px;
   flex: 1;
   min-width: 0;
 }
