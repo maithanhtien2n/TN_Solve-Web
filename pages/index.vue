@@ -991,7 +991,7 @@ useSeo({
   display: flex;
   align-items: center;
   gap: 12px;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   margin-top: 4px;
 }
 
@@ -1000,6 +1000,9 @@ useSeo({
   position: relative;
   display: inline-flex;
   align-items: center;
+  justify-content: center;
+  flex: 1 1 0;
+  min-width: 0;
   gap: 9px;
   padding: 13px 26px;
   border-radius: 12px;
@@ -1017,6 +1020,7 @@ useSeo({
     transform 0.18s,
     box-shadow 0.18s;
   letter-spacing: -0.2px;
+  white-space: nowrap;
 }
 
 .cta-primary__glow {
@@ -1052,6 +1056,9 @@ useSeo({
 .cta-ghost {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
+  flex: 1 1 0;
+  min-width: 0;
   gap: 8px;
   padding: 13px 22px;
   border-radius: 12px;
@@ -1067,6 +1074,16 @@ useSeo({
     background 0.18s,
     transform 0.18s;
   letter-spacing: -0.2px;
+  white-space: nowrap;
+}
+
+@media (max-width: 420px) {
+  .cta-primary,
+  .cta-ghost {
+    padding: 12px 10px;
+    font-size: 0.9rem;
+    gap: 6px;
+  }
 }
 
 .cta-ghost:hover {
