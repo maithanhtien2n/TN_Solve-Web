@@ -44,6 +44,12 @@ const appVersionDownload = computed(
 
 const showCredit = ref(false);
 
+// Đường dẫn video demo AI ở hero (bind động, không dùng src tĩnh) — nếu viết
+// src="/videos/xxx.mp4" thẳng trong template, Vite sẽ tự biến nó thành import
+// lúc build và sập cả trang khi file chưa tồn tại. Đặt tên file thật vào đây
+// khi có, không cần sửa gì khác.
+const heroDemoVideoSrc = "/videos/demo-hero.mp4";
+
 // Value stack hiển thị trong pricing card ở hero — sửa nội dung ở đây khi cần
 // đổi thông số gói, không cần đụng template.
 const heroFeatures = [
@@ -204,34 +210,19 @@ useSeo({
         </template>
       </div>
 
-      <!-- Right visual -->
+      <!-- Right visual — demo video AI thật, tự chạy/tắt tiếng/lặp lại -->
       <div class="hero-visual">
         <div class="hv-card">
           <div class="hv-screen">
-            <div class="hv-screen-bg" />
-            <div class="hv-play">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="28"
-                height="28"
-                viewBox="0 0 24 24"
-                fill="currentColor"
-              >
-                <polygon points="5 3 19 12 5 21 5 3" />
-              </svg>
-            </div>
-            <div class="hv-bar">
-              <div class="hv-bar-fill" />
-            </div>
-          </div>
-          <div class="hv-info">
-            <div class="hv-info-dot" />
-            <span>Video AI đang xử lý…</span>
-          </div>
-          <div class="hv-tags">
-            <span class="hv-tag">HD 1080p</span>
-            <span class="hv-tag">Tạo tự động</span>
-            <span class="hv-tag">Xuất nhanh</span>
+            <video
+              class="hv-video"
+              :src="heroDemoVideoSrc"
+              autoplay
+              muted
+              loop
+              playsinline
+              preload="metadata"
+            />
           </div>
         </div>
       </div>
@@ -694,7 +685,6 @@ useSeo({
   gap: 12px;
 }
 
-/* mock video screen */
 .hv-screen {
   position: relative;
   width: 100%;
@@ -704,101 +694,12 @@ useSeo({
   background: #0d1117;
 }
 
-.hv-screen-bg {
+.hv-video {
   position: absolute;
   inset: 0;
-  background: linear-gradient(135deg, #0d1b2a 0%, #1a3a5c 60%, #1e5fa0 100%);
-  opacity: 0.9;
-}
-
-.hv-play {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: rgba(255, 255, 255, 0.9);
-  z-index: 1;
-}
-
-.hv-play svg {
-  filter: drop-shadow(0 0 12px rgba(255, 255, 255, 0.4));
-  animation: pulse-play 2s ease-in-out infinite;
-}
-
-@keyframes pulse-play {
-  0%,
-  100% {
-    transform: scale(1);
-    opacity: 0.85;
-  }
-  50% {
-    transform: scale(1.12);
-    opacity: 1;
-  }
-}
-
-/* progress bar */
-.hv-bar {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 3px;
-  background: rgba(255, 255, 255, 0.15);
-  z-index: 1;
-}
-
-.hv-bar-fill {
+  width: 100%;
   height: 100%;
-  width: 62%;
-  background: linear-gradient(90deg, #38bdf8, #818cf8);
-  border-radius: 2px;
-  animation: progress-fill 3s ease-in-out infinite alternate;
-}
-
-@keyframes progress-fill {
-  from {
-    width: 30%;
-  }
-  to {
-    width: 85%;
-  }
-}
-
-/* info row */
-.hv-info {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 0.78rem;
-  color: rgba(255, 255, 255, 0.7);
-}
-
-.hv-info-dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: #38bdf8;
-  flex-shrink: 0;
-  animation: pulse 1.6s ease-in-out infinite;
-}
-
-/* tags */
-.hv-tags {
-  display: flex;
-  gap: 6px;
-  flex-wrap: wrap;
-}
-
-.hv-tag {
-  font-size: 0.68rem;
-  font-weight: 600;
-  padding: 3px 9px;
-  border-radius: 999px;
-  background: rgba(56, 189, 248, 0.15);
-  color: #7dd3fc;
-  border: 1px solid rgba(56, 189, 248, 0.25);
+  object-fit: cover;
 }
 
 /* floating stats */
