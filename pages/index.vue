@@ -587,7 +587,7 @@ useSeo({
       transparent 28px
     ),
     linear-gradient(135deg, #0f172a 0%, #1e3a5f 55%, #1565c0 100%);
-  margin-top: -32px;
+  margin-top: -16px;
   margin-bottom: 0;
   overflow: hidden;
   color: #fff;
