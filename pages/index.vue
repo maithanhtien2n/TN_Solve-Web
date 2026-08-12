@@ -161,10 +161,7 @@ useSeo({
               </div>
               <div class="pricing-card__price-extra">
                 <span class="hero-price-only hero-price-only--video">500</span>
-                <div class="hero-price-right">
-                  <span class="hero-price-per">video</span>
-                  <span class="hero-price-desc">mỗi tháng</span>
-                </div>
+                <span class="hero-price-per">video</span>
               </div>
             </div>
             <ul class="pricing-card__features">
