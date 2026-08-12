@@ -627,7 +627,7 @@ useSeo({
   position: relative;
   z-index: 1;
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: 48px;
 }
 
