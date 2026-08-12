@@ -64,6 +64,7 @@ const heroFeatures = [
   "5.000 tín dụng",
   "Video dài lên đến 10 phút",
   "Đồng nhất nhân vật xuyên suốt",
+  "Mua thêm 2.000 tín dụng chỉ với 10.000đ",
 ];
 
 const isSubscribed = computed(
