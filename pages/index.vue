@@ -28,6 +28,14 @@ onMounted(async () => {
   } catch (_) {}
 });
 
+// Bấm "Xem hướng dẫn" ở hero → scroll mượt tới khối video hướng dẫn, đưa vào
+// giữa màn hình cho dễ thấy.
+const scrollToVideoTutorial = () => {
+  document
+    .getElementById("video-huong-dan")
+    ?.scrollIntoView({ behavior: "smooth", block: "center" });
+};
+
 const playingSmallVideoId = ref<string | null>(null);
 const onClickSmallTutorialVideo = (id: string) => {
   playingSmallVideoId.value = id;
@@ -95,7 +103,6 @@ useSeo({
           <div class="hero-ctas" style="margin-top: 8px">
             <button
               class="cta-primary"
-              style="flex: 0 0 194px"
               @click="router.push('/thu-vien-cua-toi/tao-moi')"
             >
               <span class="cta-primary__glow" />
@@ -116,6 +123,23 @@ useSeo({
                 />
               </svg>
               Tạo video
+            </button>
+            <button class="cta-ghost" @click="scrollToVideoTutorial">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="17"
+                height="17"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="12" cy="12" r="10" />
+                <polygon points="10 8 16 12 10 16 10 8" />
+              </svg>
+              Xem hướng dẫn
             </button>
           </div>
         </template>
@@ -396,7 +420,7 @@ useSeo({
   </v-dialog>
 
   <!-- ── Video tutorial ─────────────────────────────────── -->
-  <div class="video-section">
+  <div id="video-huong-dan" class="video-section">
     <div class="video-section-label">
       <div class="video-section-badge">
         <v-icon size="15" color="#e53935">mdi-youtube</v-icon>
@@ -939,6 +963,7 @@ useSeo({
   border: 1.5px solid rgba(255, 255, 255, 0.28);
   background: rgba(255, 255, 255, 0.06);
   text-decoration: none;
+  cursor: pointer;
   backdrop-filter: blur(4px);
   transition:
     border-color 0.18s,
