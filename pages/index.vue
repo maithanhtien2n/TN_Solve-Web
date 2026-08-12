@@ -80,7 +80,7 @@ useSeo({
     <div class="hero-glow" />
 
     <div class="hero-inner">
-      <div class="hero-content" :class="{ 'hero-content--centered': isSubscribed }">
+      <div class="hero-content">
         <template v-if="isSubscribed">
           <div class="hero-label">
             <span class="dot-live" />
@@ -665,11 +665,6 @@ useSeo({
   gap: 20px;
   flex: 1;
   min-width: 0;
-}
-
-.hero-content--centered {
-  align-items: center;
-  text-align: center;
 }
 
 /* ─── Hero visual (right col) ────────────────────────── */
