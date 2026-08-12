@@ -600,7 +600,7 @@ useSeo({
   position: relative;
   z-index: 1;
   display: flex;
-  align-items: stretch;
+  align-items: flex-start;
   gap: 48px;
 }
 
@@ -671,12 +671,10 @@ useSeo({
 .hero-visual {
   flex: 1 1 0;
   min-width: 0;
-  align-self: stretch;
   position: relative;
 }
 
 .hv-card {
-  height: 100%;
   background: rgba(255, 255, 255, 0.07);
   border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: 16px;
@@ -690,7 +688,7 @@ useSeo({
 .hv-screen {
   position: relative;
   width: 100%;
-  flex: 1;
+  aspect-ratio: 16 / 9;
   border-radius: 10px;
   overflow: hidden;
   background: #0d1117;
