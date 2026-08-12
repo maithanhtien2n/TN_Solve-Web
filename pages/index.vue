@@ -61,7 +61,7 @@ const heroDemoVideoSrc = "/videos/demo-hero.mp4";
 // Value stack hiển thị trong pricing card ở hero — sửa nội dung ở đây khi cần
 // đổi thông số gói, không cần đụng template.
 const heroFeatures = [
-  "5.000 tín dụng",
+  "Tặng 5.000 tín dụng",
   "Video dài lên đến 10 phút",
   "Đồng nhất nhân vật xuyên suốt",
   "Mua thêm 2.000 tín dụng chỉ với 10.000đ",
