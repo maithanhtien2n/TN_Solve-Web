@@ -61,7 +61,7 @@ const heroDemoVideoSrc = "/videos/demo-hero.mp4";
 // Value stack hiển thị trong pricing card ở hero — sửa nội dung ở đây khi cần
 // đổi thông số gói, không cần đụng template.
 const heroFeatures = [
-  "5.000 tín dụng (500 video) mỗi tháng",
+  "5.000 tín dụng mỗi tháng",
   "Video dài lên đến 10 phút",
   "Đồng nhất nhân vật xuyên suốt",
 ];
@@ -152,10 +152,19 @@ useSeo({
 
           <div class="pricing-card">
             <div class="pricing-card__price">
-              <span class="hero-price-only">139.000đ</span>
-              <div class="hero-price-right">
-                <span class="hero-price-per">/tháng</span>
-                <span class="hero-price-desc">không giới hạn tính năng</span>
+              <div class="pricing-card__price-main">
+                <span class="hero-price-only">139.000đ</span>
+                <div class="hero-price-right">
+                  <span class="hero-price-per">/tháng</span>
+                  <span class="hero-price-desc">không giới hạn tính năng</span>
+                </div>
+              </div>
+              <div class="pricing-card__price-extra">
+                <span class="hero-price-only hero-price-only--video">500</span>
+                <div class="hero-price-right">
+                  <span class="hero-price-per">video</span>
+                  <span class="hero-price-desc">mỗi tháng</span>
+                </div>
               </div>
             </div>
             <ul class="pricing-card__features">
@@ -809,9 +818,32 @@ useSeo({
 }
 
 .pricing-card__price {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.pricing-card__price-main,
+.pricing-card__price-extra {
   display: inline-flex;
   align-items: center;
   gap: 10px;
+}
+
+.pricing-card__price-extra {
+  padding-left: 16px;
+  border-left: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.hero-price-only.hero-price-only--video {
+  color: #7dd3fc;
+  text-shadow: 0 0 24px rgba(56, 189, 248, 0.5);
+}
+
+.pricing-card__price-extra .hero-price-per {
+  color: #7dd3fc;
 }
 
 .hero-price-only {
