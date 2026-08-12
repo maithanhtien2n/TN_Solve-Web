@@ -315,21 +315,7 @@ useSeo({
       </div>
     </a>
 
-    <router-link
-      v-if="!isSubscribed"
-      to="/dang-ky-dich-vu"
-      class="quick-card qc-purple"
-    >
-      <div class="quick-icon">
-        <v-icon color="#8b5cf6" size="22">mdi-crown-outline</v-icon>
-      </div>
-      <div class="quick-card-body">
-        <div class="quick-label">Nâng cấp</div>
-        <div class="quick-desc">Chỉ 139.000đ/tháng</div>
-      </div>
-    </router-link>
-
-    <router-link v-else to="/tro-ly-ai" class="quick-card qc-purple">
+    <router-link to="/tro-ly-ai" class="quick-card qc-purple">
       <div class="quick-icon">
         <v-icon color="#8b5cf6" size="22">mdi-book-open-outline</v-icon>
       </div>
