@@ -82,10 +82,6 @@ useSeo({
     <div class="hero-inner">
       <div class="hero-content">
         <template v-if="isSubscribed">
-          <div class="hero-label">
-            <span class="dot-live" />
-            Hệ thống đang hoạt động
-          </div>
           <h1 class="hero-heading">
             Xin chào,
             <span class="hero-name">{{
@@ -747,35 +743,6 @@ useSeo({
   font-size: 0.65rem;
   color: #64748b;
   white-space: nowrap;
-}
-
-.hero-label {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 0.72rem;
-  font-weight: 600;
-  color: rgba(255, 255, 255, 0.7);
-  letter-spacing: 0.5px;
-  text-transform: uppercase;
-}
-
-.dot-live {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: #4ade80;
-  animation: blink 1.5s ease-in-out infinite;
-}
-
-@keyframes blink {
-  0%,
-  100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.3;
-  }
 }
 
 .hero-heading {
