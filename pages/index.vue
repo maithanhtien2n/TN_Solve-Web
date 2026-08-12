@@ -99,6 +99,7 @@ useSeo({
           <div class="hero-ctas" style="margin-top: 8px">
             <button
               class="cta-primary"
+              style="flex: 0 0 194px"
               @click="router.push('/thu-vien-cua-toi/tao-moi')"
             >
               <span class="cta-primary__glow" />
