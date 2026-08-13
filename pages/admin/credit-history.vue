@@ -4,9 +4,9 @@ import { accountService } from "~/services/account";
 const headers = [
   { title: "Thông tin khách hàng", key: "customerInfo", sortable: false },
   { title: "Loại tín dụng",        key: "creditAmount", sortable: false },
-  { title: "Số tiền",              key: "price",        align: "end", sortable: false },
-  { title: "Ngày mua",             key: "serviceStartDate", sortable: false },
-  { title: "Hết hạn",              key: "serviceExpiry",    sortable: false },
+  { title: "Thời gian",            key: "serviceStartDate", sortable: false },
+  { title: "Giá tiền",             key: "price",        align: "end", sortable: false },
+  { title: "Cập nhật",             key: "updatedAt",    sortable: false },
 ];
 
 const creditTypeOptions = [
@@ -121,9 +121,14 @@ definePageMeta({ layout: "admin", title: "Lịch sử mua tín dụng" });
       <span class="text-red text-nowrap">{{ formatCurrency((item as any).price) }}</span>
     </template>
 
-    <template #row-serviceExpiry="{ item }">
-      <span v-if="(item as any).serviceExpiry" class="text-nowrap">{{ (item as any).serviceExpiry }}</span>
-      <span v-else class="text-medium-emphasis">—</span>
+    <template #row-serviceStartDate="{ item }">
+      <template v-if="(item as any).creditAmount === -1">
+        <span v-if="(item as any).serviceExpiry" class="text-nowrap">
+          {{ (item as any).serviceStartDate }} - {{ (item as any).serviceExpiry }}
+        </span>
+        <span v-else class="text-medium-emphasis">—</span>
+      </template>
+      <span v-else class="text-nowrap">{{ (item as any).serviceStartDate }}</span>
     </template>
   </DataTable>
 </template>

@@ -9,8 +9,7 @@ const headers = [
   { title: "Thông tin khách hàng", key: "customerInfo", sortable: false },
   { title: "Chi tiết gói", key: "note", sortable: false },
   { title: "Người giới thiệu", key: "referral.name", sortable: false },
-  { title: "Ngày bắt đầu", key: "serviceStartDate", sortable: false },
-  { title: "Ngày hết hạn", key: "serviceExpiry", sortable: false },
+  { title: "Thời gian", key: "serviceStartDate", sortable: false },
   { title: "Giá gói", key: "basePrice", align: "end", sortable: false },
   { title: "Thành tiền", key: "price", align: "end", sortable: false },
   { title: "Cập nhật", key: "updatedAt", sortable: false },
@@ -160,6 +159,12 @@ definePageMeta({ layout: "admin", title: "Gói cho thuê" });
 
     <template #row-price="{ item }">
       <div class="text-error text-nowrap">{{ formatCurrency((item as any).price) }}</div>
+    </template>
+
+    <template #row-serviceStartDate="{ item }">
+      <span class="text-nowrap">
+        {{ (item as any).serviceStartDate }} - {{ (item as any).serviceExpiry }}
+      </span>
     </template>
 
     <template #row-expiryStatus="{ item }">
