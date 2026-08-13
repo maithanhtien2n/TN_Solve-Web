@@ -242,18 +242,21 @@ const getQueueMsg = (item: any): { title: string } | null => {
           <div class="thumb-area">
             <!-- Success -->
             <template v-if="item.state === 'success' && item.video">
+              <!-- preload="auto" + #t=0.1 (media fragment) -> trình duyệt tải
+                   và nhảy tới gần khung hình đầu ngay, đỡ đen màn hình lúc
+                   mới vào (chưa có ảnh thumbnail thật). -->
               <div class="video-wrapper">
                 <video
                   class="video-bg"
-                  :src="item.video"
-                  preload="metadata"
+                  :src="`${item.video}#t=0.1`"
+                  preload="auto"
                   muted
                   playsinline
                 />
                 <video
                   class="video-main"
-                  :src="item.video"
-                  preload="metadata"
+                  :src="`${item.video}#t=0.1`"
+                  preload="auto"
                   muted
                   playsinline
                   :style="

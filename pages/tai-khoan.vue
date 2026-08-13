@@ -232,7 +232,10 @@ definePageMeta({ middleware: "auth" });
 
       <!-- Stats -->
       <div class="profile-stats">
-        <div class="stat-item">
+        <!-- Chưa từng đăng ký gói nào (serviceExpiry null vì không có
+             ServiceRental nào, kể cả đã hết hạn) -> ẩn hẳn mục này thay vì
+             hiện "Đã hết hạn" gây hiểu nhầm là đã từng mua rồi hết hạn. -->
+        <div v-if="userData?.serviceExpiry" class="stat-item">
           <div class="stat-icon" style="background: #eff6ff">
             <v-icon size="18" color="#1e88e5"
               >mdi-calendar-clock-outline</v-icon
@@ -247,7 +250,7 @@ definePageMeta({ middleware: "auth" });
         </div>
 
         <template v-if="unlimitedRemainingFormatted">
-          <div class="stat-divider" />
+          <div v-if="userData?.serviceExpiry" class="stat-divider" />
 
           <div class="stat-item">
             <div class="stat-icon" style="background: #fef3c7">
@@ -260,7 +263,7 @@ definePageMeta({ middleware: "auth" });
           </div>
         </template>
 
-        <div class="stat-divider" />
+        <div v-if="userData?.serviceExpiry || unlimitedRemainingFormatted" class="stat-divider" />
 
         <div class="stat-item">
           <div class="stat-icon" style="background: #eff6ff">

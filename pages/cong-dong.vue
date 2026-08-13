@@ -139,17 +139,20 @@ useSeo({
         <div class="thumb-area">
           <!-- Success: video -->
           <template v-if="item.state === 'success' && item.video">
-            <video class="video-bg" preload="metadata" muted playsinline>
-              <source :src="item.video" type="video/mp4" />
+            <!-- preload="auto" + #t=0.1 (media fragment) -> trình duyệt tải và
+                 nhảy tới gần khung hình đầu ngay, đỡ đen màn hình lúc mới vào
+                 (chưa có ảnh thumbnail thật, xem giải thích ở chỗ khác). -->
+            <video class="video-bg" preload="auto" muted playsinline>
+              <source :src="`${item.video}#t=0.1`" type="video/mp4" />
             </video>
             <video
               class="video-main"
               :style="item.frameRate === 'Khổ ngang (16:9)' ? { objectFit: 'cover' } : {}"
-              preload="metadata"
+              preload="auto"
               muted
               playsinline
             >
-              <source :src="item.video" type="video/mp4" />
+              <source :src="`${item.video}#t=0.1`" type="video/mp4" />
             </video>
           </template>
 
