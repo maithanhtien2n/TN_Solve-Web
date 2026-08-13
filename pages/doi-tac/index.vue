@@ -43,6 +43,23 @@ const onCopyReferralLink = async () => {
   }
 };
 
+// Khớp TEST_AMOUNT ở core/constants/common.ts (server) — xem giải thích đầy
+// đủ ở doi-tac/thanh-toan.vue (cùng cơ chế).
+const REFERRAL_TEST_AMOUNT = 3;
+const isCodeCopied = ref<boolean>(false);
+const onCopyReferralCode = async () => {
+  if (!userData.value?._id) return;
+  try {
+    await navigator.clipboard.writeText(userData.value._id);
+    isCodeCopied.value = true;
+    setTimeout(() => {
+      isCodeCopied.value = false;
+    }, 2000);
+  } catch (err) {
+    console.error("Failed to copy referral code: ", err);
+  }
+};
+
 const onClickViewDashboardPartnerDetail = (id: string) => {
   if (userData.value?.role !== EnumAccountRole.ADMIN) return;
   router.push(`/doi-tac?id=${id}`);
@@ -258,6 +275,55 @@ definePageMeta({ layout: "partner", title: "Tổng quan" });
             </v-card>
           </v-col>
         </v-row>
+      </v-col>
+
+      <v-col cols="12" class="mt-4">
+        <v-card variant="outlined">
+          <v-card-text>
+            <v-row dense>
+              <v-col cols="12" md="6">
+                <h3 class="mb-2 font-bold">MÃ GIỚI THIỆU (KHÁCH NHẬP ĐƯỢC GIẢM 10.000Đ)</h3>
+                <v-text-field
+                  readonly
+                  hide-details
+                  flat
+                  variant="solo-filled"
+                  bg-color="grey-lighten-3"
+                  title="Sao chép mã"
+                  style="cursor: pointer"
+                  :color="isCodeCopied ? 'success' : 'default'"
+                  :model-value="userData?._id"
+                  :append-inner-icon="isCodeCopied ? 'mdi-check' : 'mdi-content-copy'"
+                  @click:append-inner="onCopyReferralCode()"
+                />
+              </v-col>
+
+              <v-col cols="12" md="6">
+                <h3 class="mb-2 font-bold">LINK GIỚI THIỆU CỦA BẠN (KHÁCH BẤM VÀO ĐƯỢC TẶNG {{ REFERRAL_TEST_AMOUNT }} LƯỢT DÙNG THỬ)</h3>
+                <v-text-field
+                  readonly
+                  hide-details
+                  flat
+                  variant="solo-filled"
+                  bg-color="grey-lighten-3"
+                  title="Sao chép link"
+                  style="cursor: pointer"
+                  :color="isCopied ? 'success' : 'default'"
+                  :model-value="userData?.referralLink"
+                  :append-inner-icon="isCopied ? 'mdi-check' : 'mdi-content-copy'"
+                  @click:append-inner="onCopyReferralLink()"
+                />
+              </v-col>
+            </v-row>
+
+            <p class="mt-3 mb-0 text-medium-emphasis">
+              Dùng cách nào cũng được — cả 2 đều tự gán bạn là người giới
+              thiệu cho khách. Muốn khách <b>dùng thử trước</b> thì gửi
+              <b>link</b>, muốn <b>kích thích khách mua ngay</b> thì gửi
+              <b>mã giảm giá</b>.
+            </p>
+          </v-card-text>
+        </v-card>
       </v-col>
 
       <v-col cols="12" class="mt-4">

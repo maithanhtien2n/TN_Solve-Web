@@ -136,7 +136,7 @@ useSeo({
     </div>
 
     <!-- Load more trigger -->
-    <div ref="loadMore" class="d-flex justify-center py-4">
+    <div v-if="videos.length < totalDocs" ref="loadMore" class="d-flex justify-center py-4">
       <v-progress-circular
         v-if="loading === ''"
         width="2"
@@ -384,7 +384,7 @@ useSeo({
   flex-direction: column;
   align-items: center;
   text-align: center;
-  padding: 60px 20px;
+  padding: 60px 20px 0;
 }
 
 .empty-icon {

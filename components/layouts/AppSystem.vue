@@ -145,7 +145,6 @@ onMounted(async () => {
             onActionAllMasterDataClient({ type: "my-partner" }),
             onActionAllMasterDataClient({ type: "discount-type" }),
             onActionAllMasterDataClient({ type: "condition-type" }),
-            onActionAllMasterDataClient({ type: "app-version" }),
           ]);
         }
       })

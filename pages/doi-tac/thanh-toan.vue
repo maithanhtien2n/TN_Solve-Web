@@ -8,7 +8,6 @@ const { onGetterUserData, onActionGetUserData } = useAppStore();
 
 const MIN_PAYOUT_AMOUNT = 100000;
 
-const isCopied = ref<boolean>(false);
 const commonDialogRef = ref<any>(null);
 
 const banks = computed(() => onGetterMasterData.value["banks"] || []);
@@ -48,19 +47,6 @@ const onSavePaymentInfo = async () => {
     .finally(() => {
       loading.value = "";
     });
-};
-
-const onCopyReferralLink = async () => {
-  if (!onGetterUserData.value?.referralLink) return;
-  try {
-    await navigator.clipboard.writeText(onGetterUserData.value?.referralLink);
-    isCopied.value = true;
-    setTimeout(() => {
-      isCopied.value = false;
-    }, 2000); // Reset biểu tượng sau 2 giây
-  } catch (err) {
-    console.error("Failed to copy referral code: ", err);
-  }
 };
 
 definePageMeta({ layout: "partner", title: "Thanh toán" });
@@ -232,24 +218,6 @@ definePageMeta({ layout: "partner", title: "Thanh toán" });
             </v-sheet>
           </v-card-text>
 
-          <v-card-text>
-            <h3 class="mb-2 font-bold">
-              LINK GỚI THIỆU CỦA BẠN
-            </h3>
-
-            <v-text-field
-              readonly
-              hide-details
-              variant="outlined"
-              title="Sao chép mã"
-              style="cursor: pointer"
-              :color="isCopied ? 'success' : 'default'"
-              :model-value="onGetterUserData.referralLink"
-              :append-inner-icon="isCopied ? 'mdi-check' : 'mdi-content-copy'"
-              @click:append-inner="onCopyReferralLink()"
-            />
-          </v-card-text>
-
           <v-card-text
             class="pb-7 pt-2"
             v-if="
@@ -305,7 +273,7 @@ definePageMeta({ layout: "partner", title: "Thanh toán" });
             <li>
               Nếu sau ngày 8 vẫn chưa nhận được tiền, vui lòng
               <a
-                href="https://zalo.me/g/vvhrhc608"
+                href="https://zalo.me/g/5semsotoryhj32yksgrx"
                 target="_blank"
                 class="text-primary underline"
               >

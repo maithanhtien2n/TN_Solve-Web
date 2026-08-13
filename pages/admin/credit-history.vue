@@ -20,6 +20,17 @@ const loading        = ref("");
 const revenueByMonth = ref<any[]>([]);
 const showRevenue    = ref(false);
 
+// Data cũ lưu note dạng "Không giới hạn 💎 X tháng" / "Gia hạn không giới hạn
+// 💎 X tháng" (thứ tự cũ) — chuẩn hoá lại thành "X tháng không giới hạn 💎"
+// (thứ tự mới) chỉ để HIỂN THỊ, không sửa data gốc trong DB. Note dạng mới đã
+// đúng thứ tự (kết thúc bằng 💎, không phải số) thì regex không khớp -> giữ
+// nguyên, không đổi gì.
+function normalizeUnlimitedNote(note: string | null | undefined): string {
+  if (!note) return "";
+  const match = note.match(/(\d+\s*tháng(?:\s*\d+\s*ngày)?|\d+\s*ngày)\s*$/i);
+  return match ? `${match[1]} không giới hạn 💎` : note;
+}
+
 async function loadItems(event: any) {
   loading.value = "load-table";
   await accountService
@@ -98,8 +109,7 @@ definePageMeta({ layout: "admin", title: "Lịch sử mua tín dụng" });
     <template #row-creditAmount="{ item }">
       <v-chip :color="(item as any).creditAmount === -1 ? 'primary' : 'success'">
         <template v-if="(item as any).creditAmount === -1">
-          <v-icon size="13" start>mdi-infinity</v-icon>
-          Không giới hạn
+          {{ normalizeUnlimitedNote((item as any).note) || "Không giới hạn" }}
         </template>
         <template v-else>
           {{ Number((item as any).creditAmount).toLocaleString("vi-VN") }} 💎

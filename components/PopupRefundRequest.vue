@@ -32,7 +32,7 @@ const BANKS = [
 const categoryConfig: Record<string, { icon: string; color: string; bg: string; label: string }> = {
   subscription:     { icon: "mdi-calendar-clock",         color: "#7c3aed", bg: "#f3e8ff", label: "Gói dịch vụ"             },
   credit_unlimited: { icon: "mdi-infinity",               color: "#0284c7", bg: "#e0f2fe", label: "Tín dụng không giới hạn" },
-  credit:           { icon: "mdi-circle-multiple-outline", color: "#059669", bg: "#d1fae5", label: "Tín dụng còn lại"         },
+  credit:           { icon: "mdi-circle-multiple-outline", color: "#059669", bg: "#d1fae5", label: "Tín dụng"                 },
 };
 
 const loading = ref(false);
@@ -63,8 +63,20 @@ async function loadPreview() {
 }
 
 async function submit() {
-  if (!form.value.bankCode || !form.value.bankAccount || !form.value.bankAccountName || form.value.reason.length < 10) {
-    errorMsg.value = "Vui lòng điền đầy đủ thông tin (lý do tối thiểu 10 ký tự)!";
+  if (!form.value.bankCode) {
+    errorMsg.value = "Vui lòng chọn ngân hàng!";
+    return;
+  }
+  if (!form.value.bankAccount) {
+    errorMsg.value = "Vui lòng nhập số tài khoản!";
+    return;
+  }
+  if (!form.value.bankAccountName) {
+    errorMsg.value = "Vui lòng nhập tên chủ tài khoản!";
+    return;
+  }
+  if (form.value.reason.length < 10) {
+    errorMsg.value = "Lý do hoàn tiền phải có tối thiểu 10 ký tự!";
     return;
   }
   loading.value = true;
@@ -129,7 +141,7 @@ onMounted(() => { loadPreview(); });
                 </div>
               </div>
 
-              <!-- Progress bar ngày (chỉ subscription / unlimited) -->
+              <!-- Progress bar: ngày còn lại (subscription/unlimited) hoặc tín dụng còn lại (credit) -->
               <template v-if="item.totalDays > 0">
                 <div class="rr-progress-wrap">
                   <div
@@ -141,8 +153,8 @@ onMounted(() => { loadPreview(); });
                   />
                 </div>
                 <div class="rr-progress-label">
-                  <template v-if="item.notStarted">
-                    <span class="rr-not-started">Chưa bắt đầu — hoàn 100%</span>
+                  <template v-if="item.category === 'credit'">
+                    Còn <strong>{{ item.remainingDays.toLocaleString("vi-VN") }}</strong> / {{ item.totalDays.toLocaleString("vi-VN") }} 💎
                   </template>
                   <template v-else>
                     Còn <strong>{{ item.remainingDays }}</strong> / {{ item.totalDays }} ngày
@@ -171,8 +183,12 @@ onMounted(() => { loadPreview(); });
           <!-- ── Tổng ── -->
           <div class="rr-total">
             <div class="rr-total-row">
-              <span>Tổng tiền gốc</span>
-              <span class="rr-total-original">{{ formatCurrency(preview.totalOriginal) }}</span>
+              <span>Tổng tiền hoàn</span>
+              <span class="rr-total-original">{{ formatCurrency(preview.totalRefundBeforeFee) }}</span>
+            </div>
+            <div v-if="preview.refundFee > 0" class="rr-total-row">
+              <span>Phí xử lý hoàn tiền</span>
+              <span class="rr-total-fee">-{{ formatCurrency(preview.refundFee) }}</span>
             </div>
             <div class="rr-total-divider" />
             <div class="rr-total-row rr-total-row--main">
@@ -222,8 +238,7 @@ onMounted(() => { loadPreview(); });
             hide-details="auto"
             class="rr-field"
             placeholder="VD: NGUYEN VAN A"
-            hint="Nhập IN HOA đúng tên trên tài khoản ngân hàng"
-            persistent-hint
+            @update:model-value="(v) => (form.bankAccountName = v.toUpperCase())"
           />
 
           <v-textarea
@@ -379,17 +394,6 @@ onMounted(() => { loadPreview(); });
   margin-top: -4px;
 }
 .rr-progress-label strong { color: #0f172a; }
-.rr-not-started {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 0.73rem;
-  font-weight: 600;
-  color: #059669;
-  background: #d1fae5;
-  padding: 2px 8px;
-  border-radius: 999px;
-}
 
 /* Amounts */
 .rr-item-amounts {
@@ -434,6 +438,7 @@ onMounted(() => { loadPreview(); });
 }
 .rr-total-row span:first-child { color: #64748b; }
 .rr-total-original { font-weight: 600; color: #374151; }
+.rr-total-fee { font-weight: 600; color: #dc2626; }
 .rr-total-divider { height: 1px; background: #e2e8f0; }
 .rr-total-row--main span:first-child { font-weight: 700; color: #0f172a; font-size: 0.9rem; }
 .rr-total-refund {

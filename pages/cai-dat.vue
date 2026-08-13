@@ -365,10 +365,6 @@ definePageMeta({ middleware: "auth" });
 </template>
 
 <style scoped>
-.sw {
-  padding-bottom: 24px;
-}
-
 /* ── Card ────────────────────────────────────────────── */
 .sw-card {
   background: #fff;

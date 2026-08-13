@@ -14,11 +14,25 @@ const {
   onGetterDisplayPopupBuyCredit,
   onGetterDisplayLogin: displayLogin,
 } = useAppStore();
-const { onGetterMasterData, onActionAllMasterDataClient } =
-  useMasterDataStore();
+const { onActionAllMasterDataClient } = useMasterDataStore();
 
 const loading = ref(true);
 const commonDialogPaymentRef = ref<any>(null);
+const paidSummary = ref<any>(null);
+
+// Đọc lại tóm tắt gói vừa mua (lưu ở dang-ky-dich-vu.vue/PopupBuyCredit.vue
+// ngay trước lúc redirect sang cổng thanh toán) để hiện đúng chi tiết gói
+// trong popup "Thanh toán thành công" thay vì 1 mẫu chung chung cho mọi case.
+// Xoá ngay sau khi đọc — chỉ dùng đúng 1 lần cho lượt thanh toán vừa xong.
+function readPendingPaymentSummary() {
+  try {
+    const raw = localStorage.getItem("pendingPaymentSummary");
+    localStorage.removeItem("pendingPaymentSummary");
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
+}
 
 const client = computed<boolean>(() => {
   const win = window as any;
@@ -28,10 +42,6 @@ const client = computed<boolean>(() => {
 const pathArray = computed(() => {
   return route.path.split("/").filter((i) => i);
 });
-
-const appVersionDownload = computed(
-  () => onGetterMasterData.value["app-version"] || "",
-);
 
 const onReturnTitle = (title: string) => {
   switch (title) {
@@ -170,6 +180,7 @@ onMounted(async () => {
       // 2. Phân nhánh xử lý theo mã trạng thái
       if (resultCode === "0") {
         // 🟢 THÀNH CÔNG
+        paidSummary.value = readPendingPaymentSummary();
         commonDialogPaymentRef.value?.onDisplay(true);
       } else if (resultCode === "2") {
         // 🟡 KHÁCH TỰ HỦY
@@ -231,20 +242,6 @@ onMounted(async () => {
         }
       });
 
-    // await onActionAllMasterDataClient({
-    //   type: "app-version",
-    //   download: true,
-    // }).catch(() => {});
-
-    // if (
-    //   !onGetterSystemPopup.value?.display &&
-    //   !commonDialogPaymentRef.value?.display &&
-    //   userData.value?.role &&
-    //   userData.value?.role !== EnumAccountRole.ADMIN &&
-    //   !isMobile.value
-    // ) {
-    //   commonDialogRef.value?.onDisplay(!client.value);
-    // }
   } catch (error) {
     console.error(error);
   } finally {
@@ -265,15 +262,47 @@ onMounted(async () => {
       width="450"
     >
       <v-card-text class="py-4 px-1 text-center">
-        <v-avatar color="success-lighten-5" size="80" class="mb-6">
+        <v-avatar color="success-lighten-5" size="80" class="mb-0">
           <v-icon icon="mdi-check-circle" color="success" size="64"></v-icon>
         </v-avatar>
 
-        <h3 class="text-h5 font-weight-bold mb-2 text-grey-darken-3">
+        <h3 class="text-h5 font-weight-bold mb-5 text-grey-darken-3">
           Thanh toán thành công!
         </h3>
 
-        <p class="text-body-1 text-grey-darken-1 mb-6">
+        <!-- Chi tiết gói vừa mua — liệt kê đầy đủ từng mục + giá tiền, đọc từ
+             pendingPaymentSummary lưu ở FE trước lúc redirect sang cổng
+             thanh toán (xem readPendingPaymentSummary). -->
+        <v-sheet
+          v-if="paidSummary?.items?.length"
+          color="grey-lighten-4"
+          rounded="lg"
+          class="pa-4 mb-4 text-left"
+        >
+          <div
+            v-for="(item, idx) in paidSummary.items"
+            :key="idx"
+            class="d-flex align-center justify-space-between"
+            :class="idx > 0 ? 'mt-2' : ''"
+          >
+            <span class="text-body-1 text-grey-darken-3" style="min-width: 0">{{ item.label }}</span>
+            <span class="text-body-1 font-weight-bold text-red ml-2" style="white-space: nowrap; flex-shrink: 0;">
+              {{ formatCurrency(item.price) }}
+            </span>
+          </div>
+
+          <template v-if="paidSummary.items.length > 1">
+            <v-divider class="my-2" style="border-style: dotted;" />
+            <div class="d-flex align-center justify-space-between">
+              <span class="text-body-1 font-weight-bold text-grey-darken-3" style="min-width: 0">Tổng cộng</span>
+              <span class="text-body-1 font-weight-bold text-red ml-2" style="white-space: nowrap; flex-shrink: 0;">
+                {{ formatCurrency(paidSummary.total) }}
+              </span>
+            </div>
+          </template>
+        </v-sheet>
+
+        <p class="text-body-1 text-grey-darken-1 mb-4">
           Cảm ơn bạn đã tin dùng <strong>TN SOLVE</strong>. Để không bỏ lỡ các
           tài liệu và hướng dẫn mới nhất, mời bạn tham gia cộng đồng của chúng
           tôi.
@@ -304,83 +333,6 @@ onMounted(async () => {
             https://zalo.me/g/p8hls5tonlfkqmyfndmx
           </a>
         </v-sheet>
-      </v-card-text>
-    </CommonDialog>
-
-    <CommonDialog
-      ref="commonDialogRef"
-      title="Thông báo từ TN SOLVE"
-      width="530"
-    >
-      <v-card-text>
-        <div class="d-flex flex-column align-center mb-6">
-          <v-icon color="warning" size="64" class="mb-2">
-            mdi-shield-alert-outline
-          </v-icon>
-          <h3 class="text-h5 font-weight-bold text-center">
-            THÔNG BÁO QUAN TRỌNG
-          </h3>
-        </div>
-
-        <div class="text-body-1 line-height-relaxed text-grey-darken-3">
-          <p class="mb-4">
-            Để tối ưu tốc độ <strong>tạo Video AI tự động</strong> và đảm bảo hệ
-            thống hoạt động <strong>ổn định</strong>, chúng tôi đã phát hành
-            phiên bản công cụ <strong>cài đặt trực tiếp trên máy tính</strong>.
-          </p>
-
-          <v-alert type="warning" variant="tonal" border="start" class="mb-4">
-            <strong>Khuyến nghị:</strong> Sử dụng công cụ chạy trên máy cá nhân
-            giúp hạn chế gián đoạn, giảm lỗi khi xử lý video và đảm bảo trải
-            nghiệm ổn định nhất trong quá trình sử dụng.
-          </v-alert>
-
-          <!-- <p class="text-body-2 text-grey-darken-1 mb-4 text-center">
-            <i>(Hỗ trợ <strong>.exe</strong> cho Windows)</i>
-          </p> -->
-        </div>
-
-        <div class="d-flex flex-column gap-3">
-          <a
-            class="download-btn justify-center mt-2"
-            :href="appVersionDownload"
-            target="_blank"
-            rel="noopener"
-          >
-            <v-icon size="22" class="icon-win">mdi-microsoft-windows</v-icon>
-            <span :style="{ 'font-size': isMobile ? '1rem' : '1.2rem' }">
-              Tải công cụ TN Solve cho Windows
-            </span>
-          </a>
-
-          <div class="mt-6 d-flex justify-center">
-            <iframe
-              class="w-100"
-              height="300"
-              src="https://www.youtube.com/embed/GR2b8sXxUac"
-              frameborder="0"
-              allow="
-                accelerometer;
-                autoplay;
-                clipboard-write;
-                encrypted-media;
-                gyroscope;
-                picture-in-picture;
-                web-share;
-              "
-              referrerpolicy="strict-origin-when-cross-origin"
-              allowfullscreen
-            />
-          </div>
-
-          <!-- <a
-            target="_blank"
-            href="https://youtube.com/shorts/NasjgxOiTXY?si=EvCKjKwMthEC73Zv"
-            class="text-center mt-3"
-          >
-            Xem Video Hướng Dẫn Cài Đặt
-          </a> -->
-        </div>
       </v-card-text>
     </CommonDialog>
 

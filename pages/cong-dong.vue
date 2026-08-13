@@ -205,7 +205,7 @@ useSeo({
     </div>
 
     <!-- Load more trigger -->
-    <div ref="loadMore" class="d-flex justify-center py-4">
+    <div v-if="(products?.docs?.length || 0) < (products?.totalDocs || 0)" ref="loadMore" class="d-flex justify-center py-4">
       <v-progress-circular
         v-if="loading === ''"
         width="2"

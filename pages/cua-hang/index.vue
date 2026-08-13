@@ -500,7 +500,6 @@ onUnmounted(stopPolling);
 <style scoped>
 .shop-page {
   min-height: 80vh;
-  padding-bottom: 60px;
 }
 
 

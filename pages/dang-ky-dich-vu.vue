@@ -25,6 +25,14 @@ const planOptions = [
   { months: 12, label: "1 năm",    save: "−25%", price: 1251000, days: 365, credits: 60000 },
 ];
 
+const selectPlan = (months: number) => {
+  formData.value.rentalMonths = months;
+  // Đổi gói thuê -> reset dropdown "Không giới hạn" về mặc định 1 tháng,
+  // tránh giữ lại lựa chọn dài của gói cũ (VD đang chọn "7 tháng" cho gói 6
+  // tháng, bấm sang gói 1 tháng thì dropdown vẫn hiện 7 tháng gây hiểu nhầm).
+  unlimitedMs.value = 30 * DAY_MS;
+};
+
 const selectedPlan = computed(() =>
   planOptions.find((p) => p.months === formData.value.rentalMonths) ?? planOptions[0]
 );
@@ -45,52 +53,102 @@ const couponDiscountAmt = computed(() => {
   return Math.ceil(amount / 500) * 500;
 });
 
-const checkoutTotal = computed(() => Math.max(selectedPlan.value.price - couponDiscountAmt.value, 0));
+// Số tiền giảm thực áp dụng — không vượt quá giá gói, khớp
+// Math.max(priceFinal - discountAmount, 0) ở backend.
+const appliedDiscountAmt = computed(() => Math.min(couponDiscountAmt.value, selectedPlan.value.price));
 
-const totalPrice = computed(() => {
-  const rentalMonths = formData.value.rentalMonths;
-  const basePricePerMonth = 139000;
-  const originalPrice = basePricePerMonth * rentalMonths;
-  const coupon = couponDetail.value;
+// Gói "Không giới hạn" mua kèm (tuỳ chọn) — giá cố định 200k/30 ngày, KHÔNG áp
+// mã giảm giá/referral (chỉ áp vào phần thuê gốc ở trên). Đơn vị làm việc là
+// MILI GIÂY (unlimitedMs) — CHÍNH XÁC tuyệt đối, không làm tròn ngày — để khi
+// khách chọn option "khớp hạn gói thuê", gói Không giới hạn hết hạn ĐÚNG CÙNG
+// THỜI ĐIỂM (tới từng giây) với gói thuê chính, không lệch vài giờ do làm
+// tròn. Label hiển thị vẫn làm tròn theo ngày cho dễ đọc — khớp field/logic
+// bên backend (paymentRequests/payment2sRequests, getMaxUnlimitedAddOnMs).
+const DAY_MS = 24 * 60 * 60 * 1000;
+const UNLIMITED_PRICE_PER_30_DAYS = 200000;
+const addUnlimited = ref(false);
+const unlimitedMs = ref(30 * DAY_MS); // mặc định "1 tháng"
 
-  let finalPrice = originalPrice;
-  let packageDiscountAmount = 0;
-
-  switch (rentalMonths) {
-    case 3:  finalPrice = 388000;  packageDiscountAmount = originalPrice - finalPrice; break;
-    case 6:  finalPrice = 701000;  packageDiscountAmount = originalPrice - finalPrice; break;
-    case 12: finalPrice = 1251000; packageDiscountAmount = originalPrice - finalPrice; break;
-    default: finalPrice = originalPrice;
-  }
-
-  let couponDiscountAmount = 0;
-  if (coupon) {
-    if (coupon.discountType === EnumDiscountType.PERCENTAGE)
-      couponDiscountAmount = Math.round((finalPrice * coupon.discountValue) / 100);
-    else if (coupon.discountType === EnumDiscountType.FIXED)
-      couponDiscountAmount = coupon.discountValue;
-    couponDiscountAmount = Math.ceil(couponDiscountAmount / 500) * 500;
-  } else {
-    packageDiscountAmount = Math.ceil(packageDiscountAmount / 500) * 500;
-  }
-
-  finalPrice = Math.max(finalPrice - couponDiscountAmount, 0);
-  const totalDiscount = packageDiscountAmount + couponDiscountAmount;
-
-  if (totalDiscount === 0) return formatCurrency(finalPrice);
-
-  const discountRatePercent = Math.round((totalDiscount / originalPrice) * 100);
-  const discountRateText =
-    coupon && coupon.discountType === EnumDiscountType.FIXED
-      ? formatCurrency(totalDiscount)
-      : `${discountRatePercent}%`;
-
-  return {
-    originalPrice: formatCurrency(originalPrice),
-    finalPrice: formatCurrency(finalPrice),
-    discountRate: discountRateText,
-  };
+// Thời gian còn lại (mili giây, CHÍNH XÁC) của gói thuê CHÍNH hiện tại (nếu
+// có) — cho phép gợi ý mua gói "Không giới hạn" khớp đúng hạn gói thuê sau
+// khi gia hạn. Backend tự tính lại từ DB, đây chỉ là preview.
+const remainingRentalMs = computed(() => {
+  const expiry = userData.value?.serviceExpiry;
+  if (!expiry) return 0;
+  const diffMs = new Date(expiry).getTime() - Date.now();
+  return diffMs > 0 ? diffMs : 0;
 });
+
+// Thời gian còn lại (mili giây, CHÍNH XÁC) của gói "Không giới hạn" ĐANG CÓ
+// (nếu có) — PHẢI trừ ra khỏi tổng tối đa bên dưới, nếu không tài khoản đã có
+// sẵn Không giới hạn còn hạn dài sẽ bị gợi ý mua dư (vd còn 150 ngày Không
+// giới hạn + gia hạn thêm 1 tháng thì dropdown vẫn cho chọn tới 9 tháng thay
+// vì đúng ra chỉ còn thiếu 4 tháng là khớp đủ gói thuê — bug thật đã gặp).
+const existingUnlimitedMs = computed(() => {
+  const expiry = userData.value?.settings?.unlimitedExpiry;
+  if (!expiry) return 0;
+  const diffMs = new Date(expiry).getTime() - Date.now();
+  return diffMs > 0 ? diffMs : 0;
+});
+
+// Tổng thời lượng tối đa được phép mua = thời gian còn lại của gói thuê hiện
+// tại + số tháng đang chọn mua mới × 30 ngày − thời gian Không giới hạn hiện
+// có (khớp getMaxUnlimitedAddOnMs bên server).
+const maxUnlimitedMs = computed(() =>
+  Math.max(
+    0,
+    remainingRentalMs.value +
+      selectedPlan.value.months * 30 * DAY_MS -
+      existingUnlimitedMs.value
+  )
+);
+
+// Danh sách option dropdown: các mốc tháng nguyên (1, 2, ... N tháng), cộng
+// thêm 1 option cuối "N tháng X ngày" nếu còn dư thời gian lẻ từ gói thuê
+// hiện tại. Label làm tròn theo ngày cho dễ đọc, nhưng GIÁ TRỊ THẬT (.ms) của
+// option lẻ vẫn giữ chính xác tuyệt đối tới từng mili giây.
+const unlimitedOptions = computed(() => {
+  const wholeMonths = Math.floor(maxUnlimitedMs.value / (30 * DAY_MS));
+  const opts = Array.from({ length: wholeMonths }, (_, i) => ({
+    ms: (i + 1) * 30 * DAY_MS,
+    label: `${i + 1} tháng`,
+  }));
+  const extraMs = maxUnlimitedMs.value - wholeMonths * 30 * DAY_MS;
+  const extraDaysRounded = Math.round(extraMs / DAY_MS);
+  if (extraDaysRounded > 0) {
+    // Làm tròn đủ 30 ngày -> gộp gọn thành "N+1 tháng" thay vì hiện dạng
+    // "N tháng 30 ngày" nhìn rối. Giá trị .ms vẫn giữ NGUYÊN maxUnlimitedMs
+    // (không làm tròn lên đủ tháng), nên giá tiền/hạn dùng thật vẫn chính xác.
+    const label =
+      extraDaysRounded >= 30
+        ? `${wholeMonths + 1} tháng`
+        : `${wholeMonths} tháng ${extraDaysRounded} ngày`;
+    opts.push({ ms: maxUnlimitedMs.value, label });
+  }
+  return opts;
+});
+
+watch(maxUnlimitedMs, (newMax) => {
+  if (unlimitedMs.value > newMax) unlimitedMs.value = newMax;
+});
+
+const selectedUnlimitedLabel = computed(
+  () =>
+    unlimitedOptions.value.find((o) => o.ms === unlimitedMs.value)?.label ??
+    `${Math.round(unlimitedMs.value / DAY_MS)} ngày`
+);
+
+const unlimitedAddOnPrice = computed(() =>
+  addUnlimited.value
+    ? Math.floor(
+        (unlimitedMs.value * UNLIMITED_PRICE_PER_30_DAYS) / (30 * DAY_MS) / 500
+      ) * 500
+    : 0
+);
+
+const checkoutTotal = computed(
+  () => selectedPlan.value.price - appliedDiscountAmt.value + unlimitedAddOnPrice.value
+);
 
 const onClickPayment = async () => {
   if (!userData.value?.email) {
@@ -105,8 +163,41 @@ const onClickPayment = async () => {
   showTermsError.value = false;
   loading.value = "create-url";
   await appService
-    .createPaymentUrl({ rentalMonths: formData.value.rentalMonths, discountCode: formData.value.discountCode })
-    .then((res) => { if (res.data) window.location.href = res.data; })
+    .createPaymentUrl({
+      rentalMonths: formData.value.rentalMonths,
+      discountCode: formData.value.discountCode,
+      unlimitedMs: addUnlimited.value ? unlimitedMs.value : 0,
+      // true khi chọn đúng option cuối (khớp full hạn gói thuê) — báo backend
+      // tính lại thời hạn TƯƠI lúc webhook cấp phát, tránh lệch giờ do thời
+      // gian thanh toán (xem getMaxUnlimitedAddOnMs bên server).
+      unlimitedSyncFull:
+        addUnlimited.value && unlimitedMs.value === maxUnlimitedMs.value,
+    })
+    .then((res: any) => {
+      if (res.data) {
+        // Lưu lại tóm tắt gói vừa chọn để hiện đúng chi tiết ở popup "Thanh
+        // toán thành công" (layouts/default.vue) khi cổng thanh toán redirect
+        // về — tại thời điểm đó server có thể chưa xử lý xong webhook, nên
+        // không tra được dữ liệu mới nhất từ DB, phải tự lưu từ phía FE.
+        const items = [
+          {
+            label: `Gói ${selectedPlan.value.label}`,
+            price: selectedPlan.value.price - appliedDiscountAmt.value,
+          },
+        ];
+        if (addUnlimited.value && unlimitedMs.value > 0) {
+          items.push({
+            label: `Không giới hạn tín dụng ${selectedUnlimitedLabel.value}`,
+            price: unlimitedAddOnPrice.value,
+          });
+        }
+        localStorage.setItem(
+          "pendingPaymentSummary",
+          JSON.stringify({ items, total: checkoutTotal.value })
+        );
+        window.location.href = res.data;
+      }
+    })
     .finally(() => { loading.value = ""; });
 };
 
@@ -184,7 +275,7 @@ definePageMeta({});
             'plan-item--active': formData.rentalMonths === plan.months,
             'plan-item--popular': plan.popular,
           }"
-          @click="formData.rentalMonths = plan.months"
+          @click="selectPlan(plan.months)"
         >
           <div class="plan-item-label">{{ plan.label }}</div>
           <div v-if="plan.popular" class="plan-popular-badge">Phổ biến nhất</div>
@@ -194,6 +285,23 @@ definePageMeta({});
             <v-icon size="11" color="#fff">mdi-lightning-bolt</v-icon>
             {{ plan.tag }}
           </div>
+        </div>
+      </div>
+
+      <!-- Add-on: gói tạo video không giới hạn -->
+      <div class="addon-box">
+        <div class="addon-toggle">
+          <input id="addon-unlimited-checkbox" v-model="addUnlimited" type="checkbox" />
+          <label for="addon-unlimited-checkbox" class="addon-label">Nâng cấp tạo video không giới hạn</label>
+          <select
+            v-if="addUnlimited && unlimitedOptions.length > 1"
+            v-model.number="unlimitedMs"
+            class="addon-native-select"
+            @click.stop
+          >
+            <option v-for="opt in unlimitedOptions" :key="opt.ms" :value="opt.ms">{{ opt.label }}</option>
+          </select>
+          <span v-else-if="addUnlimited" class="addon-static-month">{{ selectedUnlimitedLabel }}</span>
         </div>
       </div>
 
@@ -220,7 +328,8 @@ definePageMeta({});
           </div>
           <div class="pi-row">
             <span class="pi-label">Tín dụng</span>
-            <span class="pi-val">Bao gồm <strong>{{ selectedCredits.toLocaleString("vi-VN") }} tín dụng</strong> khởi đầu</span>
+            <span v-if="addUnlimited" class="pi-val">Bao gồm <strong>{{ selectedCredits.toLocaleString("vi-VN") }} tín dụng</strong> khởi đầu và <strong>không giới hạn tín dụng</strong> {{ selectedUnlimitedLabel }}</span>
+            <span v-else class="pi-val">Bao gồm <strong>{{ selectedCredits.toLocaleString("vi-VN") }} tín dụng</strong> khởi đầu</span>
           </div>
           <div class="pi-row">
             <span class="pi-label">Phạm vi sử dụng</span>
@@ -228,7 +337,7 @@ definePageMeta({});
           </div>
           <div class="pi-row">
             <span class="pi-label">Giá gói</span>
-            <span class="pi-val"><strong>{{ formatCurrency(selectedPlan.price) }} VNĐ</strong>, đã bao gồm VAT</span>
+            <span class="pi-val"><strong>{{ formatCurrency(checkoutTotal) }}</strong>, đã bao gồm VAT</span>
           </div>
           <div class="pi-row">
             <span class="pi-label">Trước khi thanh toán</span>
@@ -248,7 +357,7 @@ definePageMeta({});
       <div class="checkout-card">
         <div class="checkout-title">Thông tin thanh toán</div>
 
-        <!-- Discount -->
+        <!-- Discount — với gói combo, mã giảm giá chỉ áp vào phần 139k, phần 200k giữ nguyên -->
         <div class="checkout-field">
           <label class="field-label">Mã giảm giá</label>
           <v-text-field
@@ -279,13 +388,20 @@ definePageMeta({});
               <span class="sum-pkg-price">{{ formatCurrency(selectedPlan.price) }}</span>
             </div>
           </div>
+
+          <div v-if="addUnlimited" class="sum-row">
+            <span>Không giới hạn tín dụng {{ selectedUnlimitedLabel }}</span>
+            <span class="addon-price">{{ formatCurrency(unlimitedAddOnPrice) }}</span>
+          </div>
+
           <div class="sum-row">
             <span>Số lượng</span>
             <span>1</span>
           </div>
-          <div v-if="couponDetail" class="sum-row">
+
+          <div v-if="couponDetail && appliedDiscountAmt > 0" class="sum-row">
             <span>Giảm giá</span>
-            <span class="sum-off">−{{ formatCurrency(couponDiscountAmt) }}</span>
+            <span class="sum-off">−{{ formatCurrency(appliedDiscountAmt) }}</span>
           </div>
           <div class="sum-sep" />
           <div class="sum-row sum-row--total">
@@ -339,7 +455,6 @@ definePageMeta({});
 /* ─── Page wrapper ───────────────────────────────────────── */
 .pay-page {
   width: 100%;
-  padding-bottom: 60px;
 }
 
 /* ─── Hero ───────────────────────────────────────────────── */
@@ -509,7 +624,7 @@ definePageMeta({});
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 12px;
-  margin-bottom: 24px;
+  margin-bottom: 12px;
 }
 
 .plan-item {
@@ -526,6 +641,7 @@ definePageMeta({});
   border: 2px solid #e5e7eb;
   background: #fff;
   cursor: pointer;
+  user-select: none;
   transition: border-color 0.15s, background 0.15s, box-shadow 0.15s;
 }
 
@@ -550,8 +666,14 @@ definePageMeta({});
   .plan-list { grid-template-columns: repeat(2, 1fr); gap: 8px; }
   .plan-item,
   .plan-item--popular { padding: 16px 10px; }
-}
 
+  .addon-native-select,
+  .addon-static-month {
+    flex: 1 1 100%;
+    width: 100%;
+    margin-left: 0;
+  }
+}
 
 .plan-item-label { font-size: 1rem; font-weight: 700; color: #0f172a; }
 .plan-item-price { font-size: 0.95rem; font-weight: 600; color: #1e88e5; }
@@ -573,11 +695,11 @@ definePageMeta({});
   gap: 3px;
   font-size: 0.78rem;
   font-weight: 600;
-  background: linear-gradient(135deg, #f59e0b, #fbbf24);
+  background: linear-gradient(135deg, #1565c0, #42a5f5);
   color: #fff;
   padding: 4px 12px;
   border-radius: 999px;
-  box-shadow: 0 3px 10px rgba(245,158,11,0.45);
+  box-shadow: 0 3px 10px rgba(30,136,229,0.45);
   letter-spacing: 0.2px;
 }
 
@@ -645,7 +767,8 @@ definePageMeta({});
   font-size: 0.8rem;
   color: #065f46;
   margin-top: 8px;
-  padding: 8px 12px;
+  height: 40px;
+  padding: 0 12px;
   background: #ecfdf5;
   border-radius: 8px;
 }
@@ -663,11 +786,155 @@ definePageMeta({});
 .sum-row {
   display: flex;
   justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
   font-size: 0.85rem;
   color: #374151;
 }
 
-.sum-original { color: #9e9e9e; text-decoration: line-through; }
+.sum-row > span:first-child {
+  min-width: 0;
+}
+
+.sum-row > span:last-child {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.addon-box {
+  padding: 14px;
+  margin: 4px 0;
+  border: 2px solid #e5e7eb;
+  border-radius: 14px;
+  background: #fff;
+  user-select: none;
+}
+
+.addon-toggle {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  row-gap: 8px;
+  width: 100%;
+  min-height: 30px;
+}
+
+.addon-toggle input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+  flex-shrink: 0;
+  width: 19px;
+  height: 19px;
+  border-radius: 6px;
+  border: 1.5px solid #90caf9;
+  background: #fff;
+  cursor: pointer;
+  position: relative;
+  transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.addon-toggle input[type="checkbox"]:hover {
+  border-color: #1e88e5;
+}
+
+.addon-toggle input[type="checkbox"]:checked {
+  background: linear-gradient(135deg, #1565c0, #42a5f5);
+  border-color: #1565c0;
+}
+
+.addon-toggle input[type="checkbox"]:checked::after {
+  content: "";
+  position: absolute;
+  left: 6px;
+  top: 2px;
+  width: 5px;
+  height: 9px;
+  border: solid #fff;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+.addon-toggle input[type="checkbox"]:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(30, 136, 229, 0.18);
+}
+
+.addon-label {
+  flex: 0 1 auto;
+  max-width: 100%;
+  font-size: 0.85rem;
+  color: #374151;
+  white-space: normal;
+  overflow-wrap: break-word;
+  cursor: pointer;
+}
+
+.addon-static-month {
+  flex-shrink: 0;
+  margin-left: auto;
+  box-sizing: border-box;
+  min-width: 100px;
+  height: 30px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  line-height: 27px;
+  padding: 0 10px;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 8px;
+  color: #64748b;
+  text-align: center;
+}
+
+.addon-native-select {
+  flex-shrink: 0;
+  margin-left: auto;
+  appearance: none;
+  -webkit-appearance: none;
+  box-sizing: border-box;
+  width: auto;
+  min-width: 100px;
+  height: 30px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  line-height: 1;
+  padding: 0 26px 0 10px;
+  border: 1.5px solid #90caf9;
+  border-radius: 8px;
+  background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%231565c0' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E") no-repeat right 8px center;
+  background-size: 12px;
+  color: #1565c0;
+  cursor: pointer;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.addon-native-select:hover {
+  border-color: #1e88e5;
+}
+
+.addon-native-select:focus-visible {
+  outline: none;
+  border-color: #1565c0;
+  box-shadow: 0 0 0 3px rgba(30, 136, 229, 0.18);
+}
+
+.addon-native-select option {
+  color: #374151;
+  background: #fff;
+  font-weight: 400;
+  padding: 6px 10px;
+}
+
+.addon-native-select option:checked {
+  color: #1565c0;
+  background: #f0f7ff;
+}
+
+.addon-price {
+  color: #1565c0;
+  font-weight: 600;
+}
+
 .sum-off { color: #10b981; font-weight: 600; }
 .sum-sep { border-top: 1px dashed #e5e7eb; margin: 4px 0; }
 .sum-row--total { font-weight: 700; font-size: 0.95rem; }
@@ -683,8 +950,8 @@ definePageMeta({});
   margin-bottom: 2px;
 }
 .sum-product-name { font-size: 0.88rem; font-weight: 600; color: #1e293b; }
-.sum-product-price { display: flex; align-items: center; gap: 6px; }
-.sum-pkg-price { font-size: 0.9rem; font-weight: 700; color: #1565c0; }
+.sum-product-price { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+.sum-pkg-price { font-size: 0.9rem; font-weight: 700; color: #1565c0; white-space: nowrap; }
 .sum-original { font-size: 0.78rem; color: #94a3b8; text-decoration: line-through; }
 
 /* ─── Product info (A3) ──────────────────────────────────── */
@@ -788,15 +1055,48 @@ definePageMeta({});
   line-height: 1.5;
   cursor: pointer;
   margin-bottom: 4px;
+  user-select: none;
 }
 
 .agree-check input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
   margin-top: 2px;
   flex-shrink: 0;
-  accent-color: #1565c0;
-  width: 15px;
-  height: 15px;
+  width: 19px;
+  height: 19px;
+  border-radius: 6px;
+  border: 1.5px solid #90caf9;
+  background: #fff;
   cursor: pointer;
+  position: relative;
+  transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.agree-check input[type="checkbox"]:hover {
+  border-color: #1e88e5;
+}
+
+.agree-check input[type="checkbox"]:checked {
+  background: linear-gradient(135deg, #1565c0, #42a5f5);
+  border-color: #1565c0;
+}
+
+.agree-check input[type="checkbox"]:checked::after {
+  content: "";
+  position: absolute;
+  left: 6px;
+  top: 2px;
+  width: 5px;
+  height: 9px;
+  border: solid #fff;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+.agree-check input[type="checkbox"]:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(30, 136, 229, 0.18);
 }
 
 .agree-check a { color: #1565c0; text-decoration: none; }

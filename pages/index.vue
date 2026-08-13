@@ -5,7 +5,6 @@ const router = useRouter();
 const { isMobile } = useDevice();
 
 const { onGetterUserData: userData } = useAppStore();
-const { onGetterMasterData } = useMasterDataStore();
 
 // ID video YouTube cho mục "Video hướng dẫn" — đọc từ System Setting (admin
 // chỉnh được ở Admin > Cài đặt chung), fallback giữ nguyên video cũ nếu lỗi.
@@ -41,16 +40,7 @@ const onClickSmallTutorialVideo = (id: string) => {
   playingSmallVideoId.value = id;
 };
 
-const client = computed<boolean>(() => {
-  const win = window as any;
-  return !!(win?.electronAPI && win?.electronAPI?.isElectron);
-});
-
-const appVersionDownload = computed(
-  () => onGetterMasterData.value["app-version"] || "",
-);
-
-const showCredit = ref(false);
+const creditDialogRef = ref<any>(null);
 
 // Đường dẫn video demo AI ở hero (bind động, không dùng src tĩnh) — nếu viết
 // src="/videos/xxx.mp4" thẳng trong template, Vite sẽ tự biến nó thành import
@@ -244,11 +234,12 @@ useSeo({
             <video
               class="hv-video"
               :src="heroDemoVideoSrc"
+              poster="/images/demo-hero-poster.jpg"
               autoplay
               muted
               loop
               playsinline
-              preload="metadata"
+              preload="auto"
             />
           </div>
         </div>
@@ -279,7 +270,7 @@ useSeo({
     <div
       v-else
       class="quick-card qc-blue"
-      @click="showCredit = true"
+      @click="creditDialogRef?.onDisplay(true)"
       style="cursor: pointer"
     >
       <div class="quick-icon">
@@ -327,90 +318,73 @@ useSeo({
   </div>
 
   <!-- Credit info dialog -->
-  <v-dialog v-model="showCredit" max-width="480">
-    <v-card rounded="xl" class="credit-dialog">
-      <v-card-title class="credit-dialog-header">
-        <div class="credit-dialog-title">
-          <div class="credit-dialog-icon">
-            <v-icon color="white" size="18">mdi-diamond-stone</v-icon>
-          </div>
-          <div>
-            <div class="credit-dialog-name">Chi tiết gói dịch vụ</div>
-            <div class="credit-dialog-sub">
-              Minh bạch · Linh hoạt · Tiết kiệm
-            </div>
-          </div>
-        </div>
-        <v-btn
-          icon="mdi-close"
-          variant="text"
-          size="small"
-          @click="showCredit = false"
-        />
-      </v-card-title>
+  <CommonDialog ref="creditDialogRef" title="Chi tiết gói dịch vụ" width="480">
+    <div class="credit-section">
+      <div class="credit-main-price">139.000đ <span>/tháng</span></div>
+      <div class="credit-main-sub">
+        Tặng kèm <strong>5.000 tín dụng</strong> để tạo video
+      </div>
+    </div>
 
-      <v-card-text class="pt-2 pb-5 px-5">
-        <div class="credit-section">
-          <div class="credit-chip">Gói cơ bản</div>
-          <div class="credit-main-price">139.000đ <span>/tháng</span></div>
-          <div class="credit-main-sub">
-            Tặng kèm <strong>5.000 tín dụng</strong> để tạo video
-          </div>
+    <div class="credit-section">
+      <div class="credit-section-title">
+        <v-icon size="15" color="#f59e0b">mdi-lightning-bolt</v-icon>
+        Cách tính tín dụng
+      </div>
+      <div class="credit-rows">
+        <div class="credit-row">
+          <span>Video 8 giây</span>
+          <span class="credit-cost">10 tín dụng</span>
         </div>
+        <div class="credit-row">
+          <span>Video 16 giây</span>
+          <span class="credit-cost">20 tín dụng</span>
+        </div>
+        <div class="credit-row">
+          <span>Video 24 giây</span>
+          <span class="credit-cost">30 tín dụng</span>
+        </div>
+        <div class="credit-row">
+          <span>Video 32 giây, 40 giây,...</span>
+          <span class="credit-cost">Tương tự</span>
+        </div>
+      </div>
+    </div>
 
-        <div class="credit-section">
-          <div class="credit-section-title">
-            <v-icon size="15" color="#f59e0b">mdi-lightning-bolt</v-icon>
-            Cách tính tín dụng
-          </div>
-          <div class="credit-rows">
-            <div class="credit-row">
-              <span>Video 8 giây</span>
-              <span class="credit-cost">10 tín dụng</span>
-            </div>
-            <div class="credit-row">
-              <span>Video 16 giây</span>
-              <span class="credit-cost">20 tín dụng</span>
-            </div>
-            <div class="credit-row">
-              <span>Video 24 giây</span>
-              <span class="credit-cost">30 tín dụng</span>
-            </div>
-          </div>
-          <div class="credit-note">Mỗi 8 giây video = 10 tín dụng</div>
+    <div class="credit-section">
+      <div class="credit-section-title">
+        <v-icon size="15" color="#10b981">mdi-plus-circle-outline</v-icon>
+        Mua thêm tín dụng
+      </div>
+      <div class="credit-rows">
+        <div class="credit-row">
+          <span>2.000 tín dụng</span>
+          <span class="credit-cost credit-cost--green">10.000đ</span>
         </div>
+        <div class="credit-row">
+          <span>4.000 tín dụng</span>
+          <span class="credit-cost credit-cost--green">20.000đ</span>
+        </div>
+        <div class="credit-row">
+          <span>6.000 tín dụng</span>
+          <span class="credit-cost credit-cost--green">30.000đ</span>
+        </div>
+        <div class="credit-row">
+          <span>8.000 tín dụng, 10.000 tín dụng,...</span>
+          <span class="credit-cost credit-cost--green">Tương tự</span>
+        </div>
+      </div>
+    </div>
 
-        <div class="credit-section">
-          <div class="credit-section-title">
-            <v-icon size="15" color="#10b981">mdi-plus-circle-outline</v-icon>
-            Mua thêm tín dụng
-          </div>
-          <div class="credit-rows">
-            <div class="credit-row">
-              <span>2.000 tín dụng</span>
-              <span class="credit-cost credit-cost--green">10.000đ</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="credit-unlimited">
-          <div class="credit-unlimited-title">
-            <v-icon size="16" color="#8b5cf6">mdi-infinity</v-icon>
-            Tạo không giới hạn
-          </div>
-          <div class="credit-unlimited-body">
-            <div>Gói 139k + Tín dụng không giới hạn 200k</div>
-            <div class="credit-unlimited-price">
-              Chỉ <strong>339.000đ</strong>/tháng
-            </div>
-            <div class="credit-unlimited-sub">
-              Tạo video thoải mái, không lo hết tín dụng
-            </div>
-          </div>
-        </div>
-      </v-card-text>
-    </v-card>
-  </v-dialog>
+    <template #footer>
+      <button
+        class="credit-register-btn"
+        @click="creditDialogRef?.onDisplay(false); router.push('/dang-ky-dich-vu')"
+      >
+        Đăng ký ngay
+      </button>
+    </template>
+  </CommonDialog>
 
   <!-- ── Video tutorial ─────────────────────────────────── -->
   <div id="video-huong-dan" class="video-section">
@@ -1273,59 +1247,8 @@ useSeo({
 }
 
 /* ─── Credit dialog ──────────────────────────────────── */
-.credit-dialog-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 16px 20px 8px;
-}
-
-.credit-dialog-title {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.credit-dialog-icon {
-  width: 38px;
-  height: 38px;
-  border-radius: 10px;
-  background: linear-gradient(135deg, #1565c0, #1e88e5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  box-shadow: 0 3px 10px rgba(30, 136, 229, 0.3);
-}
-
-.credit-dialog-name {
-  font-size: 0.95rem;
-  font-weight: 700;
-  color: #0f172a;
-  line-height: 1.3;
-}
-
-.credit-dialog-sub {
-  font-size: 0.72rem;
-  color: #9e9e9e;
-  margin-top: 1px;
-}
-
 .credit-section {
   margin-bottom: 18px;
-}
-
-.credit-chip {
-  display: inline-block;
-  font-size: 0.68rem;
-  font-weight: 700;
-  color: #1e88e5;
-  background: #e3f2fd;
-  padding: 2px 10px;
-  border-radius: 999px;
-  text-transform: uppercase;
-  letter-spacing: 0.4px;
-  margin-bottom: 8px;
 }
 
 .credit-main-price {
@@ -1391,39 +1314,22 @@ useSeo({
   background: #ecfdf5;
 }
 
-.credit-note {
-  font-size: 0.75rem;
-  color: #9e9e9e;
-  margin-top: 6px;
-  padding-left: 2px;
-}
-
-.credit-unlimited {
-  background: linear-gradient(135deg, #fdf4ff, #eff6ff);
-  border: 1px solid #e9d5ff;
-  border-radius: 12px;
-  padding: 14px;
-}
-
-.credit-unlimited-title {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 0.82rem;
+.credit-register-btn {
+  width: 100%;
+  height: 46px;
+  margin-top: 4px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #1565c0, #1e88e5);
+  color: #fff;
+  font-size: 0.95rem;
   font-weight: 700;
-  color: #7c3aed;
-  margin-bottom: 8px;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
 }
 
-.credit-unlimited-price {
-  font-size: 1.1rem;
-  font-weight: 700;
-  color: #0f172a;
-  margin: 6px 0 3px;
-}
-
-.credit-unlimited-sub {
-  font-size: 0.78rem;
-  color: #64748b;
+.credit-register-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(30, 136, 229, 0.35);
 }
 </style>

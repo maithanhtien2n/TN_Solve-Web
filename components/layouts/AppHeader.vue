@@ -82,18 +82,36 @@ const menus = computed(() => {
   return items;
 });
 
+// Chỉ hiện số ngày còn lại (giống cách hiện của gói "Không giới hạn"), tính
+// trực tiếp từ serviceExpiry (raw) thay vì dùng remainingTime (chuỗi có kèm
+// giờ:phút:giây) từ backend.
+const rentalRemainingDays = computed(() => {
+  const expiry = userData.value?.serviceExpiry;
+  if (!expiry) return null;
+  const diffMs = new Date(expiry).getTime() - Date.now();
+  if (diffMs <= 0) return null;
+  return Math.ceil(diffMs / 86400000);
+});
+
 const statusLabel = computed(() => {
   if (userData.value?.role === EnumAccountRole.ADMIN) return { text: "Admin", ok: true };
   if (userData.value?.serviceExpiry)
-    return userData.value?.remainingTime
-      ? { text: `Còn ${userData.value.remainingTime}`, ok: true }
+    return rentalRemainingDays.value
+      ? { text: `Còn ${rentalRemainingDays.value} ngày`, ok: true }
       : { text: "Hết hạn", ok: false };
   if (userData.value?.settings?.testAmount != null)
     return { text: `${userData.value.settings.testAmount} lượt thử`, ok: true };
   return null;
 });
 
+// Điều khiển tay việc đóng/mở menu tài khoản — mặc định Vuetify tự đóng ngay
+// khi bấm BẤT KỲ ĐÂU bên trong content (kể cả bấm vào tên để bôi đen/copy),
+// nên phải tắt close-on-content-click rồi tự đóng khi bấm ĐÚNG 1 item menu.
+// Bấm ra ngoài hẳn thì Vuetify vẫn tự đóng bình thường (hành vi mặc định).
+const accountMenuOpen = ref(false);
+
 const onClickMenuItem = (value: string) => {
+  accountMenuOpen.value = false;
   if (value === "logout") {
     authService.logout().then(() => {
       window.location.href = "/";
@@ -151,7 +169,7 @@ const onClickMenuItem = (value: string) => {
 
           <!-- Logged in -->
           <template v-if="Object.values(userData || {})?.length">
-            <v-menu location="bottom end" :offset="10">
+            <v-menu v-model="accountMenuOpen" location="bottom end" :offset="10" :close-on-content-click="false">
               <template #activator="{ props }">
                 <button v-bind="props" class="avatar-btn">
                   <v-avatar size="34">
@@ -175,12 +193,15 @@ const onClickMenuItem = (value: string) => {
                   <div>
                     <div class="menu-name">{{ userData.name }}</div>
                     <div class="menu-credit" v-if="userData?.role !== EnumAccountRole.ADMIN">
-                      <span class="menu-credit-badge" v-if="userData.settings?.unlimitedVideo">
-                        <v-icon size="11" color="#f59e0b">mdi-infinity</v-icon>
-                        {{ userData.settings.unlimitedVideo }} ngày
-                      </span>
-                      <span class="menu-credit-badge" v-else>
-                        💎 {{ (userData.settings?.credit || 0).toLocaleString("vi-VN") }} tín dụng
+                      <span
+                        class="menu-credit-badge"
+                        :class="{ 'menu-credit-badge--frozen': userData.settings?.unlimitedVideo }"
+                      >
+                        <span
+                          class="menu-credit-icon"
+                          :class="{ 'menu-credit-icon--lock': userData.settings?.unlimitedVideo }"
+                        >{{ userData.settings?.unlimitedVideo ? "🔒" : "💎" }}</span>
+                        {{ (userData.settings?.credit || 0).toLocaleString("vi-VN") }} tín dụng
                       </span>
                     </div>
                   </div>
@@ -406,14 +427,38 @@ const onClickMenuItem = (value: string) => {
 .menu-credit-badge {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  font-size: 0.7rem;
+  gap: 5px;
+  font-size: 0.75rem;
   font-weight: 600;
   color: #fcd34d;
   background: rgba(252,211,77,0.15);
   border: 1px solid rgba(252,211,77,0.3);
-  padding: 2px 8px;
+  padding: 4px 12px;
   border-radius: 999px;
+}
+
+/* Tín dụng thường đang bị "đóng băng" vì tài khoản đang dùng gói Không giới
+   hạn — làm mờ + đổi màu xám lạnh (khác hẳn màu vàng bình thường) để user
+   hiểu ngay số này tạm ngưng dùng, không phải mất hẳn. */
+.menu-credit-badge--frozen {
+  color: #cbd5e1;
+  background: rgba(148,163,184,0.15);
+  border: 1px solid rgba(148,163,184,0.3);
+  opacity: 0.75;
+}
+
+.menu-credit-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 13px;
+  height: 13px;
+  line-height: 1;
+  font-size: 0.75rem;
+}
+
+.menu-credit-icon--lock {
+  transform: translateY(-1.5px);
 }
 
 /* ─── Menu items ─────────────────────────────────────── */
@@ -477,5 +522,12 @@ const onClickMenuItem = (value: string) => {
 .login-btn:hover {
   background: #f0f6ff;
   box-shadow: 0 4px 14px rgba(21, 101, 192, 0.22);
+}
+
+@media (max-width: 600px) {
+  .login-btn {
+    padding: 5px 14px;
+    font-size: 0.85rem;
+  }
 }
 </style>

@@ -21,8 +21,15 @@
   --vt-c-text-dark-2: rgba(235, 235, 235, 0.64);
 }
 
-/* semantic color variables for this project */
+/* semantic color variables for this project — app này KHÔNG có thiết kế dark
+   mode (Vuetify ép defaultTheme: "light" ở plugins/vuetify.ts), nên bỏ hẳn
+   khối @media (prefers-color-scheme: dark) còn sót lại từ boilerplate Vue
+   mặc định — nó từng khiến nền trang tự đổi sang đen khi trình duyệt/OS ở
+   chế độ tối, đè lên nền sáng #eef5fd của app (main.css). color-scheme: light
+   để trình duyệt cũng không tự tô màu tối cho các phần tử form/scrollbar mặc định. */
 :root {
+  color-scheme: light;
+
   --color-background: var(--vt-c-white);
   --color-background-soft: var(--vt-c-white-soft);
   --color-background-mute: var(--vt-c-white-mute);
@@ -34,20 +41,6 @@
   --color-text: var(--vt-c-text-light-1);
 
   --section-gap: 160px;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --color-background: var(--vt-c-black);
-    --color-background-soft: var(--vt-c-black-soft);
-    --color-background-mute: var(--vt-c-black-mute);
-
-    --color-border: var(--vt-c-divider-dark-2);
-    --color-border-hover: var(--vt-c-divider-dark-1);
-
-    --color-heading: var(--vt-c-text-dark-1);
-    --color-text: var(--vt-c-text-dark-2);
-  }
 }
 
 *,

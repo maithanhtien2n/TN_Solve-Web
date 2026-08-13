@@ -56,17 +56,6 @@ onMounted(async () => {
         </p>
         <div class="social-row">
           <a
-            href="https://www.tiktok.com/@tnsolve"
-            target="_blank"
-            class="social-icon"
-          >
-            <img
-              src="/images/icon-tiktok.png"
-              alt="TikTok TN Solve"
-              style="width: 16px; height: 16px; object-fit: contain"
-            />
-          </a>
-          <a
             href="https://www.facebook.com/tnsolve2025"
             target="_blank"
             class="social-icon"
@@ -85,6 +74,17 @@ onMounted(async () => {
             <img
               src="/images/icon-youtube.png"
               alt="YouTube TN Solve"
+              style="width: 16px; height: 16px; object-fit: contain"
+            />
+          </a>
+          <a
+            href="https://www.tiktok.com/@tnsolve"
+            target="_blank"
+            class="social-icon"
+          >
+            <img
+              src="/images/icon-tiktok.png"
+              alt="TikTok TN Solve"
               style="width: 16px; height: 16px; object-fit: contain"
             />
           </a>

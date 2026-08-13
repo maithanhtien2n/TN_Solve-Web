@@ -43,6 +43,88 @@ async function onRefundSubmitted() {
   if (res?.data?.docs) myRefunds.value = res.data.docs;
 }
 
+// Tập hợp refId của các gói/tín dụng đã được duyệt hoàn tiền — dùng để hiện
+// cột "Ghi chú" trong bảng lịch sử gói/tín dụng. Mỗi giao dịch (kể cả tín
+// dụng thường) giờ đều có refId riêng trong breakdown nên hiện đồng đều được.
+const refundedRefIds = computed(() => {
+  const set = new Set<string>();
+  for (const r of myRefunds.value) {
+    if (r.status !== "approved") continue;
+    for (const b of r.breakdown || []) {
+      if (b?.refId) set.add(String(b.refId));
+    }
+  }
+  return set;
+});
+
+// Cột "Ghi chú" dùng chung cho cả 2 bảng lịch sử gói/tín dụng — ưu tiên
+// "Hoàn tiền" trước, sau đó mới xét theo statusText backend trả về (Hết hạn/
+// Hoạt động/Đang chờ). Tín dụng mua lẻ luôn có statusText="Hoàn tất" (không
+// khớp case nào) nên tự động rơi về "---" (không có khái niệm hết hạn/đang
+// dùng thật sự, không cần hiện gì thêm).
+function getHistoryNoteText(item: any): string {
+  if (refundedRefIds.value.has(String(item._id))) return "Hoàn tiền";
+  if (["Hết hạn", "Hoạt động", "Đang chờ"].includes(item.statusText)) {
+    return item.statusText;
+  }
+  return "---";
+}
+
+function getHistoryNoteClass(item: any): string {
+  if (refundedRefIds.value.has(String(item._id))) return "cell-note--refunded";
+  if (item.statusText === "Hoạt động") return "cell-note--active";
+  if (item.statusText === "Hết hạn") return "cell-note--expired";
+  if (item.statusText === "Đang chờ") return "cell-note--upcoming";
+  return "";
+}
+
+// Tổng số tiền được giảm (combo + mã giảm giá/giới thiệu) — dùng để gạch giá
+// gốc niêm yết theo tháng (basePrice x rentalMonths), khớp cách admin hiện
+// (xem service-rentals.vue / transaction-history.vue).
+function getTotalDiscountAmount(item: any): number {
+  const known =
+    (item.comboDiscountAmount || 0) +
+    (item.couponDiscountAmount || 0) +
+    (item.referralDiscountAmount || 0);
+  if (known > 0) return known;
+
+  // Data cũ (tạo trước khi tách 3 field trên) không có breakdown nhưng vẫn
+  // tính lại được TỔNG số tiền giảm từ basePrice/rentalMonths/price — hiện
+  // nhãn trung tính "Giảm X" (không suy đoán nguồn) thay vì ẩn hẳn.
+  const legacy = (item.basePrice || 0) * (item.rentalMonths || 1) - (item.price || 0);
+  return legacy > 0 ? legacy : 0;
+}
+
+// Data cũ lưu note dạng "Không giới hạn 💎 X tháng" / "Gia hạn không giới hạn
+// 💎 X tháng" (thứ tự cũ) — chuẩn hoá lại thành "X tháng không giới hạn 💎"
+// (thứ tự mới) chỉ để HIỂN THỊ, không sửa data gốc trong DB. Note dạng mới đã
+// đúng thứ tự (kết thúc bằng 💎, không phải số) thì regex không khớp -> giữ
+// nguyên, không đổi gì.
+function normalizeUnlimitedNote(note: string | null | undefined): string {
+  if (!note) return "";
+  const match = note.match(/(\d+\s*tháng(?:\s*\d+\s*ngày)?|\d+\s*ngày)\s*$/i);
+  return match ? `${match[1]} không giới hạn 💎` : note;
+}
+
+function isLegacyDiscount(item: any): boolean {
+  const known =
+    (item.comboDiscountAmount || 0) +
+    (item.couponDiscountAmount || 0) +
+    (item.referralDiscountAmount || 0);
+  return known === 0 && getTotalDiscountAmount(item) > 0;
+}
+
+// Data cũ: số tháng khớp mốc combo (3/6/12) thì quy về combo (tính lại %),
+// còn lại quy về mã giảm giá — khớp logic ở service-rentals.vue/transaction-
+// history.vue.
+function isLegacyComboTier(item: any): boolean {
+  return [3, 6, 12].includes(item.rentalMonths);
+}
+function getLegacyComboPercent(item: any): number {
+  const total = (item.basePrice || 0) * (item.rentalMonths || 1);
+  return total > 0 ? Math.round((getTotalDiscountAmount(item) / total) * 100) : 0;
+}
+
 const refundStatusMap: Record<string, { label: string; color: string }> = {
   pending: { label: "Chờ duyệt", color: "#d97706" },
   approved: { label: "Đã hoàn tiền", color: "#059669" },
@@ -67,18 +149,25 @@ const formatDate = (iso: string) => {
   });
 };
 
-const serviceStatus = computed(() => {
-  if (userData.value?.role === EnumAccountRole.ADMIN)
-    return { label: "Quản trị viên", color: "#7c3aed", bg: "#f3e8ff" };
-  if (userData.value?.serviceExpiry)
-    return userData.value?.remainingTime
-      ? {
-          label: `Còn ${userData.value.remainingTime}`,
-          color: "#059669",
-          bg: "#ecfdf5",
-        }
-      : { label: "Đã hết hạn", color: "#dc2626", bg: "#fef2f2" };
-  return { label: "Chưa đăng ký", color: "#64748b", bg: "#f1f5f9" };
+// Định dạng "X ngày HH:MM:SS" đầy đủ cho gói "Không giới hạn" — khớp cách
+// hiện chi tiết của serviceStatus (remainingTime) bên trên, để khách xem rõ
+// còn bao lâu chính xác thay vì chỉ mỗi số ngày làm tròn.
+const unlimitedRemainingFormatted = computed(() => {
+  const expiry = userData.value?.settings?.unlimitedExpiry;
+  if (!expiry) return null;
+  const diffMs = new Date(expiry).getTime() - Date.now();
+  if (diffMs <= 0) return null;
+
+  const totalSeconds = Math.floor(diffMs / 1000);
+  const days = Math.floor(totalSeconds / 86400);
+  const hours = Math.floor((totalSeconds % 86400) / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = totalSeconds % 60;
+  const pad = (n: number) => String(n).padStart(2, "0");
+
+  return days > 0
+    ? `${days} ngày ${pad(hours)}:${pad(minutes)}:${pad(seconds)}`
+    : `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
 });
 
 const shopStatusMap: Record<string, { label: string; cls: string }> = {
@@ -138,29 +227,41 @@ definePageMeta({ middleware: "auth" });
         <div class="profile-info">
           <div class="profile-name">{{ userData?.name }}</div>
           <div class="profile-email">{{ userData?.email }}</div>
-          <div
-            class="profile-badge"
-            :style="{
-              color: serviceStatus.color,
-              background: serviceStatus.bg,
-            }"
-          >
-            <span
-              class="badge-dot"
-              :style="{ background: serviceStatus.color }"
-            />
-            {{ serviceStatus.label }}
-          </div>
         </div>
-
-        <button v-if="refundEnabled" class="refund-all-btn" @click="refundPopup = true">
-          <v-icon size="14">mdi-cash-refund</v-icon>
-          Yêu cầu hoàn tiền
-        </button>
       </div>
 
       <!-- Stats -->
       <div class="profile-stats">
+        <div class="stat-item">
+          <div class="stat-icon" style="background: #eff6ff">
+            <v-icon size="18" color="#1e88e5"
+              >mdi-calendar-clock-outline</v-icon
+            >
+          </div>
+          <div>
+            <div class="stat-label">Còn lại</div>
+            <div class="stat-value">
+              {{ userData?.remainingTime || "Đã hết hạn" }}
+            </div>
+          </div>
+        </div>
+
+        <template v-if="unlimitedRemainingFormatted">
+          <div class="stat-divider" />
+
+          <div class="stat-item">
+            <div class="stat-icon" style="background: #fef3c7">
+              <v-icon size="18" color="#d97706">mdi-infinity</v-icon>
+            </div>
+            <div>
+              <div class="stat-label">Tạo video không giới hạn</div>
+              <div class="stat-value">{{ unlimitedRemainingFormatted }}</div>
+            </div>
+          </div>
+        </template>
+
+        <div class="stat-divider" />
+
         <div class="stat-item">
           <div class="stat-icon" style="background: #eff6ff">
             <v-icon size="18" color="#1e88e5"
@@ -170,46 +271,26 @@ definePageMeta({ middleware: "auth" });
           <div>
             <div class="stat-label">Tín dụng</div>
             <div class="stat-value">
-              <template v-if="userData?.settings?.unlimitedVideo">
-                <v-icon size="14">mdi-infinity</v-icon>
-                {{ userData.settings.unlimitedVideo }} ngày
-              </template>
-              <template v-else>{{
-                (userData?.settings?.credit || 0).toLocaleString("vi-VN")
-              }}</template>
+              {{ (userData?.settings?.credit || 0).toLocaleString("vi-VN") }}
             </div>
           </div>
         </div>
 
-        <div class="stat-divider" />
+        <template v-if="refundEnabled">
+          <div class="stat-divider" />
 
-        <div class="stat-item">
-          <div class="stat-icon" style="background: #f0fdf4">
-            <v-icon size="18" color="#059669"
-              >mdi-calendar-check-outline</v-icon
-            >
-          </div>
-          <div>
-            <div class="stat-label">Hết hạn</div>
-            <div class="stat-value">
-              {{ formatDate(userData?.serviceExpiry) }}
+          <div class="stat-item">
+            <div class="stat-icon" style="background: #fef2f2">
+              <v-icon size="18" color="#dc2626">mdi-cash-refund</v-icon>
+            </div>
+            <div>
+              <div class="stat-label">Yêu cầu hoàn tiền</div>
+              <div class="stat-value stat-value--link" @click="refundPopup = true">
+                Gửi yêu cầu
+              </div>
             </div>
           </div>
-        </div>
-
-        <div class="stat-divider" />
-
-        <div class="stat-item">
-          <div class="stat-icon" style="background: #fdf4ff">
-            <v-icon size="18" color="#9333ea"
-              >mdi-package-variant-closed</v-icon
-            >
-          </div>
-          <div>
-            <div class="stat-label">Lịch sử gói</div>
-            <div class="stat-value">{{ packageHistory.length }} gói</div>
-          </div>
-        </div>
+        </template>
       </div>
     </div>
 
@@ -233,6 +314,7 @@ definePageMeta({ middleware: "auth" });
           Lịch sử tín dụng
         </div>
         <div
+          v-if="shopOrders.length"
           class="tab-item"
           :class="{ 'tab-item--active': tab === 'shop' }"
           @click="selectTab('shop')"
@@ -241,6 +323,7 @@ definePageMeta({ middleware: "auth" });
           Lịch sử mua hàng
         </div>
         <div
+          v-if="myRefunds.length"
           class="tab-item"
           :class="{ 'tab-item--active': tab === 'refunds' }"
           @click="selectTab('refunds')"
@@ -256,38 +339,74 @@ definePageMeta({ middleware: "auth" });
           <v-icon size="40" color="#cbd5e1">mdi-package-variant</v-icon>
           <div>Chưa có lịch sử gói</div>
         </div>
-        <table v-else class="data-table">
-          <thead>
-            <tr>
-              <th>Gói mua</th>
-              <th>Giá tiền</th>
-              <th class="text-right">Trạng thái</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="item in packageHistory" :key="item.id">
-              <td>
-                <div class="cell-title">{{ item.note }}</div>
-                <div class="cell-sub">
-                  {{ item.serviceStartDate }} → {{ item.serviceExpiry }}
-                </div>
-              </td>
-              <td>
-                <div class="cell-price">{{ formatCurrency(item.price) }}</div>
-                <div v-if="+item.discount" class="cell-discount">
-                  Giảm {{ formatCurrency(+item.discount) }}
-                </div>
-              </td>
-              <td class="text-right">
-                <span
-                  class="status-chip"
-                  :class="`status-${item.statusColor}`"
-                  >{{ item.statusText }}</span
-                >
-              </td>
-            </tr>
-          </tbody>
-        </table>
+        <div v-else class="table-scroll">
+          <table class="data-table history-table">
+            <thead>
+              <tr>
+                <th>Gói mua</th>
+                <th>Giá tiền</th>
+                <th>Thời gian</th>
+                <th>Ghi chú</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="item in packageHistory" :key="item.id">
+                <td>
+                  <div class="cell-title">{{ item.note }}</div>
+                </td>
+                <td>
+                  <div
+                    v-if="getTotalDiscountAmount(item) > 0"
+                    class="cell-price-original"
+                  >
+                    {{ formatCurrency(item.price + getTotalDiscountAmount(item)) }}
+                  </div>
+                  <div
+                    v-if="item.comboDiscountPercent > 0"
+                    class="cell-price-label"
+                  >
+                    Gói {{ item.rentalMonths }} tháng giảm {{ item.comboDiscountPercent }}%
+                  </div>
+                  <div
+                    v-if="item.couponDiscountAmount > 0"
+                    class="cell-price-label"
+                  >
+                    Mã giảm {{ formatCurrency(item.couponDiscountAmount) }}
+                  </div>
+                  <div
+                    v-else-if="item.referralDiscountAmount > 0"
+                    class="cell-price-label"
+                  >
+                    Mã GT giảm {{ formatCurrency(item.referralDiscountAmount) }}
+                  </div>
+                  <div
+                    v-else-if="isLegacyDiscount(item) && isLegacyComboTier(item)"
+                    class="cell-price-label"
+                  >
+                    Gói {{ item.rentalMonths }} tháng giảm {{ getLegacyComboPercent(item) }}%
+                  </div>
+                  <div
+                    v-else-if="isLegacyDiscount(item)"
+                    class="cell-price-label"
+                  >
+                    Mã giảm {{ formatCurrency(getTotalDiscountAmount(item)) }}
+                  </div>
+                  <div class="cell-price">{{ formatCurrency(item.price) }}</div>
+                </td>
+                <td>
+                  <div class="cell-date-range">
+                    {{ item.serviceStartDate }} - {{ item.serviceExpiry }}
+                  </div>
+                </td>
+                <td>
+                  <div class="cell-note" :class="getHistoryNoteClass(item)">
+                    {{ getHistoryNoteText(item) }}
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
 
       <!-- Credit history -->
@@ -296,46 +415,59 @@ definePageMeta({ middleware: "auth" });
           <v-icon size="40" color="#cbd5e1">mdi-database-off-outline</v-icon>
           <div>Chưa có lịch sử tín dụng</div>
         </div>
-        <table v-else class="data-table">
-          <thead>
-            <tr>
-              <th>Tín dụng</th>
-              <th>Giá tiền</th>
-              <th class="text-right">Thời gian</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="item in creditHistory" :key="item.id">
-              <td>
-                <div class="cell-title">
-                  {{
-                    item.creditAmount === -1
-                      ? "Không giới hạn 💎"
-                      : `Mua ${item.creditAmount} 💎`
-                  }}
-                  <span
-                    v-if="[11000, 24000].includes(item.creditAmount)"
-                    class="cell-bonus"
-                  >
-                    +{{ item.creditAmount === 11000 ? "1,000" : "4,000" }} KM
-                  </span>
-                </div>
-                <div v-if="item.creditAmount === -1" class="cell-sub">
-                  {{ item.serviceStartDate }} → {{ item.serviceExpiry }}
-                </div>
-              </td>
-              <td>
-                <div class="cell-price">{{ formatCurrency(item.price) }}</div>
-                <div v-if="+item.discount" class="cell-discount">
-                  Giảm {{ formatCurrency(+item.discount) }}
-                </div>
-              </td>
-              <td class="text-right">
-                <div class="cell-date">{{ item.serviceStartDate }}</div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+        <div v-else class="table-scroll">
+          <table class="data-table history-table">
+            <thead>
+              <tr>
+                <th>Tín dụng</th>
+                <th>Giá tiền</th>
+                <th>Thời gian</th>
+                <th>Ghi chú</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="item in creditHistory" :key="item.id">
+                <td>
+                  <div class="cell-title">
+                    {{
+                      item.creditAmount === -1
+                        ? normalizeUnlimitedNote(item.note) || "Không giới hạn 💎"
+                        : `${(
+                            item.creditAmount === 11000
+                              ? 10000
+                              : item.creditAmount === 24000
+                                ? 20000
+                                : item.creditAmount
+                          ).toLocaleString("en-US")} 💎`
+                    }}
+                    <span
+                      v-if="[11000, 24000].includes(item.creditAmount)"
+                      class="cell-bonus"
+                    >
+                      +{{ item.creditAmount === 11000 ? "1,000" : "4,000" }} KM
+                    </span>
+                  </div>
+                </td>
+                <td>
+                  <div class="cell-price">{{ formatCurrency(item.price) }}</div>
+                </td>
+                <td>
+                  <div v-if="item.creditAmount === -1" class="cell-date-range">
+                    {{ item.serviceStartDate }} - {{ item.serviceExpiry }}
+                  </div>
+                  <div v-else class="cell-date-range">
+                    {{ item.createdAt }}
+                  </div>
+                </td>
+                <td>
+                  <div class="cell-note" :class="getHistoryNoteClass(item)">
+                    {{ getHistoryNoteText(item) }}
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
 
       <!-- Refund history -->
@@ -344,73 +476,70 @@ definePageMeta({ middleware: "auth" });
           <v-icon size="40" color="#cbd5e1">mdi-cash-refund</v-icon>
           <div>Chưa có yêu cầu hoàn tiền nào</div>
         </div>
-        <table v-else class="data-table">
-          <thead>
-            <tr>
-              <th>Ngày gửi</th>
-              <th>Tiền gốc</th>
-              <th>Tiền hoàn</th>
-              <th>Ngân hàng</th>
-              <th>Lý do</th>
-              <th class="text-right">Trạng thái</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="item in myRefunds" :key="item._id">
-              <td>
-                <div class="cell-sub">{{ item.createdAt }}</div>
-              </td>
-              <td>
-                <div class="cell-price">
-                  {{ formatCurrency(item.originalAmount) }}
-                </div>
-              </td>
-              <td>
-                <div class="cell-price" style="color: #059669">
-                  {{ formatCurrency(item.refundAmount) }}
-                </div>
-              </td>
-              <td>
-                <div class="cell-title" style="font-size: 0.8rem">
-                  {{ item.bankName }}
-                </div>
-                <div class="cell-sub">{{ item.bankAccount }}</div>
-              </td>
-              <td>
-                <div class="cell-sub">
-                  {{ item.reason }}
-                </div>
-                <div
-                  v-if="item.adminNote"
-                  class="cell-sub"
-                  style="color: #f59e0b"
-                >
-                  {{ item.adminNote }}
-                </div>
-              </td>
-              <td class="text-right">
-                <div>
-                  <span
-                    class="status-chip"
-                    :style="{
-                      background: refundStatusMap[item.status]?.color + '18',
-                      color: refundStatusMap[item.status]?.color,
-                    }"
+        <div v-else class="table-scroll">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Ngày gửi</th>
+                <th>Tiền gốc</th>
+                <th>Tiền hoàn</th>
+                <th>Ngân hàng</th>
+                <th>Lý do</th>
+                <th class="text-right">Trạng thái</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="item in myRefunds" :key="item._id">
+                <td>
+                  <div class="cell-sub">{{ item.createdAt }}</div>
+                </td>
+                <td>
+                  <div class="cell-price">
+                    {{ formatCurrency(item.originalAmount) }}
+                  </div>
+                </td>
+                <td>
+                  <div class="cell-price" style="color: #059669">
+                    {{ formatCurrency(item.refundAmount) }}
+                  </div>
+                </td>
+                <td>
+                  <div class="cell-title" style="font-size: 0.8rem">
+                    {{ item.bankName }}
+                  </div>
+                  <div class="cell-sub">{{ item.bankAccount }}</div>
+                </td>
+                <td>
+                  <div class="cell-sub">
+                    {{ item.reason }}
+                  </div>
+                  <div
+                    v-if="item.adminNote"
+                    class="cell-sub"
+                    style="color: #f59e0b; font-size: 0.775rem"
+                  >
+                    {{ item.adminNote }}
+                  </div>
+                </td>
+                <td class="text-right">
+                  <div
+                    class="cell-status"
+                    :style="{ color: refundStatusMap[item.status]?.color }"
                   >
                     {{ refundStatusMap[item.status]?.label || item.status }}
-                  </span>
-                </div>
-                <div
-                  v-if="item.status === 'approved'"
-                  class="cell-sub mt-1"
-                  style="color: #059669; font-size: 0.72rem"
-                >
-                  Vui lòng kiểm tra tài khoản ngân hàng của bạn
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+                  </div>
+                  <div
+                    v-if="item.status === 'approved'"
+                    class="cell-sub mt-1"
+                    style="color: #059669; font-size: 0.72rem"
+                  >
+                    Vui lòng kiểm tra tài khoản ngân hàng của bạn
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
 
       <!-- Shop order history -->
@@ -594,7 +723,6 @@ definePageMeta({ middleware: "auth" });
   display: flex;
   flex-direction: column;
   gap: 20px;
-  padding-bottom: 60px;
 }
 
 /* ─── Profile card ───────────────────────────────────── */
@@ -631,23 +759,6 @@ definePageMeta({ middleware: "auth" });
   margin-bottom: 10px;
 }
 
-.profile-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 4px 12px;
-  border-radius: 999px;
-  font-size: 0.78rem;
-  font-weight: 600;
-}
-
-.badge-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  flex-shrink: 0;
-}
-
 /* Stats */
 .profile-stats {
   display: flex;
@@ -663,6 +774,14 @@ definePageMeta({ middleware: "auth" });
   gap: 12px;
   padding: 16px 0;
   flex: 1;
+}
+
+.stat-value--link {
+  cursor: pointer;
+}
+
+.stat-value--link:hover {
+  color: #dc2626;
 }
 
 .stat-divider {
@@ -769,13 +888,56 @@ definePageMeta({ middleware: "auth" });
 }
 
 /* ─── Table ──────────────────────────────────────────── */
+.table-scroll {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
 .data-table {
   width: 100%;
+  min-width: 680px;
   border-collapse: collapse;
 }
 
+/* Bảng "Lịch sử gói"/"Lịch sử tín dụng" dùng chung cấu trúc 4 cột — ép
+   table-layout: fixed + % cố định để cột không bị nhảy vị trí khi chuyển qua
+   lại 2 tab (table-layout auto mặc định tính width theo nội dung riêng của
+   từng bảng, khác nhau giữa 2 tab nên bị lệch). Cột "Thời gian" cần % lớn vì
+   nội dung dài (khoảng ngày giờ), không được để quá hẹp kẻo bị tràn ra ngoài
+   trên mobile — min-width vừa đủ để scroll ngang thay vì bị cắt/tràn. */
+.history-table {
+  table-layout: fixed;
+  min-width: 620px;
+}
+
+.history-table th:nth-child(1),
+.history-table td:nth-child(1) {
+  width: 26%;
+}
+
+.history-table th:nth-child(2),
+.history-table td:nth-child(2) {
+  width: 17%;
+}
+
+.history-table th:nth-child(3),
+.history-table td:nth-child(3) {
+  width: 42%;
+}
+
+.history-table th:nth-child(4),
+.history-table td:nth-child(4) {
+  width: 15%;
+}
+
+.data-table th,
+.data-table td {
+  white-space: nowrap;
+}
+
 .data-table th {
-  padding: 12px 20px;
+  padding: 12px 10px;
   font-size: 0.72rem;
   font-weight: 700;
   text-transform: uppercase;
@@ -786,8 +948,40 @@ definePageMeta({ middleware: "auth" });
   text-align: left;
 }
 
+.data-table th:first-child,
+.data-table td:first-child {
+  padding-left: 24px;
+}
+
+.data-table th:last-child,
+.data-table td:last-child {
+  padding-right: 24px;
+}
+
+@media (max-width: 600px) {
+  .data-table th:first-child,
+  .data-table td:first-child {
+    padding-left: 14px;
+  }
+
+  .data-table th:last-child,
+  .data-table td:last-child {
+    padding-right: 14px;
+  }
+}
+
+.data-table th.text-right,
+.data-table td.text-right {
+  text-align: right;
+}
+
+.data-table th.text-center,
+.data-table td.text-center {
+  text-align: center;
+}
+
 .data-table td {
-  padding: 14px 20px;
+  padding: 14px 10px;
   border-bottom: 1px solid #f8f8f8;
   vertical-align: middle;
 }
@@ -809,27 +1003,58 @@ definePageMeta({ middleware: "auth" });
 }
 
 .cell-sub {
-  font-size: 0.775rem;
-  color: #94a3b8;
+  font-size: 0.875rem;
+  color: #1a1a1a;
   margin-top: 3px;
 }
 
-.cell-price {
-  font-size: 0.9rem;
-  font-weight: 700;
+.cell-date-range {
+  font-size: 0.875rem;
+  color: #1a1a1a;
+  margin-top: 3px;
+}
+
+.cell-note {
+  font-size: 0.875rem;
+  color: #94a3b8;
+}
+
+.cell-note--refunded {
+  color: #64748b;
+}
+
+.cell-note--active {
+  color: #059669;
+}
+
+.cell-note--expired {
+  color: #dc2626;
+}
+
+.cell-note--upcoming {
   color: #1e88e5;
 }
 
-.cell-discount {
-  font-size: 0.75rem;
-  color: #ef4444;
-  margin-top: 2px;
+.cell-price {
+  font-size: 0.875rem;
+  font-weight: 400;
+  color: #dc2626;
 }
 
-.cell-date {
+.cell-price-original {
+  font-size: 0.75rem;
+  color: #94a3b8;
+  text-decoration: line-through;
+}
+
+.cell-price-label {
+  font-size: 0.75rem;
+  color: #1e88e5;
+}
+
+.cell-status {
   font-size: 0.875rem;
   font-weight: 600;
-  color: #059669;
 }
 
 .cell-bonus {
@@ -845,8 +1070,9 @@ definePageMeta({ middleware: "auth" });
   display: inline-block;
   padding: 4px 12px;
   border-radius: 999px;
-  font-size: 0.75rem;
-  font-weight: 600;
+  font-size: 0.875rem;
+  font-weight: 400;
+  color: #1a1a1a;
 }
 
 .status-success {
@@ -864,29 +1090,6 @@ definePageMeta({ middleware: "auth" });
 .status-grey {
   background: #f1f5f9;
   color: #64748b;
-}
-
-/* ─── Refund all button ──────────────────────────────── */
-.refund-all-btn {
-  margin-left: auto;
-  flex-shrink: 0;
-  align-self: flex-start;
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  padding: 6px 13px;
-  border-radius: 8px;
-  border: 1px solid #fde68a;
-  background: #fffbeb;
-  color: #d97706;
-  font-size: 0.78rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.15s;
-  white-space: nowrap;
-}
-.refund-all-btn:hover {
-  background: #fef3c7;
 }
 
 /* ─── Empty state ────────────────────────────────────── */

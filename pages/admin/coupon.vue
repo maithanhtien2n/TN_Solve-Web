@@ -15,10 +15,9 @@ const headers = [
     align: "end",
     sortable: false,
   },
-  { title: "Ngày và giờ bắt đầu", key: "startDateFormat", sortable: false },
-  { title: "Ngày và giờ kết thúc", key: "endDateFormat", sortable: false },
+  { title: "Ngày bắt đầu", key: "startDateFormat", sortable: false },
+  { title: "Ngày kết thúc", key: "endDateFormat", sortable: false },
   { title: "Giới hạn sử dụng", key: "usageLimit", sortable: false },
-  { title: "Đối tượng áp dụng", key: "conditionType", sortable: false },
   { title: "Trạng thái", key: "status", align: "center", sortable: false },
   { title: "Cập nhật", key: "updatedAt", sortable: false },
   { title: "Thao tác", key: "action", align: "center", sortable: false },
@@ -430,21 +429,37 @@ definePageMeta({ layout: "admin", title: "Mã giảm giá" });
       </div>
     </template>
 
-    <template #row-conditionType="{ item }">
-      <span>{{ (item as any).conditionType || "Tất cả" }}</span>
-    </template>
-
     <template #row-usageLimit="{ item }">
-      <div class="d-flex ga-1">
-        <span>{{ (item as any).usageLimit }}</span>
-        <span v-if="(item as any).limitPerAccount" class="text-nowrap">
-          (Mỗi tài khoản được {{ (item as any).limitPerAccount }} lần)
-        </span>
+      <div class="my-2">
+        <div class="text-nowrap">{{ (item as any).usageLimit }} lượt</div>
+        <div
+          v-if="(item as any).limitPerAccount"
+          class="text-caption text-medium-emphasis text-nowrap"
+        >
+          Tối đa {{ (item as any).limitPerAccount }}/khách
+        </div>
+        <div class="text-caption text-medium-emphasis text-nowrap">
+          {{ (item as any).conditionType || "Tất cả" }}
+        </div>
       </div>
     </template>
 
     <template #row-action="{ item }">
       <div class="d-flex justify-center align-center ga-2">
+        <v-checkbox
+          hide-details
+          density="compact"
+          color="primary"
+          style="flex: 0 0 auto"
+          :loading="Boolean(loading == 'switch-' + (item as any)._id)"
+          :model-value="(item as any).isActive"
+          @update:model-value="
+            (e) => {
+              onAction({ action: 'switch', item, isActive: e });
+            }
+          "
+        />
+
         <v-btn
           icon
           size="40"
@@ -461,20 +476,8 @@ definePageMeta({ layout: "admin", title: "Mã giảm giá" });
           color="error"
           @click="onAction({ action: 'delete', item })"
         >
-          <v-icon size="20">mdi-delete-outline</v-icon>
+          <v-icon size="20">mdi-trash-can-outline</v-icon>
         </v-btn>
-
-        <v-switch
-          hide-details
-          color="primary"
-          :loading="Boolean(loading == 'switch-' + (item as any)._id)"
-          :model-value="(item as any).isActive"
-          @update:model-value="
-            (e) => {
-              onAction({ action: 'switch', item, isActive: e });
-            }
-          "
-        />
       </div>
     </template>
   </DataTable>

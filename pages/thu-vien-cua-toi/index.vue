@@ -371,7 +371,7 @@ const getQueueMsg = (item: any): { title: string } | null => {
                       disabled:
                         ['download-video', 'public', 'private'].includes(
                           menu.value
-                        ) && ['primary', 'error'].includes(item.state),
+                        ) && ['primary', 'error', 'grey'].includes(item.state),
                     }"
                     @click="onClickDotMenuItem(menu.value, item)"
                   >

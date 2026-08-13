@@ -18,14 +18,16 @@ const copiedField = ref("");
 const statusOptions = [
   { title: "Tất cả", value: "" },
   { title: "Chờ thanh toán", value: "pending" },
+  { title: "Đang xử lý", value: "processing" },
   { title: "Hoàn thành", value: "completed" },
   { title: "Thất bại", value: "failed" },
 ];
 
 const statusMap: Record<string, { label: string; cls: string }> = {
-  pending:   { label: "Chờ thanh toán", cls: "status-warning" },
-  completed: { label: "Hoàn thành",     cls: "status-success" },
-  failed:    { label: "Thất bại",        cls: "status-error"   },
+  pending:    { label: "Chờ thanh toán", cls: "status-warning" },
+  processing: { label: "Đang xử lý",     cls: "status-warning" },
+  completed:  { label: "Hoàn thành",     cls: "status-success" },
+  failed:     { label: "Thất bại",        cls: "status-error"   },
 };
 
 const totalPages = computed(() => Math.ceil(total.value / limit));
