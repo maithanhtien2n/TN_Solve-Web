@@ -303,6 +303,18 @@ definePageMeta({});
           </select>
           <span v-else-if="addUnlimited" class="addon-static-month">{{ selectedUnlimitedLabel }}</span>
         </div>
+        <div class="addon-desc">
+          <div class="addon-desc-intro">Khi tích chọn, bạn sẽ được:</div>
+          <ul>
+            <li>
+              <span class="addon-desc-highlight">Tạo video không giới hạn</span> với số tháng bạn đã
+              chọn.
+            </li>
+            <li>
+              Giá gói tăng thêm <span class="addon-desc-highlight">200.000đ/tháng</span>.
+            </li>
+          </ul>
+        </div>
       </div>
 
       <!-- Thông tin sản phẩm (A3) -->
@@ -868,6 +880,35 @@ definePageMeta({});
   white-space: normal;
   overflow-wrap: break-word;
   cursor: pointer;
+}
+
+.addon-desc {
+  margin: 10px -14px -14px -14px;
+  padding: 10px 14px;
+  line-height: 1.4;
+  background: #f0f7ff;
+  border-radius: 0 0 12px 12px;
+  user-select: text;
+}
+
+.addon-desc-intro {
+  margin-bottom: 4px;
+}
+
+.addon-desc-highlight {
+  font-weight: 600;
+}
+
+.addon-desc ul {
+  padding-left: 20px;
+}
+
+.addon-desc li {
+  list-style: disc;
+}
+
+.addon-desc li + li {
+  margin-top: 4px;
 }
 
 .addon-static-month {

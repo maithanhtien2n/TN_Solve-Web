@@ -156,6 +156,12 @@ const onClickPayment = async () => {
 };
 
 watch(onGetterDisplayPopupBuyCredit, (newVal) => {
+  if (newVal && unlimitedOptions.value.length) {
+    // Mỗi lần mở lại popup -> reset dropdown "Không giới hạn" về mặc định 1
+    // tháng (option đầu), tránh giữ lại lựa chọn dài của lần mở trước (VD
+    // chọn "3 tháng" rồi đóng mở lại vẫn còn "3 tháng" gây hiểu nhầm).
+    selectedUnlimitedMs.value = unlimitedOptions.value[0].ms;
+  }
   commonDialogRef.value.onDisplay(newVal);
 });
 </script>
