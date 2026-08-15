@@ -59,7 +59,34 @@ useSeo({
       </p>
     </PolicySection>
 
-    <PolicySection num="5" title="Thay Đổi Điều Khoản">
+    <PolicySection num="5" title="Tính chất dịch vụ và giới hạn trách nhiệm">
+      <p>
+        TN Solve là nền tảng cung cấp công cụ hỗ trợ tạo video bằng trí tuệ
+        nhân tạo, được xây dựng dựa trên việc kết nối và sử dụng công nghệ AI
+        của các bên cung cấp công nghệ thứ ba. Do đó, việc cung cấp dịch vụ của
+        TN Solve phụ thuộc vào tính sẵn sàng, sự ổn định và các thay đổi từ
+        phía công nghệ nền của bên thứ ba, nằm ngoài khả năng kiểm soát trực
+        tiếp của TN Solve.
+      </p>
+      <p>
+        TN Solve nỗ lực đảm bảo dịch vụ hoạt động liên tục và ổn định, tuy
+        nhiên không cam kết dịch vụ sẽ luôn sẵn sàng 100% thời gian (uptime).
+        Trong trường hợp dịch vụ bị gián đoạn, thay đổi hoặc tạm ngưng do
+        nguyên nhân từ phía công nghệ nền của bên thứ ba, TN Solve sẽ thông
+        báo và hỗ trợ khách hàng theo Chính sách bảo hành và đổi trả được công
+        bố trên website.
+      </p>
+      <p>
+        TN Solve cung cấp dịch vụ theo nguyên tắc "như hiện có" (as-is) và
+        không chịu trách nhiệm đối với các thiệt hại gián tiếp, hệ quả hoặc
+        tổn thất phát sinh từ việc gián đoạn dịch vụ nằm ngoài khả năng kiểm
+        soát hợp lý của TN Solve, bao gồm nhưng không giới hạn ở việc thay đổi
+        chính sách, tạm ngưng hoặc chấm dứt dịch vụ từ phía nhà cung cấp công
+        nghệ nền.
+      </p>
+    </PolicySection>
+
+    <PolicySection num="6" title="Thay Đổi Điều Khoản">
       <p>
         Chúng tôi có quyền thay đổi các điều khoản và quy định này mà không cần
         thông báo trước. Việc sử dụng tiếp tục của bạn sau các thay đổi này sẽ
@@ -67,7 +94,7 @@ useSeo({
       </p>
     </PolicySection>
 
-    <PolicySection num="6" title="Liên Hệ">
+    <PolicySection num="7" title="Liên Hệ">
       <p>
         Nếu bạn có bất kỳ câu hỏi hoặc ý kiến về Điều Khoản và Quy Định Chung
         này, vui lòng liên hệ với chúng tôi qua thông tin liên hệ được cung cấp
