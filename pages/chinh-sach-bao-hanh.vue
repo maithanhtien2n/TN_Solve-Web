@@ -132,6 +132,7 @@ useSeo({
       <p>Chuyển khoản vào tài khoản ngân hàng do khách hàng cung cấp;</p>
       <p>Quy đổi thành thời gian sử dụng dịch vụ, lượt sử dụng, dung lượng hoặc quyền lợi khác nếu khách hàng đồng ý;</p>
       <p>Phương thức khác theo thỏa thuận giữa TN Solve và khách hàng.</p>
+      <p>TN Solve áp dụng phí xử lý hoàn tiền cố định 10.000đ cho mỗi yêu cầu hoàn tiền được chấp thuận, được trừ trực tiếp vào số tiền hoàn lại.</p>
       <p>TN Solve có thể yêu cầu khách hàng cung cấp thông tin cần thiết để thực hiện hoàn tiền. Khách hàng chịu trách nhiệm đảm bảo thông tin nhận hoàn tiền là chính xác.</p>
     </PolicySection>
 
