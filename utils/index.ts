@@ -118,7 +118,7 @@ export function useSeo({
     : `${siteUrl}/images/page-home.png`;
 
   const defaultKeywords =
-    "tạo video AI, TN Solve, video AI tự động, Veo, Grok, công cụ tạo video, AI video generator, tạo video online";
+    "tạo video AI, TN Solve, video AI tự động, công cụ tạo video, AI video generator, tạo video online";
 
   const metaTags: any[] = [
     { name: "description", content: description },

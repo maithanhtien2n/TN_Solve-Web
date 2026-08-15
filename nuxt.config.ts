@@ -61,7 +61,7 @@ export default defineNuxtConfig({
         {
           name: "keywords",
           content:
-            "tạo video AI, TN Solve, video AI tự động, Veo, Grok, công cụ tạo video, AI video generator",
+            "tạo video AI, TN Solve, video AI tự động, công cụ tạo video, AI video generator",
         },
         { property: "og:type", content: "website" },
         { property: "og:locale", content: "vi_VN" },

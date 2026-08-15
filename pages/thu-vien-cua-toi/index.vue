@@ -188,7 +188,7 @@ onMounted(() => {
 useSeo({
   title: "Thư viện của tôi",
   description:
-    "Thư viện video AI của bạn trên TN Solve - Quản lý, xem lại và tải xuống các video đã tạo bằng Veo, Grok. Theo dõi tiến trình tạo video.",
+    "Thư viện video AI của bạn trên TN Solve - Quản lý, xem lại và tải xuống các video AI đã tạo. Theo dõi tiến trình tạo video.",
   image: "/images/page-video.png",
   keywords:
     "thư viện video AI, video đã tạo, quản lý video TN Solve, tải video AI",

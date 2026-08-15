@@ -70,10 +70,10 @@ onMounted(() => {
 useSeo({
   title: "Thước phim cộng đồng",
   description:
-    "Khám phá thư viện video AI cộng đồng TN Solve. Xem hàng ngàn video được tạo bằng AI Veo, Grok. Nguồn cảm hứng sáng tạo nội dung miễn phí.",
+    "Khám phá thư viện video AI cộng đồng TN Solve. Xem hàng ngàn video được tạo bằng công nghệ AI tiên tiến. Nguồn cảm hứng sáng tạo nội dung miễn phí.",
   image: "/images/page-video.png",
   keywords:
-    "thước phim cộng đồng, video AI công khai, TN Solve video, xem video AI, mẫu video Veo Grok",
+    "thước phim cộng đồng, video AI công khai, TN Solve video, xem video AI, mẫu video AI",
 });
 </script>
 

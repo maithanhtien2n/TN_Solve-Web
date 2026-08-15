@@ -609,10 +609,10 @@ useSeo({
   title: productId.value ? "Chi tiết video" : "Tạo video AI",
   description: productId.value
     ? "Xem chi tiết và theo dõi tiến trình tạo video AI của bạn trên TN Solve. Xem từng cảnh quay, tải xuống video hoàn chỉnh."
-    : "Tạo video AI chuyên nghiệp với TN Solve - Chọn mô hình Veo, Grok, thiết lập cảnh quay và tạo video tự động chỉ trong vài phút.",
+    : "Tạo video AI chuyên nghiệp với TN Solve - Chọn công nghệ AI phù hợp, thiết lập cảnh quay và tạo video tự động chỉ trong vài phút.",
   image: "/images/page-detail.png",
   keywords:
-    "tạo video AI, Veo, Grok, video tự động, TN Solve tạo video, AI video creator",
+    "tạo video AI, video tự động, TN Solve tạo video, AI video creator",
 });
 
 definePageMeta({ middleware: "auth" });

@@ -126,10 +126,10 @@ const onClickDocument = (item: any) => {
 useSeo({
   title: "Trợ lý AI",
   description:
-    "Trợ lý viết câu lệnh AI TN Solve - Hướng dẫn viết prompt hiệu quả cho Veo, Grok. Bộ sưu tập prompt mẫu giúp tạo video AI chất lượng cao.",
+    "Trợ lý viết câu lệnh AI TN Solve - Hướng dẫn viết prompt hiệu quả để tạo video AI. Bộ sưu tập prompt mẫu giúp tạo video AI chất lượng cao.",
   image: "/images/page-home.png",
   keywords:
-    "prompt AI, viết câu lệnh AI, hướng dẫn Veo Grok, prompt tạo video, TN Solve tài liệu, mẫu prompt video AI",
+    "prompt AI, viết câu lệnh AI, hướng dẫn viết prompt video AI, prompt tạo video, TN Solve tài liệu, mẫu prompt video AI",
 });
 
 definePageMeta({ middleware: "auth" });
