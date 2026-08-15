@@ -226,7 +226,7 @@ const onClickMenuItem = (value: string) => {
 
           <!-- Login -->
           <button v-else class="login-btn" @click="() => { router.replace({ query: { redirect: route.path } }); displayLogin = true; }">
-            <v-icon size="16" class="login-btn-icon">mdi-login-variant</v-icon>
+            <v-icon size="18" class="login-btn-icon">mdi-account</v-icon>
             <span>ĐĂNG NHẬP</span>
           </button>
         </div>
