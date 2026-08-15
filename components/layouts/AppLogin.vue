@@ -96,7 +96,7 @@ useHead({
         <div class="lc-form">
           <div class="lc-form-header">
             <v-img src="/images/tn-solve-icon.png" lazy-src="/images/tn-solve-icon.png" width="170" height="64" class="lc-logo" />
-            <h2 class="lc-title">CHÀO MỪNG!</h2>
+            <h2 class="lc-title">ĐĂNG NHẬP</h2>
             <p class="lc-sub">Đăng nhập để bắt đầu với TN Solve</p>
           </div>
 
