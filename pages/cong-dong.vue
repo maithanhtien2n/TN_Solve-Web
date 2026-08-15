@@ -240,7 +240,7 @@ useSeo({
 .page-hero {
   position: relative;
   overflow: hidden;
-  background: linear-gradient(135deg, #1a237e 0%, #283593 40%, #1565c0 80%, #1e88e5 100%);
+  background: linear-gradient(135deg, #134e4a 0%, #115e59 40%, #0d9488 80%, #14b8a6 100%);
   border-radius: 16px;
   padding: 28px 36px;
   margin-bottom: 24px;

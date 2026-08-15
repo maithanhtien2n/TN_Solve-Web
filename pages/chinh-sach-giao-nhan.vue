@@ -12,7 +12,7 @@ useSeo({
     title="Chính sách giao nhận dịch vụ"
     updated="Cập nhật lần cuối: Ngày 26 tháng 04 năm 2026"
     icon="mdi-truck-fast-outline"
-    color="#7c3aed"
+    color="#1565c0"
   >
     <PolicySection num="1" title="Phạm vi áp dụng">
       <p>Chính sách giao nhận dịch vụ này áp dụng đối với khách hàng đăng ký, gia hạn và sử dụng các gói dịch vụ trên website TN Solve.</p>

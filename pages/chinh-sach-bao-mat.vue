@@ -12,10 +12,10 @@ useSeo({
     title="Chính sách bảo mật thông tin"
     updated="Cập nhật lần cuối: Ngày 26 tháng 04 năm 2026"
     icon="mdi-shield-lock-outline"
-    color="#0f766e"
+    color="#1565c0"
   >
     <div class="pol-notice">
-      <v-icon size="16" color="#0f766e">mdi-information-outline</v-icon>
+      <v-icon size="16" color="#1565c0">mdi-information-outline</v-icon>
       Trước khi tiến hành đặt hàng hoặc sử dụng dịch vụ, bạn bắt buộc phải đồng ý với chính sách Bảo vệ thông tin cá nhân của chúng tôi. Để đảm bảo an toàn và bảo vệ thông tin cá nhân của bạn, vui lòng đọc kỹ và đồng ý với các chính sách bảo mật thông tin dưới đây:
     </div>
 

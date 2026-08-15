@@ -12,7 +12,7 @@ useSeo({
     title="Chính sách bảo hành và đổi trả"
     updated="Cập nhật lần cuối: Ngày 26 tháng 04 năm 2026"
     icon="mdi-shield-check-outline"
-    color="#b45309"
+    color="#1565c0"
   >
     <PolicySection num="1" title="Phạm vi áp dụng">
       <p>Chính sách bảo hành và đổi trả này áp dụng đối với khách hàng đăng ký, gia hạn và sử dụng các gói dịch vụ trên website TN Solve.</p>
