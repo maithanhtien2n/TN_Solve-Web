@@ -226,7 +226,8 @@ const onClickMenuItem = (value: string) => {
 
           <!-- Login -->
           <button v-else class="login-btn" @click="() => { router.replace({ query: { redirect: route.path } }); displayLogin = true; }">
-            ĐĂNG NHẬP
+            <v-icon size="16" class="login-btn-icon">mdi-login-variant</v-icon>
+            <span>ĐĂNG NHẬP</span>
           </button>
         </div>
       </div>
@@ -503,30 +504,61 @@ const onClickMenuItem = (value: string) => {
 }
 
 /* ─── Login ──────────────────────────────────────────── */
+/* Pill + gradient xanh đậm khớp tông .menu-header (1e3a5f → 1565c0) — trước
+   đây là nút trắng bo góc 10px, lệch hẳn với ngôn ngữ thiết kế "pill glassy"
+   dùng xuyên suốt header (.nav-track, .avatar-btn, .status-badge đều 999px). */
 .login-btn {
-  padding: 6px 18px;
-  border-radius: 10px;
-  background: #fff;
-  color: #1565c0;
-  font-size: 1rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 22px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #1e3a5f 0%, #1565c0 55%, #2196f3 100%);
+  color: #fff;
+  font-size: 0.95rem;
   font-weight: 700;
   border: none;
   cursor: pointer;
-  letter-spacing: 0;
-  box-shadow: 0 2px 8px rgba(21, 101, 192, 0.15);
-  transition: box-shadow 0.18s, background 0.18s;
+  letter-spacing: 0.3px;
   white-space: nowrap;
   user-select: none;
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  box-shadow: 0 1px 2px rgba(21, 101, 192, 0.3), 0 2px 6px rgba(21, 101, 192, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.login-btn-icon {
+  color: #fff !important;
+}
+
+/* Vệt sáng lướt qua khi hover — nằm dưới chữ nhờ isolation + z-index âm */
+.login-btn::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(115deg, transparent 35%, rgba(255, 255, 255, 0.4) 50%, transparent 65%);
+  transform: translateX(-130%);
+  transition: transform 0.55s ease;
 }
 
 .login-btn:hover {
-  background: #f0f6ff;
-  box-shadow: 0 4px 14px rgba(21, 101, 192, 0.22);
+  box-shadow: 0 2px 4px rgba(21, 101, 192, 0.35), 0 4px 10px rgba(21, 101, 192, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.login-btn:hover::before {
+  transform: translateX(130%);
+}
+
+.login-btn:active {
+  box-shadow: 0 1px 2px rgba(21, 101, 192, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2);
 }
 
 @media (max-width: 600px) {
   .login-btn {
-    padding: 5px 14px;
+    padding: 6px 16px;
     font-size: 0.85rem;
   }
 }

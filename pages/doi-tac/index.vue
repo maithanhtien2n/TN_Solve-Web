@@ -2,9 +2,16 @@
 const router = useRouter();
 
 const { onGetterUserData: userData } = useAppStore();
-const { onGetterMasterData } = useMasterDataStore();
+const { onGetterMasterData, onGetterMasterDataLoading } = useMasterDataStore();
 
 const dashboard = computed(() => onGetterMasterData.value["dashboard"]);
+// Admin bấm sang xem CTV khác trong bảng xếp hạng (đổi ?id=) — dữ liệu mới
+// phải chờ gọi API xong mới có, trong lúc đó dashboard vẫn còn hiện số liệu
+// CŨ (chưa đổi component, chỉ đổi query) — hiện cờ loading để dim nhẹ +
+// spinner cho biết đang tải, tránh cảm giác đứng hình/giật cục.
+const isDashboardLoading = computed(
+  () => !!onGetterMasterDataLoading.value["dashboard"]
+);
 // User thường (chưa mở khóa CTV) xem trang tiến độ; PARTNER/ADMIN xem dashboard đầy đủ
 const showFullDashboard = computed(() =>
   [EnumAccountRole.PARTNER, EnumAccountRole.ADMIN].includes(
@@ -29,11 +36,18 @@ const progressPercent = computed(() => {
   );
 });
 
+// dashboard trả về đúng mã/link giới thiệu của CTV đang được XEM (ctvId ở
+// backend) — KHÁC với userData (tài khoản đang ĐĂNG NHẬP). Khi ADMIN mở xem
+// dashboard của 1 CTV khác (/doi-tac?id=...), 2 cái này khác hẳn nhau — nếu
+// lấy nhầm userData sẽ hiện mã/link của ADMIN thay vì của CTV đang xem.
+const referralCode = computed(() => dashboard.value?.accountId !== "all" ? dashboard.value?.accountId : userData.value?._id);
+const referralLink = computed(() => dashboard.value?.referralLink ?? userData.value?.referralLink);
+
 const isCopied = ref<boolean>(false);
 const onCopyReferralLink = async () => {
-  if (!userData.value?.referralLink) return;
+  if (!referralLink.value) return;
   try {
-    await navigator.clipboard.writeText(userData.value.referralLink);
+    await navigator.clipboard.writeText(referralLink.value);
     isCopied.value = true;
     setTimeout(() => {
       isCopied.value = false;
@@ -48,9 +62,9 @@ const onCopyReferralLink = async () => {
 const REFERRAL_TEST_AMOUNT = 3;
 const isCodeCopied = ref<boolean>(false);
 const onCopyReferralCode = async () => {
-  if (!userData.value?._id) return;
+  if (!referralCode.value) return;
   try {
-    await navigator.clipboard.writeText(userData.value._id);
+    await navigator.clipboard.writeText(referralCode.value);
     isCodeCopied.value = true;
     setTimeout(() => {
       isCodeCopied.value = false;
@@ -66,9 +80,11 @@ const onClickViewDashboardPartnerDetail = (id: string) => {
   // window.location.href = `https://tnsolve.com/partner?id=${id}`;
 };
 
-// Popup hướng dẫn kiếm tiền Affiliate — hiện mỗi lần vào trang /doi-tac
+// Popup hướng dẫn kiếm tiền Affiliate — hiện mỗi lần vào trang /doi-tac, TRỪ
+// ADMIN (admin vào đây để xem/quản lý CTV khác, không cần hướng dẫn kiếm tiền).
 const tutorialDialogRef = ref<any>(null);
 onMounted(() => {
+  if (userData.value?.role === EnumAccountRole.ADMIN) return;
   tutorialDialogRef.value?.onDisplay(true);
 });
 
@@ -197,7 +213,14 @@ definePageMeta({ layout: "partner", title: "Tổng quan" });
   </v-container>
 
   <v-container v-else class="ma-0 pa-0">
-    <v-row dense>
+    <v-progress-linear
+      :active="isDashboardLoading"
+      indeterminate
+      color="primary"
+      height="3"
+      class="dashboard-loading-bar"
+    />
+    <v-row dense class="dashboard-content" :class="{ 'dashboard-content--loading': isDashboardLoading }">
       <v-col cols="12" lg="5">
         <v-card variant="flat" color="primary" class="text-white" height="100%">
           <v-card-text>
@@ -292,7 +315,7 @@ definePageMeta({ layout: "partner", title: "Tổng quan" });
                   title="Sao chép mã"
                   style="cursor: pointer"
                   :color="isCodeCopied ? 'success' : 'default'"
-                  :model-value="userData?._id"
+                  :model-value="referralCode"
                   :append-inner-icon="isCodeCopied ? 'mdi-check' : 'mdi-content-copy'"
                   @click:append-inner="onCopyReferralCode()"
                 />
@@ -309,7 +332,7 @@ definePageMeta({ layout: "partner", title: "Tổng quan" });
                   title="Sao chép link"
                   style="cursor: pointer"
                   :color="isCopied ? 'success' : 'default'"
-                  :model-value="userData?.referralLink"
+                  :model-value="referralLink"
                   :append-inner-icon="isCopied ? 'mdi-check' : 'mdi-content-copy'"
                   @click:append-inner="onCopyReferralLink()"
                 />
@@ -595,6 +618,22 @@ definePageMeta({ layout: "partner", title: "Tổng quan" });
   font-size: 0.72rem;
   color: #888;
   margin-top: 2px;
+}
+
+.dashboard-loading-bar {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  margin-bottom: -3px; /* không chiếm layout khi ẩn, tránh giật nội dung bên dưới */
+}
+
+.dashboard-content {
+  transition: opacity 0.15s ease;
+}
+
+.dashboard-content--loading {
+  opacity: 0.5;
+  pointer-events: none;
 }
 
 @media only screen and (max-width: 600px) {
