@@ -66,7 +66,7 @@ const isSubscribed = computed(
 useSeo({
   title: "Trang chủ",
   description:
-    "TN Solve - Nền tảng AI tạo video tự động chuyên nghiệp chỉ 139.000đ/tháng. Tạo video AI chất lượng cao bằng công nghệ AI tiên tiến chỉ trong vài phút. Đăng ký ngay!",
+    "TN Solve, nền tảng tạo video AI chuyên nghiệp với chi phí chỉ từ 139.000đ/tháng, ứng dụng công nghệ tiên tiến tạo ra video chất lượng cao chỉ trong vài phút.",
   image: "/images/page-home.png",
   keywords:
     "TN Solve, tạo video AI, video AI tự động, tạo video chuyên nghiệp, công cụ AI, tạo video online 139k",
