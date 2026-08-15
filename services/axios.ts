@@ -30,7 +30,17 @@ api.interceptors.response.use(
     return response.data;
   },
   (error) => {
+    // Request nền (polling) tự đánh dấu bằng query param (KHÔNG dùng header
+    // tuỳ ý — sẽ kích hoạt CORS preflight mà server chưa khai allowedHeaders
+    // cho header lạ, khiến mọi request loại này fail hẳn — xem product.ts).
+    // 1 lỗi thoáng qua giữa các lượt poll không nên làm phiền người dùng bằng
+    // popup, tự thử lại ở lượt kế tiếp là đủ. KHÔNG áp dụng cho nhánh 403 bên
+    // dưới — session hết hạn thật vẫn phải đăng xuất dù request đó là poll
+    // nền hay không.
+    const isSilent = error.config?.params?.silentError === 1;
+
     if (
+      !isSilent &&
       !error.request.responseURL.includes("/accounts/me") &&
       !["ERR_CANCELED"].includes(error.code) &&
       ![401].includes(error.status)
@@ -40,7 +50,7 @@ api.interceptors.response.use(
         typeof error.response?.data?.message === "string" &&
         error.response?.data?.message.includes("đăng ký gói dịch vụ")
       ) {
-        useRouter().push("/payment");
+        useRouter().push("/dang-ky-dich-vu");
       }
 
       if (

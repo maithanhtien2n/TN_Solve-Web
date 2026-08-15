@@ -17,6 +17,7 @@ const uploadImageRef = ref<any>(null);
 const commonDialogRef = ref<any>(null);
 const uploadImageRefs = ref<any[]>([]);
 const myTimeline = ref<HTMLDivElement | null>(null);
+const pollTimer = ref<ReturnType<typeof setTimeout> | null>(null);
 
 const client = computed<boolean>(() => {
   const win = window as any;
@@ -339,19 +340,127 @@ const scrollToTimeline = () => {
   }
 };
 
-const onGetProductDetail = async (loadingType: string = "") => {
-  await masterDataService
-    .getVideoFlow()
-    .then((res) => {
-      videoFlow.value = res?.data || {};
-    })
-    .catch(() => {});
+// Thay cho socket (io.emit bắn 1 lần, không phát lại nếu client rớt kết nối
+// đúng lúc đó — có trường hợp UI đứng yên mãi phải reload mới thấy cập nhật).
+// Poll lại API cho tới khi có video cuối cùng (ghép xong) — đảm bảo luôn
+// nhận được trạng thái đúng, chỉ đánh đổi độ trễ.
+const POLL_INTERVAL_ACTIVE_MS = 10_000;
+// Khi đã rơi vào lỗi: KHÔNG dừng hẳn, chỉ poll thưa hơn — vì có thể bị "tạo
+// lại giúp" từ nơi khác không đi qua onSubmit() của chính trang này (VD admin
+// bấm nút xoay tròn ở trang Thước phim/Tạo bị lỗi — components/admin/
+// VideoTable.vue gọi thẳng saveProduct, không liên quan gì tới trang đang mở
+// của user), hoặc chính user tự bấm "Tạo lại" ở 1 tab khác. Nếu dừng hẳn thì
+// trang đang mở sẽ đứng yên mãi không hề hay biết, phải tự reload mới thấy.
+const POLL_INTERVAL_ERROR_MS = 30_000;
+
+const stopPolling = () => {
+  if (pollTimer.value) {
+    clearTimeout(pollTimer.value);
+    pollTimer.value = null;
+  }
+};
+
+// pollTimer.value KHÔNG phản ánh đúng "đang gọi API hay không" — nó vẫn giữ
+// nguyên ID (đã hết hạn, vô hại) suốt lúc pollTick() đang await, chỉ được
+// gán ID mới ở CUỐI hàm. Nếu onLiveHint() bắn đúng lúc này, nó sẽ tưởng đang
+// rảnh và lên lịch thêm 1 lượt pollTick() chạy chồng. Dùng cờ riêng để chặn.
+let isPolling = false;
+
+const pollTick = async () => {
+  if (isPolling) return;
+  isPolling = true;
+
+  const prevMessageCount = formData.messages.length;
+  const hadVideo = Boolean(formData.video);
+
+  await onGetProductDetail("", false, false).finally(() => {
+    isPolling = false;
+  });
+
+  if (formData.video) {
+    stopPolling();
+    if (!hadVideo) nextTick(() => window.scrollTo({ top: 0, behavior: "smooth" }));
+    return;
+  }
+
+  // Chỉ cuộn khi thực sự có cập nhật mới, tránh giật màn hình mỗi lần poll
+  if (formData.messages.length !== prevMessageCount) {
+    nextTick(() => scrollToTimeline());
+  }
+
+  pollTimer.value = setTimeout(
+    pollTick,
+    isError.value ? POLL_INTERVAL_ERROR_MS : POLL_INTERVAL_ACTIVE_MS,
+  );
+};
+
+// idOverride: dùng khi gọi ngay sau router.replace() cho video MỚI tạo lần
+// đầu — productId.value (computed theo route) CHƯA kịp cập nhật lúc này
+// (router.replace chưa resolve xong), nếu chỉ dựa vào nó thì hàm sẽ tự thoát
+// sớm và không bao giờ bắt đầu poll. pollTick() bên trong vẫn luôn đọc
+// productId.value tại THỜI ĐIỂM CHẠY (sau delay), lúc đó route đã cập nhật
+// xong nên không cần truyền override vào tận trong.
+const startPolling = (idOverride?: string) => {
+  const pid = idOverride || productId.value;
+  if (!pid || pollTimer.value || formData.video) return;
+  pollTimer.value = setTimeout(
+    pollTick,
+    isError.value ? POLL_INTERVAL_ERROR_MS : POLL_INTERVAL_ACTIVE_MS,
+  );
+};
+
+// Server có sẵn 1 chỗ bắn socket riêng cho đúng case admin bấm "tạo lại
+// giúp" (impersonate) — xem product.service.ts: io.emit khi có
+// request.impersonatedBy. Không tin thẳng payload của event này (đó là lý
+// do bỏ socket ở trên) — chỉ dùng làm tín hiệu "có gì đó vừa đổi, poll ngay
+// đi" để rút ngắn độ trễ từ tối đa 30s xuống gần như tức thời khi socket may
+// mắn tới nơi; poll định kỳ vẫn là lưới an toàn chính nếu socket bị rớt.
+const onLiveHint = () => {
+  // Đang bận gọi API rồi thì thôi — lượt đang chạy sẽ tự lấy dữ liệu mới
+  // nhất, không cần giục thêm (tránh chạy chồng 2 pollTick() cùng lúc).
+  if (isPolling || !pollTimer.value) return;
+  clearTimeout(pollTimer.value);
+  pollTimer.value = setTimeout(pollTick, 0);
+};
+
+// Trình duyệt (đặc biệt mobile) tạm dừng/throttle nặng setTimeout khi tab bị
+// đưa xuống nền — quay lại tab có thể phải đợi hết chu kỳ hiện tại (tối đa
+// POLL_INTERVAL_ERROR_MS) mới thấy cập nhật dù server đã có dữ liệu mới từ
+// lâu. Poll ngay khi tab active trở lại để rút ngắn độ trễ đó.
+const onVisibilityChange = () => {
+  if (document.visibilityState === "visible") onLiveHint();
+};
+
+const onGetProductDetail = async (
+  loadingType: string = "",
+  // Poll định kỳ gọi lại API này liên tục (tối đa 2 tiếng) — 1 lần lỗi mạng/
+  // timeout thoáng qua giữa chừng KHÔNG được đá người dùng ra trang tạo mới,
+  // chỉ bỏ qua lượt đó rồi tự thử lại ở lượt poll kế tiếp. Chỉ redirect khi lần load ĐẦU
+  // TIÊN thật sự xác nhận sản phẩm không tồn tại/lỗi.
+  redirectOnError: boolean = true,
+  // Ngân sách cảnh (videoFlow) gần như không đổi trong lúc đang theo dõi 1
+  // video — chỉ cần lấy 1 lần lúc vào trang, KHÔNG cần gọi lại mỗi lượt poll
+  // (5-30s/lần, kéo dài tới 2 tiếng) vì tốn request vô ích không mang lại
+  // thông tin gì mới.
+  includeFlow: boolean = true,
+) => {
+  if (includeFlow) {
+    await masterDataService
+      .getVideoFlow()
+      .then((res) => {
+        videoFlow.value = res?.data || {};
+      })
+      .catch(() => {});
+  }
 
   if (!productId.value) return;
 
   loading.value = loadingType;
   await productService
-    .getDetailProduct({ _id: productId.value })
+    // silent = !redirectOnError: cùng 1 tín hiệu "đây là poll nền" — poll thì
+    // không redirect khi lỗi (đã sửa trước) VÀ cũng không nên bật popup lỗi
+    // toàn cục (services/axios.ts) cho 1 lần lỗi mạng thoáng qua.
+    .getDetailProduct({ _id: productId.value }, !redirectOnError)
     .then((res) => {
       const data = res?.data;
       if (data) {
@@ -392,12 +501,12 @@ const onGetProductDetail = async (loadingType: string = "") => {
             uploadImageRef.value?.setValue(data.images[0]);
           }
         }, 100);
-      } else {
+      } else if (redirectOnError) {
         router.replace("/thu-vien-cua-toi/tao-moi");
       }
     })
     .catch(() => {
-      router.replace("/thu-vien-cua-toi/tao-moi");
+      if (redirectOnError) router.replace("/thu-vien-cua-toi/tao-moi");
     })
     .finally(() => {
       loading.value = "";
@@ -433,6 +542,23 @@ const onSubmit = async () => {
           ? formData.messages
           : [{ title: "Đang xử lý...", dateTime: "", color: "primary" }];
         router.replace(`/thu-vien-cua-toi/${productId}`);
+        // "Tạo lại video" dùng lại đúng productId cũ (không đổi route) nên
+        // onMounted không tự chạy lại — nếu lần trước đã dừng poll (vì video
+        // trước đó lỗi/xong), phải khởi động lại thủ công ở đây. Còn video
+        // tạo MỚI lần đầu thì route đổi nhưng component không remount (Vue
+        // Router tái dùng instance khi chỉ đổi param) nên onMounted cũng
+        // không tự chạy — phải tự đăng ký ở đây, dùng "productId" (biến cục
+        // bộ ở trên, vừa lấy từ response) chứ KHÔNG dùng productId.value
+        // (computed theo route, có thể chưa kịp cập nhật do router.replace
+        // chưa resolve xong).
+        if (!formData.video) {
+          startPolling(productId);
+          $socket.off(`server:product-detail:${productId}`, onLiveHint);
+          $socket.on(`server:product-detail:${productId}`, onLiveHint);
+          // addEventListener tự bỏ qua nếu đăng ký trùng (không như
+          // $socket.on) nên gọi lại vô hại nếu onMounted đã đăng ký rồi.
+          document.addEventListener("visibilitychange", onVisibilityChange);
+        }
       }
     })
     .catch(() => {
@@ -450,25 +576,20 @@ const onClickLikeVideo = () => {
   });
 };
 
-onMounted(() => {
+onMounted(async () => {
   if (!productId.value) {
     formData.title = `Video của tôi ${new Date().toLocaleTimeString()} ${new Date().toLocaleDateString()}`;
   }
-  onGetProductDetail();
-});
-
-onMounted(() => {
-  $socket.on(`server:product-detail:${productId.value}`, async (data) => {
-    await onGetProductDetail();
-
-    nextTick(() => {
-      if (data.state === "success") {
-        window.scrollTo({ top: 0, behavior: "smooth" });
-      } else {
-        scrollToTimeline();
-      }
-    });
-  });
+  await onGetProductDetail();
+  // Poll cả khi trang load thẳng vào trạng thái lỗi (không chỉ lúc đang chạy
+  // bình thường) — để bắt được trường hợp có ai/nơi nào khác tạo lại giúp
+  // (xem giải thích POLL_INTERVAL_ERROR_MS ở trên).
+  if (productId.value && !formData.video) {
+    startPolling();
+    $socket.off(`server:product-detail:${productId.value}`, onLiveHint);
+    $socket.on(`server:product-detail:${productId.value}`, onLiveHint);
+    document.addEventListener("visibilitychange", onVisibilityChange);
+  }
 });
 
 onMounted(async () => {
@@ -477,7 +598,11 @@ onMounted(async () => {
 });
 
 onUnmounted(() => {
-  $socket.off(`server:product-detail:${productId.value}`);
+  stopPolling();
+  if (productId.value) {
+    $socket.off(`server:product-detail:${productId.value}`, onLiveHint);
+  }
+  document.removeEventListener("visibilitychange", onVisibilityChange);
 });
 
 useSeo({
@@ -1135,7 +1260,12 @@ definePageMeta({ middleware: "auth" });
                   )
                 "
               >
-                {{ item.note }}
+                {{
+                  onGetterUserData?.role === EnumAccountRole.ADMIN ||
+                  !item.isInternalRetry
+                    ? item.note
+                    : "Quá trình này có thể mất vài phút, vui lòng kiên nhẫn chờ đợi..."
+                }}
               </div>
               <div
                 v-if="

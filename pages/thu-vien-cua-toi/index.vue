@@ -122,15 +122,19 @@ const _registerSocketListeners = () => {
       const msgs: any[] = updated?.messages || [];
       const newState = msgs.length ? (msgs[msgs.length - 1]?.color || 'success') : 'success';
 
-      // Cập nhật item in-place (không re-fetch toàn list để tránh flicker)
+      // Vẫn đang chạy (primary/grey): cập nhật ngay tại chỗ để note/vị trí
+      // hàng đợi luôn mới nhất — không cần video nên không sợ thiếu.
+      // Đã XONG (success/error): KHÔNG tự đổi state ở đây — socket này không
+      // có video URL hợp lệ (cần qua getFileS3Url() ở API), nếu đổi state
+      // ngay sẽ hiện "success" mà chưa có video, card hiện sai/nháy lỗi oan.
+      // Để card đứng yên ở "Đang xử lý" rồi nhảy thẳng 1 lần sang đúng kết
+      // quả cuối khi onGetProducts() refetch xong (có đủ cả state lẫn video).
       const idx = (products.value?.docs as any[])?.findIndex((d: any) => d._id === id);
-      if (idx !== -1) {
+      if (idx !== -1 && ['primary', 'grey'].includes(newState)) {
         products.value.docs[idx] = {
           ...products.value.docs[idx],
           messages: msgs,
           state: newState,
-          // video URL cần getFileS3Url — khi done, user click vào detail sẽ thấy đúng
-          ...(updated.video ? {} : {}),
         };
       }
 
@@ -138,7 +142,7 @@ const _registerSocketListeners = () => {
       if (!['primary', 'grey'].includes(newState)) {
         $socket.off(`server:product-detail:${id}`);
         _socketIds.delete(id);
-        // Refresh nhẹ để lấy video URL đúng từ API
+        // Refresh để lấy state + video URL đúng, cập nhật atomically 1 lần
         onGetProducts();
       }
     });
@@ -296,6 +300,23 @@ const getQueueMsg = (item: any): { title: string } | null => {
                 />
                 <span class="processing-label">Đang xử lý</span>
                 <span class="processing-hint">Video đang được tạo...</span>
+              </div>
+            </template>
+
+            <!-- state đã success nhưng video URL chưa kịp cập nhật (socket không
+            gán video, chỉ đổi state — xem _registerSocketListeners) — đây vẫn
+            là ĐANG XONG, KHÔNG PHẢI lỗi. Tách riêng khỏi nhánh error bên dưới
+            để tránh nháy card đỏ oan trong lúc chờ onGetProducts() refetch. -->
+            <template v-else-if="item.state === 'success'">
+              <div class="processing-state">
+                <v-progress-circular
+                  indeterminate
+                  color="rgba(255,255,255,0.85)"
+                  size="38"
+                  width="2"
+                />
+                <span class="processing-label">Đang hoàn tất</span>
+                <span class="processing-hint">Sắp xong rồi...</span>
               </div>
             </template>
 

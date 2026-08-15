@@ -34,8 +34,19 @@ export const productService = {
     return await api.post(`/products/video-automation`, formData);
   },
 
-  async getDetailProduct(params: any) {
-    return await api.get(`/products/detail`, { params });
+  // silent: dùng cho polling nền ([id].vue) — 1 lần lỗi mạng/timeout thoáng
+  // qua giữa các lượt poll không nên bật popup lỗi toàn cục (services/axios.ts),
+  // vì poll tự thử lại ở lượt kế tiếp, không cần làm phiền người dùng.
+  // Đánh dấu bằng QUERY PARAM chứ không phải header tuỳ ý — thêm header lạ
+  // (X-Silent-Error) khiến trình duyệt bắt buộc gửi CORS preflight (OPTIONS)
+  // trước, mà server chỉ khai allowedHeaders cố định (server.ts) không có
+  // header này nên preflight bị chặn, mọi request kèm header đó fail thẳng
+  // (CORS error) — không phải lỗi thoáng qua nữa mà lỗi 100% mọi lần. Query
+  // param không kích hoạt preflight, an toàn hơn nhiều cho mục đích này.
+  async getDetailProduct(params: any, silent = false) {
+    return await api.get(`/products/detail`, {
+      params: { ...params, ...(silent && { silentError: 1 }) },
+    });
   },
 
   async actionProduct(payload: any) {
