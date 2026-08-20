@@ -84,9 +84,6 @@ const onReturnTitle = (title: string) => {
     case "nguoi-dung": {
       return "Người dùng";
     }
-    case "cua-hang": {
-      return "Cửa hàng";
-    }
     case "dieu-khoan": {
       return "Điều khoản & quy định";
     }

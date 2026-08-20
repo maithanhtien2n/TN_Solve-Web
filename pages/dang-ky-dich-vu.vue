@@ -430,7 +430,6 @@ definePageMeta({});
             <span>Tôi đã đọc và đồng ý với <a href="/dieu-khoan" target="_blank"><strong>Điều khoản dịch vụ</strong></a> và <a href="/chinh-sach-bao-mat" target="_blank"><strong>Chính sách bảo mật</strong></a></span>
           </label>
           <p v-if="showTermsError" class="terms-error">
-            <v-icon size="13" color="#ef4444">mdi-alert-circle-outline</v-icon>
             Vui lòng tích vào ô trên để đồng ý với điều khoản!
           </p>
         </div>
