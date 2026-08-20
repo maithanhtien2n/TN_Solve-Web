@@ -14,8 +14,16 @@ export const masterDataService = {
     return await api.get(`/master-data/video-tutorial`);
   },
 
+  async getZaloGroupLink() {
+    return await api.get(`/master-data/zalo-group-link`);
+  },
+
   async getTutorialVideos(params?: { page?: number; limit?: number }) {
     return await api.get(`/master-data/tutorial-videos`, { params });
+  },
+
+  async getContactInfo() {
+    return await api.get(`/master-data/contact-info`);
   },
 
   async getTutorialVideosAdmin(params?: {
@@ -41,6 +49,64 @@ export const masterDataService = {
 
   async deleteTutorialVideo(payload: { _id: string }) {
     return await api.delete(`/master-data/tutorial-videos/admin`, {
+      data: payload,
+    });
+  },
+
+  async getContactInfoAdmin(params?: {
+    search?: string;
+    page?: number;
+    limit?: number;
+  }) {
+    return await api.get(`/master-data/contact-info/admin`, { params });
+  },
+
+  async createContactInfo(payload: { title: string; value: string }) {
+    return await api.post(`/master-data/contact-info/admin`, payload);
+  },
+
+  async updateContactInfo(payload: {
+    _id: string;
+    title?: string;
+    value?: string;
+    status?: string;
+  }) {
+    return await api.put(`/master-data/contact-info/admin`, payload);
+  },
+
+  async deleteContactInfo(payload: { _id: string }) {
+    return await api.delete(`/master-data/contact-info/admin`, {
+      data: payload,
+    });
+  },
+
+  async getOtherProducts() {
+    return await api.get(`/master-data/other-products`);
+  },
+
+  async getOtherProductsAdmin(params?: {
+    search?: string;
+    page?: number;
+    limit?: number;
+  }) {
+    return await api.get(`/master-data/other-products/admin`, { params });
+  },
+
+  async createOtherProduct(payload: { title: string; value: string }) {
+    return await api.post(`/master-data/other-products/admin`, payload);
+  },
+
+  async updateOtherProduct(payload: {
+    _id: string;
+    title?: string;
+    value?: string;
+    status?: string;
+  }) {
+    return await api.put(`/master-data/other-products/admin`, payload);
+  },
+
+  async deleteOtherProduct(payload: { _id: string }) {
+    return await api.delete(`/master-data/other-products/admin`, {
       data: payload,
     });
   },

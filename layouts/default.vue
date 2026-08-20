@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { accountService, authService } from "~/services/app";
+import { accountService, authService, masterDataService } from "~/services/app";
 
 import AppHeader from "~/components/layouts/AppHeader.vue";
 import AppFooter from "~/components/layouts/AppFooter.vue";
@@ -7,6 +7,17 @@ import AppFooter from "~/components/layouts/AppFooter.vue";
 const route = useRoute();
 const router = useRouter();
 const { isMobile } = useDevice();
+
+// Link nhóm Zalo hiển thị ở popup "Thanh toán thành công!" — admin chỉnh được
+// ở Admin > Cài đặt > Thông tin chung (mục "Link nhóm Zalo"), không cần
+// deploy code mỗi lần đổi link.
+const zaloGroupLink = ref("https://zalo.me/g/p8hls5tonlfkqmyfndmx");
+onMounted(async () => {
+  try {
+    const res = await masterDataService.getZaloGroupLink();
+    if (res.data?.link) zaloGroupLink.value = res.data.link;
+  } catch (_) {}
+});
 
 const {
   onActionGetUserData,
@@ -324,10 +335,10 @@ onMounted(async () => {
 
           <a
             target="_blank"
-            href="https://zalo.me/g/p8hls5tonlfkqmyfndmx"
+            :href="zaloGroupLink"
             style="font-size: 1.2rem"
           >
-            https://zalo.me/g/p8hls5tonlfkqmyfndmx
+            {{ zaloGroupLink }}
           </a>
         </v-sheet>
       </v-card-text>

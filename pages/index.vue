@@ -42,6 +42,19 @@ const onClickSmallTutorialVideo = (id: string) => {
 
 const creditDialogRef = ref<any>(null);
 
+// Popup "Thông tin liên hệ" (admin quản lý ở Admin > Quản lý dữ liệu > Thông
+// tin liên hệ) — bấm thẻ "Nhóm Zalo" hiện popup liệt kê các link liên hệ thay
+// vì mở thẳng 1 link cố định, để admin thêm/sửa được mà không cần deploy code.
+const contactInfoDialogRef = ref<any>(null);
+const contactInfoList = ref<{ _id: string; title: string; value: string }[]>([]);
+const openContactInfo = async () => {
+  contactInfoDialogRef.value?.onDisplay(true);
+  try {
+    const res = await masterDataService.getContactInfo();
+    contactInfoList.value = res.data || [];
+  } catch (_) {}
+};
+
 // Đường dẫn video demo AI ở hero (bind động, không dùng src tĩnh) — nếu viết
 // src="/videos/xxx.mp4" thẳng trong template, Vite sẽ tự biến nó thành import
 // lúc build và sập cả trang khi file chưa tồn tại. Đặt tên file thật vào đây
@@ -292,19 +305,19 @@ useSeo({
       </div>
     </router-link>
 
-    <a
-      href="https://zalo.me/g/p8hls5tonlfkqmyfndmx"
-      target="_blank"
+    <div
       class="quick-card qc-orange"
+      style="cursor: pointer"
+      @click="openContactInfo"
     >
       <div class="quick-icon">
         <v-icon color="#f59e0b" size="22">mdi-account-group-outline</v-icon>
       </div>
       <div class="quick-card-body">
-        <div class="quick-label">Nhóm Zalo</div>
+        <div class="quick-label">Nhóm hỗ trợ</div>
         <div class="quick-desc">Tin tức & hỗ trợ mỗi ngày</div>
       </div>
-    </a>
+    </div>
 
     <router-link to="/tro-ly-ai" class="quick-card qc-purple">
       <div class="quick-icon">
@@ -384,6 +397,26 @@ useSeo({
         Đăng ký ngay
       </button>
     </template>
+  </CommonDialog>
+
+  <CommonDialog ref="contactInfoDialogRef" title="Nhóm hỗ trợ" width="480">
+    <div v-if="!contactInfoList.length" class="contact-empty">
+      Chưa có thông tin liên hệ nào
+    </div>
+    <div v-else class="contact-info-list">
+      <a
+        v-for="item in contactInfoList"
+        :key="item._id"
+        :href="item.value"
+        target="_blank"
+        rel="noopener"
+        class="contact-info-row"
+      >
+        <v-icon size="20" color="#f59e0b">mdi-account-group-outline</v-icon>
+        <span>{{ item.title }}</span>
+        <v-icon size="18" color="#94a3b8" class="ml-auto">mdi-open-in-new</v-icon>
+      </a>
+    </div>
   </CommonDialog>
 
   <!-- ── Video tutorial ─────────────────────────────────── -->
@@ -1124,6 +1157,45 @@ useSeo({
   font-size: 0.8rem;
   color: #64748b;
   line-height: 1.4;
+}
+
+/* ─── Popup "Thông tin liên hệ" ──────────────────────── */
+.contact-empty {
+  padding: 24px 4px;
+  text-align: center;
+  color: #94a3b8;
+  font-size: 0.875rem;
+  min-height: 160px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.contact-info-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-top: 8px;
+  min-height: 160px;
+}
+
+.contact-info-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border: 1px solid #f0f0f0;
+  border-radius: 10px;
+  text-decoration: none;
+  color: #1e293b;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.contact-info-row:hover {
+  background: #fffbeb;
+  border-color: #fde68a;
 }
 
 /* ─── Section block ──────────────────────────────────── */

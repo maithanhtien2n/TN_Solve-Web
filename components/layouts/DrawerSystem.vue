@@ -106,20 +106,12 @@ const menus = computed<any>(() => {
       route: "master-data",
       children: [
         {
-          title: "Tài khoản Grok",
-          route: "/admin/master-data/account-create-video-grok",
+          title: "Nhóm hỗ trợ",
+          route: "/admin/master-data/contact-info",
         },
         {
-          title: "Tài khoản Veo3 (Basic)",
-          route: "/admin/master-data/account-create-video-basic",
-        },
-        {
-          title: "Tài khoản Veo3 (Advanced)",
-          route: "/admin/master-data/account-create-video-advanced",
-        },
-        {
-          title: "Tài khoản Nano banana",
-          route: "/admin/master-data/account-create-image",
+          title: "Sản phẩm khác",
+          route: "/admin/master-data/other-products",
         },
       ],
     },

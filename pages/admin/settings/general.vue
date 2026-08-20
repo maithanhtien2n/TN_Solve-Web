@@ -12,6 +12,7 @@ const data = ref<any>({});
 const loading = ref<string>("");
 const dataTableRef = ref<any>(null);
 const newRevenuePassword = ref<string>("");
+const newZaloGroupLink = ref<string>("");
 const newVideoTutorialId = ref<string>("");
 
 async function onSaveRevenuePassword(item: any) {
@@ -27,6 +28,24 @@ async function onSaveRevenuePassword(item: any) {
     dataTableRef.value?.loadItems();
   } catch (error) {
     console.log("Lỗi khi đổi mật khẩu!", error);
+  } finally {
+    loading.value = "";
+  }
+}
+
+async function onSaveZaloGroupLink(item: any) {
+  if (!newZaloGroupLink.value) return;
+
+  loading.value = `zalo-group-link-${item._id}`;
+  try {
+    await masterDataService.settingAction({
+      _id: item._id,
+      value: newZaloGroupLink.value,
+    });
+    newZaloGroupLink.value = "";
+    dataTableRef.value?.loadItems();
+  } catch (error) {
+    console.log("Lỗi khi đổi link nhóm Zalo!", error);
   } finally {
     loading.value = "";
   }
@@ -176,6 +195,15 @@ definePageMeta({ layout: "admin", title: "Thông tin chung" });
         v-else-if="(item as any).title === 'Mật khẩu xem doanh thu công khai'"
       >
         <span class="text-nowrap text-medium-emphasis">•••••••• (đã mã hóa)</span>
+      </template>
+
+      <template v-else-if="(item as any).title === 'Link nhóm Zalo'">
+        <span v-if="(item as any).value" class="text-nowrap">
+          {{ (item as any).value }}
+        </span>
+        <span v-else class="text-nowrap text-medium-emphasis">
+          https://zalo.me/g/p8hls5tonlfkqmyfndmx (mặc định)
+        </span>
       </template>
 
       <template
@@ -328,6 +356,30 @@ definePageMeta({ layout: "admin", title: "Thông tin chung" });
               :loading="loading === `revenue-password-${(item as any)._id}`"
               icon="mdi-content-save-outline"
               @click="onSaveRevenuePassword(item)"
+            />
+          </div>
+        </template>
+
+        <template v-else-if="(item as any).title === 'Link nhóm Zalo'">
+          <div class="d-flex align-center ga-2 my-2 w-10rem">
+            <v-text-field
+              v-model="newZaloGroupLink"
+              density="compact"
+              variant="outlined"
+              hide-details
+              class="flex-grow-1"
+              :placeholder="(item as any).value || 'https://zalo.me/g/...'"
+              @keyup.enter="onSaveZaloGroupLink(item)"
+            />
+            <v-btn
+              variant="tonal"
+              color="primary"
+              height="36"
+              rounded="lg"
+              :disabled="!newZaloGroupLink"
+              :loading="loading === `zalo-group-link-${(item as any)._id}`"
+              icon="mdi-content-save-outline"
+              @click="onSaveZaloGroupLink(item)"
             />
           </div>
         </template>

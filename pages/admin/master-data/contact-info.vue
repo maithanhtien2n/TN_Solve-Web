@@ -4,7 +4,7 @@ import { masterDataService } from "~/services/app";
 
 const headers = [
   { title: "Tiêu đề", key: "title", sortable: false },
-  { title: "Giá trị", key: "value", align: "center", sortable: false },
+  { title: "Đường dẫn", key: "value", sortable: false },
   { title: "Cập nhật", key: "updatedAt", sortable: false },
   { title: "Trạng thái", key: "status", align: "center", sortable: false },
   { title: "Thao tác", key: "action", align: "center", sortable: false },
@@ -23,11 +23,11 @@ const { handleSubmit, resetForm } = useForm({
   },
   validationSchema: {
     title(value: any) {
-      if (!value) return "Vui lòng nhập tiêu đề video";
+      if (!value) return "Vui lòng nhập tiêu đề";
       return true;
     },
     value(value: any) {
-      if (!value) return "Vui lòng nhập ID video YouTube";
+      if (!value) return "Vui lòng nhập đường dẫn";
       return true;
     },
   },
@@ -35,7 +35,7 @@ const { handleSubmit, resetForm } = useForm({
 
 const _id = useField("_id");
 const title = useField("title");
-const videoId = useField("value");
+const link = useField("value");
 
 function onResetForm(item?: any) {
   resetForm({
@@ -50,7 +50,7 @@ function onResetForm(item?: any) {
 async function loadItems(event: any) {
   loading.value = "load-table";
   try {
-    const res = await masterDataService.getTutorialVideosAdmin({
+    const res = await masterDataService.getContactInfoAdmin({
       search: event?.search,
       page: event?.page,
       limit: event?.limit,
@@ -60,7 +60,7 @@ async function loadItems(event: any) {
       totalDocs: res.data?.totalDocs || 0,
     };
   } catch (error) {
-    console.log("Lỗi khi tải danh sách video hướng dẫn!", error);
+    console.log("Lỗi khi tải danh sách thông tin liên hệ!", error);
   } finally {
     loading.value = "";
   }
@@ -70,13 +70,13 @@ const onSubmitForm = handleSubmit(async (values: any) => {
   loading.value = "submit-form";
   try {
     if (values._id) {
-      await masterDataService.updateTutorialVideo({
+      await masterDataService.updateContactInfo({
         _id: values._id,
         title: values.title,
         value: values.value,
       });
     } else {
-      await masterDataService.createTutorialVideo({
+      await masterDataService.createContactInfo({
         title: values.title,
         value: values.value,
       });
@@ -85,7 +85,7 @@ const onSubmitForm = handleSubmit(async (values: any) => {
     onResetForm();
     dataTableRef.value?.loadItems();
   } catch (error) {
-    console.log("Lỗi khi lưu video hướng dẫn!", error);
+    console.log("Lỗi khi lưu thông tin liên hệ!", error);
   } finally {
     loading.value = "";
   }
@@ -101,10 +101,10 @@ const onAction = async (event: any) => {
   } else if (event.action === "delete") {
     loading.value = "delete";
     try {
-      await masterDataService.deleteTutorialVideo({ _id: event.ids[0] });
+      await masterDataService.deleteContactInfo({ _id: event.ids[0] });
       dataTableRef.value?.loadItems();
     } catch (error) {
-      console.log("Lỗi khi xóa video hướng dẫn!", error);
+      console.log("Lỗi khi xóa thông tin liên hệ!", error);
     } finally {
       loading.value = "";
     }
@@ -114,25 +114,25 @@ const onAction = async (event: any) => {
 async function onToggleStatus(item: any) {
   loading.value = `status-${item._id}`;
   try {
-    await masterDataService.updateTutorialVideo({
+    await masterDataService.updateContactInfo({
       _id: item._id,
       status: item.status?.code === "active" ? "inactive" : "active",
     });
     dataTableRef.value?.loadItems();
   } catch (error) {
-    console.log("Lỗi khi đổi trạng thái video hướng dẫn!", error);
+    console.log("Lỗi khi đổi trạng thái thông tin liên hệ!", error);
   } finally {
     loading.value = "";
   }
 }
 
-definePageMeta({ layout: "admin", title: "Video hướng dẫn" });
+definePageMeta({ layout: "admin", title: "Nhóm hỗ trợ" });
 </script>
 
 <template>
   <CommonDialog
     ref="commonDialogRef"
-    :title="_id.value.value ? 'Cập nhật video hướng dẫn' : 'Thêm video hướng dẫn'"
+    :title="_id.value.value ? 'Cập nhật thông tin liên hệ' : 'Thêm thông tin liên hệ'"
     width="500"
   >
     <div class="mt-2">
@@ -141,8 +141,8 @@ definePageMeta({ layout: "admin", title: "Video hướng dẫn" });
           <v-text-field
             v-model="title.value.value"
             variant="outlined"
-            label="Tiêu đề video (✳)"
-            placeholder="Ví dụ: Cách viết prompt hiệu quả"
+            label="Tiêu đề (✳)"
+            placeholder="Ví dụ: Zalo hỗ trợ, Fanpage Facebook..."
             :error-messages="title.errorMessage.value"
             :hide-details="Boolean(!title.errorMessage.value)"
           />
@@ -150,15 +150,14 @@ definePageMeta({ layout: "admin", title: "Video hướng dẫn" });
 
         <v-col cols="12">
           <v-text-field
-            v-model="videoId.value.value"
+            v-model="link.value.value"
             variant="outlined"
-            label="ID video YouTube (✳)"
-            placeholder="Ví dụ: v8OvU85tDLY"
-            :error-messages="videoId.errorMessage.value"
-            :hide-details="Boolean(!videoId.errorMessage.value)"
+            label="Đường dẫn (✳)"
+            placeholder="Ví dụ: https://zalo.me/..."
+            :error-messages="link.errorMessage.value"
+            :hide-details="Boolean(!link.errorMessage.value)"
           />
         </v-col>
-
       </v-row>
     </div>
 
@@ -176,7 +175,7 @@ definePageMeta({ layout: "admin", title: "Video hướng dẫn" });
           indeterminate
         />
 
-        <v-icon v-else size="27">mdi-youtube</v-icon>
+        <v-icon v-else size="27">mdi-card-account-phone-outline</v-icon>
         <h3>{{ _id.value.value ? "Cập nhật" : "Thêm mới" }}</h3>
       </div>
     </template>
@@ -201,16 +200,14 @@ definePageMeta({ layout: "admin", title: "Video hướng dẫn" });
     </template>
 
     <template #row-value="{ item }">
-      <div class="d-flex justify-center">
-        <v-img
-          :src="`https://img.youtube.com/vi/${(item as any).value}/mqdefault.jpg`"
-          :aspect-ratio="16 / 9"
-          cover
-          rounded
-          class="my-2"
-          style="width: 100px; max-width: 100px; flex: none"
-        />
-      </div>
+      <a
+        :href="(item as any).value"
+        target="_blank"
+        rel="noopener"
+        class="contact-link"
+      >
+        {{ (item as any).value }}
+      </a>
     </template>
 
     <template #row-status="{ item }">
@@ -229,12 +226,12 @@ definePageMeta({ layout: "admin", title: "Video hướng dẫn" });
 </template>
 
 <style scoped>
-/* max-width trên td/th thường bị trình duyệt bỏ qua khi table-layout: auto
-   (mặc định) — dùng width: 0 để buộc cột co khít theo đúng nội dung bên
-   trong (div đã giới hạn max-width: 320px ở template), không bị dư khoảng trống. */
-:deep(th:nth-child(1)),
-:deep(td:nth-child(1)) {
-  width: 0;
+.contact-link {
+  color: #1e88e5;
+  text-decoration: none;
+  word-break: break-all;
 }
-
+.contact-link:hover {
+  text-decoration: underline;
+}
 </style>

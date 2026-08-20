@@ -1,8 +1,20 @@
 <script setup lang="ts">
+import { masterDataService } from "~/services/app";
+
 const router = useRouter();
 
 const currentYear = new Date().getFullYear();
 const version = ref<string | null>(null);
+
+// Cột "SẢN PHẨM KHÁC" — admin quản lý ở Admin > Quản lý dữ liệu > Sản phẩm
+// khác, để sau này quảng cáo thêm sản phẩm/tool khác mà không cần deploy code.
+const otherProducts = ref<{ _id: string; title: string; value: string }[]>([]);
+onMounted(async () => {
+  try {
+    const res = await masterDataService.getOtherProducts();
+    otherProducts.value = res.data || [];
+  } catch (_) {}
+});
 
 const onClickNavigate = (value: string) => {
   if (!value) {
@@ -11,21 +23,6 @@ const onClickNavigate = (value: string) => {
       content: "Tính năng đang được phát triển!",
     });
     return;
-  } else if (value === "tutorial") {
-    window.open("https://youtu.be/dCb8hL7wLAM", "_blank");
-  } else if (value === "tnsolve-teacher") {
-    window.open("https://teacher.tnsolve.com", "_blank");
-  } else if (value === "contact") {
-    window.open("https://zalo.me/0343027232", "_blank");
-  } else if (value === "zalo-group") {
-    window.open("https://zalo.me/g/p8hls5tonlfkqmyfndmx", "_blank");
-  } else if (value === "facebook-group") {
-    window.open("https://www.facebook.com/groups/1175744533986396", "_blank");
-  } else if (value === "download-tool") {
-    window.open(
-      "https://github.com/maithanhtien2n/tnsolve_release/releases",
-      "_blank",
-    );
   } else {
     router.push(`/${value}`);
   }
@@ -126,18 +123,23 @@ onMounted(async () => {
           </div>
         </div>
 
-        <!-- Hỗ trợ -->
-        <div class="footer-col">
+        <!-- Sản phẩm khác (admin quản lý ở Admin > Quản lý dữ liệu > Sản phẩm khác) -->
+        <div v-if="otherProducts.length" class="footer-col">
           <div class="col-title">
             <span class="col-title__accent" />
-            HỖ TRỢ
+            SẢN PHẨM KHÁC
           </div>
           <div class="col-links">
-            <a class="col-link" @click="onClickNavigate('tutorial')">Video hướng dẫn</a>
-            <a class="col-link" @click="onClickNavigate('')">Câu hỏi thường gặp</a>
-            <a class="col-link" @click="onClickNavigate('contact')">Liên hệ Zalo</a>
-            <a class="col-link" @click="onClickNavigate('zalo-group')">Nhóm hỗ trợ Zalo</a>
-            <a class="col-link" @click="onClickNavigate('facebook-group')">Nhóm Facebook</a>
+            <a
+              v-for="item in otherProducts"
+              :key="item._id"
+              class="col-link"
+              :href="item.value"
+              target="_blank"
+              rel="noopener"
+            >
+              {{ item.title }}
+            </a>
           </div>
         </div>
 
