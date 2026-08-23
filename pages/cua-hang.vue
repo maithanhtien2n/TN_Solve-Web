@@ -203,7 +203,12 @@ useSeo({
           </div>
         </div>
 
-        <button type="button" class="wallet-btn" @click="onOpenTopup">
+        <button
+          v-if="Object.values(userData || {})?.length"
+          type="button"
+          class="wallet-btn"
+          @click="onOpenTopup"
+        >
           <div class="wallet-btn-icon">
             <v-icon size="18" color="#fff">mdi-wallet-outline</v-icon>
           </div>
