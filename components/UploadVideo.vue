@@ -2,34 +2,21 @@
 const props = defineProps({
   width: { type: String, default: "100%" },
   height: { type: String, default: "20rem" },
-  iconUpload: { type: String, default: "mdi-folder-upload-outline" },
-  textUpload: { type: String, default: "Tải ảnh lên" },
+  iconUpload: { type: String, default: "mdi-video-plus-outline" },
+  textUpload: { type: String, default: "Tải video lên" },
   readonly: { type: Boolean, default: false },
-  // Ẩn dòng "hoặc kéo thả ảnh vào đây" — dùng khi ô quá hẹp (VD nhiều ô ảnh
-  // xếp chung 1 hàng) khiến chữ tràn/vỡ layout.
-  hideHint: { type: Boolean, default: false },
-  // Ẩn icon phía trên chữ — cùng lý do (ô quá hẹp, cần gọn hơn nữa).
-  hideIcon: { type: Boolean, default: false },
 });
 
 const emits = defineEmits(["onSelectFile"]);
 
 const file = ref<File>();
-const base64 = ref<string>("");
-const loading = ref<boolean>(false);
+const previewUrl = ref<string>("");
 const isDragging = ref<boolean>(false);
 
 const processFile = (selectedFile: File) => {
-  loading.value = true;
-  const reader = new FileReader();
-  reader.onload = (e: any) => {
-    file.value = selectedFile;
-    base64.value = e.target.result;
-    loading.value = false;
-    emits("onSelectFile", { file: file.value, base64: base64.value });
-  };
-  reader.onerror = () => { loading.value = false; };
-  reader.readAsDataURL(selectedFile);
+  file.value = selectedFile;
+  previewUrl.value = URL.createObjectURL(selectedFile);
+  emits("onSelectFile", { file: file.value, previewUrl: previewUrl.value });
 };
 
 const onChangeFile = (event: any) => {
@@ -42,25 +29,26 @@ const onChangeFile = (event: any) => {
 const onDrop = (event: DragEvent) => {
   isDragging.value = false;
   const f = event.dataTransfer?.files?.[0];
-  if (f && f.type.startsWith("image/")) processFile(f);
+  if (f && f.type.startsWith("video/")) processFile(f);
 };
 
 const onRemoveFile = () => {
   file.value = undefined;
-  base64.value = "";
-  emits("onSelectFile", { file: file.value, base64: base64.value });
+  previewUrl.value = "";
+  emits("onSelectFile", { file: file.value, previewUrl: "" });
 };
 
-// Nạp giá trị có sẵn (từ server) — phải reset `file` về undefined, nếu không
-// component bị tái sử dụng giữa các lần mở dialog khác nhau (Vue không
-// unmount) sẽ giữ lại `file` từ lần chọn ảnh trước đó của 1 phiên khác, khiến
-// nơi gọi tưởng nhầm là user vừa chọn lại ảnh này trong phiên hiện tại.
+// value: url video đã có sẵn (VD khi sửa 1 mẫu đã có video) — không phải file
+// thật nên không set `file`, chỉ hiện preview. Phải reset `file` về undefined,
+// nếu không component bị tái sử dụng giữa các lần mở dialog khác nhau (Vue
+// không unmount) sẽ giữ lại `file` từ lần chọn video trước đó của 1 phiên
+// khác, khiến nơi gọi tưởng nhầm là user vừa chọn lại video này.
 const setValue = (value: any) => {
-  base64.value = value;
+  previewUrl.value = value || "";
   file.value = undefined;
 };
 
-defineExpose({ file, base64, setValue, hehe: "11" });
+defineExpose({ file, previewUrl, setValue });
 </script>
 
 <template>
@@ -75,18 +63,8 @@ defineExpose({ file, base64, setValue, hehe: "11" });
     <slot />
 
     <!-- Preview state -->
-    <template v-if="base64">
-      <v-img
-        :src="base64"
-        :lazy-src="base64"
-        alt="image-upload"
-        class="ui-upload__img"
-        contain
-      >
-        <template #placeholder>
-          <v-img src="/images/image-default.svg" />
-        </template>
-      </v-img>
+    <template v-if="previewUrl">
+      <video :src="previewUrl" controls class="ui-upload__video" />
 
       <button v-if="!readonly" class="ui-upload__remove" @click.stop="onRemoveFile">
         <v-icon size="16">mdi-close</v-icon>
@@ -95,21 +73,17 @@ defineExpose({ file, base64, setValue, hehe: "11" });
 
     <!-- Empty state -->
     <template v-else>
-      <div v-if="loading" class="ui-upload__loading">
-        <v-progress-circular indeterminate size="36" width="2" color="#1565c0" />
-      </div>
-
-      <div v-else class="ui-upload__empty">
-        <div v-if="!hideIcon" class="ui-upload__icon-wrap">
+      <div class="ui-upload__empty">
+        <div class="ui-upload__icon-wrap">
           <v-icon size="28" color="#1565c0">{{ iconUpload }}</v-icon>
         </div>
         <p class="ui-upload__label">{{ textUpload }}</p>
-        <p v-if="!hideHint" class="ui-upload__hint">hoặc kéo thả ảnh vào đây</p>
+        <p class="ui-upload__hint">hoặc kéo thả video vào đây</p>
       </div>
 
       <input
         type="file"
-        accept="image/*"
+        accept="video/*"
         class="ui-upload__input"
         @change="onChangeFile"
       />
@@ -139,9 +113,11 @@ defineExpose({ file, base64, setValue, hehe: "11" });
 }
 
 /* ── Preview ───────────────────────────────── */
-.ui-upload__img {
+.ui-upload__video {
   width: 100%;
   height: 100%;
+  object-fit: contain;
+  background: #000;
 }
 
 .ui-upload__remove {
@@ -151,7 +127,7 @@ defineExpose({ file, base64, setValue, hehe: "11" });
   width: 26px;
   height: 26px;
   border-radius: 50%;
-  background: rgba(0,0,0,0.55);
+  background: rgba(0, 0, 0, 0.55);
   color: #fff;
   border: none;
   cursor: pointer;
@@ -162,7 +138,9 @@ defineExpose({ file, base64, setValue, hehe: "11" });
   z-index: 2;
 }
 
-.ui-upload__remove:hover { background: #ef4444; }
+.ui-upload__remove:hover {
+  background: #ef4444;
+}
 
 /* ── Empty ─────────────────────────────────── */
 .ui-upload__empty {
@@ -180,7 +158,7 @@ defineExpose({ file, base64, setValue, hehe: "11" });
   width: 52px;
   height: 52px;
   border-radius: 12px;
-  background: rgba(21,101,192,0.1);
+  background: rgba(21, 101, 192, 0.1);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -198,14 +176,6 @@ defineExpose({ file, base64, setValue, hehe: "11" });
   font-size: 0.75rem;
   color: #94a3b8;
   margin: 0;
-}
-
-.ui-upload__loading {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
 /* ── Input ─────────────────────────────────── */

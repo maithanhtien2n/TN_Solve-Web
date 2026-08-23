@@ -211,6 +211,7 @@ const onAction = async (event: any) => {
 };
 
 const onSubmit = handleSubmit(async (values: any) => {
+  if (loading.value === "submit-form") return;
   const payload: any = { ...values };
 
   loading.value = "submit-form";
@@ -383,6 +384,7 @@ definePageMeta({ layout: "admin", title: "Mã giảm giá" });
     <template #footer>
       <div
         class="cta-button w-100 justify-center"
+        :class="{ disabled: loading === 'submit-form' }"
         style="border-radius: 6px"
         @click="onSubmit"
       >

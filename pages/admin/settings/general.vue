@@ -14,6 +14,7 @@ const dataTableRef = ref<any>(null);
 const newRevenuePassword = ref<string>("");
 const newZaloGroupLink = ref<string>("");
 const newVideoTutorialId = ref<string>("");
+const newDefaultTemplatePrice = ref<string>("");
 
 async function onSaveRevenuePassword(item: any) {
   if (!newRevenuePassword.value) return;
@@ -64,6 +65,24 @@ async function onSaveVideoTutorialId(item: any) {
     dataTableRef.value?.loadItems();
   } catch (error) {
     console.log("Lỗi khi đổi video hướng dẫn!", error);
+  } finally {
+    loading.value = "";
+  }
+}
+
+async function onSaveDefaultTemplatePrice(item: any) {
+  if (!newDefaultTemplatePrice.value) return;
+
+  loading.value = `default-template-price-${item._id}`;
+  try {
+    await masterDataService.settingAction({
+      _id: item._id,
+      value: newDefaultTemplatePrice.value,
+    });
+    newDefaultTemplatePrice.value = "";
+    dataTableRef.value?.loadItems();
+  } catch (error) {
+    console.log("Lỗi khi đổi giá tạo video mặc định!", error);
   } finally {
     loading.value = "";
   }
@@ -191,6 +210,14 @@ definePageMeta({ layout: "admin", title: "Thông tin chung" });
         <span v-else class="text-red text-nowrap">Không cho phép</span>
       </template>
 
+      <template v-else-if="(item as any).title === 'Hiển thị trang Cửa hàng'">
+        <span v-if="(item as any).value" class="text-green text-nowrap">
+          Cho phép
+        </span>
+
+        <span v-else class="text-red text-nowrap">Không cho phép</span>
+      </template>
+
       <template
         v-else-if="(item as any).title === 'Mật khẩu xem doanh thu công khai'"
       >
@@ -217,13 +244,20 @@ definePageMeta({ layout: "admin", title: "Thông tin chung" });
         </span>
       </template>
 
-      <template v-else-if="(item as any).title === 'Mô hình ưu tiên'">
-        <span v-if="(item as any).value === 'grok'" class="text-nowrap">
-          🥉 TNS - 6s / 5💎
+      <template
+        v-else-if="(item as any).title === 'Giá tạo video mặc định (Cửa hàng)'"
+      >
+        <span v-if="(item as any).value" class="text-nowrap">
+          {{ Number((item as any).value).toLocaleString("vi-VN") }}đ
         </span>
+        <span v-else class="text-nowrap text-medium-emphasis">
+          500đ (mặc định)
+        </span>
+      </template>
 
+      <template v-else-if="(item as any).title === 'Mô hình ưu tiên'">
         <span
-          v-else-if="(item as any).value === 'veo3_fast'"
+          v-if="(item as any).value === 'veo3_fast'"
           class="text-nowrap"
         >
           🥈 TNS - 8s / 10💎
@@ -333,6 +367,16 @@ definePageMeta({ layout: "admin", title: "Thông tin chung" });
           />
         </template>
 
+        <template v-else-if="(item as any).title === 'Hiển thị trang Cửa hàng'">
+          <v-checkbox
+            readonly
+            hide-details
+            class="my-1"
+            :model-value="Boolean((item as any).value)"
+            @click="onClickAction(item)"
+          />
+        </template>
+
         <template
           v-else-if="(item as any).title === 'Mật khẩu xem doanh thu công khai'"
         >
@@ -410,6 +454,33 @@ definePageMeta({ layout: "admin", title: "Thông tin chung" });
           </div>
         </template>
 
+        <template
+          v-else-if="(item as any).title === 'Giá tạo video mặc định (Cửa hàng)'"
+        >
+          <div class="d-flex align-center ga-2 my-2 w-10rem">
+            <v-text-field
+              v-model="newDefaultTemplatePrice"
+              type="number"
+              density="compact"
+              variant="outlined"
+              hide-details
+              class="flex-grow-1"
+              :placeholder="(item as any).value || '500'"
+              @keyup.enter="onSaveDefaultTemplatePrice(item)"
+            />
+            <v-btn
+              variant="tonal"
+              color="primary"
+              height="36"
+              rounded="lg"
+              :disabled="!newDefaultTemplatePrice"
+              :loading="loading === `default-template-price-${(item as any)._id}`"
+              icon="mdi-content-save-outline"
+              @click="onSaveDefaultTemplatePrice(item)"
+            />
+          </div>
+        </template>
+
         <template v-else-if="(item as any).title === 'Mô hình ưu tiên'">
           <div>
             <v-select
@@ -419,7 +490,6 @@ definePageMeta({ layout: "admin", title: "Thông tin chung" });
               variant="outlined"
               class="my-4 w-10rem"
               :items="[
-                { title: '🥉 TNS - 6s / 5💎', value: 'grok' },
                 { title: '🥈 TNS - 8s / 10💎', value: 'veo3_fast' },
               ]"
               @update:model-value="onClickAction(item)"

@@ -119,6 +119,7 @@ const creditPackagesData = computed(() => [
 ]);
 
 const onClickPayment = async () => {
+  if (loading.value) return;
   loading.value = true;
   const selectedPkg = creditPackagesData.value[selectedPackageIndex.value];
   await appService
@@ -229,8 +230,9 @@ watch(onGetterDisplayPopupBuyCredit, (newVal) => {
     <template #footer>
       <div
         class="cta-button w-100 justify-center"
+        :class="{ disabled: loading }"
         style="border-radius: 6px"
-        @click="onClickPayment"
+        @click="!loading && onClickPayment()"
       >
         <v-progress-circular
           v-if="loading"

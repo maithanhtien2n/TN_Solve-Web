@@ -226,10 +226,6 @@ definePageMeta({});
       <div class="hero-blob2" />
       <div class="hero-inner">
         <div class="hero-left">
-          <div class="hero-badge">
-            <v-icon size="13" color="rgba(255,255,255,0.85)">mdi-crown</v-icon>
-            TN Solve
-          </div>
           <h1 class="hero-title">Đăng ký dịch vụ</h1>
           <div class="hero-checks">
             <div class="hero-check">
@@ -507,22 +503,6 @@ definePageMeta({});
 }
 
 .hero-left { display: flex; flex-direction: column; gap: 6px; }
-
-.hero-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  background: rgba(255,255,255,0.18);
-  border: 1px solid rgba(255,255,255,0.3);
-  border-radius: 999px;
-  padding: 3px 10px;
-  font-size: 0.65rem;
-  font-weight: 700;
-  letter-spacing: 0.5px;
-  color: rgba(255,255,255,0.95);
-  text-transform: uppercase;
-  width: fit-content;
-}
 
 .hero-title {
   font-size: 1.6rem;

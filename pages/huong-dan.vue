@@ -64,20 +64,16 @@ useSeo({
     <div class="hero-blob2" />
     <div class="hero-inner">
       <div class="hero-left">
-        <div class="hero-badge">
-          <v-icon size="13" color="rgba(255,255,255,0.85)">mdi-youtube</v-icon>
-          Video hướng dẫn
-        </div>
-        <h1 class="hero-title">Học cách dùng TN Solve nhanh nhất</h1>
+        <h1 class="hero-title">Hướng dẫn sử dụng</h1>
         <div class="hero-check">
           <v-icon size="14" color="rgba(255,255,255,0.9)">mdi-check-circle</v-icon>
-          Toàn bộ video hướng dẫn, mẹo và thủ thuật để tạo video AI hiệu quả hơn
+          Mẹo và thủ thuật tạo video AI
         </div>
       </div>
       <div class="hero-stats">
         <div class="hero-stat">
           <span class="hero-stat-num">{{ totalDocs }}</span>
-          <span class="hero-stat-label">video hướng dẫn</span>
+          <span class="hero-stat-label">video</span>
         </div>
         <div class="hero-stat-sep" />
         <div class="hero-stat">
@@ -105,8 +101,6 @@ useSeo({
   <div v-else-if="videos.length">
     <div class="huongdan-grid">
       <div v-for="video in videos" :key="video._id" class="huongdan-card">
-        <div class="huongdan-title">{{ video.title }}</div>
-
         <div
           v-if="playingId !== video._id"
           class="huongdan-thumb-wrap"
@@ -131,6 +125,10 @@ useSeo({
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
             allowfullscreen
           />
+        </div>
+
+        <div class="huongdan-card-info">
+          <div class="huongdan-title">{{ video.title }}</div>
         </div>
       </div>
     </div>
@@ -210,22 +208,6 @@ useSeo({
   gap: 6px;
 }
 
-.hero-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  background: rgba(255, 255, 255, 0.18);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  border-radius: 999px;
-  padding: 3px 10px;
-  font-size: 0.65rem;
-  font-weight: 700;
-  letter-spacing: 0.5px;
-  color: rgba(255, 255, 255, 0.95);
-  text-transform: uppercase;
-  width: fit-content;
-}
-
 .hero-title {
   font-size: 1.6rem;
   font-weight: 800;
@@ -284,35 +266,54 @@ useSeo({
 
 .huongdan-card,
 .huongdan-card-skeleton {
+  display: flex;
+  flex-direction: column;
   background: #fff;
-  border-radius: 14px;
+  border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+  border: 1px solid #f0f0f0;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.huongdan-card:hover {
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+  border-color: #e0e0e0;
 }
 
 .huongdan-card-skeleton {
   padding: 16px;
 }
 
+.huongdan-card-info {
+  padding: 10px 12px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
 .huongdan-title {
-  padding: 16px;
+  margin: 0;
   font-size: 0.95rem;
   font-weight: 600;
-  color: #1e293b;
-  line-height: 1.3;
-  min-height: calc(1.3em * 2);
+  color: #1a1a1a;
+  line-height: 1.45;
   display: -webkit-box;
   -webkit-line-clamp: 2;
-  line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
+  transition: color 0.18s ease;
+}
+
+.huongdan-card:hover .huongdan-title {
+  color: #1e88e5;
 }
 
 .huongdan-thumb-wrap {
   position: relative;
   width: 100%;
   padding-top: 56.25%;
-  background: #000;
+  background: #0d0d0d;
   cursor: pointer;
 }
 
@@ -366,15 +367,17 @@ useSeo({
   border-radius: 10px;
 }
 
-@media only screen and (max-width: 900px) {
+@media (max-width: 900px) {
   .huongdan-grid {
     grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
   }
 }
 
-@media only screen and (max-width: 600px) {
+@media (max-width: 550px) {
   .huongdan-grid {
     grid-template-columns: 1fr;
+    gap: 12px;
   }
 }
 

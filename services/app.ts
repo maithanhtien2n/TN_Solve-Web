@@ -6,6 +6,7 @@ export * from "./account";
 export * from "./product";
 export * from "./master-data";
 export * from "./public-revenue";
+export * from "./store";
 
 export const appService = {
   async getUserData(params?: any) {

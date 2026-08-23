@@ -67,6 +67,7 @@ async function loadItems(event: any) {
 }
 
 const onSubmitForm = handleSubmit(async (values: any) => {
+  if (loading.value === "submit-form") return;
   loading.value = "submit-form";
   try {
     if (values._id) {
@@ -165,6 +166,7 @@ definePageMeta({ layout: "admin", title: "Video hướng dẫn" });
     <template #footer>
       <div
         class="cta-button w-100 justify-center"
+        :class="{ disabled: loading === 'submit-form' }"
         style="border-radius: 6px"
         @click="onSubmitForm"
       >

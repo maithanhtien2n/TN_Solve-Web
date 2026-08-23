@@ -14,12 +14,19 @@ const {
   onGetterDisplayPopupBuyCredit,
 } = useAppStore();
 
-const navItems = [
+const STORE_NAV_ITEM = { title: "Cửa hàng", path: "/cua-hang", icon: "mdi-store-outline" };
+
+// Mặc định HIỆN nút Cửa hàng (khớp giá trị mặc định "true" ở backend khi cài
+// đặt "Hiển thị trang Cửa hàng" mới được tạo lần đầu) — tránh nháy ẩn/hiện lúc
+// đang chờ fetch xong. Chỉ ẩn đi khi admin CHỦ ĐỘNG tắt cài đặt này (dùng để
+// tạm ngưng Cửa hàng bảo trì mà user không bấm vào được).
+const navItems = ref([
   { title: "Trang chủ", path: "/", icon: "mdi-home-outline" },
   { title: "Cộng đồng", path: "/cong-dong", icon: "mdi-earth" },
   { title: "Hướng dẫn", path: "/huong-dan", icon: "mdi-youtube" },
   { title: "Đăng ký", path: "/dang-ky-dich-vu", icon: "mdi-tag-outline" },
-];
+  STORE_NAV_ITEM,
+]);
 
 const isActive = (path: string) => route.path === path;
 
@@ -28,7 +35,7 @@ const pillStyle = ref({ left: "4px", width: "0px" });
 
 const updatePill = () => {
   if (!navTrackRef.value) return;
-  const activeIndex = navItems.findIndex((i) => isActive(i.path));
+  const activeIndex = navItems.value.findIndex((i) => isActive(i.path));
   if (activeIndex === -1) {
     pillStyle.value = { left: "4px", width: "0px" };
     return;
@@ -41,7 +48,18 @@ const updatePill = () => {
 };
 
 watch(() => route.path, () => nextTick(updatePill));
-onMounted(() => nextTick(updatePill));
+onMounted(async () => {
+  nextTick(updatePill);
+  const storeVisible = await getSettingValue("Hiển thị trang Cửa hàng");
+  // [audit fix] KHÔNG so sánh "i !== STORE_NAV_ITEM" — navItems bọc trong
+  // ref() nên các phần tử object bên trong đã bị Vue biến thành reactive
+  // proxy, không còn cùng reference với STORE_NAV_ITEM gốc nữa -> so sánh
+  // luôn true, không bao giờ lọc được. Dùng so sánh field "path" thay thế.
+  if (!storeVisible) {
+    navItems.value = navItems.value.filter((i) => i.path !== STORE_NAV_ITEM.path);
+    nextTick(updatePill);
+  }
+});
 
 const menus = computed(() => {
   let items = [

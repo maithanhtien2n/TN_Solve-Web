@@ -171,15 +171,17 @@ export function removeLocalePrefixStrict(fullPath: string): string {
 }
 
 /**
- * input: "HH:mm DD/MM/YYYY" (vd: "00:17 04/02/2026")
- * now:   Date tuỳ chọn để test (mặc định = thời điểm hiện tại)
+ * Parse chuỗi định dạng "HH:mm DD/MM/YYYY" (server trả về qua
+ * format.formatDateTime() — KHÔNG phải ISO, new Date(str) trực tiếp sẽ ra
+ * Invalid Date) thành Date thật — dùng chung bởi timeAgoVi() và bất kỳ chỗ
+ * nào khác cần tính toán theo thời gian thật từ formData.createdAt/updatedAt
+ * (VD tính % tiến trình giả theo thời gian trôi qua ở thu-vien-cua-toi/[id].vue).
  */
-export function timeAgoVi(input: string, now: Date = new Date()): string {
-  // Parse "HH:mm DD/MM/YYYY"
+export function parseVnDateTime(input: string): Date | null {
   const m = input
-    .trim()
+    ?.trim()
     .match(/^(\d{1,2}):(\d{2})\s+(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
-  if (!m) return "không rõ thời gian";
+  if (!m) return null;
 
   const [, hhStr, mmStr, ddStr, MMStr, yyyyStr] = m;
   const hh = Number(hhStr);
@@ -188,9 +190,17 @@ export function timeAgoVi(input: string, now: Date = new Date()): string {
   const MM = Number(MMStr);
   const yyyy = Number(yyyyStr);
 
-  // Date(year, monthIndex, day, hour, minute)
   const dt = new Date(yyyy, MM - 1, dd, hh, mi, 0, 0);
-  if (Number.isNaN(dt.getTime())) return "không rõ thời gian";
+  return Number.isNaN(dt.getTime()) ? null : dt;
+}
+
+/**
+ * input: "HH:mm DD/MM/YYYY" (vd: "00:17 04/02/2026")
+ * now:   Date tuỳ chọn để test (mặc định = thời điểm hiện tại)
+ */
+export function timeAgoVi(input: string, now: Date = new Date()): string {
+  const dt = parseVnDateTime(input);
+  if (!dt) return "không rõ thời gian";
 
   const diffMs = now.getTime() - dt.getTime();
   const isFuture = diffMs < 0;

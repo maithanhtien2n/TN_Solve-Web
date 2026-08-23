@@ -29,9 +29,57 @@ export const productService = {
         formData.append("images", image);
       });
     }
+    // "Tùy chọn" ở Phong cách — prompt user tự nhập tay từng cảnh (bỏ qua AI
+    // phân tích, xem product.service.ts buildCustomPromptScenes).
+    if (payload.customPrompts && Array.isArray(payload.customPrompts)) {
+      payload.customPrompts.forEach((text: string) => {
+        formData.append("customPrompts", text);
+      });
+    }
     if (payload.client) formData.append("client", true);
 
     return await api.post(`/products/video-automation`, formData);
+  },
+
+  // Tạo video theo mẫu "Cửa hàng" — 1 video duy nhất, model omni, trừ ví riêng
+  // (xem product.service.ts videoAutomationStore). Có thể mất tới ~9 phút
+  // (AbortSignal.timeout ở run-video.ts) nhưng KHÔNG cần override timeout ở
+  // đây vì endpoint này trả về ngay lập tức (chỉ tạo ProductModel + đẩy vào
+  // videoQueue), sinh video thật chạy nền — khác hẳn /store/generate cũ (đã
+  // xoá) từng phải giữ kết nối mở suốt lúc tạo.
+  async saveProductStore(payload: {
+    title?: string;
+    templateId?: string;
+    videoMode?: string;
+    promptInput?: string;
+    promptInputs?: Record<string, string>;
+    aspectRatio?: string;
+    images?: File[];
+    // Đánh dấu từng ô ảnh theo đúng thứ tự: URL ảnh cũ (giữ nguyên, không cần
+    // chọn lại) hoặc null (ô đó có file MỚI, khớp thứ tự với mảng images ở
+    // trên) — cho phép "Tạo lại video" sau lỗi giữ nguyên ảnh cũ không cần
+    // chọn lại (xem product.service.ts videoAutomationStore).
+    imagesMeta?: (string | null)[];
+  }) {
+    const formData = new FormData();
+    if (payload.title) formData.append("title", payload.title);
+    if (payload.templateId) formData.append("templateId", payload.templateId);
+    if (payload.videoMode) formData.append("videoMode", payload.videoMode);
+    if (payload.promptInput) formData.append("promptInput", payload.promptInput);
+    if (payload.promptInputs) {
+      formData.append("promptInputs", JSON.stringify(payload.promptInputs));
+    }
+    if (payload.aspectRatio) formData.append("aspectRatio", payload.aspectRatio);
+    if (Array.isArray(payload.images)) {
+      payload.images.forEach((image) => {
+        if (image) formData.append("images", image);
+      });
+    }
+    if (payload.imagesMeta) {
+      formData.append("imagesMeta", JSON.stringify(payload.imagesMeta));
+    }
+
+    return await api.post(`/products/video-automation-store`, formData);
   },
 
   // silent: dùng cho polling nền ([id].vue) — 1 lần lỗi mạng/timeout thoáng

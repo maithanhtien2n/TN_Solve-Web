@@ -32,7 +32,12 @@ const dataTableRef = ref<any>(null);
 // Icon thể hiện loại tài nguyên đã dùng để tạo video (snapshot lúc tạo — xem
 // resourceType ở product.model.ts). Video tạo trước khi có field này sẽ
 // không có icon (không suy ngược từ trạng thái tài khoản hiện tại).
-function resourceTypeIcon(resourceType?: string): string {
+function resourceTypeIcon(resourceType?: string, modelVideo?: string): string {
+  // Video "Cửa hàng" luôn dùng model omni (hardcode server-side, không phải
+  // lựa chọn user chọn ở luồng thường) và không đi qua hệ thống credit
+  // thường nên resourceType luôn rỗng — check riêng modelVideo để vẫn có
+  // icon phân biệt thay vì để trống.
+  if (modelVideo === "omni") return "🏪 ";
   switch (resourceType) {
     case "trial":
       return "🎁 ";
@@ -79,7 +84,7 @@ const videoStyleItems = computed(() => {
   ];
 
   switch (params.videoMode) {
-    case "movie": {
+    case "ttv": {
       return list.filter((x: any) =>
         [null, "general", "monologue", "narration"].includes(x.value)
       );
@@ -109,7 +114,7 @@ const videoDurationItems = computed(() => {
     ...(onGetterMasterData.value["video-duration"] || []),
   ];
 
-  if (params.videoMode === "movie") {
+  if (params.videoMode === "ttv") {
     return allOptions;
   } else if (["short_form_video", "my_subject"].includes(params.videoMode)) {
     // Nếu là video ngắn, chỉ lấy các giá trị từ '1' đến '7'
@@ -151,7 +156,17 @@ async function loadItems(event: any) {
 const onClickRestartVideo = async (item: any) => {
   if (!item || !item._id) return;
 
-  await productService.saveProduct(item);
+  // Video cũ có thể đang lưu videoStyle đã bị BE gỡ khỏi enum — gửi thẳng giá
+  // trị cũ này lên sẽ bị Joi (productSchema.create) từ chối. Sửa về giá trị
+  // hợp lệ hiện tại (theo master-data) trước khi gửi để không gãy "Tạo lại".
+  const validStyles = (onGetterMasterData.value["video-style"] || []).map(
+    (x: any) => x.value,
+  );
+  const payload = validStyles.includes(item.videoStyle)
+    ? item
+    : { ...item, videoStyle: validStyles[0] || "general" };
+
+  await productService.saveProduct(payload);
   await dataTableRef.value?.loadItems();
 
   // confirmDialogRef.value.show({
@@ -252,7 +267,7 @@ const onChangeFilter = (event: any) => {
     <template #row-title="{ item }">
       <div class="d-flex flex-column ga-1 py-4" style="max-width: 20rem">
         <span style="min-width: 14rem">
-          {{ `${resourceTypeIcon((item as any).resourceType)}${(item as any).title}` }}
+          {{ `${resourceTypeIcon((item as any).resourceType, (item as any).modelVideo)}${(item as any).title}` }}
         </span>
 
         <div
