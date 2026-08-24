@@ -68,11 +68,26 @@ export const storeService = {
     return await api.get(`/store/wallet`);
   },
 
-  async getWalletTransactions(params?: { page?: number; limit?: number }) {
+  async getWalletTransactions(params?: {
+    page?: number;
+    limit?: number;
+    type?: "topup" | "generation";
+  }) {
     return await api.get(`/store/wallet/transactions`, { params });
   },
 
   async createWalletTopupPayment(payload: { amount: number }) {
     return await api.post(`/store/wallet/topup`, payload);
+  },
+
+  // Admin xem lịch sử ví Cửa hàng của TẤT CẢ user (khác getWalletTransactions
+  // ở trên — chỉ trả về của chính người gọi).
+  async getAllWalletTransactions(params: any) {
+    return await api.get(`/store/wallet/transactions/admin`, { params });
+  },
+
+  // Admin xem lịch sử MUA HÀNG (mỗi video Cửa hàng tạo thành công) của TẤT CẢ user.
+  async getAllPurchaseHistory(params: any) {
+    return await api.get(`/store/purchases/admin`, { params });
   },
 };

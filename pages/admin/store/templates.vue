@@ -205,7 +205,7 @@ async function onToggleStatus(item: any) {
   }
 }
 
-definePageMeta({ layout: "admin", title: "Cửa hàng - Mẫu video" });
+definePageMeta({ layout: "admin", title: "Sản phẩm" });
 </script>
 
 <template>

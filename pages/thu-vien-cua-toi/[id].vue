@@ -16,6 +16,31 @@ const loading = ref("");
 const videoFlow = ref<any>({});
 const commonDialogRef = ref<any>(null);
 const uploadImageRefs = ref<any[]>([]);
+// [audit fix] Các lưới ô ảnh "KHÔNG bắt buộc điền hết" (rtv 1-3 ảnh; Cửa hàng
+// "Tạo mặc định" khi KHÔNG phải chế độ "Image to video") cho phép user điền ô
+// SAU mà bỏ trống ô TRƯỚC — mảng formData.images sẽ có 1 phần tử "undefined"
+// NẰM GIỮA 2 ảnh thật. Lúc gửi đi (services/product.ts, forEach KHÔNG bỏ qua
+// phần tử đã gán rõ undefined, khác sparse hole thật) tạo request lỗi, và
+// product.service.ts phía BE không lọc phần tử rỗng nên crash lúc đọc
+// image.originalname. Thay vì chỉ lọc lúc gửi, DỒN LẠI ngay trên UI mỗi khi
+// user chọn/xoá 1 ô — ảnh luôn tự xếp liền mạch từ ô đầu tiên. Nhận thêm
+// refsArray vì có 2 lưới dùng ref khác nhau (uploadImageRefs cho rtv/
+// my_subject, storeImageRefs cho Cửa hàng) nhưng cùng ghi vào formData.images.
+// Áp dụng CẢ cho "Image to video" (Ảnh đầu/Ảnh cuối): pipeline bắt buộc phải
+// có khung hình ĐẦU mới chạy được, nên nếu user chỉ nhập 1 ảnh (bất kể nhập ở
+// ô "Ảnh đầu" hay "Ảnh cuối") thì ảnh đó PHẢI được đẩy về vị trí "Ảnh đầu"
+// (index 0) — đúng ý nghĩa nó cần đóng vai trò khung hình đầu bắt buộc.
+function compactImageSlots(refsArray: any[], totalSlots: number) {
+  const refs = refsArray.slice(0, totalSlots);
+  const filled = refs
+    .map((ref: any) => ({ file: ref?.file, base64: ref?.base64 }))
+    .filter((item: any) => item.base64);
+  for (let i = 0; i < totalSlots; i++) {
+    const item = filled[i];
+    formData.images[i] = item?.file;
+    refs[i]?.setFileValue(item?.base64 || "", item?.file);
+  }
+}
 // Prompt gốc (formData.value) có thể rất dài (VD kịch bản thuyết trình vài
 // nghìn ký tự) — mặc định thu gọn lại, cho nút "Xem thêm/Thu gọn" bung ra khi
 // cần. Chỉ 1 state dùng chung cho 2 nơi hiện Prompt (storeOrder mặc định vs
@@ -1646,7 +1671,18 @@ definePageMeta({ middleware: "auth" });
                     :textUpload="storeImageSlotLabel(n)"
                     hide-hint
                     hide-icon
-                    @on-select-file="(event) => (formData.images[n - 1] = event?.file)"
+                    @on-select-file="
+                      (event) => {
+                        formData.images[n - 1] = event?.file;
+                        // Luôn tự dồn — kể cả 'Image to video' (Ảnh đầu/Ảnh
+                        // cuối): pipeline bắt buộc phải có khung hình ĐẦU nên
+                        // nếu chỉ nhập 1 ảnh (ở ô nào cũng vậy) thì ảnh đó phải
+                        // được đẩy về vị trí 'Ảnh đầu' (index 0), giống RTV.
+                        nextTick(() =>
+                          compactImageSlots(storeImageRefs, storeImageCount),
+                        );
+                      }
+                    "
                   />
                 </div>
               </div>
@@ -1682,7 +1718,15 @@ definePageMeta({ middleware: "auth" });
                     hide-hint
                     hide-icon
                     @on-select-file="
-                      (event) => (formData.images[n - 1] = event?.file)
+                      (event) => {
+                        formData.images[n - 1] = event?.file;
+                        nextTick(() =>
+                          compactImageSlots(
+                            uploadImageRefs,
+                            formData.videoMode === 'my_subject' ? 1 : 3,
+                          ),
+                        );
+                      }
                     "
                   />
                 </div>

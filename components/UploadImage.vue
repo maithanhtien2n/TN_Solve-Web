@@ -60,7 +60,16 @@ const setValue = (value: any) => {
   file.value = undefined;
 };
 
-defineExpose({ file, base64, setValue, hehe: "11" });
+// Dùng khi DỒN Ô (compactImageSlots ở nơi gọi) — khác setValue() ở trên: phải
+// GIỮ LẠI File thật (không set undefined), nếu không lúc submit sẽ mất file
+// gốc (chỉ còn base64), khiến imagesMeta bị hiểu nhầm là "ảnh cũ giữ nguyên"
+// thay vì "ảnh mới cần upload".
+const setFileValue = (value: any, fileValue?: File) => {
+  base64.value = value;
+  file.value = fileValue;
+};
+
+defineExpose({ file, base64, setValue, setFileValue, hehe: "11" });
 </script>
 
 <template>

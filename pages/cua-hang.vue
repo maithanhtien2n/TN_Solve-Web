@@ -17,6 +17,24 @@ const walletDialogRef = ref<any>(null);
 const topupAmount = ref<number>(50000);
 const topupLoading = ref(false);
 const topupPresets = [10000, 20000, 50000, 100000, 200000, 500000];
+// Giống ô "Thông tin sản phẩm"/đồng ý điều khoản ở trang Đăng ký dịch vụ
+// (dang-ky-dich-vu.vue) — bắt buộc tích đồng ý mới cho nạp, đúng quy định
+// hiển thị đủ thông tin trước khi thanh toán.
+const showTopupProductInfo = ref<boolean>(true);
+const agreedToTopupTerms = ref<boolean>(false);
+const showTopupTermsError = ref<boolean>(false);
+
+// Lịch sử ví CỦA CHÍNH USER (khác trang admin xem của TẤT CẢ user) — dùng
+// chung 1 dialog cho cả "Lịch sử nạp tiền" và "Lịch sử mua hàng", chỉ khác
+// tham số `type` gửi lên BE (xem store.service.ts getWalletTransactions).
+const historyDialogRef = ref<any>(null);
+const historyType = ref<"topup" | "generation">("topup");
+const historyLoading = ref(false);
+const historyLoadingMore = ref(false);
+const historyDocs = ref<any[]>([]);
+const historyPage = ref(1);
+const historyTotalDocs = ref(0);
+const HISTORY_PAGE_SIZE = 20;
 
 const previewDialogRef = ref<any>(null);
 const previewTemplate = ref<any>(null);
@@ -97,11 +115,64 @@ function onOpenTopup() {
     displayLogin.value = true;
     return;
   }
+  agreedToTopupTerms.value = false;
+  showTopupTermsError.value = false;
   walletDialogRef.value?.onDisplay(true);
+}
+
+async function onOpenHistory(type: "topup" | "generation") {
+  if (!userData.value?._id) {
+    displayLogin.value = true;
+    return;
+  }
+  historyType.value = type;
+  historyDialogRef.value?.onDisplay(true);
+  historyDocs.value = [];
+  historyPage.value = 1;
+  historyTotalDocs.value = 0;
+  historyLoading.value = true;
+  try {
+    const res = await storeService.getWalletTransactions({
+      type,
+      page: 1,
+      limit: HISTORY_PAGE_SIZE,
+    });
+    historyDocs.value = res.data?.docs || [];
+    historyTotalDocs.value = res.data?.totalDocs || 0;
+  } catch (error) {
+    console.log("Lỗi khi tải lịch sử ví!", error);
+  } finally {
+    historyLoading.value = false;
+  }
+}
+
+async function onLoadMoreHistory() {
+  if (historyLoadingMore.value) return;
+  historyLoadingMore.value = true;
+  try {
+    const nextPage = historyPage.value + 1;
+    const res = await storeService.getWalletTransactions({
+      type: historyType.value,
+      page: nextPage,
+      limit: HISTORY_PAGE_SIZE,
+    });
+    historyDocs.value = [...historyDocs.value, ...(res.data?.docs || [])];
+    historyTotalDocs.value = res.data?.totalDocs || historyTotalDocs.value;
+    historyPage.value = nextPage;
+  } catch (error) {
+    console.log("Lỗi khi tải thêm lịch sử ví!", error);
+  } finally {
+    historyLoadingMore.value = false;
+  }
 }
 
 async function onClickTopup() {
   if (topupLoading.value) return;
+  if (!agreedToTopupTerms.value) {
+    showTopupTermsError.value = true;
+    return;
+  }
+  showTopupTermsError.value = false;
   topupLoading.value = true;
   try {
     const res = await storeService.createWalletTopupPayment({
@@ -135,56 +206,176 @@ useSeo({
 
 <template>
   <CommonDialog ref="walletDialogRef" title="Nạp ví Cửa hàng" width="530">
-    <div class="mt-2">
-      <div class="text-body-2 text-medium-emphasis mb-3">
-        Số dư hiện tại:
-        <strong>{{ walletBalance.toLocaleString("vi-VN") }}đ</strong>
-        — Nạp tối thiểu 10.000đ, tối đa 500.000đ mỗi lần.
+    <div class="mt-2 topup-form">
+      <div class="checkout-field">
+        <label class="field-label">Số tiền nạp (đ)</label>
+        <v-number-input
+          v-model="topupAmount"
+          class="topup-amount-field"
+          variant="outlined"
+          control-variant="stacked"
+          :min="10000"
+          :max="500000"
+          :step="10000"
+          hide-details
+        />
+        <div class="field-hint">Nạp tối thiểu 10.000đ, tối đa 500.000đ mỗi lần.</div>
+
+        <div class="topup-presets">
+          <v-chip
+            v-for="amt in topupPresets"
+            :key="amt"
+            size="small"
+            variant="tonal"
+            :color="topupAmount === amt ? 'primary' : undefined"
+            @click="topupAmount = amt"
+          >
+            {{ amt.toLocaleString("vi-VN") }}đ
+          </v-chip>
+        </div>
       </div>
 
-      <v-number-input
-        v-model="topupAmount"
-        variant="outlined"
-        control-variant="stacked"
-        :min="10000"
-        :max="500000"
-        :step="10000"
-        label="Số tiền nạp (đ)"
-        hide-details
-      />
+      <!-- Summary -->
+      <div class="checkout-summary">
+        <div class="sum-product">
+          <span class="sum-product-name">Nạp ví Cửa hàng</span>
+          <span class="sum-pkg-price">{{ formatCurrency(topupAmount) }}</span>
+        </div>
+        <div class="sum-row">
+          <span>Số lượng</span>
+          <span>1</span>
+        </div>
+        <div class="sum-sep" />
+        <div class="sum-row sum-row--total">
+          <span>Thành tiền</span>
+          <span class="sum-total">{{ formatCurrency(topupAmount) }}</span>
+        </div>
+        <div class="sum-vat">Đã bao gồm thuế VAT</div>
+      </div>
 
-      <div class="topup-presets">
-        <v-chip
-          v-for="amt in topupPresets"
-          :key="amt"
-          size="small"
-          variant="tonal"
-          :color="topupAmount === amt ? 'primary' : undefined"
-          @click="topupAmount = amt"
-        >
-          {{ amt.toLocaleString("vi-VN") }}đ
-        </v-chip>
+      <!-- Thông tin sản phẩm -->
+      <div class="product-info">
+        <div class="product-info-title" @click="showTopupProductInfo = !showTopupProductInfo">
+          Thông tin sản phẩm
+          <v-icon class="pi-toggle-icon" size="18" color="#475569">
+            {{ showTopupProductInfo ? "mdi-chevron-up" : "mdi-chevron-down" }}
+          </v-icon>
+        </div>
+        <div class="product-info-list" :class="{ 'pi-collapsed': !showTopupProductInfo }">
+          <div class="pi-row">
+            <span class="pi-label">Dịch vụ</span>
+            <span class="pi-val">Nạp tiền vào ví Cửa hàng để tạo video AI theo mẫu có sẵn</span>
+          </div>
+          <div class="pi-row">
+            <span class="pi-label">Nguồn gốc/xuất xứ</span>
+            <span class="pi-val">Sản phẩm/dịch vụ do TN Solve phát triển và cung cấp</span>
+          </div>
+          <div class="pi-row">
+            <span class="pi-label">Hình thức sử dụng</span>
+            <span class="pi-val">Số dư được cộng vào ví, trừ dần khi tạo video, không giới hạn thời gian sử dụng</span>
+          </div>
+          <div class="pi-row">
+            <span class="pi-label">Số tiền nạp</span>
+            <span class="pi-val"><strong>{{ formatCurrency(topupAmount) }}</strong>, đã bao gồm VAT</span>
+          </div>
+          <div class="pi-row">
+            <span class="pi-label">Trước khi thanh toán</span>
+            <span class="pi-val">Khách hàng được kiểm tra lại số tiền nạp và tổng số tiền cần thanh toán</span>
+          </div>
+          <div class="pi-row">
+            <span class="pi-label">Giao hàng</span>
+            <span class="pi-val">Số dư được cộng vào ví ngay sau khi thanh toán thành công</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Đồng ý điều khoản -->
+      <div>
+        <label class="agree-check" @click="showTopupTermsError = false">
+          <input v-model="agreedToTopupTerms" type="checkbox" />
+          <span>
+            Tôi đã đọc và đồng ý với
+            <a href="/dieu-khoan" target="_blank"><strong>Điều khoản dịch vụ</strong></a>
+            và
+            <a href="/chinh-sach-bao-mat" target="_blank"><strong>Chính sách bảo mật</strong></a>
+          </span>
+        </label>
+        <p v-if="showTopupTermsError" class="terms-error">
+          Vui lòng tích vào ô trên để đồng ý với điều khoản!
+        </p>
       </div>
     </div>
 
     <template #footer>
-      <div
-        class="cta-button w-100 justify-center"
-        :class="{ disabled: topupLoading }"
-        style="border-radius: 6px"
-        @click="!topupLoading && onClickTopup()"
+      <button
+        class="checkout-btn"
+        :disabled="Boolean(topupLoading)"
+        @click="onClickTopup"
       >
-        <v-progress-circular
-          v-if="topupLoading"
-          width="2"
-          size="23"
-          color="white"
-          indeterminate
-        />
-        <v-icon v-else size="27">mdi-wallet-plus-outline</v-icon>
-        <h3>Nạp ví</h3>
-      </div>
+        <v-progress-circular v-if="topupLoading" width="2" size="18" color="white" indeterminate />
+        <template v-else>
+          <v-icon size="18">mdi-wallet-plus-outline</v-icon>
+          Nạp ví ngay
+        </template>
+      </button>
     </template>
+  </CommonDialog>
+
+  <CommonDialog
+    ref="historyDialogRef"
+    :title="historyType === 'topup' ? 'Lịch sử nạp tiền' : 'Lịch sử mua hàng'"
+    width="530"
+  >
+    <div class="mt-2 history-list">
+      <div v-if="historyLoading" class="text-center py-6">
+        <v-progress-circular indeterminate color="primary" />
+      </div>
+
+      <div v-else-if="!historyDocs.length" class="text-center text-medium-emphasis py-6">
+        Chưa có giao dịch nào.
+      </div>
+
+      <div v-else>
+        <div v-for="doc in historyDocs" :key="doc._id" class="history-row">
+          <div class="history-row-main">
+            <span class="history-row-title">
+              {{ historyType === "topup" ? "Nạp ví Cửa hàng" : doc.templateTitle }}
+            </span>
+            <span class="history-row-time">{{ doc.createdAt }}</span>
+          </div>
+
+          <div class="history-row-side">
+            <v-chip v-if="doc.discountPercent > 0" color="success" size="x-small" class="mb-1">
+              -{{ doc.discountPercent }}%
+            </v-chip>
+            <span
+              class="history-row-amount"
+              :class="historyType === 'topup' ? 'text-success' : 'text-red'"
+            >
+              {{ historyType === "topup" ? "+" : "-" }}{{ doc.amount.toLocaleString("vi-VN") }}đ
+            </span>
+            <a
+              v-if="doc.videoUrl"
+              :href="doc.videoUrl"
+              target="_blank"
+              rel="noopener"
+              class="history-row-link"
+            >
+              Xem video
+            </a>
+          </div>
+        </div>
+
+        <div v-if="historyDocs.length < historyTotalDocs" class="text-center pt-3">
+          <span
+            class="history-load-more"
+            @click="!historyLoadingMore && onLoadMoreHistory()"
+          >
+            {{ historyLoadingMore ? "Đang tải..." : "Xem thêm" }}
+          </span>
+        </div>
+      </div>
+    </div>
   </CommonDialog>
 
   <div class="shop-page">
@@ -203,23 +394,34 @@ useSeo({
           </div>
         </div>
 
-        <button
-          v-if="Object.values(userData || {})?.length"
-          type="button"
-          class="wallet-btn"
-          @click="onOpenTopup"
-        >
-          <div class="wallet-btn-icon">
-            <v-icon size="18" color="#fff">mdi-wallet-outline</v-icon>
+        <div v-if="Object.values(userData || {})?.length" class="wallet-area">
+          <div
+            v-if="userData?.role !== EnumAccountRole.ADMIN"
+            class="wallet-history-links"
+          >
+            <button type="button" class="wallet-history-link" @click="onOpenHistory('topup')">
+              <v-icon size="14" color="#fff">mdi-history</v-icon>
+              Lịch sử nạp tiền
+            </button>
+            <button type="button" class="wallet-history-link" @click="onOpenHistory('generation')">
+              <v-icon size="14" color="#fff">mdi-cart-outline</v-icon>
+              Lịch sử mua hàng
+            </button>
           </div>
-          <div class="wallet-btn-text">
-            <span class="wallet-btn-label">Số dư ví</span>
-            <span class="wallet-btn-value">{{ walletBalance.toLocaleString("vi-VN") }}đ</span>
-          </div>
-          <div class="wallet-btn-add">
-            <v-icon size="18" color="#fff">mdi-plus</v-icon>
-          </div>
-        </button>
+
+          <button type="button" class="wallet-btn" @click="onOpenTopup">
+            <div class="wallet-btn-icon">
+              <v-icon size="18" color="#fff">mdi-wallet-outline</v-icon>
+            </div>
+            <div class="wallet-btn-text">
+              <span class="wallet-btn-label">Số dư ví</span>
+              <span class="wallet-btn-value">{{ walletBalance.toLocaleString("vi-VN") }}đ</span>
+            </div>
+            <div class="wallet-btn-add">
+              <v-icon size="18" color="#fff">mdi-plus</v-icon>
+            </div>
+          </button>
+        </div>
       </div>
     </div>
 
@@ -286,6 +488,9 @@ useSeo({
 
         <div v-if="previewTemplate.sampleVideo" class="preview-video-wrap">
           <video :src="previewTemplate.sampleVideo" controls class="preview-video" />
+        </div>
+        <div v-else-if="previewTemplate.thumbnail" class="preview-video-wrap">
+          <v-img :src="previewTemplate.thumbnail" cover height="100%" class="preview-video" />
         </div>
 
         <StoreFieldCard v-if="previewTemplate.exampleImages?.length" label="Ảnh yêu cầu">
@@ -403,7 +608,8 @@ useSeo({
   align-items: center;
   gap: 12px;
   flex-shrink: 0;
-  padding: 8px 10px;
+  height: 52px;
+  padding: 0 10px;
   border-radius: 16px;
   background: rgba(255, 255, 255, 0.14);
   border: 1px solid rgba(255, 255, 255, 0.35);
@@ -470,12 +676,124 @@ useSeo({
   background: rgba(255, 255, 255, 0.35);
 }
 
+.wallet-area {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.wallet-history-links {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.wallet-history-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+  padding: 0 12px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 400;
+  color: #fff;
+  white-space: nowrap;
+  transition: background 0.18s, transform 0.18s, box-shadow 0.18s;
+}
+
+.wallet-history-link:hover {
+  background: rgba(255, 255, 255, 0.22);
+}
+
+.history-list {
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
+.history-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.history-row:last-child {
+  border-bottom: none;
+}
+
+.history-row-main {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.history-row-title {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #1e293b;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.history-row-time {
+  font-size: 0.72rem;
+  color: #94a3b8;
+}
+
+.history-row-side {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  flex-shrink: 0;
+  gap: 2px;
+}
+
+.history-row-amount {
+  font-size: 0.9rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.history-row-link {
+  font-size: 0.72rem;
+  color: #1565c0;
+  text-decoration: none;
+}
+
+.history-row-link:hover {
+  text-decoration: underline;
+}
+
+.history-load-more {
+  font-size: 0.85rem;
+  color: #1565c0;
+  cursor: pointer;
+}
+
+.history-load-more:hover {
+  text-decoration: underline;
+}
+
 @media (max-width: 700px) {
   .shop-hero { padding: 24px 20px; border-radius: 12px; }
   .hero-inner { flex-direction: column; align-items: stretch; gap: 16px; }
   .hero-title { font-size: 1.3rem; }
-  .wallet-btn { width: 100%; }
+  .wallet-area { align-items: stretch; }
+  .wallet-btn { flex: 1.4; }
   .wallet-btn-add { margin-left: auto; }
+  .wallet-history-links { flex: 1; }
+  .wallet-history-link { font-size: 0.75rem; padding: 0 8px; }
 }
 
 /* ─── Lưới mẫu video ─────────────────────────────────── */
@@ -708,4 +1026,217 @@ useSeo({
   gap: 6px;
   margin-top: 12px;
 }
+
+/* ─── Nạp ví — giống bố cục trang Đăng ký dịch vụ (dang-ky-dich-vu.vue) ──── */
+.topup-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.field-label {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #374151;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  margin-bottom: 8px;
+}
+
+.field-hint {
+  font-size: 0.75rem;
+  color: #94a3b8;
+  margin-top: 6px;
+}
+
+/* Khớp chiều cao ô nhập số tiền với nút "Nạp ví ngay" (48px) */
+.topup-amount-field :deep(.v-field__input) {
+  min-height: 48px;
+  padding-top: 0;
+  padding-bottom: 0;
+  align-items: center;
+}
+
+.topup-amount-field :deep(.v-field__field) {
+  min-height: 48px;
+}
+
+.checkout-summary {
+  background: #f8fafc;
+  border-radius: 10px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.sum-product {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid #f1f5f9;
+  margin-bottom: 2px;
+}
+
+.sum-product-name { font-size: 0.88rem; font-weight: 600; color: #1e293b; }
+.sum-pkg-price { font-size: 0.9rem; font-weight: 700; color: #1565c0; white-space: nowrap; }
+
+.sum-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  font-size: 0.85rem;
+  color: #374151;
+}
+
+.sum-sep { border-top: 1px dashed #e5e7eb; margin: 4px 0; }
+.sum-row--total { font-weight: 700; font-size: 0.95rem; }
+.sum-total { color: #e53935; font-size: 1.25rem; font-weight: 800; }
+.sum-vat { font-size: 0.72rem; color: #94a3b8; text-align: right; margin-top: 4px; }
+
+.product-info {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.product-info-title {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #475569;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 10px 14px;
+  background: #f1f5f9;
+  border-bottom: 1px solid #e2e8f0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+}
+
+.product-info-list {
+  padding: 4px 0;
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  column-gap: 14px;
+  font-size: 0.8rem;
+  line-height: 1.5;
+}
+.product-info-list.pi-collapsed { display: none; }
+
+/* display:contents — mỗi .pi-row không tạo box riêng, để .pi-label/.pi-val
+   bên trong trở thành item TRỰC TIẾP của grid cha, nhờ vậy cột trái luôn
+   canh thẳng hàng (rộng theo nhãn dài nhất) thay vì lệch theo từng dòng. */
+.pi-row { display: contents; }
+
+.pi-label,
+.pi-val {
+  padding: 7px 0;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.pi-row:last-child .pi-label,
+.pi-row:last-child .pi-val {
+  border-bottom: none;
+}
+
+.pi-label {
+  padding-left: 14px;
+  white-space: nowrap;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.pi-val { padding-right: 14px; color: #334155; }
+
+.agree-check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.8rem;
+  color: #475569;
+  line-height: 1.5;
+  cursor: pointer;
+  user-select: none;
+}
+
+.agree-check input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+  margin-top: 2px;
+  flex-shrink: 0;
+  width: 19px;
+  height: 19px;
+  border-radius: 6px;
+  border: 1.5px solid #90caf9;
+  background: #fff;
+  cursor: pointer;
+  position: relative;
+  transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.agree-check input[type="checkbox"]:hover { border-color: #1e88e5; }
+
+.agree-check input[type="checkbox"]:checked {
+  background: linear-gradient(135deg, #1565c0, #42a5f5);
+  border-color: #1565c0;
+}
+
+.agree-check input[type="checkbox"]:checked::after {
+  content: "";
+  position: absolute;
+  left: 6px;
+  top: 2px;
+  width: 5px;
+  height: 9px;
+  border: solid #fff;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+.agree-check input[type="checkbox"]:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(30, 136, 229, 0.18);
+}
+
+.agree-check a { color: #1565c0; text-decoration: none; }
+.agree-check a:hover { text-decoration: underline; }
+
+.terms-error {
+  font-size: 0.75rem;
+  color: #ef4444;
+  margin: 6px 0 0;
+}
+
+.checkout-btn {
+  width: 100%;
+  height: 48px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #1565c0, #1e88e5);
+  color: #fff;
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 4px 14px rgba(30, 136, 229, 0.35);
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.checkout-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(30, 136, 229, 0.45);
+}
+
+.checkout-btn:disabled { opacity: 0.7; cursor: not-allowed; }
 </style>

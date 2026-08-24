@@ -103,7 +103,21 @@ const menus = computed<any>(() => {
       role: [EnumAccountRole.ADMIN],
       title: "Cửa hàng",
       icon: "mdi-store-outline",
-      route: "/admin/store/templates",
+      route: "store",
+      children: [
+        {
+          title: "Sản phẩm",
+          route: "/admin/store/templates",
+        },
+        {
+          title: "Lịch sử nạp tiền",
+          route: "/admin/store/wallet-history",
+        },
+        {
+          title: "Lịch sử mua hàng",
+          route: "/admin/store/purchase-history",
+        },
+      ],
     },
     {
       role: [EnumAccountRole.ADMIN],

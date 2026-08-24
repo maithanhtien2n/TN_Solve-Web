@@ -31,6 +31,13 @@ const breadcrumbs = computed<any>(() => {
     } as unknown as any);
   }
 
+  if (matched.length === 1 && matched[0].path.includes("/admin/store")) {
+    matched.unshift({
+      path: "/admin/store",
+      meta: { title: "Cửa hàng" },
+    } as unknown as any);
+  }
+
   if (matched.length === 1 && matched[0].path.includes("/admin/master-data")) {
     matched.unshift({
       path: "/admin/master-data",
@@ -38,7 +45,14 @@ const breadcrumbs = computed<any>(() => {
     } as unknown as any);
   }
 
-  if (matched.length === 1 && matched[0].path.includes("/admin/settings")) {
+  if (
+    matched.length === 1 &&
+    (matched[0].path.includes("/admin/settings") ||
+      // Video hướng dẫn (/admin/tutorial-videos) thuộc menu con "Cài đặt"
+      // (xem DrawerSystem.vue) nhưng route KHÔNG nằm dưới /admin/settings/...
+      // nên phải khớp riêng, không thì breadcrumb thiếu tiền tố "Cài đặt".
+      matched[0].path.includes("/admin/tutorial-videos"))
+  ) {
     matched.unshift({
       path: "/admin/settings",
       meta: { title: "Cài đặt" },
