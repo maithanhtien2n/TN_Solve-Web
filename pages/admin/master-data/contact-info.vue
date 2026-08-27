@@ -14,6 +14,7 @@ const data = ref<any>({});
 const loading = ref<string>("");
 const dataTableRef = ref<any>(null);
 const commonDialogRef = ref<any>(null);
+const confirmDialogRef = ref<any>(null);
 
 const { handleSubmit, resetForm } = useForm({
   initialValues: {
@@ -100,15 +101,16 @@ const onAction = async (event: any) => {
     onResetForm(event.item);
     commonDialogRef.value?.onDisplay(true);
   } else if (event.action === "delete") {
-    loading.value = "delete";
-    try {
-      await masterDataService.deleteContactInfo({ _id: event.ids[0] });
-      dataTableRef.value?.loadItems();
-    } catch (error) {
-      console.log("Lỗi khi xóa thông tin liên hệ!", error);
-    } finally {
-      loading.value = "";
-    }
+    // Tự xác nhận + tự chờ API xoá xong mới tắt loading trên nút "Đồng ý"
+    // (xem ConfirmDialog.vue) — nút xoá ở #row-action gọi thẳng onAction({item}).
+    confirmDialogRef.value?.show({
+      title: "Xóa thông tin liên hệ",
+      message: `Bạn có chắc chắn muốn xóa "${event.item.title}" không? Hành động này không thể hoàn tác.`,
+      onConfirm: async () => {
+        await masterDataService.deleteContactInfo({ _id: event.item._id });
+        dataTableRef.value?.loadItems();
+      },
+    });
   }
 };
 
@@ -131,6 +133,8 @@ definePageMeta({ layout: "admin", title: "Nhóm hỗ trợ" });
 </script>
 
 <template>
+  <ConfirmDialog ref="confirmDialogRef" />
+
   <CommonDialog
     ref="commonDialogRef"
     :title="_id.value.value ? 'Cập nhật thông tin liên hệ' : 'Thêm thông tin liên hệ'"
@@ -188,7 +192,6 @@ definePageMeta({ layout: "admin", title: "Nhóm hỗ trợ" });
     :filters="[]"
     :showSelect="false"
     :actions="['add']"
-    :rowActions="['update', 'delete']"
     :headers="headers"
     :data="data"
     :loading="Boolean(loading == 'load-table')"
@@ -223,6 +226,29 @@ definePageMeta({ layout: "admin", title: "Nhóm hỗ trợ" });
           (item as any).status?.code === "active" ? "Hoạt động" : "Tạm ngưng"
         }}
       </v-chip>
+    </template>
+
+    <template #row-action="{ item }">
+      <div class="d-flex justify-center align-center ga-2">
+        <v-btn
+          icon
+          size="40"
+          variant="text"
+          @click="onAction({ action: 'update', item })"
+        >
+          <v-icon size="20">mdi-pencil-outline</v-icon>
+        </v-btn>
+
+        <v-btn
+          icon
+          size="40"
+          variant="text"
+          color="error"
+          @click="onAction({ action: 'delete', item })"
+        >
+          <v-icon size="20">mdi-trash-can-outline</v-icon>
+        </v-btn>
+      </div>
     </template>
   </DataTable>
 </template>

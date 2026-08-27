@@ -16,6 +16,15 @@ const loading = ref<string>("");
 const loadMore = ref<any>(null);
 const confirmDialogRef = ref<any>(null);
 
+// Thẻ video <video preload="metadata"> không có poster nên hiện nền đen
+// (.thumb-area) trong lúc chờ tải đủ dữ liệu để vẽ khung hình đầu — nhất là
+// video vừa tạo (CDN chưa cache, lần đầu tải chậm hơn hẳn). Che nền đen bằng
+// hiệu ứng loading cho tới khi phần tử <video> chính báo đã có dữ liệu.
+const loadedVideos = ref<Record<string, boolean>>({});
+function onVideoLoaded(id: string) {
+  loadedVideos.value[id] = true;
+}
+
 const onGetProducts = async (loadingType: string = "") => {
   loading.value = loadingType;
   await productService
@@ -44,21 +53,23 @@ const onClickDotMenuItem = (type: string, data: any) => {
     return;
   } else if (["public", "private"].includes(type) || type === "delete-video") {
     let message = "";
+    let title = "Xác nhận";
 
     if (type === "public") {
       message = "Bạn có chắc chắn muốn công khai video này không?";
     } else if (type === "private") {
       message = "Bạn có chắc chắn muốn riêng tư video này không?";
     } else if (type === "delete-video") {
-      if (["primary", "grey"].includes(data.state)) {
-        message =
-          "Xóa thước phim đang tạo sẽ tốn 10 tín dụng. Bạn có muốn tiếp tục?";
-      } else {
-        message = "Bạn có chắc chắn muốn xoá thước phim này không?";
-      }
+      // Khớp đúng format các popup xoá ở admin: có tiêu đề riêng + tên video +
+      // luôn kèm "Hành động này không thể hoàn tác." (xem VideoTable.vue).
+      title = "Xóa thước phim";
+      message = ["primary", "grey"].includes(data.state)
+        ? `Xóa thước phim "${data.title}" đang tạo sẽ tốn 10 tín dụng. Hành động này không thể hoàn tác. Bạn có muốn tiếp tục?`
+        : `Bạn có chắc chắn muốn xóa "${data.title}" không? Hành động này không thể hoàn tác.`;
     }
 
     confirmDialogRef.value.show({
+      title,
       message,
       noTransMsg: true,
       onConfirm: async () => {
@@ -265,7 +276,10 @@ const getQueueMsg = (item: any): { title: string } | null => {
                       ? { objectFit: 'cover' }
                       : {}
                   "
+                  @loadeddata="onVideoLoaded(item._id)"
                 />
+
+                <div v-if="!loadedVideos[item._id]" class="video-loading-overlay" />
               </div>
 
               <span v-if="item.videoDuration" class="duration-badge">
@@ -551,6 +565,31 @@ const getQueueMsg = (item: any): { title: string } | null => {
   height: 100%;
   object-fit: contain;
   z-index: 1;
+}
+
+.video-loading-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  background: #e2e8f0;
+  background-image: linear-gradient(
+    100deg,
+    transparent 30%,
+    rgba(255, 255, 255, 0.7) 50%,
+    transparent 70%
+  );
+  background-size: 200% 100%;
+  animation: video-shimmer 1.4s ease-in-out infinite;
+}
+
+@keyframes video-shimmer {
+  0% {
+    background-position: 150% 0;
+  }
+  100% {
+    background-position: -50% 0;
+  }
 }
 
 .video-main::-webkit-media-controls,

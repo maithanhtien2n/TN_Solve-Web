@@ -68,6 +68,9 @@ const onReturnTitle = (title: string) => {
     case "cong-dong": {
       return "Cộng đồng";
     }
+    case "cua-hang": {
+      return "Cửa hàng";
+    }
     case "huong-dan": {
       return "Hướng dẫn";
     }
@@ -78,7 +81,7 @@ const onReturnTitle = (title: string) => {
       return "Trợ lý AI";
     }
     case "dang-ky-dich-vu": {
-      return "Đăng ký dịch vụ";
+      return "Đăng ký";
     }
     case "doi-tac": {
       return "Cộng tác viên";

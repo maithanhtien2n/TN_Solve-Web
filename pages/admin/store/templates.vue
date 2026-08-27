@@ -179,6 +179,11 @@ const onAction = async (event: any) => {
     onResetForm(event.item);
     commonDialogRef.value?.onDisplay(true);
   } else if (event.action === "delete") {
+    // Tự xác nhận + tự chờ xong mới tắt loading (giống coupon.vue) — nút xoá
+    // gọi thẳng onAction({item}) qua slot #row-action riêng, KHÔNG qua
+    // onConfirmAction/emit "ids" mặc định của DataTable (emit đó không đợi
+    // được API xoá thật xong, nên nút "Đồng ý" tắt loading ngay tức thì dù
+    // xoá xong hay chưa).
     confirmDialogRef.value?.show({
       title: "Xóa mẫu video",
       message: `Bạn có chắc chắn muốn xóa mẫu "${event.item.title}" không? Hành động này không thể hoàn tác.`,
@@ -356,7 +361,6 @@ definePageMeta({ layout: "admin", title: "Sản phẩm" });
     :filters="[]"
     :showSelect="false"
     :actions="['add']"
-    :rowActions="['update', 'delete']"
     :headers="headers"
     :data="data"
     :loading="Boolean(loading == 'load-table')"
@@ -371,7 +375,11 @@ definePageMeta({ layout: "admin", title: "Sản phẩm" });
         height="54"
         cover
         class="rounded my-3"
-      />
+      >
+        <template #placeholder>
+          <div class="thumb-loading-overlay" />
+        </template>
+      </v-img>
       <v-icon v-else size="40" color="grey-lighten-1">mdi-image-off-outline</v-icon>
     </template>
 
@@ -406,6 +414,29 @@ definePageMeta({ layout: "admin", title: "Sản phẩm" });
         }}
       </v-chip>
     </template>
+
+    <template #row-action="{ item }">
+      <div class="d-flex justify-center align-center ga-2">
+        <v-btn
+          icon
+          size="40"
+          variant="text"
+          @click="onAction({ action: 'update', item })"
+        >
+          <v-icon size="20">mdi-pencil-outline</v-icon>
+        </v-btn>
+
+        <v-btn
+          icon
+          size="40"
+          variant="text"
+          color="error"
+          @click="onAction({ action: 'delete', item })"
+        >
+          <v-icon size="20">mdi-trash-can-outline</v-icon>
+        </v-btn>
+      </div>
+    </template>
   </DataTable>
 </template>
 
@@ -413,6 +444,32 @@ definePageMeta({ layout: "admin", title: "Sản phẩm" });
 .example-image-slot {
   width: 100%;
   aspect-ratio: 16 / 9;
+}
+
+.thumb-loading-overlay {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  background: #e2e8f0;
+  background-image: linear-gradient(
+    100deg,
+    transparent 30%,
+    rgba(255, 255, 255, 0.7) 50%,
+    transparent 70%
+  );
+  background-size: 200% 100%;
+  animation: thumb-shimmer 1.4s ease-in-out infinite;
+}
+
+@keyframes thumb-shimmer {
+  0% {
+    background-position: 150% 0;
+  }
+  100% {
+    background-position: -50% 0;
+  }
 }
 
 .analyze-btn {

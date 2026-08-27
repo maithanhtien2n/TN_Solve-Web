@@ -16,13 +16,30 @@ definePageMeta({ layout: "admin", title: "Tổng quan" });
 <template>
   <div class="db-wrap">
 
-    <!-- Skeleton -->
+    <!-- Skeleton — khớp đúng cấu trúc 3 hàng thật (4 thẻ nổi bật, 6 ô thống
+    kê, 2 bảng gần đây) thay vì chỉ 2 khối chung chung như trước (thiếu hẳn
+    khung cho hàng 3 — bảng thật xuất hiện đột ngột gây giật layout lúc data
+    vừa load xong). -->
     <template v-if="!stats">
       <div class="db-grid db-grid--4">
         <v-skeleton-loader v-for="i in 4" :key="i" type="card" height="100" rounded="lg" />
       </div>
       <div class="db-grid db-grid--3">
-        <v-skeleton-loader v-for="i in 6" :key="i" type="card" height="90" rounded="lg" />
+        <v-skeleton-loader
+          v-for="i in 6"
+          :key="i"
+          type="list-item-avatar-two-line"
+          height="74"
+          rounded="lg"
+          class="db-stat-skeleton"
+        />
+      </div>
+      <div class="db-grid db-grid--2">
+        <div v-for="i in 2" :key="i" class="db-table-card">
+          <v-skeleton-loader
+            type="table-heading, table-row, table-row, table-row, table-row"
+          />
+        </div>
       </div>
     </template>
 
@@ -245,6 +262,15 @@ definePageMeta({ layout: "admin", title: "Tổng quan" });
 .db-label { font-size: 0.72rem; opacity: 0.85; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
 .db-value { font-size: 1.5rem; font-weight: 800; line-height: 1.2; margin-bottom: 2px; }
 .db-sub   { font-size: 0.72rem; opacity: 0.8; }
+
+/* Skeleton — viền/bóng khớp .db-stat / .db-table-card thật, tránh popup/giật
+kích thước lúc data load xong thay thế skeleton. */
+.db-stat-skeleton {
+  border: 1px solid #f0f0f0;
+  border-radius: 12px;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.04);
+  overflow: hidden;
+}
 
 /* Stat card */
 .db-stat {

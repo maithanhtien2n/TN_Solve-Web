@@ -460,7 +460,7 @@ const videoStyleOptions = computed(() => {
     return [
       { title: "Mặc định", value: "general" },
       { title: "Chuyển cảnh mượt", value: "smooth_transition" },
-      { title: "Tùy chọn", value: "custom_prompt" },
+      { title: "Tùy chỉnh", value: "custom_prompt" },
     ];
   }
 
@@ -470,7 +470,7 @@ const videoStyleOptions = computed(() => {
   if (["ttv", "rtv"].includes(formData.videoMode)) {
     return [
       { title: "Mặc định", value: "general" },
-      { title: "Tùy chọn", value: "custom_prompt" },
+      { title: "Tùy chỉnh", value: "custom_prompt" },
     ];
   }
 
@@ -579,8 +579,17 @@ const videoDurationOptions = computed(() => {
       value: x.value,
     })) || [];
 
-  if (productId.value || formData.videoMode === "ttv") {
+  if (productId.value) {
     return allOptions;
+  }
+
+  // TTV: giới hạn tối đa 45 cảnh (6 phút) — story quá dài (VD 75 cảnh/10
+  // phút) khiến AI (gpt-4o-mini, 1 lần gọi xử lý cả story) trả về JSON đúng
+  // cấu trúc nhưng nội dung từng cảnh bị rỗng (beats/context/camera_movement
+  // thiếu), do model "đuối" khi phải xử lý story quá dài trong 1 lần gọi —
+  // xem generate-scene-chatgpt.ts/prompt-chatgpt/index.ts promptMovie.
+  if (formData.videoMode === "ttv") {
+    return allOptions.filter((option: any) => +option.value <= 45);
   }
 
   if (
@@ -1349,7 +1358,11 @@ definePageMeta({ middleware: "auth" });
                 :key="idx"
                 class="store-image-slot"
               >
-                <v-img :src="img" contain class="store-image-slot-img" />
+                <v-img :src="img" contain class="store-image-slot-img">
+                  <template #placeholder>
+                    <div class="img-loading-overlay" />
+                  </template>
+                </v-img>
               </div>
             </div>
           </StoreFieldCard>
@@ -1464,7 +1477,11 @@ definePageMeta({ middleware: "auth" });
                   :key="idx"
                   class="store-image-slot"
                 >
-                  <v-img :src="img" contain class="store-image-slot-img" />
+                  <v-img :src="img" contain class="store-image-slot-img">
+                    <template #placeholder>
+                      <div class="img-loading-overlay" />
+                    </template>
+                  </v-img>
                 </div>
               </div>
             </StoreFieldCard>
@@ -2327,6 +2344,32 @@ definePageMeta({ middleware: "auth" });
   height: 100%;
   border-radius: 10px;
   background: #e2e8f0;
+}
+
+.img-loading-overlay {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  background: #e2e8f0;
+  background-image: linear-gradient(
+    100deg,
+    transparent 30%,
+    rgba(255, 255, 255, 0.7) 50%,
+    transparent 70%
+  );
+  background-size: 200% 100%;
+  animation: img-shimmer 1.4s ease-in-out infinite;
+}
+
+@keyframes img-shimmer {
+  0% {
+    background-position: 150% 0;
+  }
+  100% {
+    background-position: -50% 0;
+  }
 }
 
 .store-prompt-fields-list {

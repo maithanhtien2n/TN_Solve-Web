@@ -14,6 +14,15 @@ const products = ref<any>({});
 const loading = ref<string>("");
 const loadMore = ref<any>(null);
 
+// Thẻ video <video preload="metadata"> không có poster nên hiện nền đen
+// trong lúc chờ tải đủ dữ liệu để vẽ khung hình đầu — che bằng hiệu ứng
+// shimmer cho tới khi phần tử <video> chính báo đã có dữ liệu (xem
+// thu-vien-cua-toi/index.vue — cùng 1 pattern, dùng chung logic).
+const loadedVideos = ref<Record<string, boolean>>({});
+function onVideoLoaded(id: string) {
+  loadedVideos.value[id] = true;
+}
+
 const onGetProducts = async (loadingType: string = "") => {
   loading.value = loadingType;
   await productService
@@ -144,9 +153,12 @@ useSeo({
               preload="metadata"
               muted
               playsinline
+              @loadeddata="onVideoLoaded(item._id)"
             >
               <source :src="item.video" type="video/mp4" />
             </video>
+
+            <div v-if="!loadedVideos[item._id]" class="video-loading-overlay" />
           </template>
 
           <!-- Processing -->
@@ -383,6 +395,31 @@ useSeo({
   height: 100%;
   object-fit: contain;
   z-index: 1;
+}
+
+.video-loading-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  background: #e2e8f0;
+  background-image: linear-gradient(
+    100deg,
+    transparent 30%,
+    rgba(255, 255, 255, 0.7) 50%,
+    transparent 70%
+  );
+  background-size: 200% 100%;
+  animation: video-shimmer 1.4s ease-in-out infinite;
+}
+
+@keyframes video-shimmer {
+  0% {
+    background-position: 150% 0;
+  }
+  100% {
+    background-position: -50% 0;
+  }
 }
 
 .video-main::-webkit-media-controls,

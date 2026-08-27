@@ -12,9 +12,14 @@ const emits = defineEmits(["onSelectFile"]);
 const file = ref<File>();
 const previewUrl = ref<string>("");
 const isDragging = ref<boolean>(false);
+// video load từ URL local (blob mới chọn) gần như tức thì, nhưng video CŨ
+// (setValue với URL server thật, xem bên dưới) cần tải qua mạng — che nền đen
+// trong lúc chờ bằng shimmer, giống UploadImage-family khác trong dự án.
+const videoLoaded = ref<boolean>(false);
 
 const processFile = (selectedFile: File) => {
   file.value = selectedFile;
+  videoLoaded.value = false;
   previewUrl.value = URL.createObjectURL(selectedFile);
   emits("onSelectFile", { file: file.value, previewUrl: previewUrl.value });
 };
@@ -45,6 +50,7 @@ const onRemoveFile = () => {
 // khác, khiến nơi gọi tưởng nhầm là user vừa chọn lại video này.
 const setValue = (value: any) => {
   previewUrl.value = value || "";
+  videoLoaded.value = false;
   file.value = undefined;
 };
 
@@ -64,7 +70,13 @@ defineExpose({ file, previewUrl, setValue });
 
     <!-- Preview state -->
     <template v-if="previewUrl">
-      <video :src="previewUrl" controls class="ui-upload__video" />
+      <video
+        :src="previewUrl"
+        controls
+        class="ui-upload__video"
+        @loadeddata="videoLoaded = true"
+      />
+      <div v-if="!videoLoaded" class="ui-upload__video-loading" />
 
       <button v-if="!readonly" class="ui-upload__remove" @click.stop="onRemoveFile">
         <v-icon size="16">mdi-close</v-icon>
@@ -118,6 +130,31 @@ defineExpose({ file, previewUrl, setValue });
   height: 100%;
   object-fit: contain;
   background: #000;
+}
+
+.ui-upload__video-loading {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: #e2e8f0;
+  background-image: linear-gradient(
+    100deg,
+    transparent 30%,
+    rgba(255, 255, 255, 0.7) 50%,
+    transparent 70%
+  );
+  background-size: 200% 100%;
+  animation: video-shimmer 1.4s ease-in-out infinite;
+}
+
+@keyframes video-shimmer {
+  0% {
+    background-position: 150% 0;
+  }
+  100% {
+    background-position: -50% 0;
+  }
 }
 
 .ui-upload__remove {

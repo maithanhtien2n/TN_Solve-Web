@@ -138,6 +138,11 @@ const onConfirmAction = (action: string, item?: any | null) => {
       emits("action", {
         action,
         ids: item?._id ? [item._id] : selected.value,
+        // Vài trang (templates.vue/coupon.vue) đọc event.item để dựng message
+        // xác nhận riêng/lấy field ngoài _id — trước đây KHÔNG emit field
+        // này, khiến event.item luôn undefined, ném lỗi ngay khi build message
+        // nên hành động xoá thật sự không bao giờ chạy tới.
+        item,
       });
     },
   });

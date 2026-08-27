@@ -9,6 +9,28 @@ const api = axios.create({
   withCredentials: true,
 });
 
+// Xén khoảng trắng đầu/cuối cho MỌI ô input toàn dự án — chặn ở 1 chỗ DUY
+// NHẤT (interceptor) thay vì sửa từng ô input riêng lẻ. Giữ nguyên khoảng
+// trắng Ở GIỮA chuỗi (VD nội dung Prompt nhiều dòng). Bỏ qua FormData (dùng
+// cho request có file upload — server tự trim lại các field text sau khi
+// multer parse xong, xem core/middleware/trim-input.ts) vì không thể/không
+// cần đụng vào cấu trúc multipart phía client.
+function trimDeep(value: any): any {
+  if (typeof value === "string") return value.trim();
+  if (Array.isArray(value)) return value.map(trimDeep);
+  if (
+    value &&
+    typeof value === "object" &&
+    !(typeof FormData !== "undefined" && value instanceof FormData)
+  ) {
+    for (const key of Object.keys(value)) {
+      value[key] = trimDeep(value[key]);
+    }
+    return value;
+  }
+  return value;
+}
+
 api.interceptors.request.use((config: InternalAxiosRequestConfig) => {
   if (typeof window !== "undefined" && config.headers) {
     const csrf = useCookie<string | null>("csrf_token");
@@ -17,6 +39,14 @@ api.interceptors.request.use((config: InternalAxiosRequestConfig) => {
       config.headers["X-CSRF-Token"] = csrf.value;
     }
   }
+
+  if (config.data && typeof config.data === "object") {
+    trimDeep(config.data);
+  }
+  if (config.params && typeof config.params === "object") {
+    trimDeep(config.params);
+  }
+
   return config;
 });
 

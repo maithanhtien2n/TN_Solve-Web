@@ -2,8 +2,11 @@
 import { storeService } from "~/services/app";
 
 const router = useRouter();
-const { onGetterUserData: userData, onGetterDisplayLogin: displayLogin } =
-  useAppStore();
+const {
+  onGetterUserData: userData,
+  onGetterDisplayLogin: displayLogin,
+  onActionSetSystemPopup,
+} = useAppStore();
 
 const templates = ref<any[]>([]);
 const defaultPrice = ref<number>(0);
@@ -23,6 +26,10 @@ const topupPresets = [10000, 20000, 50000, 100000, 200000, 500000];
 const showTopupProductInfo = ref<boolean>(true);
 const agreedToTopupTerms = ref<boolean>(false);
 const showTopupTermsError = ref<boolean>(false);
+// Ô "Đồng ý điều khoản" nằm cuối popup, dễ bị khuất dưới "Thông tin sản
+// phẩm" — nếu bấm "Nạp ví ngay" mà chưa tích, phải tự cuộn xuống cho user
+// THẤY NGAY lỗi, không để lỗi hiện âm thầm ở phần đang bị che khuất.
+const agreeCheckSectionRef = ref<HTMLElement | null>(null);
 
 // Lịch sử ví CỦA CHÍNH USER (khác trang admin xem của TẤT CẢ user) — dùng
 // chung 1 dialog cho cả "Lịch sử nạp tiền" và "Lịch sử mua hàng", chỉ khác
@@ -38,6 +45,9 @@ const HISTORY_PAGE_SIZE = 20;
 
 const previewDialogRef = ref<any>(null);
 const previewTemplate = ref<any>(null);
+// <video controls> không có poster nên hiện nền đen trong lúc chờ tải đủ dữ
+// liệu — che bằng shimmer, reset lại mỗi lần mở dialog (đổi mẫu khác).
+const previewVideoLoaded = ref(false);
 
 async function loadTemplates() {
   try {
@@ -96,11 +106,29 @@ function onClickTemplateCard(id: string | null) {
     displayLogin.value = true;
     return;
   }
+
+  // Chặn sớm ngay tại đây (thay vì để user điều hướng sang trang tạo rồi mới
+  // biết lỗi) — giá lấy đúng giá ĐÃ ÁP DỤNG giảm 40% nếu có, khớp giá thật sẽ
+  // bị trừ (xem product.service.ts).
+  const tpl = id ? templates.value.find((t) => t._id === id) : null;
+  const price = id
+    ? (tpl?.discountedPrice ?? tpl?.price ?? 0)
+    : (defaultDiscountedPrice.value ?? defaultPrice.value);
+
+  if (walletBalance.value < price) {
+    onActionSetSystemPopup({
+      type: "error",
+      content: `Số dư ví Cửa hàng không đủ (còn ${formatCurrency(walletBalance.value)}, cần ${formatCurrency(price)}). Vui lòng nạp thêm!`,
+    });
+    return;
+  }
+
   router.push(`/thu-vien-cua-toi/tao-moi?templateId=${id || "default"}`);
 }
 
 function onOpenPreview(tpl: any) {
   previewTemplate.value = tpl;
+  previewVideoLoaded.value = false;
   previewDialogRef.value?.onDisplay(true);
 }
 
@@ -170,6 +198,16 @@ async function onClickTopup() {
   if (topupLoading.value) return;
   if (!agreedToTopupTerms.value) {
     showTopupTermsError.value = true;
+    // Đợi DOM render xong dòng lỗi (thêm chiều cao mới cho khối này) rồi mới
+    // cuộn — cuộn ngay lúc set state cũ sẽ tính sai vị trí (chưa tính chiều
+    // cao dòng lỗi vừa thêm vào). block: "end" để dòng lỗi (nằm CUỐI khối)
+    // luôn lộ hẳn phía trên nút "Nạp ví ngay", không bị kẹt sát mép popup.
+    nextTick(() => {
+      agreeCheckSectionRef.value?.scrollIntoView({
+        behavior: "smooth",
+        block: "end",
+      });
+    });
     return;
   }
   showTopupTermsError.value = false;
@@ -290,7 +328,7 @@ useSeo({
       </div>
 
       <!-- Đồng ý điều khoản -->
-      <div>
+      <div ref="agreeCheckSectionRef">
         <label class="agree-check" @click="showTopupTermsError = false">
           <input v-model="agreedToTopupTerms" type="checkbox" />
           <span>
@@ -301,6 +339,7 @@ useSeo({
           </span>
         </label>
         <p v-if="showTopupTermsError" class="terms-error">
+          <v-icon size="16" color="#b91c1c">mdi-alert-circle</v-icon>
           Vui lòng tích vào ô trên để đồng ý với điều khoản!
         </p>
       </div>
@@ -409,14 +448,11 @@ useSeo({
             </button>
           </div>
 
-          <button type="button" class="wallet-btn" @click="onOpenTopup">
+          <button type="button" class="wallet-btn" @click="onOpenTopup" title="Nạp tiền">
             <div class="wallet-btn-icon">
               <v-icon size="18" color="#fff">mdi-wallet-outline</v-icon>
             </div>
-            <div class="wallet-btn-text">
-              <span class="wallet-btn-label">Số dư ví</span>
-              <span class="wallet-btn-value">{{ walletBalance.toLocaleString("vi-VN") }}đ</span>
-            </div>
+            <span class="wallet-btn-value">{{ walletBalance.toLocaleString("vi-VN") }}đ</span>
             <div class="wallet-btn-add">
               <v-icon size="18" color="#fff">mdi-plus</v-icon>
             </div>
@@ -451,7 +487,11 @@ useSeo({
 
       <div v-for="tpl in templates" :key="tpl._id" class="template-card">
         <div class="template-card-media">
-          <v-img v-if="tpl.thumbnail" :src="tpl.thumbnail" cover height="100%" />
+          <v-img v-if="tpl.thumbnail" :src="tpl.thumbnail" cover height="100%">
+            <template #placeholder>
+              <div class="img-loading-overlay" />
+            </template>
+          </v-img>
           <v-icon v-else size="34" color="#cbd5e1">mdi-image-outline</v-icon>
           <div v-if="tpl.discountedPrice != null" class="template-card-discount-badge">
             -{{ Math.round((1 - tpl.discountedPrice / tpl.price) * 100) }}%
@@ -487,7 +527,13 @@ useSeo({
         </div>
 
         <div v-if="previewTemplate.sampleVideo" class="preview-video-wrap">
-          <video :src="previewTemplate.sampleVideo" controls class="preview-video" />
+          <video
+            :src="previewTemplate.sampleVideo"
+            controls
+            class="preview-video"
+            @loadeddata="previewVideoLoaded = true"
+          />
+          <div v-if="!previewVideoLoaded" class="video-loading-overlay" />
         </div>
         <div v-else-if="previewTemplate.thumbnail" class="preview-video-wrap">
           <v-img :src="previewTemplate.thumbnail" cover height="100%" class="preview-video" />
@@ -639,23 +685,11 @@ useSeo({
   justify-content: center;
 }
 
-.wallet-btn-text {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  line-height: 1.2;
-}
-
-.wallet-btn-label {
-  font-size: 0.66rem;
-  color: rgba(255, 255, 255, 0.72);
-  font-weight: 600;
-}
-
 .wallet-btn-value {
   font-size: 1.05rem;
   color: #fff;
-  font-weight: 800;
+  font-weight: 400;
+  white-space: nowrap;
 }
 
 .wallet-btn-add {
@@ -996,6 +1030,34 @@ useSeo({
   object-fit: contain;
 }
 
+.video-loading-overlay,
+.img-loading-overlay {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  pointer-events: none;
+  background: #e2e8f0;
+  background-image: linear-gradient(
+    100deg,
+    transparent 30%,
+    rgba(255, 255, 255, 0.7) 50%,
+    transparent 70%
+  );
+  background-size: 200% 100%;
+  animation: video-shimmer 1.4s ease-in-out infinite;
+}
+
+@keyframes video-shimmer {
+  0% {
+    background-position: 150% 0;
+  }
+  100% {
+    background-position: -50% 0;
+  }
+}
+
 .preview-req {
   display: flex;
   align-items: center;
@@ -1209,9 +1271,17 @@ useSeo({
 .agree-check a:hover { text-decoration: underline; }
 
 .terms-error {
-  font-size: 0.75rem;
-  color: #ef4444;
-  margin: 6px 0 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #b91c1c;
+  background: #fee2e2;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  padding: 8px 12px;
+  margin: 8px 0 0;
 }
 
 .checkout-btn {

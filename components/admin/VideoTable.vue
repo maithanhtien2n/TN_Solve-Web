@@ -62,9 +62,14 @@ const params = reactive<any>({
   status: null,
 });
 
+// "omni" (video Cửa hàng) bị cố ý giấu khỏi danh sách "model-video" từ BE
+// (không cho user thường tự chọn lúc tạo video) — riêng ở bộ lọc ADMIN này
+// thì cần thấy được để lọc ra video Cửa hàng, nên thêm thẳng ở FE, không sửa
+// endpoint dùng chung với form tạo video thường.
 const modelVideoItems = computed(() => [
   { title: "Tất cả", value: null },
   ...(onGetterMasterData.value["model-video"] || []),
+  { title: "omni", value: "omni" },
 ]);
 
 const frameRateItems = computed(() => [
@@ -77,58 +82,84 @@ const videoModeItems = computed(() => [
   ...(onGetterMasterData.value["video-mode"] || []),
 ]);
 
+// Khớp đúng quy tắc Phong cách THẬT theo từng Chế độ (xem [id].vue
+// videoStyleOptions — nguồn tham chiếu chuẩn) — switch cũ ở đây tham chiếu
+// tên chế độ/phong cách CŨ đã bị xoá từ đợt đổi tên enum trước
+// ("storytelling", "short_form_video", "monologue", "narration",
+// "satisfying", "asmr" không còn tồn tại), khiến lựa chọn sai/thiếu (VD
+// thiếu hẳn "Tùy chọn" — field isCustomPrompt riêng, KHÔNG phải giá trị
+// VideoStyle thật, xem product.service.ts).
 const videoStyleItems = computed(() => {
   const list = [
     { title: "Tất cả", value: null },
     ...(onGetterMasterData.value["video-style"] || []),
   ];
+  const customPromptOption = { title: "Tùy chỉnh", value: "custom_prompt" };
 
   switch (params.videoMode) {
-    case "ttv": {
-      return list.filter((x: any) =>
-        [null, "general", "monologue", "narration"].includes(x.value)
-      );
-    }
-    case "storytelling": {
-      return list.filter((x: any) => [null, "general"].includes(x.value));
-    }
-    case "short_form_video": {
-      return list.filter((x: any) =>
-        [null, "general", "satisfying", "asmr"].includes(x.value)
-      );
-    }
     case "my_subject": {
       return list.filter((x: any) =>
-        [null, "general", "testimonial"].includes(x.value)
+        [null, "general", "testimonial", "shorts"].includes(x.value)
       );
     }
+    case "itv": {
+      return [
+        { title: "Tất cả", value: null },
+        { title: "Mặc định", value: "general" },
+        { title: "Chuyển cảnh mượt", value: "smooth_transition" },
+        customPromptOption,
+      ];
+    }
+    case "ttv":
+    case "rtv": {
+      return [
+        { title: "Tất cả", value: null },
+        { title: "Mặc định", value: "general" },
+        customPromptOption,
+      ];
+    }
+    case "object_sync":
+    case "continuous_shot": {
+      return list.filter((x: any) => [null, "general"].includes(x.value));
+    }
     default: {
-      return list;
+      // Chưa chọn Chế độ cụ thể ("Tất cả") — hiện đủ mọi lựa chọn Phong cách
+      // khả dĩ trên toàn bộ chế độ, kể cả "Tùy chọn".
+      return [...list, customPromptOption];
     }
   }
 });
 
+// Khớp CHÍNH XÁC từng trường hợp theo Chế độ giống [id].vue
+// (videoDurationOptions — nguồn tham chiếu chuẩn), cùng lý do ở videoStyleItems
+// ("short_form_video"/"storytelling" không còn tồn tại, "my_subject" trước đó
+// bị cắt thiếu "8"). ttv giờ cũng giới hạn 45 cảnh/6 phút, khớp đúng ràng buộc
+// lúc tạo mới hiện tại.
 const videoDurationItems = computed(() => {
   const allOptions = [
     { title: "Tất cả", value: null },
     ...(onGetterMasterData.value["video-duration"] || []),
   ];
 
-  if (params.videoMode === "ttv") {
-    return allOptions;
-  } else if (["short_form_video", "my_subject"].includes(params.videoMode)) {
-    // Nếu là video ngắn, chỉ lấy các giá trị từ '1' đến '7'
-    const shortVideoValues = [null, "1", "2", "3", "4", "5", "6", "7"];
+  if (["my_subject", "continuous_shot", "itv"].includes(params.videoMode)) {
+    const shortVideoValues = [null, "1", "2", "3", "4", "5", "6", "7", "8"];
     return allOptions.filter((option: any) =>
       shortVideoValues.includes(option.value)
     );
-  } else if (["storytelling"].includes(params.videoMode)) {
-    const shortVideoValues = [null, "8", "12", "16", "20", "24"];
+  } else if (["object_sync", "rtv"].includes(params.videoMode)) {
+    const shortVideoValues = Array.from({ length: 24 }, (_, i) =>
+      String(i + 1)
+    );
     return allOptions.filter((option: any) =>
-      shortVideoValues.includes(option.value)
+      [null, ...shortVideoValues].includes(option.value)
     );
   } else {
-    return allOptions;
+    // "ttv" HOẶC chưa chọn Chế độ cụ thể — 45 cảnh/6 phút là trần cao nhất
+    // hiện cho phép trong toàn hệ thống (khớp đúng giới hạn tạo mới hiện tại
+    // ở [id].vue), áp dụng chung cho cả 2 trường hợp.
+    return allOptions.filter(
+      (option: any) => option.value === null || +option.value <= 45
+    );
   }
 });
 
@@ -192,13 +223,19 @@ const onAction = async (event: any) => {
       });
     }
   } else if (event.action == "delete") {
-    loading.value = "load-table";
-    await productService
-      .actionProduct({ ids: event.ids, action: "delete" })
-      .finally(() => {
-        loading.value = "";
-      });
-    await dataTableRef.value?.loadItems();
+    // Tự xác nhận + tự chờ API xoá xong mới tắt loading trên nút "Đồng ý"
+    // (xem ConfirmDialog.vue) — nút xoá ở #row-action gọi thẳng onAction({item}).
+    confirmDialogRef.value?.show({
+      title: "Xóa thước phim",
+      message: `Bạn có chắc chắn muốn xóa "${event.item?.title}" không? Hành động này không thể hoàn tác.`,
+      onConfirm: async () => {
+        await productService.actionProduct({
+          ids: [event.item._id],
+          action: "delete",
+        });
+        await dataTableRef.value?.loadItems();
+      },
+    });
   }
 };
 
@@ -252,11 +289,6 @@ const onChangeFilter = (event: any) => {
     ]"
     :showSelect="false"
     :actions="[]"
-    :rowActions="
-      route.path?.split('/')?.pop() === 'error'
-        ? ['delete', 'reload', 'view']
-        : ['delete', 'view']
-    "
     :headers="headers"
     :data="data"
     :loading="Boolean(loading == 'load-table')"
@@ -339,6 +371,50 @@ const onChangeFilter = (event: any) => {
         <span class="text-nowrap line-clamp-1" style="max-width: 170px">
           {{ `${(item as any)?.account?.name}` }}
         </span>
+      </div>
+    </template>
+
+    <template #row-action="{ item }">
+      <div class="d-flex justify-center align-center ga-2">
+        <v-btn
+          icon
+          size="40"
+          variant="text"
+          color="error"
+          @click="onAction({ action: 'delete', item })"
+        >
+          <v-icon size="20">mdi-trash-can-outline</v-icon>
+        </v-btn>
+
+        <v-btn
+          v-if="route.path?.split('/')?.pop() === 'error'"
+          icon
+          size="40"
+          variant="text"
+          :disabled="
+            (item as any).loading
+            || (item as any).isDelete
+            || ['❌ Không nhận được phản hồi từ AI!'].includes((item as any)?.lastMessage?.errorMsg)
+            || Boolean((item as any)?.lastMessage?.note.includes('🚨') && (item as any)?.lastMessage?.note !== '🚨 Thước phim gặp sự cố khi xử lý âm thanh cho kịch bản này.')
+          "
+          @click="
+            () => {
+              (item as any).loading = true;
+              onAction({ action: 'reload', item });
+            }
+          "
+        >
+          <v-icon size="20">mdi-reload</v-icon>
+        </v-btn>
+
+        <v-btn
+          icon
+          size="40"
+          variant="text"
+          @click="onAction({ action: 'view', item })"
+        >
+          <v-icon size="20">mdi-eye-outline</v-icon>
+        </v-btn>
       </div>
     </template>
   </DataTable>

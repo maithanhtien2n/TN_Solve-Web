@@ -196,6 +196,10 @@ const onAction = async (event: any) => {
         loading.value = "";
       });
   } else if (event.action === "delete") {
+    // Trang này dùng slot #row-action RIÊNG (thay hẳn cột thao tác mặc định
+    // của DataTable) — nút xoá gọi thẳng onAction({item}), KHÔNG đi qua
+    // onConfirmAction của DataTable nên không có ids, cũng chưa có bước xác
+    // nhận nào — phải tự xác nhận + dùng event.item ở đây.
     confirmDialogRef.value?.show({
       title: "Xóa mã giảm giá",
       message: `Bạn có chắc chắn muốn xóa mã "${event.item.code}" không? Hành động này không thể hoàn tác.`,

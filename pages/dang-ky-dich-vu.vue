@@ -426,6 +426,7 @@ definePageMeta({});
             <span>Tôi đã đọc và đồng ý với <a href="/dieu-khoan" target="_blank"><strong>Điều khoản dịch vụ</strong></a> và <a href="/chinh-sach-bao-mat" target="_blank"><strong>Chính sách bảo mật</strong></a></span>
           </label>
           <p v-if="showTermsError" class="terms-error">
+            <v-icon size="16" color="#b91c1c">mdi-alert-circle</v-icon>
             Vui lòng tích vào ô trên để đồng ý với điều khoản!
           </p>
         </div>
@@ -1125,10 +1126,15 @@ definePageMeta({});
 .terms-error {
   display: flex;
   align-items: center;
-  gap: 4px;
-  font-size: 0.75rem;
-  color: #ef4444;
-  margin: 6px 0 0;
+  gap: 6px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #b91c1c;
+  background: #fee2e2;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  padding: 8px 12px;
+  margin: 8px 0 0;
 }
 
 /* ─── Contact ────────────────────────────────────────────── */
