@@ -133,8 +133,8 @@ const videoStyleItems = computed(() => {
 // Khớp CHÍNH XÁC từng trường hợp theo Chế độ giống [id].vue
 // (videoDurationOptions — nguồn tham chiếu chuẩn), cùng lý do ở videoStyleItems
 // ("short_form_video"/"storytelling" không còn tồn tại, "my_subject" trước đó
-// bị cắt thiếu "8"). ttv giờ cũng giới hạn 45 cảnh/6 phút, khớp đúng ràng buộc
-// lúc tạo mới hiện tại.
+// bị cắt thiếu "8"). [2026-08-28] TTV nới từ 45 lên 75 cảnh (10:00 chẵn),
+// khớp đúng giới hạn tạo mới hiện tại ở [id].vue.
 const videoDurationItems = computed(() => {
   const allOptions = [
     { title: "Tất cả", value: null },
@@ -154,11 +154,10 @@ const videoDurationItems = computed(() => {
       [null, ...shortVideoValues].includes(option.value)
     );
   } else {
-    // "ttv" HOẶC chưa chọn Chế độ cụ thể — 45 cảnh/6 phút là trần cao nhất
-    // hiện cho phép trong toàn hệ thống (khớp đúng giới hạn tạo mới hiện tại
-    // ở [id].vue), áp dụng chung cho cả 2 trường hợp.
+    // "ttv" HOẶC chưa chọn Chế độ cụ thể — 75 cảnh/10:00 là trần cao nhất
+    // hiện cho phép, khớp đúng giới hạn tạo mới hiện tại ở [id].vue.
     return allOptions.filter(
-      (option: any) => option.value === null || +option.value <= 45
+      (option: any) => option.value === null || +option.value <= 75
     );
   }
 });

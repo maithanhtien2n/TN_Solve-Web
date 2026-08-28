@@ -583,13 +583,13 @@ const videoDurationOptions = computed(() => {
     return allOptions;
   }
 
-  // TTV: giới hạn tối đa 45 cảnh (6 phút) — story quá dài (VD 75 cảnh/10
-  // phút) khiến AI (gpt-4o-mini, 1 lần gọi xử lý cả story) trả về JSON đúng
-  // cấu trúc nhưng nội dung từng cảnh bị rỗng (beats/context/camera_movement
-  // thiếu), do model "đuối" khi phải xử lý story quá dài trong 1 lần gọi —
-  // xem generate-scene-chatgpt.ts/prompt-chatgpt/index.ts promptMovie.
+  // [2026-08-28] TTV: nới từ 45 lên 75 cảnh (10:00 chẵn, theo yêu cầu user)
+  // thay vì 10:08 lẻ (trần cao nhất hệ thống). Rủi ro cũ (gpt-4o-mini "đuối"
+  // với story quá dài trong 1 lần gọi, xem generate-scene-chatgpt.ts/
+  // prompt-chatgpt/index.ts promptMovie) vẫn còn đó, user đã biết và chấp
+  // nhận rủi ro này.
   if (formData.videoMode === "ttv") {
-    return allOptions.filter((option: any) => +option.value <= 45);
+    return allOptions.filter((option: any) => +option.value <= 75);
   }
 
   if (

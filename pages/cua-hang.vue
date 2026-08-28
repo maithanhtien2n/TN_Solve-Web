@@ -23,6 +23,11 @@ const topupPresets = [10000, 20000, 50000, 100000, 200000, 500000];
 // Giống ô "Thông tin sản phẩm"/đồng ý điều khoản ở trang Đăng ký dịch vụ
 // (dang-ky-dich-vu.vue) — bắt buộc tích đồng ý mới cho nạp, đúng quy định
 // hiển thị đủ thông tin trước khi thanh toán.
+// [2026-08-28] Mặc định ĐÓNG trên điện thoại, mở trên desktop — set lúc MỞ
+// dialog (onOpenTopup), KHÔNG set tĩnh ở đây lúc component setup: useDevice()
+// đo width qua onMounted (bắt đầu = 0 -> isMobile.value luôn true lúc setup,
+// chưa kịp đo thật), set tĩnh 1 lần ở đây sẽ luôn bắt nhầm là mobile.
+const { isMobile } = useDevice();
 const showTopupProductInfo = ref<boolean>(true);
 const agreedToTopupTerms = ref<boolean>(false);
 const showTopupTermsError = ref<boolean>(false);
@@ -145,6 +150,9 @@ function onOpenTopup() {
   }
   agreedToTopupTerms.value = false;
   showTopupTermsError.value = false;
+  // Mặc định đóng trên điện thoại, mở trên desktop — set đúng lúc mở dialog
+  // (page đã mounted xong, isMobile.value đo đúng thật lúc này).
+  showTopupProductInfo.value = !isMobile.value;
   walletDialogRef.value?.onDisplay(true);
 }
 
