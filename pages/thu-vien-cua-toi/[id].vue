@@ -814,16 +814,19 @@ const onGetProductDetail = async (
           formData.videoStyle = "smooth_transition";
           customModeStyleChoice.value = "smooth_transition";
         } else {
-          // Video cũ có thể đang lưu 1 videoStyle đã bị gỡ khỏi hệ thống (BE đã
-          // xóa hẳn enum) — nếu giữ nguyên giá trị cũ này và user bấm "Tạo lại",
-          // request sẽ bị BE (Joi productSchema.create) từ chối vì giá trị đó
-          // không còn hợp lệ. Fallback về option đầu tiên (general) khi giá trị
-          // cũ không còn nằm trong videoStyleOptions hiện tại.
-          formData.videoStyle = videoStyleOptions.value.some(
-            (x: any) => x.value === data.videoStyle,
-          )
-            ? data.videoStyle
-            : videoStyleOptions.value[0]?.value || "general";
+          // [2026-08-29] LUÔN tin thẳng data.videoStyle để HIỂN THỊ — trước
+          // đây kiểm tra "còn nằm trong videoStyleOptions hiện tại không" NGAY
+          // TẠI ĐÂY để phát hiện style đã bị gỡ khỏi hệ thống, nhưng
+          // videoStyleOptions phụ thuộc danh sách "video-style" tải RIÊNG (ở
+          // layouts/default.vue, song song lúc mở app) — nếu API chi tiết
+          // video này trả về TRƯỚC KHI danh sách đó tải xong, videoStyleOptions
+          // rỗng → luôn rơi vào fallback "general" dù giá trị thật vẫn hợp lệ
+          // (race condition, gây hiện sai "Mặc định" dù data thật là
+          // "testimonial" — bug thật gặp trên production). Việc kiểm tra "còn
+          // hợp lệ để GỬI ĐI không" chỉ thật sự cần lúc SUBMIT (xem
+          // onSubmitNormal), tách ra khỏi lúc hiển thị để không còn phụ thuộc
+          // thời điểm tải xong của 1 API khác.
+          formData.videoStyle = data.videoStyle;
         }
         formData.videoDuration = data.videoDuration;
         formData.author = data.author;
@@ -1013,6 +1016,19 @@ const onSubmitNormal = async () => {
   } else if (["ttv", "rtv"].includes(formData.videoMode)) {
     // "custom_prompt" không phải giá trị videoStyle thật BE chấp nhận.
     payload.videoStyle = "general";
+  }
+
+  // [2026-08-29] Video cũ có thể đang lưu 1 videoStyle đã bị gỡ khỏi hệ thống
+  // (BE đã xóa hẳn enum) — nếu giữ nguyên giá trị cũ này, request sẽ bị BE
+  // (Joi productSchema.create) từ chối. Kiểm tra NGAY TRƯỚC KHI GỬI (không
+  // phải lúc hiển thị — xem giải thích đầy đủ ở onGetProductDetail) vì tới
+  // đây chắc chắn videoStyleOptions đã tải xong (user đã ở trang này 1 lúc
+  // rồi mới bấm submit), không còn race condition với API "video-style".
+  if (
+    payload.videoStyle &&
+    !videoStyleOptions.value.some((x: any) => x.value === payload.videoStyle)
+  ) {
+    payload.videoStyle = videoStyleOptions.value[0]?.value || "general";
   }
 
   if (isCustomPromptMode.value) {
