@@ -120,7 +120,12 @@ function onClickTemplateCard(id: string | null) {
     ? (tpl?.discountedPrice ?? tpl?.price ?? 0)
     : (defaultDiscountedPrice.value ?? defaultPrice.value);
 
-  if (walletBalance.value < price) {
+  // ADMIN được miễn kiểm tra số dư ví Cửa hàng — đồng bộ với backend
+  // (xem product.service.ts, currentBalance < finalPrice cũng loại trừ ADMIN).
+  if (
+    userData.value?.role !== EnumAccountRole.ADMIN &&
+    walletBalance.value < price
+  ) {
     onActionSetSystemPopup({
       type: "error",
       content: `Số dư ví Cửa hàng không đủ (còn ${formatCurrency(walletBalance.value)}, cần ${formatCurrency(price)}). Vui lòng nạp thêm!`,
