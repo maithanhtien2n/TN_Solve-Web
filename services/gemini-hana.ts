@@ -21,12 +21,16 @@ export const geminiHanaService = {
     return await api.put(`/gemini-hana/settings`, payload);
   },
 
+  // [2026-08-30] Timeout riêng 200s (thay vì mặc định 70s của axios.ts) —
+  // đồng bộ với chuỗi timeout gen-server/TN_Solve-Server phía sau (180s /
+  // 190s), để Admin Test/Chat prompt dài (VD kịch bản 75 cảnh) không bị FE
+  // cắt sớm hơn các tầng bên dưới. KHÔNG đổi default toàn app, chỉ 2 call này.
   async testAccount(payload: {
     accountId: string;
     prompt: string;
     files?: { data: string; mimeType: string; filename?: string }[];
   }) {
-    return await api.post(`/gemini-hana/test`, payload);
+    return await api.post(`/gemini-hana/test`, payload, { timeout: 200_000 });
   },
 
   async chatAccount(payload: {
@@ -35,6 +39,6 @@ export const geminiHanaService = {
     files?: { data: string; mimeType: string; filename?: string }[];
     chatMetadata?: (string | null)[] | null;
   }) {
-    return await api.post(`/gemini-hana/chat`, payload);
+    return await api.post(`/gemini-hana/chat`, payload, { timeout: 200_000 });
   },
 };
