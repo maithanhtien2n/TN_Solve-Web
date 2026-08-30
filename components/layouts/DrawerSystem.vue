@@ -121,6 +121,26 @@ const menus = computed<any>(() => {
     },
     {
       role: [EnumAccountRole.ADMIN],
+      title: "Quản lý Gemini",
+      icon: "mdi-robot-outline",
+      route: "gemini-hana",
+      children: [
+        {
+          title: "Tài khoản",
+          route: "/admin/gemini-hana/accounts",
+        },
+        {
+          title: "Cài đặt",
+          route: "/admin/gemini-hana/settings",
+        },
+        {
+          title: "Tài liệu",
+          route: "/admin/gemini-hana/docs",
+        },
+      ],
+    },
+    {
+      role: [EnumAccountRole.ADMIN],
       title: "Quản lý dữ liệu",
       icon: "mdi-database-outline",
       route: "master-data",

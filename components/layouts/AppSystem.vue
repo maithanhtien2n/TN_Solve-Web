@@ -45,6 +45,13 @@ const breadcrumbs = computed<any>(() => {
     } as unknown as any);
   }
 
+  if (matched.length === 1 && matched[0].path.includes("/admin/gemini-hana")) {
+    matched.unshift({
+      path: "/admin/gemini-hana",
+      meta: { title: "Quản lý Gemini" },
+    } as unknown as any);
+  }
+
   if (
     matched.length === 1 &&
     (matched[0].path.includes("/admin/settings") ||
