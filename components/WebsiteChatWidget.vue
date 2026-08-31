@@ -42,16 +42,53 @@ const scrollRef = ref<HTMLElement | null>(null);
 const inputRef = ref<any>(null);
 
 // [2026-08-31] Trên điện thoại, panel chat chuyển sang full màn hình (xem CSS
-// @media max-width:480px) — icon nút đóng đổi từ "X" sang mũi tên "<" cho
-// đúng cảm giác 1 màn hình riêng (giống Messenger/Zalo) thay vì 1 popup nổi
-// như trên máy tính. CSS thuần (:hover, media query) làm được phần layout,
-// nhưng đổi TÊN icon thì phải biết isMobile ở JS.
+// @media max-width:480px) — dùng để ẩn FAB lúc panel mở (setBackgroundScrollLocked)
+// và đồng bộ chiều cao panel theo bàn phím ảo (xem visualViewport bên dưới).
 const isMobile = ref(false);
 onMounted(() => {
   const mql = window.matchMedia("(max-width: 480px)");
   isMobile.value = mql.matches;
   mql.addEventListener("change", (e) => (isMobile.value = e.matches));
 });
+
+// [2026-08-31] Bàn phím ảo mobile bật lên -> header/panel bị "trôi" lên,
+// header khuất mất khỏi màn hình. Nguyên nhân: panel dùng position:fixed +
+// 100dvh, nhưng một số trình duyệt (đặc biệt Chrome Android chưa hỗ trợ/tôn
+// trọng viewport meta interactive-widget=resizes-content — đã thêm ở
+// nuxt.config.ts, lớp phòng chính) xử lý bàn phím kiểu "đè lên nội dung +
+// tự cuộn cả trang để lộ ô input" thay vì co lại đúng, khiến 100dvh không
+// phản ứng theo và phần fixed bị lệch khỏi vùng nhìn thấy thật.
+// Lớp DỰ PHÒNG này bám trực tiếp vào window.visualViewport (viewport THẬT sau
+// khi trừ phần bàn phím che, hỗ trợ rộng: iOS Safari 13+, Chrome, Firefox
+// mobile) — tự đặt đúng chiều cao + vị trí top của panel theo viewport thật
+// mỗi khi nó đổi (bàn phím bật/tắt, hoặc visual viewport bị cuộn/pan), đảm
+// bảo panel luôn khớp khung nhìn thật bất kể trình duyệt xử lý bàn phím kiểu
+// gì. Chỉ áp dụng khi panel đang mở + đang ở mobile — không đụng gì trên
+// máy tính.
+const mobileViewportStyle = ref<Record<string, string> | undefined>(undefined);
+function syncMobileViewport() {
+  const vv = window.visualViewport;
+  if (!vv || !isMobile.value || !open.value) {
+    mobileViewportStyle.value = undefined;
+    return;
+  }
+  mobileViewportStyle.value = {
+    height: `${vv.height}px`,
+    maxHeight: `${vv.height}px`,
+    top: `${vv.offsetTop}px`,
+  };
+}
+onMounted(() => {
+  if (!window.visualViewport) return;
+  window.visualViewport.addEventListener("resize", syncMobileViewport);
+  window.visualViewport.addEventListener("scroll", syncMobileViewport);
+});
+onUnmounted(() => {
+  if (!window.visualViewport) return;
+  window.visualViewport.removeEventListener("resize", syncMobileViewport);
+  window.visualViewport.removeEventListener("scroll", syncMobileViewport);
+});
+watch(open, () => nextTick(syncMobileViewport));
 
 function loadForCurrentAccount() {
   try {
@@ -276,7 +313,7 @@ function sendSuggestion(text: string) {
 <template>
   <div class="chat-widget">
     <Transition name="chat-pop">
-      <div v-if="open" class="chat-panel">
+      <div v-if="open" class="chat-panel" :style="mobileViewportStyle">
         <div class="chat-header">
           <div class="chat-header-title">
             <div class="chat-header-avatar">

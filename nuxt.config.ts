@@ -55,7 +55,20 @@ export default defineNuxtConfig({
       htmlAttrs: { lang: "vi" },
       meta: [
         { charset: "utf-8" },
-        { name: "viewport", content: "width=device-width, initial-scale=1" },
+        {
+          name: "viewport",
+          // [2026-08-31] interactive-widget=resizes-content: fix widget chat
+          // full màn hình trên mobile bị header/nội dung "trôi" lên khi bàn
+          // phím ảo bật — mặc định (không có cờ này) 1 số Chrome Android xử
+          // lý bàn phím kiểu "đè lên nội dung" thay vì co lại đúng, khiến
+          // 100dvh không co theo bàn phím như mong đợi mà trình duyệt tự
+          // cuộn/dịch cả trang lên để lộ ô input, kéo luôn phần header (đang
+          // position:fixed) trôi mất khỏi màn hình. Cờ này (Chrome 108+, các
+          // trình duyệt cũ hơn tự bỏ qua, không lỗi) ép layout/visual
+          // viewport co đúng theo bàn phím -> 100dvh phản ứng đúng.
+          content:
+            "width=device-width, initial-scale=1, interactive-widget=resizes-content",
+        },
         { name: "author", content: "TN Solve" },
         { name: "robots", content: "index, follow" },
         {
