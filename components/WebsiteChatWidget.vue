@@ -5,7 +5,14 @@ import { websiteChatService } from "~/services/website-chat";
 // trang. CHỈ dùng Hana (xem website-chat.service.ts bên server), lỗi báo
 // thẳng ra khung chat, KHÔNG fallback provider khác. KHÔNG lưu lịch sử DB —
 // chỉ giữ trong sessionStorage (mất khi đóng tab/trình duyệt), đúng yêu cầu.
-const { onGetterUserData: userData } = useAppStore();
+const {
+  onGetterUserData: userData,
+  // [2026-08-31] Sidebar điều hướng mobile (AppHeader.vue) mở/đóng qua state
+  // CHUNG này — đọc để tự ẩn nút chat nổi lúc sidebar đang mở, tránh nút chat
+  // đè lên trên lớp phủ mờ của sidebar (từng thử chỉnh z-index bên
+  // AppHeader.vue không ăn thua, xử lý dứt điểm bằng cách ẩn hẳn ở đây).
+  onGetterMobileNavOpen: mobileNavOpen,
+} = useAppStore();
 
 // [2026-08-31] sessionStorage chỉ theo TAB, KHÔNG biết ai đang đăng nhập — nếu
 // dùng 1 key cố định, 2 tài khoản dùng chung 1 tab (máy chung, đăng xuất rồi
@@ -446,7 +453,7 @@ function sendSuggestion(text: string) {
          giữ nguyên hành vi cũ (panel là popup nổi, không che kín, nút X vẫn
          cần hiện làm lối đóng phụ). -->
     <button
-      v-show="!(open && isMobile)"
+      v-show="!(open && isMobile) && !mobileNavOpen"
       class="chat-fab"
       :class="{ 'chat-fab-open': open }"
       @click="toggleOpen"

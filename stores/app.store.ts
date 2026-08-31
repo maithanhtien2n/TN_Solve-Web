@@ -11,6 +11,13 @@ export const useAppStore = defineStore("app", () => {
   const displayPopupBuyCredit = ref<boolean>(false);
   const displayLogin = ref<boolean>(false);
   const userData = ref<any>(undefined);
+  // [2026-08-31] Trạng thái mở/đóng sidebar điều hướng mobile (AppHeader.vue)
+  // — đặt ở store CHUNG (không phải state riêng trong AppHeader) để
+  // WebsiteChatWidget.vue (component KHÁC, không liên quan gì tới header) có
+  // thể tự ẩn nút chat nổi khi sidebar đang mở, tránh nút chat đè lên trên
+  // lớp phủ mờ của sidebar (đã thử chỉnh z-index qua prop của Vuetify nhưng
+  // không ăn thua, chuyển sang cách chắc chắn hơn: ẩn hẳn nút đi).
+  const mobileNavOpen = ref<boolean>(false);
 
   const hasPlayed = ref<boolean>(false);
 
@@ -19,6 +26,7 @@ export const useAppStore = defineStore("app", () => {
   const onGetterSystemPopup = computed(() => systemPopup);
   const onGetterDisplayLogin = computed(() => displayLogin);
   const onGetterUserData = computed(() => userData);
+  const onGetterMobileNavOpen = computed(() => mobileNavOpen);
 
   const onGetterHasPlayed = computed(() => hasPlayed);
 
@@ -47,6 +55,7 @@ export const useAppStore = defineStore("app", () => {
     onGetterSystemPopup,
     onGetterDisplayLogin,
     onGetterUserData,
+    onGetterMobileNavOpen,
 
     onGetterHasPlayed,
 

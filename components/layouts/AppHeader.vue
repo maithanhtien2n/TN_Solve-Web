@@ -12,6 +12,7 @@ const {
   onGetterUserData: userData,
   onGetterDisplayLogin: displayLogin,
   onGetterDisplayPopupBuyCredit,
+  onGetterMobileNavOpen: mobileNavOpen,
 } = useAppStore();
 
 const STORE_NAV_ITEM = { title: "Cửa hàng", path: "/cua-hang", icon: "mdi-store-outline" };
@@ -29,6 +30,43 @@ const navItems = ref([
 ]);
 
 const isActive = (path: string) => route.path === path;
+
+// [2026-08-31] Trên điện thoại, thanh menu ngang (.header-nav) bị ẩn hẳn
+// (v-if="!isMobile" — không đủ chỗ ngang) khiến khách không có cách nào bấm
+// vào Cộng đồng/Hướng dẫn/Đăng ký/Cửa hàng ngoài việc tự gõ URL — thêm 1 nút
+// nổi ☰ ghim mép trái màn hình (chỉ hiện ở mobile) mở ra sidebar chứa lại
+// đúng navItems đang dùng cho desktop, không tạo danh sách riêng lặp lại.
+// mobileNavOpen lấy từ store chung (app.store.ts) ở trên, không khai báo lại
+// ref riêng ở đây — để WebsiteChatWidget.vue đọc được mà tự ẩn nút chat nổi.
+function onClickMobileNavItem(path: string) {
+  mobileNavOpen.value = false;
+  router.push(path);
+}
+
+// Vuetify KHÔNG tự khoá scroll trang nền khi mở drawer temporary kiểu này —
+// vẫn thấy thanh cuộn + cuộn được trang phía sau dù sidebar đang che lên
+// trên. Áp lại ĐÚNG kỹ thuật đã dùng cho khung chat full màn hình mobile
+// (WebsiteChatWidget.vue setBackgroundScrollLocked) — ghim body đứng yên
+// bằng position:fixed thay vì chỉ overflow:hidden (không đáng tin cậy trên
+// mobile), rồi trả lại đúng vị trí cuộn cũ lúc đóng.
+let savedScrollY = 0;
+watch(() => mobileNavOpen.value, (open) => {
+  if (open) {
+    savedScrollY = window.scrollY;
+    document.documentElement.style.overflow = "hidden";
+    document.body.style.overflow = "hidden";
+    document.body.style.position = "fixed";
+    document.body.style.top = `-${savedScrollY}px`;
+    document.body.style.width = "100%";
+  } else {
+    document.documentElement.style.overflow = "";
+    document.body.style.overflow = "";
+    document.body.style.position = "";
+    document.body.style.top = "";
+    document.body.style.width = "";
+    window.scrollTo(0, savedScrollY);
+  }
+});
 
 const navTrackRef = ref<HTMLElement | null>(null);
 const pillStyle = ref({ left: "4px", width: "0px" });
@@ -144,6 +182,51 @@ const onClickMenuItem = (value: string) => {
 
 <template>
   <AppLogin />
+
+  <!-- Nút menu nổi ghim mép trái — CHỈ mobile (desktop đã có thanh menu ngang
+       trong header rồi). Nằm NGOÀI <header>, position:fixed riêng, không
+       cuộn theo trang. -->
+  <button
+    v-if="isMobile"
+    class="mobile-nav-fab"
+    aria-label="Mở menu điều hướng"
+    @click="mobileNavOpen = true"
+  >
+    <v-icon size="22" color="white">mdi-menu</v-icon>
+  </button>
+
+  <v-navigation-drawer
+    v-if="isMobile"
+    v-model="mobileNavOpen"
+    location="left"
+    temporary
+    width="272"
+    class="mobile-nav-drawer"
+    :z-index="2001"
+  >
+    <div class="mobile-nav-header">
+      <v-img
+        src="/images/tn-solve-logo.png"
+        lazy-src="/images/tn-solve-logo.png"
+        width="96"
+        height="48"
+        class="mobile-nav-logo"
+      />
+    </div>
+
+    <div class="mobile-nav-list">
+      <button
+        v-for="item in navItems"
+        :key="item.path"
+        class="mobile-nav-item"
+        :class="{ 'mobile-nav-item--active': isActive(item.path) }"
+        @click="onClickMobileNavItem(item.path)"
+      >
+        <v-icon :icon="item.icon" size="21" />
+        <span>{{ item.title }}</span>
+      </button>
+    </div>
+  </v-navigation-drawer>
 
   <header class="app-header">
     <v-container max-width="1400">
@@ -578,5 +661,112 @@ const onClickMenuItem = (value: string) => {
     padding: 6px 16px;
     font-size: 0.85rem;
   }
+}
+
+/* ─── Mobile nav FAB (nút ☰ ghim mép trái) ───────────── */
+.mobile-nav-fab {
+  position: fixed;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 998;
+  width: 40px;
+  height: 52px;
+  border: none;
+  /* Bo tròn CHỈ 2 góc phải — nửa "ăn" vào mép trái màn hình, nửa nhô ra như
+     1 cái tab, không phải hình tròn/pill đầy đủ như nút chat bên phải. */
+  border-radius: 0 16px 16px 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(160deg, #1e3a5f 0%, #1565c0 100%);
+  box-shadow: 2px 4px 14px -2px rgba(21, 101, 192, 0.45);
+  cursor: pointer;
+  transition: width 0.18s ease, box-shadow 0.18s ease;
+}
+.mobile-nav-fab:active {
+  width: 36px;
+  box-shadow: 1px 2px 8px -2px rgba(21, 101, 192, 0.4);
+}
+
+/* ─── Mobile nav drawer ───────────────────────────────── */
+/* z-index đặt qua prop :z-index="2001" ở component (không phải CSS ở đây) —
+   nút chat nổi (WebsiteChatWidget) đang dùng z-index:2000, mặc định Vuetify
+   cho temporary drawer thấp hơn số đó nên bị nút chat đè lên trên khi mở
+   sidebar. Dùng prop chuẩn của Vuetify thay vì tự set CSS z-index tay — prop
+   này tự động áp đúng luôn cho cả lớp phủ mờ (scrim) phía sau drawer. */
+/* Khớp ĐÚNG header thật: cùng nền gradient xanh nhạt (.app-header) và cùng
+   chiều cao (.header-inner height:64px) — logo gốc có màu (TN xanh cyan,
+   Solve xanh navy, tagline xám) vẽ cho nền sáng, không phải nền tối. */
+/* Lớp phủ mờ phía sau sidebar — Vuetify mặc định khá nhạt, tăng đậm hơn cho
+   rõ tách bạch nội dung trang nền với sidebar đang mở. Chặn cả 2 tên class
+   có thể dùng tuỳ bản Vuetify (overlay dùng chung __scrim hoặc riêng cho
+   navigation-drawer), cho chắc không bị lệch tên. */
+:deep(.v-navigation-drawer__scrim),
+:deep(.v-overlay__scrim) {
+  opacity: 0.65 !important;
+}
+
+.mobile-nav-header {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  height: 64px;
+  padding: 0 18px;
+  background: linear-gradient(90deg, #d6eaf8 0%, #e3f2fd 45%, #bbdefb 100%);
+  border-bottom: 1px solid rgba(30, 136, 229, 0.2);
+}
+/* [2026-08-31] Ép cứng kích thước bằng !important xuyên qua cấu trúc nội bộ
+   của v-img (wrapper + ảnh thật bên trong) — nghi ngờ có style mặc định nào
+   đó của Vuetify/global đang đá đè lên width/height truyền qua props, khiến
+   logo hiện to hơn hẳn 76x38 đã khai báo. Chặn tận gốc bằng !important thay
+   vì tiếp tục đoán nguyên nhân. */
+.mobile-nav-logo,
+.mobile-nav-logo :deep(.v-img__img),
+.mobile-nav-logo :deep(img) {
+  flex-shrink: 0;
+  width: 96px !important;
+  height: 48px !important;
+  max-width: 96px !important;
+  max-height: 48px !important;
+}
+
+.mobile-nav-list {
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.mobile-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  padding: 13px 14px;
+  border-radius: 12px;
+  border: none;
+  background: transparent;
+  font-size: 0.98rem;
+  font-weight: 500;
+  color: #374151;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.mobile-nav-item :deep(.v-icon) {
+  color: #64748b;
+  flex-shrink: 0;
+  transition: color 0.15s ease;
+}
+.mobile-nav-item:hover {
+  background: #f1f5f9;
+}
+.mobile-nav-item--active {
+  background: rgba(21, 101, 192, 0.1);
+  color: #1565c0;
+  font-weight: 700;
+}
+.mobile-nav-item--active :deep(.v-icon) {
+  color: #1565c0;
 }
 </style>

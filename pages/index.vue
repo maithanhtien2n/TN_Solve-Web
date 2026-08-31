@@ -2,9 +2,57 @@
 import { masterDataService } from "~/services/app";
 
 const router = useRouter();
+const route = useRoute();
 const { isMobile } = useDevice();
 
-const { onGetterUserData: userData } = useAppStore();
+const {
+  onGetterUserData: userData,
+  onGetterDisplayLogin: displayLogin,
+} = useAppStore();
+
+// [2026-08-31] Nút "Dùng thử" — gắn mã ưu đãi "tiencodeweb" (xem
+// account.service.ts getById(), auth.service.ts login() — cấp 3 video dùng
+// thử NẾU tài khoản chưa từng có testAmount VÀ chưa từng thuê gói, xem 2 điều
+// kiện `accountInfo.settings?.testAmount == null` + check hasRentedService).
+// Ẩn nút khi ĐÃ TỪNG mua gói (serviceExpiry có giá trị) HOẶC đã từng được cấp
+// testAmount rồi (dù qua link giới thiệu hay chính nút này trước đó, kể cả
+// khi testAmount đã về 0 — server chỉ xét "đã từng cấp hay chưa" bằng
+// `== null`, không xét còn lượt hay hết) — dùng đúng field/điều kiện
+// AppHeader.vue đã dùng để hiện "X lượt thử" trên badge, tránh hiện nút mời
+// chào sai cho người rõ ràng không còn nhận thêm được nữa.
+const adminAllowsTryFreeButton = ref(true);
+onMounted(async () => {
+  const visible = await getSettingValue("Hiển thị nút dùng thử");
+  if (!visible) adminAllowsTryFreeButton.value = false;
+});
+
+const showTryFreeButton = computed(
+  () =>
+    adminAllowsTryFreeButton.value &&
+    !userData.value?.serviceExpiry &&
+    userData.value?.settings?.testAmount == null
+);
+
+async function onClickTryFree() {
+  if (userData.value?.name) {
+    // Đã đăng nhập -> gắn thẳng ?code=tiencodeweb vào URL rồi reload để
+    // onActionGetUserData() (chạy trong layouts/default.vue onMounted) đọc
+    // được route.query.code và áp dụng ngay (đúng logic server đã có sẵn).
+    const url = new URL(window.location.href);
+    url.searchParams.set("code", "tiencodeweb");
+    window.location.href = url.toString();
+    return;
+  }
+
+  // Chưa đăng nhập -> chưa có tài khoản để gắn ưu đãi vào, phải đăng nhập
+  // trước. AppLogin.vue tự đọc route.query.redirect để đưa khách quay lại
+  // đúng chỗ sau khi đăng nhập Google xong (router.replace(decodedState.
+  // redirect) ở layouts/default.vue) — đặt sẵn redirect về "/?code=
+  // tiencodeweb" thì sau khi đăng nhập xong sẽ tự động áp mã luôn, không cần
+  // khách bấm lại nút.
+  await router.replace({ query: { ...route.query, redirect: "/?code=tiencodeweb" } });
+  displayLogin.value = true;
+}
 
 // ID video YouTube cho mục "Video hướng dẫn" — đọc từ System Setting (admin
 // chỉnh được ở Admin > Cài đặt chung), fallback giữ nguyên video cũ nếu lỗi.
@@ -430,6 +478,14 @@ useSeo({
       <div class="video-section-sub">
         Xem hướng dẫn đăng ký và sử dụng TN Solve để tạo video AI ngay hôm nay
       </div>
+      <button
+        v-if="showTryFreeButton"
+        class="video-section-try-free-btn"
+        @click="onClickTryFree"
+      >
+        <v-icon size="18">mdi-gift-outline</v-icon>
+        Dùng thử miễn phí
+      </button>
     </div>
     <div class="video-frame-wrap">
       <div class="video-frame-inner">
@@ -1296,6 +1352,30 @@ useSeo({
   font-size: 0.875rem;
   color: rgba(255, 255, 255, 0.6);
   line-height: 1.6;
+}
+
+.video-section-try-free-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 20px;
+  padding: 11px 22px;
+  border: none;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #0984e3, #0072c6);
+  color: #fff;
+  font-size: 0.875rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 8px 20px -6px rgba(9, 132, 227, 0.55);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.video-section-try-free-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 24px -6px rgba(9, 132, 227, 0.65);
+}
+.video-section-try-free-btn:active {
+  transform: translateY(0);
 }
 
 .video-frame-wrap {
