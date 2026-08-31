@@ -316,6 +316,24 @@ definePageMeta({ layout: "admin", title: "Thông tin chung" });
         <span class="text-nowrap">{{ (item as any).value }} người</span>
       </template>
 
+      <!-- [2026-08-31] "Giá trị" của setting này có thể rất dài (system prompt
+      nhiều đoạn văn) — hiện nguyên văn như các setting khác (1 dòng ngắn) sẽ
+      tràn/vỡ layout cả bảng. Cắt ngắn + tooltip xem đầy đủ khi cần. -->
+      <template v-else-if="(item as any).title === 'System Prompt - Chatbot Website'">
+        <v-tooltip location="bottom" max-width="480">
+          <template #activator="{ props }">
+            <span
+              v-bind="props"
+              class="text-nowrap text-truncate d-inline-block"
+              style="max-width: 320px; cursor: help"
+            >
+              {{ (item as any).value || '(chưa có nội dung)' }}
+            </span>
+          </template>
+          <span style="white-space: pre-wrap">{{ (item as any).value || '(chưa có nội dung)' }}</span>
+        </v-tooltip>
+      </template>
+
       <template v-else>
         <a
           v-if="(item as any).value?.startsWith('http')"
