@@ -220,6 +220,10 @@ async function onSubmitTest() {
       error?.response?.data?.message || error?.message || "Lỗi không xác định";
   } finally {
     testLoading.value = false;
+    // [2026-08-31] Test xong (dù thành công hay lỗi) là trạng thái SỐNG của
+    // account đó đã đổi ngay trong gemini-hana-service — làm mới cột "Trạng
+    // thái gần nhất" luôn, không đợi bạn tự tải lại cả trang mới thấy đúng.
+    loadLiveHealth();
   }
 }
 
@@ -284,6 +288,9 @@ async function onSendChat() {
     chatMessages.value.pop(); // gỡ tin nhắn user vừa thêm — gửi thất bại
   } finally {
     chatDialogLoading.value = false;
+    // Xem ghi chú ở onSubmitTest() — làm mới trạng thái ngay, không đợi tải
+    // lại cả trang.
+    loadLiveHealth();
   }
 }
 
