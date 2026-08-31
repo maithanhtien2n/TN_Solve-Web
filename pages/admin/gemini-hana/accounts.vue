@@ -7,11 +7,30 @@ const headers = [
   { title: "__Secure-1PSID", key: "secure1PSIDPreview", sortable: false },
   { title: "__Secure-1PSIDTS", key: "secure1PSIDTSPreview", sortable: false },
   { title: "Hoạt động", key: "isActive", align: "center", sortable: false },
+  { title: "Trạng thái gần nhất", key: "liveStatus", sortable: false },
   { title: "Cập nhật", key: "updatedAt", sortable: false },
   { title: "Thao tác", key: "action", align: "center", sortable: false },
 ];
 
 const data = ref<any>({});
+// [2026-08-31] Trạng thái SỐNG đọc từ RAM gemini-hana-service (KHÔNG lưu DB),
+// khớp theo _id — xem loadLiveHealth(). Load lại mỗi lần bảng load lại.
+const liveHealthMap = ref<Record<string, { healthy: boolean; lastError: string | null }>>({});
+
+async function loadLiveHealth() {
+  try {
+    const res: any = await geminiHanaService.getLiveHealth();
+    const map: Record<string, any> = {};
+    for (const a of res.data?.accounts || []) {
+      map[a.id] = { healthy: a.healthy, lastError: a.lastError || null };
+    }
+    liveHealthMap.value = map;
+  } catch {
+    // gemini-hana-service có thể đang không chạy — không chặn cả trang vì
+    // lỗi này, chỉ đơn giản không hiện được cột trạng thái lúc đó.
+    liveHealthMap.value = {};
+  }
+}
 const loading = ref<string>("");
 const dataTableRef = ref<any>(null);
 const commonDialogRef = ref<any>(null);
@@ -57,14 +76,16 @@ async function loadItems(event: any) {
   const params = { ...event };
 
   loading.value = "load-table";
-  await geminiHanaService
-    .getAllAccounts(params)
-    .then((res) => {
+  await Promise.all([
+    geminiHanaService.getAllAccounts(params).then((res) => {
       if (res.data) data.value = res.data;
-    })
-    .finally(() => {
-      loading.value = "";
-    });
+    }),
+    // Chạy song song, KHÔNG chặn bảng chính nếu gemini-hana-service chậm/lỗi
+    // (đã tự bắt lỗi bên trong loadLiveHealth).
+    loadLiveHealth(),
+  ]).finally(() => {
+    loading.value = "";
+  });
 }
 
 const onResetForm = (event?: any) => {
@@ -565,6 +586,28 @@ definePageMeta({ layout: "admin", title: "Tài khoản" });
           "
         />
       </div>
+    </template>
+
+    <template #row-liveStatus="{ item }">
+      <template v-if="!liveHealthMap[(item as any)._id]">
+        <span class="text-caption text-medium-emphasis">Chưa có dữ liệu</span>
+      </template>
+      <template v-else-if="!liveHealthMap[(item as any)._id].lastError">
+        <v-chip size="small" color="success" variant="tonal">
+          <v-icon start size="14">mdi-check-circle-outline</v-icon>
+          OK
+        </v-chip>
+      </template>
+      <template v-else>
+        <v-tooltip :text="liveHealthMap[(item as any)._id].lastError" location="top">
+          <template #activator="{ props }">
+            <v-chip v-bind="props" size="small" color="error" variant="tonal" style="cursor: help">
+              <v-icon start size="14">mdi-alert-circle-outline</v-icon>
+              Lỗi
+            </v-chip>
+          </template>
+        </v-tooltip>
+      </template>
     </template>
 
     <template #row-action="{ item }">

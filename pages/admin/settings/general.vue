@@ -15,6 +15,7 @@ const newRevenuePassword = ref<string>("");
 const newZaloGroupLink = ref<string>("");
 const newVideoTutorialId = ref<string>("");
 const newDefaultTemplatePrice = ref<string>("");
+const newWebsiteChatSystemPrompt = ref<string>("");
 
 async function onSaveRevenuePassword(item: any) {
   if (!newRevenuePassword.value) return;
@@ -83,6 +84,24 @@ async function onSaveDefaultTemplatePrice(item: any) {
     dataTableRef.value?.loadItems();
   } catch (error) {
     console.log("Lỗi khi đổi giá tạo video mặc định!", error);
+  } finally {
+    loading.value = "";
+  }
+}
+
+async function onSaveWebsiteChatSystemPrompt(item: any) {
+  if (!newWebsiteChatSystemPrompt.value) return;
+
+  loading.value = `website-chat-system-prompt-${item._id}`;
+  try {
+    await masterDataService.settingAction({
+      _id: item._id,
+      value: newWebsiteChatSystemPrompt.value,
+    });
+    newWebsiteChatSystemPrompt.value = "";
+    dataTableRef.value?.loadItems();
+  } catch (error) {
+    console.log("Lỗi khi đổi system prompt chatbot website!", error);
   } finally {
     loading.value = "";
   }
@@ -477,6 +496,40 @@ definePageMeta({ layout: "admin", title: "Thông tin chung" });
               :loading="loading === `default-template-price-${(item as any)._id}`"
               icon="mdi-content-save-outline"
               @click="onSaveDefaultTemplatePrice(item)"
+            />
+          </div>
+        </template>
+
+        <template
+          v-else-if="(item as any).title === 'System Prompt - Chatbot Website'"
+        >
+          <div class="d-flex align-center ga-2 my-2" style="width: 320px">
+            <v-textarea
+              v-model="newWebsiteChatSystemPrompt"
+              density="compact"
+              variant="outlined"
+              hide-details
+              rows="3"
+              auto-grow
+              class="flex-grow-1"
+              :placeholder="
+                (item as any).value
+                  ? 'Đã có nội dung — nhập để thay thế toàn bộ'
+                  : 'Nhập system prompt cho chatbot website...'
+              "
+              @keyup.enter.stop
+            />
+            <v-btn
+              variant="tonal"
+              color="primary"
+              height="36"
+              rounded="lg"
+              :disabled="!newWebsiteChatSystemPrompt"
+              :loading="
+                loading === `website-chat-system-prompt-${(item as any)._id}`
+              "
+              icon="mdi-content-save-outline"
+              @click="onSaveWebsiteChatSystemPrompt(item)"
             />
           </div>
         </template>

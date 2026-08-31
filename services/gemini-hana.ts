@@ -33,6 +33,13 @@ export const geminiHanaService = {
     return await api.post(`/gemini-hana/test`, payload, { timeout: 200_000 });
   },
 
+  // [2026-08-31] Trạng thái SỐNG (healthy/lastError) từng account — đọc trực
+  // tiếp từ RAM gemini-hana-service, không lưu DB. Gọi lại mỗi lần vào/tải
+  // lại trang là có dữ liệu mới nhất, không cache gì ở FE.
+  async getLiveHealth() {
+    return await api.get(`/gemini-hana/health`);
+  },
+
   async chatAccount(payload: {
     accountId: string;
     prompt: string;

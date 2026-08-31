@@ -350,6 +350,7 @@ onMounted(async () => {
     <!-- <PopupAnnouncement /> -->
     <PopupBuyCredit />
     <PopupMessage />
+    <WebsiteChatWidget />
 
     <AppHeader />
 
