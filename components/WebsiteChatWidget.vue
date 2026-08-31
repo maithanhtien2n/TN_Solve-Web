@@ -41,6 +41,18 @@ const fileInputRef = ref<HTMLInputElement | null>(null);
 const scrollRef = ref<HTMLElement | null>(null);
 const inputRef = ref<any>(null);
 
+// [2026-08-31] Trên điện thoại, panel chat chuyển sang full màn hình (xem CSS
+// @media max-width:480px) — icon nút đóng đổi từ "X" sang mũi tên "<" cho
+// đúng cảm giác 1 màn hình riêng (giống Messenger/Zalo) thay vì 1 popup nổi
+// như trên máy tính. CSS thuần (:hover, media query) làm được phần layout,
+// nhưng đổi TÊN icon thì phải biết isMobile ở JS.
+const isMobile = ref(false);
+onMounted(() => {
+  const mql = window.matchMedia("(max-width: 480px)");
+  isMobile.value = mql.matches;
+  mql.addEventListener("change", (e) => (isMobile.value = e.matches));
+});
+
 function loadForCurrentAccount() {
   try {
     const saved = sessionStorage.getItem(storageKey.value);
@@ -76,14 +88,47 @@ function scrollToBottom() {
   });
 }
 
+// [2026-08-31] Panel full màn hình trên mobile CHE MẮT trang nền chứ không
+// che luôn khả năng cuộn của nó — html/body phía sau vẫn cuộn bình thường,
+// ra 2 thanh cuộn cùng lúc (1 của khung tin nhắn, 1 của trang web nền).
+// Chỉ set overflow:hidden trên body là KHÔNG đủ tin cậy (trang có thể có
+// phần tử cuộn riêng ngoài body, một số trình duyệt mobile vẫn lách qua
+// được) — dùng cách khoá chắc chắn hơn: ghim body đứng yên bằng
+// position:fixed + đẩy lên đúng vị trí đang cuộn dở bằng margin âm "top",
+// rồi khi mở khoá thì trả lại đúng scrollY cũ (không thì trang tự nhảy về
+// đầu). Chỉ áp dụng mobile — máy tính là popup nổi, không che kín màn hình
+// nên trang nền vẫn phải cuộn được bình thường.
+let savedScrollY = 0;
+function setBackgroundScrollLocked(locked: boolean) {
+  if (!isMobile.value) return;
+  if (locked) {
+    savedScrollY = window.scrollY;
+    document.documentElement.style.overflow = "hidden";
+    document.body.style.overflow = "hidden";
+    document.body.style.position = "fixed";
+    document.body.style.top = `-${savedScrollY}px`;
+    document.body.style.width = "100%";
+  } else {
+    document.documentElement.style.overflow = "";
+    document.body.style.overflow = "";
+    document.body.style.position = "";
+    document.body.style.top = "";
+    document.body.style.width = "";
+    window.scrollTo(0, savedScrollY);
+  }
+}
+
 function toggleOpen() {
   open.value = !open.value;
+  setBackgroundScrollLocked(open.value);
   if (open.value) {
     hasOpenedOnce.value = true;
     scrollToBottom();
     nextTick(() => inputRef.value?.focus?.());
   }
 }
+
+onUnmounted(() => setBackgroundScrollLocked(false));
 
 function formatTime(ts: number) {
   return new Date(ts).toLocaleTimeString("vi-VN", {
@@ -356,7 +401,19 @@ function sendSuggestion(text: string) {
       </div>
     </Transition>
 
-    <button class="chat-fab" :class="{ 'chat-fab-open': open }" @click="toggleOpen">
+    <!-- [2026-08-31] Trên mobile, panel mở full màn hình đã che kín nút này
+         rồi (xem CSS .chat-panel trong @media max-width:480px) — vẫn giữ nó
+         RENDER + đổi icon thành X chỉ tổ gây giật/nhấp nháy lúc bấm (panel
+         có transition mở, nút lộ ra 1 nhịp trước khi bị che). Ẩn hẳn luôn
+         khi đang mở trên mobile, không chỉ dựa vào z-index che nữa. Máy tính
+         giữ nguyên hành vi cũ (panel là popup nổi, không che kín, nút X vẫn
+         cần hiện làm lối đóng phụ). -->
+    <button
+      v-show="!(open && isMobile)"
+      class="chat-fab"
+      :class="{ 'chat-fab-open': open }"
+      @click="toggleOpen"
+    >
       <span v-if="!hasOpenedOnce" class="chat-fab-ring"></span>
       <v-icon size="26" color="white">{{ open ? "mdi-close" : "mdi-chat-processing-outline" }}</v-icon>
     </button>
@@ -366,8 +423,11 @@ function sendSuggestion(text: string) {
 <style scoped>
 .chat-widget {
   position: fixed;
-  right: 20px;
-  bottom: 20px;
+  /* [2026-08-31] Khớp đúng lề nội dung trang: v-container (Vuetify) mặc định
+     padding: 16px 2 bên, header/nội dung trang đều nằm trong đó -> FAB thẳng
+     hàng với lề thật của nội dung thay vì 1 con số ước chừng. */
+  right: 16px;
+  bottom: 16px;
   z-index: 2000;
   font-family: inherit;
 }
@@ -818,14 +878,37 @@ function sendSuggestion(text: string) {
   transform: translateY(12px) scale(0.94);
 }
 
+/* ── Mobile: full màn hình, chỉ áp dụng cho điện thoại — máy tính giữ
+   nguyên dạng popup nổi góc phải dưới như hiện tại. ────────────────── */
 @media (max-width: 480px) {
-  .chat-widget {
-    right: 12px;
-    bottom: 12px;
-  }
   .chat-panel {
-    width: calc(100vw - 24px);
-    bottom: 72px;
+    /* position:fixed neo thẳng theo viewport (không phụ thuộc offset
+       right/bottom của .chat-widget) -> phủ kín toàn màn hình, đè luôn FAB
+       bên dưới nên không cần ẩn riêng nút FAB. */
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    max-width: 100%;
+    /* 100dvh = chiều cao viewport ĐỘNG, tự co lại đúng phần còn trống phía
+       trên bàn phím ảo khi nó bật lên (trình duyệt mobile đời mới hỗ trợ) —
+       100vh cũ không co theo bàn phím, input sẽ bị bàn phím che mất.
+       Fallback 100vh cho trình duyệt chưa hỗ trợ dvh. */
+    height: 100vh;
+    height: 100dvh;
+    max-height: 100vh;
+    max-height: 100dvh;
+    border-radius: 0;
+    z-index: 1;
+  }
+
+  .chat-header {
+    padding-top: env(safe-area-inset-top);
+    height: calc(62px + env(safe-area-inset-top));
+  }
+
+  .chat-input-row {
+    padding-bottom: env(safe-area-inset-bottom);
+    height: calc(62px + env(safe-area-inset-bottom));
   }
 }
 

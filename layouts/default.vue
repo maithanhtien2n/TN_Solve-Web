@@ -31,6 +31,17 @@ const loading = ref(true);
 const commonDialogPaymentRef = ref<any>(null);
 const paidSummary = ref<any>(null);
 
+// [2026-08-31] Mặc định HIỆN nút chat (khớp giá trị mặc định "true" ở backend
+// khi cài đặt "Hiển thị nút chat website" mới được tạo lần đầu — xem
+// SYSTEM_SETTING_CANONICAL_ORDER/DEFAULT_TRUE_ON_FIRST_CREATE, helper.ts) —
+// tránh nháy ẩn/hiện lúc đang chờ fetch xong. Cùng pattern với "Hiển thị
+// trang Cửa hàng" ở AppHeader.vue.
+const showChatWidget = ref(true);
+onMounted(async () => {
+  const visible = await getSettingValue("Hiển thị nút chat website");
+  if (!visible) showChatWidget.value = false;
+});
+
 // Đọc lại tóm tắt gói vừa mua (lưu ở dang-ky-dich-vu.vue/PopupBuyCredit.vue
 // ngay trước lúc redirect sang cổng thanh toán) để hiện đúng chi tiết gói
 // trong popup "Thanh toán thành công" thay vì 1 mẫu chung chung cho mọi case.
@@ -350,7 +361,7 @@ onMounted(async () => {
     <!-- <PopupAnnouncement /> -->
     <PopupBuyCredit />
     <PopupMessage />
-    <WebsiteChatWidget />
+    <WebsiteChatWidget v-if="showChatWidget" />
 
     <AppHeader />
 

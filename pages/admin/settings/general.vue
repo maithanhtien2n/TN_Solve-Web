@@ -237,6 +237,14 @@ definePageMeta({ layout: "admin", title: "Thông tin chung" });
         <span v-else class="text-red text-nowrap">Không cho phép</span>
       </template>
 
+      <template v-else-if="(item as any).title === 'Hiển thị nút chat website'">
+        <span v-if="(item as any).value" class="text-green text-nowrap">
+          Cho phép
+        </span>
+
+        <span v-else class="text-red text-nowrap">Không cho phép</span>
+      </template>
+
       <template
         v-else-if="(item as any).title === 'Mật khẩu xem doanh thu công khai'"
       >
@@ -319,7 +327,7 @@ definePageMeta({ layout: "admin", title: "Thông tin chung" });
       <!-- [2026-08-31] "Giá trị" của setting này có thể rất dài (system prompt
       nhiều đoạn văn) — hiện nguyên văn như các setting khác (1 dòng ngắn) sẽ
       tràn/vỡ layout cả bảng. Cắt ngắn + tooltip xem đầy đủ khi cần. -->
-      <template v-else-if="(item as any).title === 'System Prompt - Chatbot Website'">
+      <template v-else-if="(item as any).title === 'System prompt (Chatbot web)'">
         <v-tooltip location="bottom" max-width="480">
           <template #activator="{ props }">
             <span
@@ -405,6 +413,16 @@ definePageMeta({ layout: "admin", title: "Thông tin chung" });
         </template>
 
         <template v-else-if="(item as any).title === 'Hiển thị trang Cửa hàng'">
+          <v-checkbox
+            readonly
+            hide-details
+            class="my-1"
+            :model-value="Boolean((item as any).value)"
+            @click="onClickAction(item)"
+          />
+        </template>
+
+        <template v-else-if="(item as any).title === 'Hiển thị nút chat website'">
           <v-checkbox
             readonly
             hide-details
@@ -519,23 +537,21 @@ definePageMeta({ layout: "admin", title: "Thông tin chung" });
         </template>
 
         <template
-          v-else-if="(item as any).title === 'System Prompt - Chatbot Website'"
+          v-else-if="(item as any).title === 'System prompt (Chatbot web)'"
         >
-          <div class="d-flex align-center ga-2 my-2" style="width: 320px">
-            <v-textarea
+          <div class="d-flex align-center ga-2 my-2 w-10rem">
+            <v-text-field
               v-model="newWebsiteChatSystemPrompt"
               density="compact"
               variant="outlined"
               hide-details
-              rows="3"
-              auto-grow
               class="flex-grow-1"
               :placeholder="
                 (item as any).value
                   ? 'Đã có nội dung — nhập để thay thế toàn bộ'
                   : 'Nhập system prompt cho chatbot website...'
               "
-              @keyup.enter.stop
+              @keyup.enter="onSaveWebsiteChatSystemPrompt(item)"
             />
             <v-btn
               variant="tonal"
