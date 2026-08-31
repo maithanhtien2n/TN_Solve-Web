@@ -599,18 +599,39 @@ definePageMeta({ layout: "admin", title: "Tài khoản" });
       <template v-if="!liveHealthMap[(item as any)._id]">
         <span class="text-caption text-medium-emphasis">Chưa có dữ liệu</span>
       </template>
-      <template v-else-if="!liveHealthMap[(item as any)._id].lastError">
-        <v-chip size="small" color="success" variant="tonal">
+      <!-- [2026-08-31] Dựa theo `healthy`, KHÔNG dựa theo `lastError` nữa —
+      `healthy=false` CHỈ xảy ra khi cả cookie cache lẫn cookie gốc trong DB
+      đều thất bại (cần thay cookie thật), còn `lastError` có thể chỉ là 1
+      trục trặc tự phục hồi được (thư viện tự thử lại cookie gốc và thành
+      công ngay), không đáng báo đỏ. Vẫn hiện lastError qua tooltip để xem
+      chi tiết nếu tò mò, không dùng để quyết định màu nữa. -->
+      <template v-else-if="liveHealthMap[(item as any)._id].healthy">
+        <v-tooltip
+          v-if="liveHealthMap[(item as any)._id].lastError"
+          :text="`Có lỗi thoáng qua nhưng đã tự phục hồi: ${liveHealthMap[(item as any)._id].lastError}`"
+          location="top"
+        >
+          <template #activator="{ props }">
+            <v-chip v-bind="props" size="small" color="success" variant="tonal" style="cursor: help">
+              <v-icon start size="14">mdi-check-circle-outline</v-icon>
+              OK
+            </v-chip>
+          </template>
+        </v-tooltip>
+        <v-chip v-else size="small" color="success" variant="tonal">
           <v-icon start size="14">mdi-check-circle-outline</v-icon>
           OK
         </v-chip>
       </template>
       <template v-else>
-        <v-tooltip :text="liveHealthMap[(item as any)._id].lastError" location="top">
+        <v-tooltip
+          :text="liveHealthMap[(item as any)._id].lastError || 'Không đăng nhập được, cần kiểm tra lại cookie'"
+          location="top"
+        >
           <template #activator="{ props }">
             <v-chip v-bind="props" size="small" color="error" variant="tonal" style="cursor: help">
               <v-icon start size="14">mdi-alert-circle-outline</v-icon>
-              Lỗi
+              Cần thay cookie
             </v-chip>
           </template>
         </v-tooltip>
