@@ -110,8 +110,10 @@ function fileIcon(file: File) {
   return "mdi-file-outline";
 }
 
-function onPickFiles(event: Event) {
-  const picked = Array.from((event.target as HTMLInputElement).files || []);
+// Dùng chung cho cả 2 đường nhận file: bấm nút đính kèm (input[type=file])
+// VÀ dán ảnh chụp màn hình bằng Ctrl+V (onPaste) — cùng 1 luật kiểm tra
+// dung lượng/số lượng, tránh lặp code + lệch luật giữa 2 đường.
+function addFiles(picked: File[]) {
   const room = MAX_FILES - pendingFiles.value.length;
   for (const file of picked.slice(0, room)) {
     if (file.size > MAX_FILE_BYTES) {
@@ -124,7 +126,31 @@ function onPickFiles(event: Event) {
     }
     pendingFiles.value.push(file);
   }
+}
+
+function onPickFiles(event: Event) {
+  addFiles(Array.from((event.target as HTMLInputElement).files || []));
   if (fileInputRef.value) fileInputRef.value.value = "";
+}
+
+// Dán ảnh chụp màn hình (Ctrl+V) trực tiếp vào ô nhập — clipboard lúc đó
+// chứa ảnh dạng file (image/png,...), không phải text, nên phải tự đọc qua
+// clipboardData.items thay vì để trình duyệt paste như văn bản thường.
+function onPaste(event: ClipboardEvent) {
+  const items = event.clipboardData?.items;
+  if (!items) return;
+
+  const pastedImages: File[] = [];
+  for (const item of items) {
+    if (item.kind === "file" && item.type.startsWith("image/")) {
+      const file = item.getAsFile();
+      if (file) pastedImages.push(file);
+    }
+  }
+  if (!pastedImages.length) return; // paste text bình thường -> để trình duyệt xử lý
+
+  event.preventDefault(); // chặn paste text rỗng/base64 lẫn vào ô nhập
+  addFiles(pastedImages);
 }
 
 function removeFile(index: number) {
@@ -315,6 +341,7 @@ function sendSuggestion(text: string) {
             class="chat-input"
             placeholder="Nhập tin nhắn..."
             @keydown.enter="send"
+            @paste="onPaste"
           />
           <button
             class="chat-send-btn"
