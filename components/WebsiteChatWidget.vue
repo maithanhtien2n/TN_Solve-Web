@@ -83,6 +83,14 @@ function syncMobileViewport() {
     height: `${vv.height}px`,
     maxHeight: `${vv.height}px`,
     top: `${vv.offsetTop}px`,
+    // CSS gốc (.chat-panel, @media mobile) dùng "inset: 0" -> tự set luôn
+    // bottom:0. Ở đây chỉ ghi đè top/height qua inline style, KHÔNG đụng tới
+    // bottom -> panel bị "over-constrained" (top + height + bottom cùng có
+    // giá trị cụ thể cùng lúc), 1 số trình duyệt mobile tính layout sai/không
+    // nhất quán trong tình huống này, gây lệch/che 1 phần footer khi bàn
+    // phím ảo bật lên. Phải tự ghi đè bottom về "auto" để bỏ hẳn ràng buộc dư
+    // thừa đó, chỉ còn top+height quyết định layout, không mập mờ nữa.
+    bottom: "auto",
   };
 }
 onMounted(() => {
