@@ -61,10 +61,13 @@ function splitMessageParts(content: string): {
   if (!match || match.index === undefined) {
     return { before: raw.replace(/<<<PROMPT_(START|END)>>>/g, "").trim(), script: null, after: "" };
   }
+  // .replace() dọn marker LẺ còn sót — phòng trường hợp hiếm bot lỡ tạo 2 khối
+  // kịch bản trong cùng 1 tin nhắn (regex trên không có cờ /g nên chỉ bắt
+  // được khối ĐẦU TIÊN, khối thứ 2 sẽ rơi vào "after" còn nguyên marker thô).
   return {
-    before: raw.slice(0, match.index).trim(),
+    before: raw.slice(0, match.index).replace(/<<<PROMPT_(START|END)>>>/g, "").trim(),
     script: match[1].trim(),
-    after: raw.slice(match.index + match[0].length).trim(),
+    after: raw.slice(match.index + match[0].length).replace(/<<<PROMPT_(START|END)>>>/g, "").trim(),
   };
 }
 
