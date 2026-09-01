@@ -101,6 +101,12 @@ const menus = computed<any>(() => {
     },
     {
       role: [EnumAccountRole.ADMIN],
+      title: "Lịch sử chat website",
+      icon: "mdi-chat-outline",
+      route: "/admin/website-chat-history",
+    },
+    {
+      role: [EnumAccountRole.ADMIN],
       title: "Cửa hàng",
       icon: "mdi-store-outline",
       route: "store",

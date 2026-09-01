@@ -8,6 +8,8 @@ export const websiteChatService = {
     conversation: { role: "user" | "assistant"; content: string }[];
     message: string;
     files?: { data: string; mimeType: string; filename?: string }[];
+    sessionId?: string;
+    accountEmail?: string;
   }) {
     // silentError=1: lỗi đã hiện ngay trong bong bóng chat (WebsiteChatWidget.vue
     // tự bắt lỗi) — không cần thêm popup hệ thống chồng lên che khung chat.
@@ -15,5 +17,14 @@ export const websiteChatService = {
       timeout: 190_000,
       params: { silentError: 1 },
     });
+  },
+
+  // [2026-09-01] Admin xem lại lịch sử chat (WebsiteChatSessionModel).
+  async getSessionsAdmin(params?: { search?: string; page?: number; limit?: number }) {
+    return await api.get(`/website-chat/admin/sessions`, { params });
+  },
+
+  async getSessionDetailAdmin(id: string) {
+    return await api.get(`/website-chat/admin/sessions/${id}`);
   },
 };

@@ -109,13 +109,54 @@ function loadForCurrentAccount() {
   }
 }
 
-onMounted(loadForCurrentAccount);
+// [2026-09-01] Mã phiên GỬI KÈM BE để admin xem lại lịch sử chat gộp đúng 1
+// cuộc hội thoại (WebsiteChatSessionModel, TTL 30 ngày). PHẢI gắn theo TÀI
+// KHOẢN giống hệt storageKey ở trên (cùng key-pattern "..._${email||guest}"),
+// KHÔNG dùng 1 key cố định cho cả tab — lúc đầu làm key cố định, kết quả là
+// khách chat lúc CHƯA đăng nhập rồi đăng nhập NGAY TRONG cùng tab (không đóng
+// tab) bị gộp lộn 2 cuộc trò chuyện khác nhau vào 1 phiên bên admin, trong
+// khi chính khung chat của khách đã tự tách lịch sử hiển thị ra 2 nơi khác
+// nhau rồi (đổi storageKey) — 2 cơ chế lệch nhau. Giờ sessionId đổi theo
+// ĐÚNG NHỊP với storageKey (cùng trigger, cùng điều kiện đổi).
+const SESSION_ID_STORAGE_PREFIX = "tnsolve_website_chat_session_id_";
+const sessionIdStorageKey = computed(
+  () => `${SESSION_ID_STORAGE_PREFIX}${userData.value?.email || "guest"}`
+);
+let sessionId = "";
+function ensureSessionId() {
+  const genId = () =>
+    typeof crypto !== "undefined" && "randomUUID" in crypto
+      ? crypto.randomUUID()
+      : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+  try {
+    sessionId = sessionStorage.getItem(sessionIdStorageKey.value) || "";
+    if (!sessionId) {
+      sessionId = genId();
+      sessionStorage.setItem(sessionIdStorageKey.value, sessionId);
+    }
+  } catch {
+    // sessionStorage bị chặn -> vẫn tạo id tạm cho phiên hiện tại (không sống
+    // sót qua F5, nhưng không chặn chat hoạt động — xem ghi chú loadForCurrentAccount).
+    // LUÔN tạo mới (không tái dùng biến cũ) — hàm này gọi lại mỗi khi đổi tài
+    // khoản, id cũ thuộc về tài khoản/lượt trước, không được giữ lại.
+    sessionId = genId();
+  }
+}
+
+function loadForCurrentAccountAndSession() {
+  loadForCurrentAccount();
+  ensureSessionId();
+}
+
+onMounted(loadForCurrentAccountAndSession);
 
 // Đổi tài khoản (đăng nhập/đăng xuất) NGAY TRONG cùng 1 tab, không cần tải lại
 // trang — SPA nên không tự reload để chạy lại onMounted, phải tự lắng nghe.
+// Gộp chung 1 watch cho cả lịch sử hiển thị (storageKey) VÀ mã phiên log admin
+// (sessionIdStorageKey) — 2 cái này PHẢI luôn đổi cùng lúc, cùng 1 lý do.
 watch(
   () => userData.value?.email,
-  () => loadForCurrentAccount()
+  () => loadForCurrentAccountAndSession()
 );
 
 function persist() {
@@ -354,6 +395,8 @@ async function sendText(text: string) {
       conversation,
       message: text,
       files: encodedFiles.length ? encodedFiles : undefined,
+      sessionId: sessionId || undefined,
+      accountEmail: userData.value?.email || undefined,
     });
 
     messages.value.push({ role: "assistant", content: res.data.text, time: Date.now() });
