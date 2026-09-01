@@ -384,6 +384,10 @@ async function sendText(text: string) {
   sending.value = true;
   persist();
   scrollToBottom();
+  // Textarea tự giãn theo nội dung (xem autoGrowInput) — set input="" xong
+  // KHÔNG tự co chiều cao lại (chỉ đổi giá trị v-model, không đụng inline
+  // style.height đã set trước đó), phải tự gọi lại sau khi DOM cập nhật xong.
+  nextTick(() => autoGrowInput());
 
   try {
     const encodedFiles = await Promise.all(
@@ -435,6 +439,20 @@ async function sendText(text: string) {
 
 function send() {
   sendText(input.value.trim());
+}
+
+// [2026-09-01] Ô nhập đổi từ <input> (1 dòng cố định) sang <textarea> tự giãn
+// chiều cao theo nội dung, giống ô nhập của Gemini — Enter thường gửi tin
+// nhắn, Shift+Enter xuống dòng (xem modifier .exact.prevent ở template: chỉ
+// bắt Enter KHÔNG kèm phím khác, Shift+Enter không khớp .exact nên rơi về
+// hành vi mặc định của textarea là xuống dòng, không bị prevent). CSS đặt
+// max-height + overflow-y:auto nên set height quá cao vẫn tự bị chặn lại/
+// cuộn bên trong, không phá layout khung chat.
+function autoGrowInput() {
+  const el = inputRef.value as HTMLTextAreaElement | null;
+  if (!el) return;
+  el.style.height = "auto";
+  el.style.height = `${el.scrollHeight}px`;
 }
 
 function sendSuggestion(text: string) {
@@ -580,14 +598,16 @@ function sendSuggestion(text: string) {
           >
             <v-icon size="20">mdi-paperclip</v-icon>
           </button>
-          <input
+          <textarea
             ref="inputRef"
             v-model="input"
             class="chat-input"
+            rows="1"
             placeholder="Nhập tin nhắn..."
-            @keydown.enter="send"
+            @keydown.enter.exact.prevent="send"
+            @input="autoGrowInput"
             @paste="onPaste"
-          />
+          ></textarea>
           <button
             class="chat-send-btn"
             :class="{ 'chat-send-btn-active': input.trim() && !sending }"
@@ -1059,11 +1079,16 @@ function sendSuggestion(text: string) {
 /* ── Input row ───────────────────────────────────────── */
 .chat-input-row {
   display: flex;
-  align-items: center;
+  /* flex-end (KHÔNG phải center) — để 2 nút tròn 40px LUÔN neo đáy khi
+     textarea giãn cao nhiều dòng (giống ô nhập Gemini), thay vì bị đẩy lên
+     giữa theo textarea. Padding dọc 11px (thay vì height cố định 62px) để
+     khi chỉ 1 dòng vẫn ra đúng 62px như cũ (11+40+11), nhưng tự giãn thêm
+     đúng phần textarea cao lên khi xuống dòng. */
+  align-items: flex-end;
   gap: 6px;
-  height: 62px;
+  min-height: 62px;
   box-sizing: border-box;
-  padding: 0 12px;
+  padding: 11px 12px;
   border-top: 1px solid #eef1f5;
   flex: none;
   background: #fff;
@@ -1091,14 +1116,25 @@ function sendSuggestion(text: string) {
 }
 .chat-input {
   flex: 1;
-  height: 40px;
+  /* min-height 40px = trạng thái 1 dòng y hệt <input> cũ; max-height ~4 dòng
+     rồi tự cuộn bên trong (overflow-y:auto) thay vì phình vô hạn phá layout
+     khung chat — chiều cao thật do autoGrowInput() tự set qua JS theo
+     scrollHeight, CSS ở đây chỉ là 2 đầu chặn. resize:none để bỏ tay cầm kéo
+     giãn mặc định của textarea (tự động giãn theo nội dung là đủ, không cần
+     cho user tự kéo). */
+  min-height: 40px;
+  max-height: 110px;
+  resize: none;
+  overflow-y: auto;
   box-sizing: border-box;
   border: none;
   outline: none;
   background: #f1f5f9;
   border-radius: 20px;
-  padding: 0 15px;
+  padding: 9px 15px;
   font-size: 0.87rem;
+  line-height: 1.35;
+  font-family: inherit;
   color: #1e293b;
   min-width: 0;
 }
@@ -1171,8 +1207,11 @@ function sendSuggestion(text: string) {
   }
 
   .chat-input-row {
+    /* min-height (KHÔNG phải height cứng) — height cứng sẽ chặn textarea
+       giãn cao nhiều dòng trên mobile, xem ghi chú đầy đủ ở .chat-input-row
+       gốc phía trên (khai báo lúc đầu file, dùng chung cho cả desktop). */
     padding-bottom: env(safe-area-inset-bottom);
-    height: calc(62px + env(safe-area-inset-bottom));
+    min-height: calc(62px + env(safe-area-inset-bottom));
   }
 }
 
