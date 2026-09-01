@@ -260,13 +260,28 @@ function extractScriptBlock(content: string): string | null {
   const match = (content || "").match(PROMPT_BLOCK_REGEX);
   return match ? match[1].trim() : null;
 }
-function getDisplayText(content: string): string {
-  const stripped = (content || "").replace(PROMPT_BLOCK_REGEX, (_full, inner) => inner.trim());
-  // Phòng trường hợp bot lỡ thiếu 1 trong 2 marker (câu trả lời bị cắt/model
-  // quên) — cặp regex trên không khớp được nên không strip gì cả, để lộ
-  // nguyên chữ kỹ thuật ra chat. Dọn nốt marker lẻ (nếu còn) để không bao giờ
-  // hiện <<<PROMPT_START>>>/<<<PROMPT_END>>> trần trụi cho khách thấy.
-  return stripped.replace(/<<<PROMPT_(START|END)>>>/g, "").trim();
+// [2026-09-01] Tách 1 tin nhắn bot thành 3 phần: chữ THƯỜNG trước kịch bản
+// (VD "Đây là kịch bản mình viết cho bạn nhé:"), kịch bản (script, hiện
+// riêng trong khối nền xám có label "Prompt" + nút Sao chép), và chữ thường
+// SAU kịch bản (câu dặn dò dán vào ô Prompt...) — dùng chung 1 hàm để không
+// phải chạy regex nhiều lần rải rác trong template.
+function splitMessageParts(content: string): {
+  before: string;
+  script: string | null;
+  after: string;
+} {
+  const raw = content || "";
+  const match = raw.match(PROMPT_BLOCK_REGEX);
+  if (!match || match.index === undefined) {
+    // Không có kịch bản (hoặc bot lỡ thiếu 1 trong 2 marker) -> coi như toàn
+    // bộ là chữ thường, dọn nốt marker lẻ (nếu có) để không lộ chữ kỹ thuật.
+    return { before: raw.replace(/<<<PROMPT_(START|END)>>>/g, "").trim(), script: null, after: "" };
+  }
+  return {
+    before: raw.slice(0, match.index).trim(),
+    script: match[1].trim(),
+    after: raw.slice(match.index + match[0].length).trim(),
+  };
 }
 
 const copiedScriptIndex = ref<number | null>(null);
@@ -482,18 +497,38 @@ function sendSuggestion(text: string) {
                   'chat-bubble-error': m.role === 'error',
                 }"
               >
-                <button
-                  v-if="m.role !== 'user' && extractScriptBlock(m.content)"
-                  type="button"
-                  class="chat-copy-script-btn"
-                  @click="onCopyScript(m.content, i)"
-                >
-                  Sao chép
-                  <v-icon size="14" :color="copiedScriptIndex === i ? '#16a34a' : undefined">
-                    {{ copiedScriptIndex === i ? "mdi-check" : "mdi-content-copy" }}
-                  </v-icon>
-                </button>
-                <span class="chat-bubble-text" v-html="renderMessageContent(getDisplayText(m.content))"></span>
+                <span
+                  v-if="m.role === 'user' || splitMessageParts(m.content).before"
+                  class="chat-bubble-text"
+                  v-html="renderMessageContent(m.role === 'user' ? m.content : splitMessageParts(m.content).before)"
+                ></span>
+
+                <div v-if="m.role !== 'user' && splitMessageParts(m.content).script" class="chat-prompt-box">
+                  <div class="chat-prompt-header">
+                    <span class="chat-prompt-label">Prompt</span>
+                    <button
+                      type="button"
+                      class="chat-prompt-copy-btn"
+                      @click="onCopyScript(m.content, i)"
+                    >
+                      Sao chép
+                      <v-icon size="14" :color="copiedScriptIndex === i ? '#16a34a' : undefined">
+                        {{ copiedScriptIndex === i ? "mdi-check" : "mdi-content-copy" }}
+                      </v-icon>
+                    </button>
+                  </div>
+                  <div
+                    class="chat-prompt-content"
+                    v-html="renderMessageContent(splitMessageParts(m.content).script || '')"
+                  ></div>
+                </div>
+
+                <span
+                  v-if="m.role !== 'user' && splitMessageParts(m.content).after"
+                  class="chat-bubble-text"
+                  v-html="renderMessageContent(splitMessageParts(m.content).after)"
+                ></span>
+
                 <div v-if="m.fileNames?.length" class="chat-bubble-files">
                   <v-icon size="13">mdi-paperclip</v-icon>
                   {{ m.fileNames.join(", ") }}
@@ -876,29 +911,61 @@ function sendSuggestion(text: string) {
   align-items: center;
   gap: 4px;
 }
-.chat-copy-script-btn {
-  /* display:flex (KHÔNG phải inline-flex) để tự xuống dòng, tách khỏi phần
-     text chat-bubble-text đứng ngay sau — nhưng width:fit-content để không bị
-     giãn hết chiều ngang bubble (box khối bình thường mặc định width:auto sẽ
-     giãn hết cỡ, phải chặn lại). */
+/* [2026-09-01] Khối kịch bản (Prompt) — tách hẳn khỏi phần chữ thường của
+   bot, nền xám riêng biệt, label "Prompt" bên trái + nút Sao chép bên phải ở
+   đầu khối, nội dung kịch bản bên dưới. Đặt cách phần text trước/sau 1 khoảng
+   margin cho rõ ràng đây là 1 khối riêng, không phải văn xuôi bình thường. */
+.chat-prompt-box {
+  margin: 8px 0;
+  border-radius: 10px;
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  border-left: 3px solid #0072c6;
+  overflow: hidden;
+}
+.chat-prompt-header {
   display: flex;
-  width: fit-content;
+  align-items: center;
+  justify-content: space-between;
+  padding: 7px 10px;
+  background: #e2e8f0;
+}
+.chat-prompt-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #475569;
+  letter-spacing: 0.02em;
+}
+.chat-prompt-copy-btn {
+  display: inline-flex;
   align-items: center;
   gap: 5px;
-  margin-bottom: 8px;
-  padding: 5px 10px;
+  padding: 3px 9px;
   border: 1px solid #d7e3ec;
-  border-radius: 8px;
-  background: #f4f8fb;
+  border-radius: 7px;
+  background: #fff;
   color: #0072c6;
-  font-size: 0.76rem;
+  font-size: 0.74rem;
   font-weight: 600;
   cursor: pointer;
   transition: background 0.15s ease, border-color 0.15s ease;
 }
-.chat-copy-script-btn:hover {
-  background: #e7f1fa;
+.chat-prompt-copy-btn:hover {
+  background: #f4f8fb;
   border-color: #b9d6ea;
+}
+.chat-prompt-content {
+  padding: 10px;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: #334155;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.chat-prompt-content :deep(a) {
+  color: #0072c6;
+  text-decoration: underline;
+  word-break: break-all;
 }
 .chat-bubble-text :deep(a) {
   color: #0072c6;

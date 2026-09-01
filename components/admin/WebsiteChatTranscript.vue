@@ -48,9 +48,24 @@ function extractScriptBlock(content: string): string | null {
   const match = (content || "").match(PROMPT_BLOCK_REGEX);
   return match ? match[1].trim() : null;
 }
-function getDisplayText(content: string): string {
-  const stripped = (content || "").replace(PROMPT_BLOCK_REGEX, (_full, inner) => inner.trim());
-  return stripped.replace(/<<<PROMPT_(START|END)>>>/g, "").trim();
+// Giống hệt splitMessageParts ở WebsiteChatWidget.vue — tách chữ thường
+// trước/sau kịch bản để hiện kịch bản riêng trong khối nền xám (xem ghi chú
+// đầy đủ ở file gốc).
+function splitMessageParts(content: string): {
+  before: string;
+  script: string | null;
+  after: string;
+} {
+  const raw = content || "";
+  const match = raw.match(PROMPT_BLOCK_REGEX);
+  if (!match || match.index === undefined) {
+    return { before: raw.replace(/<<<PROMPT_(START|END)>>>/g, "").trim(), script: null, after: "" };
+  }
+  return {
+    before: raw.slice(0, match.index).trim(),
+    script: match[1].trim(),
+    after: raw.slice(match.index + match[0].length).trim(),
+  };
 }
 
 const copiedIndex = ref<number | null>(null);
@@ -86,18 +101,30 @@ async function onCopyScript(content: string, index: number) {
       </div>
       <div class="wct-col">
         <div class="wct-bubble" :class="{ 'wct-bubble-user': m.role === 'user' }">
-          <button
-            v-if="m.role !== 'user' && extractScriptBlock(m.content)"
-            type="button"
-            class="wct-copy-btn"
-            @click="onCopyScript(m.content, i)"
-          >
-            Sao chép
-            <v-icon size="14" :color="copiedIndex === i ? '#16a34a' : undefined">
-              {{ copiedIndex === i ? "mdi-check" : "mdi-content-copy" }}
-            </v-icon>
-          </button>
-          <span class="wct-bubble-text" v-html="renderMessageContent(getDisplayText(m.content))"></span>
+          <span
+            v-if="m.role === 'user' || splitMessageParts(m.content).before"
+            class="wct-bubble-text"
+            v-html="renderMessageContent(m.role === 'user' ? m.content : splitMessageParts(m.content).before)"
+          ></span>
+
+          <div v-if="m.role !== 'user' && splitMessageParts(m.content).script" class="wct-prompt-box">
+            <div class="wct-prompt-header">
+              <span class="wct-prompt-label">Prompt</span>
+              <button type="button" class="wct-prompt-copy-btn" @click="onCopyScript(m.content, i)">
+                Sao chép
+                <v-icon size="14" :color="copiedIndex === i ? '#16a34a' : undefined">
+                  {{ copiedIndex === i ? "mdi-check" : "mdi-content-copy" }}
+                </v-icon>
+              </button>
+            </div>
+            <div class="wct-prompt-content" v-html="renderMessageContent(splitMessageParts(m.content).script || '')"></div>
+          </div>
+
+          <span
+            v-if="m.role !== 'user' && splitMessageParts(m.content).after"
+            class="wct-bubble-text"
+            v-html="renderMessageContent(splitMessageParts(m.content).after)"
+          ></span>
         </div>
         <div class="wct-time" :class="{ 'wct-time-user': m.role === 'user' }">
           {{ formatTime(m.createdAt) }}
@@ -172,28 +199,58 @@ async function onCopyScript(content: string, index: number) {
   border-radius: 16px 16px 4px 16px;
   box-shadow: 0 4px 12px -4px rgba(9, 132, 227, 0.5);
 }
-.wct-copy-btn {
-  /* display:flex (KHÔNG phải inline-flex) để tự xuống dòng, tách khỏi phần
-     text wct-bubble-text đứng ngay sau — width:fit-content để không giãn hết
-     chiều ngang bubble (xem ghi chú đầy đủ ở WebsiteChatWidget.vue gốc). */
+/* Khối kịch bản (Prompt) — xem ghi chú đầy đủ ở WebsiteChatWidget.vue gốc. */
+.wct-prompt-box {
+  margin: 8px 0;
+  border-radius: 10px;
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  border-left: 3px solid #0072c6;
+  overflow: hidden;
+}
+.wct-prompt-header {
   display: flex;
-  width: fit-content;
+  align-items: center;
+  justify-content: space-between;
+  padding: 7px 10px;
+  background: #e2e8f0;
+}
+.wct-prompt-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #475569;
+  letter-spacing: 0.02em;
+}
+.wct-prompt-copy-btn {
+  display: inline-flex;
   align-items: center;
   gap: 5px;
-  margin-bottom: 8px;
-  padding: 5px 10px;
+  padding: 3px 9px;
   border: 1px solid #d7e3ec;
-  border-radius: 8px;
-  background: #f4f8fb;
+  border-radius: 7px;
+  background: #fff;
   color: #0072c6;
-  font-size: 0.76rem;
+  font-size: 0.74rem;
   font-weight: 600;
   cursor: pointer;
   transition: background 0.15s ease, border-color 0.15s ease;
 }
-.wct-copy-btn:hover {
-  background: #e7f1fa;
+.wct-prompt-copy-btn:hover {
+  background: #f4f8fb;
   border-color: #b9d6ea;
+}
+.wct-prompt-content {
+  padding: 10px;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: #334155;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.wct-prompt-content :deep(a) {
+  color: #0072c6;
+  text-decoration: underline;
+  word-break: break-all;
 }
 .wct-bubble-text :deep(a) {
   color: #0072c6;
