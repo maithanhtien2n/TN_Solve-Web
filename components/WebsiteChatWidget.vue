@@ -181,6 +181,34 @@ function formatTime(ts: number) {
   });
 }
 
+// [2026-09-01] Bubble tin nhắn trước đây render bằng {{ m.content }} (mustache
+// thuần) — Vue tự escape HTML nên AN TOÀN, nhưng cũng vì thế 1 chuỗi URL
+// (VD link Zalo bot gợi ý trong knowledge-base.json) chỉ ra CHỮ, không thành
+// thẻ <a> bấm được. Đổi sang v-html để chèn được <a>, nên PHẢI tự escape HTML
+// trước (chặn XSS từ nội dung do AI/khách sinh ra) rồi mới thay URL bằng thẻ
+// <a>, KHÔNG được làm ngược lại (escape sau sẽ biến luôn cả thẻ <a> vừa chèn
+// thành chữ).
+const URL_REGEX = /(https?:\/\/[^\s<]+)/g;
+function escapeHtml(str: string) {
+  return str
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+function renderMessageContent(content: string) {
+  const escaped = escapeHtml(content || "");
+  return escaped.replace(URL_REGEX, (rawUrl) => {
+    // Bỏ dấu câu hay dính liền cuối URL (VD "...link)." hoặc "link," trong câu
+    // văn) ra khỏi phần href, tránh bấm vào bị lỗi 404 vì dư ký tự.
+    const trailingMatch = rawUrl.match(/[).,;:!?'"]+$/);
+    const trailing = trailingMatch ? trailingMatch[0] : "";
+    const url = trailing ? rawUrl.slice(0, -trailing.length) : rawUrl;
+    if (!url) return rawUrl;
+    return `<a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>${trailing}`;
+  });
+}
+
 function fileToBase64(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -375,7 +403,7 @@ function sendSuggestion(text: string) {
                   'chat-bubble-error': m.role === 'error',
                 }"
               >
-                {{ m.content }}
+                <span class="chat-bubble-text" v-html="renderMessageContent(m.content)"></span>
                 <div v-if="m.fileNames?.length" class="chat-bubble-files">
                   <v-icon size="13">mdi-paperclip</v-icon>
                   {{ m.fileNames.join(", ") }}
@@ -757,6 +785,14 @@ function sendSuggestion(text: string) {
   display: flex;
   align-items: center;
   gap: 4px;
+}
+.chat-bubble-text :deep(a) {
+  color: #0072c6;
+  text-decoration: underline;
+  word-break: break-all;
+}
+.chat-bubble-user .chat-bubble-text :deep(a) {
+  color: #fff;
 }
 .chat-bubble-time {
   font-size: 0.68rem;
