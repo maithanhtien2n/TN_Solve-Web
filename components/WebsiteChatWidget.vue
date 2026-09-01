@@ -1158,7 +1158,15 @@ function sendSuggestion(text: string) {
   outline: none;
   background: #f1f5f9;
   border-radius: 20px;
-  padding: 9px 15px;
+  /* [2026-09-01] padding dọc 10px (không phải 9px) — textarea LUÔN neo chữ
+     từ TRÊN xuống (khác <input> cũ tự căn giữa dọc), nên ở trạng thái 1 dòng
+     (min-height 40px, border-box), nếu padding dọc CỘNG line-height nhỏ hơn
+     40px thì phần dư sẽ tụt hết xuống DƯỚI, chữ/con trỏ nhìn lệch lên trên.
+     Tính đúng: content-box (40 - 2×10 = 20px) khớp gần sát line-height thật
+     (0.87rem × 1.35 ≈ 18.8px), phần dư chỉ còn ~1.2px (không thể triệt tiêu
+     tuyệt đối vì textarea không có cách căn giữa dọc bằng CSS thuần), gần như
+     không còn nhận ra bằng mắt thường, thay vì lệch rõ ~3px như trước. */
+  padding: 10px 15px;
   font-size: 0.87rem;
   line-height: 1.35;
   font-family: inherit;
