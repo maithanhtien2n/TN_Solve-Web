@@ -482,23 +482,23 @@ function sendSuggestion(text: string) {
                   'chat-bubble-error': m.role === 'error',
                 }"
               >
+                <button
+                  v-if="m.role !== 'user' && extractScriptBlock(m.content)"
+                  type="button"
+                  class="chat-copy-script-btn"
+                  @click="onCopyScript(m.content, i)"
+                >
+                  Sao chép
+                  <v-icon size="14" :color="copiedScriptIndex === i ? '#16a34a' : undefined">
+                    {{ copiedScriptIndex === i ? "mdi-check" : "mdi-content-copy" }}
+                  </v-icon>
+                </button>
                 <span class="chat-bubble-text" v-html="renderMessageContent(getDisplayText(m.content))"></span>
                 <div v-if="m.fileNames?.length" class="chat-bubble-files">
                   <v-icon size="13">mdi-paperclip</v-icon>
                   {{ m.fileNames.join(", ") }}
                 </div>
               </div>
-              <button
-                v-if="m.role !== 'user' && extractScriptBlock(m.content)"
-                type="button"
-                class="chat-copy-script-btn"
-                @click="onCopyScript(m.content, i)"
-              >
-                Sao chép
-                <v-icon size="14" :color="copiedScriptIndex === i ? '#16a34a' : undefined">
-                  {{ copiedScriptIndex === i ? "mdi-check" : "mdi-content-copy" }}
-                </v-icon>
-              </button>
               <div class="chat-bubble-time" :class="{ 'chat-bubble-time-user': m.role === 'user' }">
                 {{ formatTime(m.time) }}
               </div>
@@ -877,11 +877,15 @@ function sendSuggestion(text: string) {
   gap: 4px;
 }
 .chat-copy-script-btn {
-  align-self: flex-start;
-  display: inline-flex;
+  /* display:flex (KHÔNG phải inline-flex) để tự xuống dòng, tách khỏi phần
+     text chat-bubble-text đứng ngay sau — nhưng width:fit-content để không bị
+     giãn hết chiều ngang bubble (box khối bình thường mặc định width:auto sẽ
+     giãn hết cỡ, phải chặn lại). */
+  display: flex;
+  width: fit-content;
   align-items: center;
   gap: 5px;
-  margin-top: 6px;
+  margin-bottom: 8px;
   padding: 5px 10px;
   border: 1px solid #d7e3ec;
   border-radius: 8px;

@@ -86,19 +86,19 @@ async function onCopyScript(content: string, index: number) {
       </div>
       <div class="wct-col">
         <div class="wct-bubble" :class="{ 'wct-bubble-user': m.role === 'user' }">
+          <button
+            v-if="m.role !== 'user' && extractScriptBlock(m.content)"
+            type="button"
+            class="wct-copy-btn"
+            @click="onCopyScript(m.content, i)"
+          >
+            Sao chép
+            <v-icon size="14" :color="copiedIndex === i ? '#16a34a' : undefined">
+              {{ copiedIndex === i ? "mdi-check" : "mdi-content-copy" }}
+            </v-icon>
+          </button>
           <span class="wct-bubble-text" v-html="renderMessageContent(getDisplayText(m.content))"></span>
         </div>
-        <button
-          v-if="m.role !== 'user' && extractScriptBlock(m.content)"
-          type="button"
-          class="wct-copy-btn"
-          @click="onCopyScript(m.content, i)"
-        >
-          Sao chép
-          <v-icon size="14" :color="copiedIndex === i ? '#16a34a' : undefined">
-            {{ copiedIndex === i ? "mdi-check" : "mdi-content-copy" }}
-          </v-icon>
-        </button>
         <div class="wct-time" :class="{ 'wct-time-user': m.role === 'user' }">
           {{ formatTime(m.createdAt) }}
         </div>
@@ -173,11 +173,14 @@ async function onCopyScript(content: string, index: number) {
   box-shadow: 0 4px 12px -4px rgba(9, 132, 227, 0.5);
 }
 .wct-copy-btn {
-  align-self: flex-start;
-  display: inline-flex;
+  /* display:flex (KHÔNG phải inline-flex) để tự xuống dòng, tách khỏi phần
+     text wct-bubble-text đứng ngay sau — width:fit-content để không giãn hết
+     chiều ngang bubble (xem ghi chú đầy đủ ở WebsiteChatWidget.vue gốc). */
+  display: flex;
+  width: fit-content;
   align-items: center;
   gap: 5px;
-  margin-top: 6px;
+  margin-bottom: 8px;
   padding: 5px 10px;
   border: 1px solid #d7e3ec;
   border-radius: 8px;
