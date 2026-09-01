@@ -442,12 +442,22 @@ function send() {
 }
 
 // [2026-09-01] Ô nhập đổi từ <input> (1 dòng cố định) sang <textarea> tự giãn
-// chiều cao theo nội dung, giống ô nhập của Gemini — Enter thường gửi tin
-// nhắn, Shift+Enter xuống dòng (xem modifier .exact.prevent ở template: chỉ
-// bắt Enter KHÔNG kèm phím khác, Shift+Enter không khớp .exact nên rơi về
-// hành vi mặc định của textarea là xuống dòng, không bị prevent). CSS đặt
-// max-height + overflow-y:auto nên set height quá cao vẫn tự bị chặn lại/
-// cuộn bên trong, không phá layout khung chat.
+// chiều cao theo nội dung, giống ô nhập của Gemini. Enter thường gửi tin
+// nhắn, Shift+Enter xuống dòng — NHƯNG CHỈ áp dụng trên MÁY TÍNH (có phím
+// Shift vật lý). Trên ĐIỆN THOẠI không có cách nào giữ Shift trên bàn phím
+// ảo, nên phải đổi hẳn quy ước: Enter luôn xuống dòng bình thường (hành vi
+// mặc định của textarea), gửi tin nhắn bắt buộc bấm nút gửi riêng — dùng lại
+// đúng biến `isMobile` component đã có sẵn (khai báo ở đầu file) để phân
+// biệt, không dùng modifier .exact tĩnh trong template được vì cần rẽ nhánh
+// theo thiết bị.
+function onInputKeydown(event: KeyboardEvent) {
+  if (event.key !== "Enter") return;
+  if (isMobile.value) return; // để mặc định xuống dòng, không can thiệp gì
+  if (event.shiftKey || event.ctrlKey || event.altKey || event.metaKey) return; // Shift+Enter... -> xuống dòng
+  event.preventDefault();
+  send();
+}
+
 function autoGrowInput() {
   const el = inputRef.value as HTMLTextAreaElement | null;
   if (!el) return;
@@ -604,7 +614,7 @@ function sendSuggestion(text: string) {
             class="chat-input"
             rows="1"
             placeholder="Nhập tin nhắn..."
-            @keydown.enter.exact.prevent="send"
+            @keydown="onInputKeydown"
             @input="autoGrowInput"
             @paste="onPaste"
           ></textarea>
