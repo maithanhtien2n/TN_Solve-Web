@@ -819,6 +819,15 @@ function sendSuggestion(text: string) {
 /* ── Body ────────────────────────────────────────────── */
 .chat-body {
   flex: 1;
+  /* BẮT BUỘC — thiếu dòng này là lỗi flexbox kinh điển: flex-item mặc định
+     min-height:auto (≈ kích thước nội dung), nên KHÔNG chịu co nhỏ hơn nội
+     dung thật của nó dù cha (.chat-panel, có overflow:hidden) đã bị ép co
+     lại đúng chiều cao bàn phím ảo còn chừa ra (visualViewport). Kết quả:
+     nội dung tràn ra ngoài .chat-panel, phần footer phía dưới bị cắt/che mất
+     dù chiều cao panel đã tính đúng. min-height:0 buộc nó co theo đúng không
+     gian còn lại, tự cuộn bên trong (overflow-y:auto) thay vì đẩy tràn ra.
+  */
+  min-height: 0;
   overflow-y: auto;
   padding: 16px 14px;
   display: flex;
@@ -1227,8 +1236,14 @@ function sendSuggestion(text: string) {
   .chat-input-row {
     /* min-height (KHÔNG phải height cứng) — height cứng sẽ chặn textarea
        giãn cao nhiều dòng trên mobile, xem ghi chú đầy đủ ở .chat-input-row
-       gốc phía trên (khai báo lúc đầu file, dùng chung cho cả desktop). */
-    padding-bottom: env(safe-area-inset-bottom);
+       gốc phía trên (khai báo lúc đầu file, dùng chung cho cả desktop).
+       padding-bottom PHẢI cộng thêm safe-area (calc), KHÔNG được thay thế
+       hẳn 11px gốc — viết "padding-bottom: env(...)" suông sẽ XOÁ mất 11px
+       cũ (longhand ghi đè đúng phần đó của shorthand "padding" khai báo
+       trước), khiến trên/dưới lệch không đối xứng (dưới có lúc còn NHỎ hơn
+       hoặc gấp đôi trên tuỳ thiết bị, tình cờ đúng là gấp đôi trên máy đang
+       test) — đây là lỗi thật, không phải cố ý. */
+    padding-bottom: calc(11px + env(safe-area-inset-bottom));
     min-height: calc(62px + env(safe-area-inset-bottom));
   }
 }
