@@ -209,6 +209,42 @@ function renderMessageContent(content: string) {
   });
 }
 
+// [2026-09-01] Khi bot viết/tối ưu kịch bản (system prompt), toàn bộ đoạn
+// Style→hết Cảnh cuối được bọc trong cặp marker ẩn <<<PROMPT_START>>>/
+// <<<PROMPT_END>>> — CHỈ dùng để FE tách CHÍNH XÁC đúng phần kịch bản ra copy
+// (không lẫn câu dặn dò "dán vào ô Prompt..." phía sau), không phải cú pháp
+// hiển thị — luôn phải strip khỏi content trước khi hiện cho user thấy.
+const PROMPT_BLOCK_REGEX = /<<<PROMPT_START>>>([\s\S]*?)<<<PROMPT_END>>>/;
+function extractScriptBlock(content: string): string | null {
+  const match = (content || "").match(PROMPT_BLOCK_REGEX);
+  return match ? match[1].trim() : null;
+}
+function getDisplayText(content: string): string {
+  const stripped = (content || "").replace(PROMPT_BLOCK_REGEX, (_full, inner) => inner.trim());
+  // Phòng trường hợp bot lỡ thiếu 1 trong 2 marker (câu trả lời bị cắt/model
+  // quên) — cặp regex trên không khớp được nên không strip gì cả, để lộ
+  // nguyên chữ kỹ thuật ra chat. Dọn nốt marker lẻ (nếu còn) để không bao giờ
+  // hiện <<<PROMPT_START>>>/<<<PROMPT_END>>> trần trụi cho khách thấy.
+  return stripped.replace(/<<<PROMPT_(START|END)>>>/g, "").trim();
+}
+
+const copiedScriptIndex = ref<number | null>(null);
+let copiedScriptTimer: ReturnType<typeof setTimeout> | null = null;
+async function onCopyScript(content: string, index: number) {
+  const script = extractScriptBlock(content);
+  if (!script) return;
+  try {
+    await navigator.clipboard.writeText(script);
+    copiedScriptIndex.value = index;
+    if (copiedScriptTimer) clearTimeout(copiedScriptTimer);
+    copiedScriptTimer = setTimeout(() => {
+      copiedScriptIndex.value = null;
+    }, 2000);
+  } catch (err) {
+    console.error("Failed to copy script:", err);
+  }
+}
+
 function fileToBase64(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -403,12 +439,23 @@ function sendSuggestion(text: string) {
                   'chat-bubble-error': m.role === 'error',
                 }"
               >
-                <span class="chat-bubble-text" v-html="renderMessageContent(m.content)"></span>
+                <span class="chat-bubble-text" v-html="renderMessageContent(getDisplayText(m.content))"></span>
                 <div v-if="m.fileNames?.length" class="chat-bubble-files">
                   <v-icon size="13">mdi-paperclip</v-icon>
                   {{ m.fileNames.join(", ") }}
                 </div>
               </div>
+              <button
+                v-if="m.role !== 'user' && extractScriptBlock(m.content)"
+                type="button"
+                class="chat-copy-script-btn"
+                @click="onCopyScript(m.content, i)"
+              >
+                Sao chép
+                <v-icon size="14" :color="copiedScriptIndex === i ? '#16a34a' : undefined">
+                  {{ copiedScriptIndex === i ? "mdi-check" : "mdi-content-copy" }}
+                </v-icon>
+              </button>
               <div class="chat-bubble-time" :class="{ 'chat-bubble-time-user': m.role === 'user' }">
                 {{ formatTime(m.time) }}
               </div>
@@ -785,6 +832,26 @@ function sendSuggestion(text: string) {
   display: flex;
   align-items: center;
   gap: 4px;
+}
+.chat-copy-script-btn {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 6px;
+  padding: 5px 10px;
+  border: 1px solid #d7e3ec;
+  border-radius: 8px;
+  background: #f4f8fb;
+  color: #0072c6;
+  font-size: 0.76rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+.chat-copy-script-btn:hover {
+  background: #e7f1fa;
+  border-color: #b9d6ea;
 }
 .chat-bubble-text :deep(a) {
   color: #0072c6;
