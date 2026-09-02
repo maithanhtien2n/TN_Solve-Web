@@ -7,6 +7,12 @@
 type TranscriptMessage = {
   role: "user" | "assistant";
   content: string;
+  // [2026-09-02] Tên file khách đính kèm ở đúng lượt hỏi đó (nếu có) — chỉ có
+  // ở message role "user", do server ghi lại (xem website-chat.service.ts
+  // logChatSession). Trước đây field này không tồn tại nên bong bóng khách
+  // đính kèm file KHÔNG hiện icon file gì cả bên admin, dù bên widget khách
+  // vẫn hiện bình thường (đó là do FE tự vẽ từ state cục bộ, không đọc DB).
+  fileNames?: string[];
   createdAt: string | Date;
 };
 
@@ -128,6 +134,11 @@ async function onCopyScript(content: string, index: number) {
             class="wct-bubble-text"
             v-html="renderMessageContent(splitMessageParts(m.content).after)"
           ></span>
+
+          <div v-if="m.fileNames?.length" class="wct-bubble-files">
+            <v-icon size="13">mdi-paperclip</v-icon>
+            {{ m.fileNames.join(", ") }}
+          </div>
         </div>
         <div class="wct-time" :class="{ 'wct-time-user': m.role === 'user' }">
           {{ formatTime(m.createdAt) }}
@@ -180,10 +191,14 @@ async function onCopyScript(content: string, index: number) {
 .wct-col {
   display: flex;
   flex-direction: column;
-  max-width: 76%;
+  /* [2026-09-02] Đồng bộ với WebsiteChatWidget.vue (bên client) — bỏ giới
+     hạn 76%, cả 2 bong bóng (bot lẫn khách) đều full chiều rộng. */
+  max-width: 100%;
+  flex: 1;
 }
 .wct-row-user .wct-col {
-  align-items: flex-end;
+  /* Trước đây "flex-end" khiến bong bóng khách chỉ rộng theo nội dung rồi
+     nép sát phải — bỏ đi để cũng full như bot, quay về mặc định "stretch". */
 }
 .wct-bubble {
   padding: 9px 13px;
@@ -262,6 +277,14 @@ async function onCopyScript(content: string, index: number) {
 }
 .wct-bubble-user .wct-bubble-text :deep(a) {
   color: #fff;
+}
+.wct-bubble-files {
+  font-size: 0.72rem;
+  opacity: 0.8;
+  margin-top: 5px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
 .wct-time {
   font-size: 0.68rem;

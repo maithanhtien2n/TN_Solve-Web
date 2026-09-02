@@ -30,6 +30,15 @@ type ChatMessage = {
   content: string;
   fileNames?: string[];
   time: number;
+  // [2026-09-01] Đánh dấu tin nhắn user gửi THẤT BẠI (VD bị BE từ chối do quá
+  // dài) — vẫn giữ hiển thị trên khung chat (khách cần thấy lại đúng nội dung
+  // mình vừa gõ để sửa/gửi lại), nhưng PHẢI loại khỏi payload `conversation`
+  // gửi cho lượt hỏi TIẾP THEO (xem sendText). Trước đây không có cờ này, tin
+  // nhắn bị từ chối vẫn âm thầm trôi theo lịch sử ở lượt sau và lọt qua vì
+  // `conversation[].content` không giới hạn độ dài — khiến AI đọc được nội
+  // dung chưa từng thực sự "gửi thành công", còn log phiên chat (chỉ ghi đúng
+  // `message` của từng lượt) thì không bao giờ ghi lại được nó.
+  failed?: boolean;
 };
 
 const SUGGESTIONS = [
@@ -387,6 +396,7 @@ async function sendText(text: string) {
     fileNames: filesToSend.length ? filesToSend.map((f) => f.name) : undefined,
     time: Date.now(),
   });
+  const userMsgIndex = messages.value.length - 1; // vừa push ở trên — dùng để đánh dấu failed nếu gửi lỗi
   input.value = "";
   pendingFiles.value = [];
   sending.value = true;
@@ -416,7 +426,10 @@ async function sendText(text: string) {
     // khi chat quá dài.
     const MAX_HISTORY_TURNS = 30;
     const conversation = messages.value
-      .filter((m) => m.role === "user" || m.role === "assistant")
+      // !m.failed: loại các tin nhắn từng bị BE từ chối (VD quá dài) — không
+      // được để chúng âm thầm trôi theo làm ngữ cảnh cho lượt hỏi này, xem
+      // ghi chú ở field `failed` trong ChatMessage.
+      .filter((m) => (m.role === "user" || m.role === "assistant") && !m.failed)
       .slice(0, -1) // bỏ tin nhắn user vừa push ở trên — gửi riêng qua `message`
       .slice(-MAX_HISTORY_TURNS)
       .map((m) => ({ role: m.role as "user" | "assistant", content: m.content }));
@@ -431,6 +444,12 @@ async function sendText(text: string) {
 
     messages.value.push({ role: "assistant", content: res.data.text, time: Date.now() });
   } catch (err: any) {
+    // Đánh dấu failed NGAY tại đây (không phải lúc build `conversation`) —
+    // để đúng tin nhắn vừa gửi lỗi, tránh đánh sai vị trí nếu mảng messages
+    // đổi index vì lý do khác trong lúc chờ request.
+    if (messages.value[userMsgIndex]?.role === "user") {
+      messages.value[userMsgIndex].failed = true;
+    }
     messages.value.push({
       role: "error",
       content:
@@ -926,10 +945,17 @@ function sendSuggestion(text: string) {
 .chat-bubble-col {
   display: flex;
   flex-direction: column;
-  max-width: 76%;
+  /* [2026-09-02] Bỏ giới hạn 76% cũ theo yêu cầu — cả bong bóng bot lẫn
+     khách đều full chiều rộng khung chat (trừ phần chừa cho avatar/khoảng
+     cách .chat-row đã có sẵn qua gap/flex), không riêng gì bot nữa. */
+  max-width: 100%;
+  flex: 1;
 }
 .chat-row-user .chat-bubble-col {
-  align-items: flex-end;
+  /* [2026-09-02] Trước đây "flex-end" khiến bong bóng khách chỉ rộng theo
+     nội dung rồi nép sát phải — bỏ đi để bong bóng khách CŨNG full chiều
+     rộng như bot (đúng yêu cầu "cả 2 đều full"), quay về mặc định "stretch"
+     của flex column (không cần khai báo lại tường minh). */
 }
 .chat-bubble {
   padding: 9px 13px;
