@@ -46,10 +46,44 @@ function compactImageSlots(refsArray: any[], totalSlots: number) {
 // cần. Chỉ 1 state dùng chung cho 2 nơi hiện Prompt (storeOrder mặc định vs
 // thường) vì chúng loại trừ nhau (v-if/v-else), không bao giờ cùng hiện 1 lúc.
 const promptExpanded = ref(false);
-const PROMPT_COLLAPSE_THRESHOLD = 400;
-const isPromptLong = computed(
-  () => (formData.value?.length || 0) > PROMPT_COLLAPSE_THRESHOLD,
+// [2026-09-02] SỬA LẠI: bản đầu quyết định hiện nút "Xem thêm" bằng ĐẾM KÝ
+// TỰ (PROMPT_COLLAPSE_THRESHOLD) — SAI, vì phần cắt ngắn thật là CSS
+// line-clamp (cắt theo SỐ DÒNG hiển thị thật, phụ thuộc độ rộng khung/cỡ
+// chữ/số lần xuống dòng thật), không phải số ký tự. User phát hiện: có case
+// > ngưỡng ký tự nhưng wrap ra màn hình vẫn vừa đủ 6 dòng -> nút hiện ra
+// nhưng bấm vào/ra không đổi gì (nội dung đã hiện đủ từ đầu). Đổi qua ĐO
+// THẬT bằng ResizeObserver: so scrollHeight (chiều cao NẾU KHÔNG bị cắt —
+// trình duyệt vẫn tính đúng giá trị này cho phần tử có -webkit-line-clamp)
+// với clientHeight (chiều cao ĐANG hiển thị, bị line-clamp giới hạn) — chỉ
+// hiện nút khi THỰC SỰ có phần bị cắt. Theo dõi thêm formData.value đổi
+// (data video tải xong SAU khi phần tử đã mount, xem onMounted/onGetProductDetail
+// bên dưới) để đo lại đúng lúc nội dung thật vừa có, dù ResizeObserver cũng
+// tự bắt được thay đổi chiều cao này (2 lớp phòng hờ, không thừa vì rẻ).
+const isPromptOverflowing = ref(false);
+const promptTextEl = ref<HTMLElement | null>(null);
+function measurePromptOverflow() {
+  const el = promptTextEl.value;
+  isPromptOverflowing.value = !!el && el.scrollHeight - el.clientHeight > 1;
+}
+let promptResizeObserver: ResizeObserver | null = null;
+// Kiểu tham số để "any" — Vue định nghĩa function ref nhận
+// Element | ComponentPublicInstance | null (không import riêng type
+// ComponentPublicInstance chỉ để khớp chữ ký), thực tế luôn là 1 <span> DOM
+// thật nên ép kiểu thẳng xuống HTMLElement bên dưới là an toàn.
+function registerPromptTextEl(el: any) {
+  promptResizeObserver?.disconnect();
+  promptResizeObserver = null;
+  promptTextEl.value = (el as HTMLElement) || null;
+  if (!el || typeof ResizeObserver === "undefined") return;
+  promptResizeObserver = new ResizeObserver(() => measurePromptOverflow());
+  promptResizeObserver.observe(el);
+  measurePromptOverflow();
+}
+watch(
+  () => formData.value,
+  () => nextTick(measurePromptOverflow),
 );
+onUnmounted(() => promptResizeObserver?.disconnect());
 const myTimeline = ref<HTMLDivElement | null>(null);
 const pollTimer = ref<ReturnType<typeof setTimeout> | null>(null);
 
@@ -1412,11 +1446,12 @@ definePageMeta({ middleware: "auth" });
             <span
               v-html="formData.value"
               class="info-value"
-              :class="{ 'info-value--clamped': isPromptLong && !promptExpanded }"
+              :class="{ 'info-value--clamped': isPromptOverflowing && !promptExpanded }"
+              :ref="registerPromptTextEl"
               style="white-space: pre-line"
             />
             <button
-              v-if="isPromptLong"
+              v-if="isPromptOverflowing"
               type="button"
               class="prompt-toggle-btn"
               @click="promptExpanded = !promptExpanded"
@@ -1531,11 +1566,12 @@ definePageMeta({ middleware: "auth" });
             <span
               v-html="formData.value"
               class="info-value"
-              :class="{ 'info-value--clamped': isPromptLong && !promptExpanded }"
+              :class="{ 'info-value--clamped': isPromptOverflowing && !promptExpanded }"
+              :ref="registerPromptTextEl"
               style="white-space: pre-line"
             />
             <button
-              v-if="isPromptLong"
+              v-if="isPromptOverflowing"
               type="button"
               class="prompt-toggle-btn"
               @click="promptExpanded = !promptExpanded"
@@ -2581,7 +2617,7 @@ definePageMeta({ middleware: "auth" });
 }
 
 /* Prompt gốc có thể dài hàng nghìn ký tự (VD kịch bản thuyết trình) — thu gọn
-   lại còn 6 dòng, bung ra bằng nút "Xem thêm" (xem promptExpanded/isPromptLong). */
+   lại còn 6 dòng, bung ra bằng nút "Xem thêm" (xem promptExpanded/isPromptOverflowing). */
 .info-value--clamped {
   display: -webkit-box;
   -webkit-line-clamp: 6;

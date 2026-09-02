@@ -267,6 +267,77 @@ function renderMessageContent(content: string) {
   });
 }
 
+// [2026-09-02] Câu hỏi USER gõ có thể rất dài (VD dán nguyên kịch bản để nhờ
+// bot chỉnh sửa) — thu gọn lại như Prompt ở trang chi tiết video
+// (thu-vien-cua-toi/[id].vue), cho nút "Xem thêm/Thu gọn" bung ra khi cần.
+// CHỈ áp dụng cho bong bóng CÂU HỎI của user — câu trả lời của bot giữ
+// nguyên như cũ, không clamp (nội dung bot đã tách before/script/after
+// riêng, script luôn hiện đầy đủ để copy được, không hợp để cắt bớt).
+//
+// [2026-09-02] SỬA LẠI: bản đầu quyết định hiện nút "Xem thêm" bằng ĐẾM KÝ
+// TỰ (content.length > ngưỡng) — SAI, vì phần cắt ngắn thật là CSS
+// line-clamp (cắt theo SỐ DÒNG hiển thị thật, phụ thuộc độ rộng khung/cỡ
+// chữ/số lần xuống dòng thật), không phải số ký tự. User phát hiện: có case
+// > ngưỡng ký tự nhưng wrap ra màn hình vẫn vừa đủ 6 dòng -> nút hiện ra
+// nhưng bấm vào/ra không đổi gì (nội dung đã hiện đủ từ đầu, line-clamp
+// không thật sự cắt gì). Đổi qua ĐO THẬT bằng ResizeObserver: so
+// scrollHeight (chiều cao NẾU KHÔNG bị cắt — trình duyệt vẫn tính đúng giá
+// trị này cho phần tử có -webkit-line-clamp, đây là cách chuẩn để biết
+// line-clamp có đang cắt bớt hay không) với clientHeight (chiều cao ĐANG
+// hiển thị, bị giới hạn bởi line-clamp 6 dòng) — chỉ hiện nút khi THỰC SỰ có
+// phần bị cắt (scrollHeight > clientHeight).
+const expandedUserMsgs = ref<Record<number, boolean>>({});
+function toggleUserMsgExpand(i: number) {
+  expandedUserMsgs.value[i] = !expandedUserMsgs.value[i];
+}
+const overflowingUserMsgs = ref<Record<number, boolean>>({});
+const userMsgEls = new Map<number, HTMLElement>();
+const userMsgElIndex = new WeakMap<HTMLElement, number>();
+let userMsgResizeObserver: ResizeObserver | null = null;
+function measureUserMsgOverflow(el: HTMLElement, i: number) {
+  overflowingUserMsgs.value[i] = el.scrollHeight - el.clientHeight > 1;
+}
+function ensureUserMsgObserver() {
+  if (userMsgResizeObserver || typeof ResizeObserver === "undefined") return;
+  // 1 observer dùng chung cho mọi bong bóng user thay vì tạo mới mỗi tin
+  // nhắn — ResizeObserver tự bắn callback ngay khi observe() lần đầu (có
+  // luôn kết quả đo ban đầu), và bắn lại mỗi khi khung chat đổi kích thước
+  // (resize cửa sổ...) khiến cách wrap chữ đổi theo.
+  userMsgResizeObserver = new ResizeObserver((entries) => {
+    for (const entry of entries) {
+      const el = entry.target as HTMLElement;
+      const idx = userMsgElIndex.get(el);
+      if (idx !== undefined) measureUserMsgOverflow(el, idx);
+    }
+  });
+}
+// Nội dung tin nhắn user đã CỐ ĐỊNH ngay lúc gửi (không đổi sau khi tạo) nên
+// không cần theo dõi thêm content đổi — chỉ cần đo đúng lúc phần tử được tạo
+// (+ ResizeObserver lo phần đổi kích thước khung sau đó).
+// el: "any" — Vue định nghĩa function ref nhận Element | ComponentPublicInstance
+// | null, thực tế luôn là 1 <span> DOM thật nên ép kiểu thẳng xuống HTMLElement
+// bên dưới là an toàn.
+function registerUserMsgTextEl(el: any, i: number) {
+  const prev = userMsgEls.get(i);
+  if (prev) {
+    userMsgResizeObserver?.unobserve(prev);
+    userMsgElIndex.delete(prev);
+  }
+  if (!el) {
+    userMsgEls.delete(i);
+    return;
+  }
+  const htmlEl = el as HTMLElement;
+  userMsgEls.set(i, htmlEl);
+  userMsgElIndex.set(htmlEl, i);
+  ensureUserMsgObserver();
+  userMsgResizeObserver?.observe(htmlEl);
+  measureUserMsgOverflow(htmlEl, i);
+}
+onUnmounted(() => {
+  userMsgResizeObserver?.disconnect();
+});
+
 // [2026-09-01] Khi bot viết/tối ưu kịch bản (system prompt), toàn bộ đoạn
 // Style→hết Cảnh cuối được bọc trong cặp marker ẩn <<<PROMPT_START>>>/
 // <<<PROMPT_END>>> — CHỈ dùng để FE tách CHÍNH XÁC đúng phần kịch bản ra copy
@@ -558,8 +629,18 @@ function sendSuggestion(text: string) {
                 <span
                   v-if="m.role === 'user' || splitMessageParts(m.content).before"
                   class="chat-bubble-text"
+                  :class="{ 'chat-bubble-text--clamped': m.role === 'user' && !expandedUserMsgs[i] }"
+                  :ref="m.role === 'user' ? (el) => registerUserMsgTextEl(el, i) : undefined"
                   v-html="renderMessageContent(m.role === 'user' ? m.content : splitMessageParts(m.content).before)"
                 ></span>
+                <button
+                  v-if="m.role === 'user' && overflowingUserMsgs[i]"
+                  type="button"
+                  class="chat-msg-toggle-btn"
+                  @click="toggleUserMsgExpand(i)"
+                >
+                  {{ expandedUserMsgs[i] ? "Thu gọn" : "Xem thêm" }}
+                </button>
 
                 <div v-if="m.role !== 'user' && splitMessageParts(m.content).script" class="chat-prompt-box">
                   <div class="chat-prompt-header">
@@ -945,17 +1026,19 @@ function sendSuggestion(text: string) {
 .chat-bubble-col {
   display: flex;
   flex-direction: column;
-  /* [2026-09-02] Bỏ giới hạn 76% cũ theo yêu cầu — cả bong bóng bot lẫn
-     khách đều full chiều rộng khung chat (trừ phần chừa cho avatar/khoảng
-     cách .chat-row đã có sẵn qua gap/flex), không riêng gì bot nữa. */
+  /* [2026-09-02] Chỉ NỚI giới hạn tối đa từ 76% lên 100% (để tin nhắn dài
+     được phép dùng hết chiều rộng khung chat thay vì bó hẹp) — KHÔNG ép full
+     cứng: bỏ "flex: 1" (thử trước đó, sai) vì nó khiến MỌI tin nhắn kể cả
+     ngắn ("ok cảm ơn ạ") cũng bị kéo full width xấu. Không có flex-grow nên
+     cột vẫn tự co theo đúng nội dung (shrink-to-fit) như bong bóng chat bình
+     thường, chỉ khác là được phép nới rộng tới 100% khi nội dung thật sự dài
+     cần tới, thay vì bị chặn cứng ở 76% như trước. */
   max-width: 100%;
-  flex: 1;
 }
 .chat-row-user .chat-bubble-col {
-  /* [2026-09-02] Trước đây "flex-end" khiến bong bóng khách chỉ rộng theo
-     nội dung rồi nép sát phải — bỏ đi để bong bóng khách CŨNG full chiều
-     rộng như bot (đúng yêu cầu "cả 2 đều full"), quay về mặc định "stretch"
-     của flex column (không cần khai báo lại tường minh). */
+  /* Khôi phục lại — bong bóng khách tự co theo nội dung rồi nép sát phải,
+     không bị "stretch" full ngang hàng nữa. */
+  align-items: flex-end;
 }
 .chat-bubble {
   padding: 9px 13px;
@@ -986,6 +1069,32 @@ function sendSuggestion(text: string) {
   display: flex;
   align-items: center;
   gap: 4px;
+}
+/* [2026-09-02] Clamp câu hỏi dài của user còn 6 dòng — xem
+   USER_MSG_COLLAPSE_THRESHOLD/isUserMsgLong/expandedUserMsgs. Giống hệt
+   .info-value--clamped ở trang chi tiết video (thu-vien-cua-toi/[id].vue). */
+.chat-bubble-text--clamped {
+  display: -webkit-box;
+  -webkit-line-clamp: 6;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.chat-msg-toggle-btn {
+  display: block;
+  margin-top: 4px;
+  background: none;
+  border: none;
+  padding: 0;
+  /* Nút này chỉ hiện trên bong bóng user (nền gradient xanh, chữ trắng) —
+     dùng trắng mờ + gạch chân khi hover thay vì xanh #1e88e5 như trang chi
+     tiết video (nền trắng), giữ tương phản đủ rõ trên nền gradient. */
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+.chat-msg-toggle-btn:hover {
+  text-decoration: underline;
 }
 /* [2026-09-01] Khối kịch bản (Prompt) — tách hẳn khỏi phần chữ thường của
    bot, nền xám riêng biệt, label "Prompt" bên trái + nút Sao chép bên phải ở

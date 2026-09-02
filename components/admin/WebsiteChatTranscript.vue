@@ -47,6 +47,60 @@ function renderMessageContent(content: string) {
   });
 }
 
+// [2026-09-02] Đồng bộ với WebsiteChatWidget.vue (bên client) — thu gọn câu
+// hỏi dài của user còn 6 dòng, nút "Xem thêm/Thu gọn" bung ra khi cần. CHỈ
+// áp dụng cho bong bóng user, không áp dụng cho câu trả lời của bot.
+//
+// [2026-09-02] SỬA LẠI: đo THẬT bằng ResizeObserver (scrollHeight vs
+// clientHeight) thay vì đếm ký tự — xem ghi chú đầy đủ ở file gốc
+// (WebsiteChatWidget.vue), lý do y hệt: đếm ký tự không phản ánh đúng việc
+// line-clamp có THỰC SỰ cắt bớt nội dung hay không (phụ thuộc cách wrap
+// chữ thật trên màn hình).
+const expandedUserMsgs = ref<Record<number, boolean>>({});
+function toggleUserMsgExpand(i: number) {
+  expandedUserMsgs.value[i] = !expandedUserMsgs.value[i];
+}
+const overflowingUserMsgs = ref<Record<number, boolean>>({});
+const userMsgEls = new Map<number, HTMLElement>();
+const userMsgElIndex = new WeakMap<HTMLElement, number>();
+let userMsgResizeObserver: ResizeObserver | null = null;
+function measureUserMsgOverflow(el: HTMLElement, i: number) {
+  overflowingUserMsgs.value[i] = el.scrollHeight - el.clientHeight > 1;
+}
+function ensureUserMsgObserver() {
+  if (userMsgResizeObserver || typeof ResizeObserver === "undefined") return;
+  userMsgResizeObserver = new ResizeObserver((entries) => {
+    for (const entry of entries) {
+      const el = entry.target as HTMLElement;
+      const idx = userMsgElIndex.get(el);
+      if (idx !== undefined) measureUserMsgOverflow(el, idx);
+    }
+  });
+}
+// el: "any" — Vue định nghĩa function ref nhận Element | ComponentPublicInstance
+// | null, thực tế luôn là 1 <span> DOM thật nên ép kiểu thẳng xuống HTMLElement
+// bên dưới là an toàn.
+function registerUserMsgTextEl(el: any, i: number) {
+  const prev = userMsgEls.get(i);
+  if (prev) {
+    userMsgResizeObserver?.unobserve(prev);
+    userMsgElIndex.delete(prev);
+  }
+  if (!el) {
+    userMsgEls.delete(i);
+    return;
+  }
+  const htmlEl = el as HTMLElement;
+  userMsgEls.set(i, htmlEl);
+  userMsgElIndex.set(htmlEl, i);
+  ensureUserMsgObserver();
+  userMsgResizeObserver?.observe(htmlEl);
+  measureUserMsgOverflow(htmlEl, i);
+}
+onUnmounted(() => {
+  userMsgResizeObserver?.disconnect();
+});
+
 // Giống hệt cơ chế marker <<<PROMPT_START>>>/<<<PROMPT_END>>> ở
 // WebsiteChatWidget.vue — xem ghi chú đầy đủ ở file gốc.
 const PROMPT_BLOCK_REGEX = /<<<PROMPT_START>>>([\s\S]*?)<<<PROMPT_END>>>/;
@@ -113,8 +167,18 @@ async function onCopyScript(content: string, index: number) {
           <span
             v-if="m.role === 'user' || splitMessageParts(m.content).before"
             class="wct-bubble-text"
+            :class="{ 'wct-bubble-text--clamped': m.role === 'user' && !expandedUserMsgs[i] }"
+            :ref="m.role === 'user' ? (el) => registerUserMsgTextEl(el, i) : undefined"
             v-html="renderMessageContent(m.role === 'user' ? m.content : splitMessageParts(m.content).before)"
           ></span>
+          <button
+            v-if="m.role === 'user' && overflowingUserMsgs[i]"
+            type="button"
+            class="wct-msg-toggle-btn"
+            @click="toggleUserMsgExpand(i)"
+          >
+            {{ expandedUserMsgs[i] ? "Thu gọn" : "Xem thêm" }}
+          </button>
 
           <div v-if="m.role !== 'user' && splitMessageParts(m.content).script" class="wct-prompt-box">
             <div class="wct-prompt-header">
@@ -191,14 +255,16 @@ async function onCopyScript(content: string, index: number) {
 .wct-col {
   display: flex;
   flex-direction: column;
-  /* [2026-09-02] Đồng bộ với WebsiteChatWidget.vue (bên client) — bỏ giới
-     hạn 76%, cả 2 bong bóng (bot lẫn khách) đều full chiều rộng. */
+  /* [2026-09-02] Đồng bộ với WebsiteChatWidget.vue (bên client) — CHỈ nới
+     giới hạn tối đa 76% -> 100% (tin dài được dùng hết chiều rộng), KHÔNG ép
+     full cứng bằng "flex: 1" (thử trước đó, sai — khiến tin ngắn như "ok cảm
+     ơn ạ" cũng bị kéo full xấu). Không có flex-grow nên vẫn tự co theo đúng
+     nội dung như bong bóng chat bình thường. */
   max-width: 100%;
-  flex: 1;
 }
 .wct-row-user .wct-col {
-  /* Trước đây "flex-end" khiến bong bóng khách chỉ rộng theo nội dung rồi
-     nép sát phải — bỏ đi để cũng full như bot, quay về mặc định "stretch". */
+  /* Khôi phục lại — bong bóng khách tự co theo nội dung rồi nép sát phải. */
+  align-items: flex-end;
 }
 .wct-bubble {
   padding: 9px 13px;
@@ -285,6 +351,28 @@ async function onCopyScript(content: string, index: number) {
   display: flex;
   align-items: center;
   gap: 4px;
+}
+/* [2026-09-02] Đồng bộ với WebsiteChatWidget.vue — xem ghi chú đầy đủ ở
+   .chat-bubble-text--clamped/.chat-msg-toggle-btn file gốc. */
+.wct-bubble-text--clamped {
+  display: -webkit-box;
+  -webkit-line-clamp: 6;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.wct-msg-toggle-btn {
+  display: block;
+  margin-top: 4px;
+  background: none;
+  border: none;
+  padding: 0;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+.wct-msg-toggle-btn:hover {
+  text-decoration: underline;
 }
 .wct-time {
   font-size: 0.68rem;
