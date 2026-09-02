@@ -79,10 +79,6 @@ function registerPromptTextEl(el: any) {
   promptResizeObserver.observe(el);
   measurePromptOverflow();
 }
-watch(
-  () => formData.value,
-  () => nextTick(measurePromptOverflow),
-);
 onUnmounted(() => promptResizeObserver?.disconnect());
 const myTimeline = ref<HTMLDivElement | null>(null);
 const pollTimer = ref<ReturnType<typeof setTimeout> | null>(null);
@@ -119,6 +115,17 @@ const formData = reactive<any>({
   imagesCount: 0,
   uploadedImages: [] as string[],
 });
+// [2026-09-02] Đặt SAU khai báo "formData" (không được đặt cùng chỗ với các
+// khai báo isPromptOverflowing/registerPromptTextEl phía trên — đã gây lỗi
+// SSR 500 thật trên production "Cannot access 'formData' before
+// initialization": watch() luôn CHẠY NGAY getter 1 lần lúc gọi (kể cả không
+// có immediate:true) để xác định dependency, nên nếu gọi watch(() =>
+// formData.value, ...) ở TRƯỚC dòng "const formData = reactive(...)" thì
+// getter đó chạy khi formData vẫn còn nằm trong temporal dead zone).
+watch(
+  () => formData.value,
+  () => nextTick(measurePromptOverflow),
+);
 
 const productId = computed(() =>
   route.params.id !== "tao-moi" ? route.params.id : null,
