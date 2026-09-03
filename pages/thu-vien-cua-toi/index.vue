@@ -226,15 +226,18 @@ const getQueueMsg = (item: any): { title: string } | null => {
   <div>
     <ConfirmDialog ref="confirmDialogRef" />
 
-    <!-- Skeleton loading -->
+    <!-- Skeleton loading — khớp đúng bố cục/kích thước card thật bên dưới
+    (thumb-area 16:9, card-info padding/gap, tiêu đề 2 dòng) để không bị
+    "nhảy" chiều cao khi chuyển từ skeleton sang data thật. -->
     <div v-if="loading === 'list'" class="video-grid">
       <div v-for="i in 12" :key="i" class="skeleton-card">
         <div class="skeleton-thumb">
           <v-skeleton-loader type="image" height="100%" />
         </div>
-        <div class="pa-3 d-flex flex-column ga-2">
-          <v-skeleton-loader type="text" />
-          <v-skeleton-loader type="text" width="55%" />
+        <div class="skeleton-info">
+          <v-skeleton-loader type="text" width="100%" />
+          <v-skeleton-loader type="text" width="60%" />
+          <v-skeleton-loader type="text" width="40%" class="mt-1" />
         </div>
       </div>
     </div>
@@ -512,8 +515,18 @@ const getQueueMsg = (item: any): { title: string } | null => {
 }
 
 .skeleton-thumb {
+  position: relative;
   aspect-ratio: 16 / 9;
   overflow: hidden;
+}
+
+/* padding/gap khớp CHÍNH XÁC .card-info thật bên dưới — trước đây dùng class
+   tiện ích pa-3/ga-2 (12px/8px), hơi rộng hơn card thật (10px 12px 12px / 5px). */
+.skeleton-info {
+  padding: 10px 12px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
 }
 
 /* ─── Video card ────────────────────────────────────── */

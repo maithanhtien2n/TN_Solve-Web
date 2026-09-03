@@ -118,13 +118,18 @@ useSeo({
     </div>
   </div>
 
-  <!-- Skeleton loading -->
+  <!-- Skeleton loading — khớp đúng bố cục/kích thước card thật bên dưới
+  (thumb-area 16:9, card-info padding/gap, tiêu đề 2 dòng) để không bị
+  "nhảy" chiều cao khi chuyển từ skeleton sang data thật. -->
   <div v-if="Boolean(loading === 'list')" class="video-grid">
     <div v-for="i in 12" :key="i" class="video-card-skeleton">
-      <v-skeleton-loader type="image" class="thumb-skeleton" />
+      <div class="thumb-skeleton">
+        <v-skeleton-loader type="image" height="100%" />
+      </div>
       <div class="skeleton-info">
-        <v-skeleton-loader type="text" width="80%" />
-        <v-skeleton-loader type="text" width="50%" />
+        <v-skeleton-loader type="text" width="100%" />
+        <v-skeleton-loader type="text" width="60%" />
+        <v-skeleton-loader type="text" width="40%" class="mt-1" />
       </div>
     </div>
   </div>
@@ -562,19 +567,24 @@ useSeo({
 .video-card-skeleton {
   border-radius: 12px;
   overflow: hidden;
+  background: #fff;
   border: 1px solid #f0f0f0;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
 }
 
 .thumb-skeleton {
+  position: relative;
   width: 100%;
-  aspect-ratio: 16/9;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
 }
 
+/* padding/gap khớp CHÍNH XÁC .card-info thật bên dưới. */
 .skeleton-info {
   padding: 10px 12px 12px;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 5px;
 }
 
 /* ─── Empty ──────────────────────────────────────────── */

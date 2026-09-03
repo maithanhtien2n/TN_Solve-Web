@@ -339,12 +339,24 @@ const onClickSaveSetting = async () => {
       </div>
     </template>
 
+    <!-- [2026-09-03] Đổi hiện đúng y hệt kiểu huy hiệu user tự thấy ở trang
+    của họ (AppHeader.vue .menu-credit-badge / tai-khoan.vue) — trước đây
+    admin lại hiện "X ngày" (số ngày còn lại gói Không giới hạn, đã có sẵn ở
+    cột "Thời hạn còn lại" ngay bên cạnh rồi, trùng lặp) thay vì số tín dụng
+    thật. Theo yêu cầu cụ thể: "ở user đang hiện như nào thì admin cũng hiện
+    y như vậy". -->
     <template #row-settings.credit="{ item }">
-      <span v-if="(item as any)?.settings?.unlimitedVideo" class="ml-1">
-        <v-icon size="17">mdi-infinity</v-icon>
-        {{ (item as any)?.settings?.unlimitedVideo }} ngày 💎
+      <span
+        class="credit-badge"
+        :class="{ 'credit-badge--frozen': (item as any)?.settings?.unlimitedVideo }"
+      >
+        <span
+          class="credit-badge-icon"
+          :class="{ 'credit-badge-icon--lock': (item as any)?.settings?.unlimitedVideo }"
+          >{{ (item as any)?.settings?.unlimitedVideo ? "🔒" : "💎" }}</span
+        >
+        {{ ((item as any)?.settings?.credit || 0).toLocaleString("vi-VN") }} tín dụng
       </span>
-      <span v-else> {{ (item as any)?.settings?.credit || 0 }} 💎</span>
     </template>
 
     <template #row-action="{ item }">
@@ -385,5 +397,47 @@ const onClickSaveSetting = async () => {
   .image-container {
     height: 8rem !important;
   }
+}
+
+/* [2026-09-03] Y HỆT .menu-credit-badge/.menu-credit-icon ở AppHeader.vue —
+   copy nguyên giá trị, đổi tên class để tránh nhầm 2 component không liên
+   quan (scoped CSS không tự dùng chung được giữa 2 file .vue khác nhau). */
+.credit-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #b45309;
+  background: rgba(252, 211, 77, 0.15);
+  border: 1px solid rgba(252, 211, 77, 0.4);
+  padding: 4px 12px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+/* Tín dụng thường đang bị "đóng băng" vì tài khoản đang dùng gói Không giới
+   hạn — làm mờ + đổi màu xám lạnh (khác hẳn màu vàng bình thường) để admin
+   hiểu ngay số này tạm ngưng dùng, không phải mất hẳn — xem giải thích đầy
+   đủ ở AppHeader.vue (.menu-credit-badge--frozen). */
+.credit-badge--frozen {
+  color: #64748b;
+  background: rgba(148, 163, 184, 0.15);
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  opacity: 0.85;
+}
+
+.credit-badge-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 13px;
+  height: 13px;
+  line-height: 1;
+  font-size: 0.75rem;
+}
+
+.credit-badge-icon--lock {
+  transform: translateY(-1.5px);
 }
 </style>
