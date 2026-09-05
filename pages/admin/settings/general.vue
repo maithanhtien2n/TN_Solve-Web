@@ -309,14 +309,11 @@ definePageMeta({ layout: "admin", title: "Thông tin chung" });
       </template>
 
       <template v-else-if="(item as any).title === 'Luồng tạo video'">
-        <span
-          v-if="(item as any).value === 'video-tab'"
-          class="text-nowrap"
-        >
-          video-tab (1 tab riêng/video)
+        <span v-if="(item as any).value" class="text-nowrap">
+          {{ (item as any).value === "video-tab" ? "Nhiều tab" : "1 tab" }}
         </span>
         <span v-else class="text-nowrap text-medium-emphasis">
-          videos (1 tab chung, mặc định)
+          1 tab (mặc định)
         </span>
       </template>
 
@@ -639,10 +636,10 @@ definePageMeta({ layout: "admin", title: "Thông tin chung" });
               hide-details
               density="compact"
               variant="outlined"
-              class="my-4 w-12rem"
+              class="my-4 w-10rem"
               :items="[
-                { title: 'videos (1 tab chung)', value: 'videos' },
-                { title: 'video-tab (1 tab/video)', value: 'video-tab' },
+                { title: '1 tab', value: 'videos' },
+                { title: 'Nhiều tab', value: 'video-tab' },
               ]"
               @update:model-value="onClickAction(item)"
             />
