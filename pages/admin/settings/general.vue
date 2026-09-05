@@ -308,6 +308,18 @@ definePageMeta({ layout: "admin", title: "Thông tin chung" });
         </span>
       </template>
 
+      <template v-else-if="(item as any).title === 'Luồng tạo video'">
+        <span
+          v-if="(item as any).value === 'video-tab'"
+          class="text-nowrap"
+        >
+          video-tab (1 tab riêng/video)
+        </span>
+        <span v-else class="text-nowrap text-medium-emphasis">
+          videos (1 tab chung, mặc định)
+        </span>
+      </template>
+
       <template v-else-if="(item as any).title === 'Chế độ tạo bối cảnh'">
         <span v-if="(item as any).value === 'api'" class="text-nowrap">
           API
@@ -614,6 +626,23 @@ definePageMeta({ layout: "admin", title: "Thông tin chung" });
                 { title: 'nano_banana_pro', value: 'nano_banana_pro' },
                 { title: 'nano_banana_2', value: 'nano_banana_2' },
                 { title: 'nano_banana_2_lite', value: 'nano_banana_2_lite' },
+              ]"
+              @update:model-value="onClickAction(item)"
+            />
+          </div>
+        </template>
+
+        <template v-else-if="(item as any).title === 'Luồng tạo video'">
+          <div>
+            <v-select
+              v-model="(item as any).value"
+              hide-details
+              density="compact"
+              variant="outlined"
+              class="my-4 w-12rem"
+              :items="[
+                { title: 'videos (1 tab chung)', value: 'videos' },
+                { title: 'video-tab (1 tab/video)', value: 'video-tab' },
               ]"
               @update:model-value="onClickAction(item)"
             />
