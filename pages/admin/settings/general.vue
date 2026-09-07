@@ -317,6 +317,15 @@ definePageMeta({ layout: "admin", title: "Thông tin chung" });
         </span>
       </template>
 
+      <template v-else-if="(item as any).title === 'Luồng sinh kịch bản/prompt'">
+        <span v-if="(item as any).value" class="text-nowrap">
+          {{ (item as any).value === "new" ? "Mới (thử nghiệm)" : "Cũ" }}
+        </span>
+        <span v-else class="text-nowrap text-medium-emphasis">
+          Cũ (mặc định)
+        </span>
+      </template>
+
       <template v-else-if="(item as any).title === 'Chế độ tạo bối cảnh'">
         <span v-if="(item as any).value === 'api'" class="text-nowrap">
           API
@@ -640,6 +649,23 @@ definePageMeta({ layout: "admin", title: "Thông tin chung" });
               :items="[
                 { title: '1 tab', value: 'videos' },
                 { title: 'Nhiều tab', value: 'video-tab' },
+              ]"
+              @update:model-value="onClickAction(item)"
+            />
+          </div>
+        </template>
+
+        <template v-else-if="(item as any).title === 'Luồng sinh kịch bản/prompt'">
+          <div>
+            <v-select
+              v-model="(item as any).value"
+              hide-details
+              density="compact"
+              variant="outlined"
+              class="my-4 w-10rem"
+              :items="[
+                { title: 'Cũ', value: 'old' },
+                { title: 'Mới (thử nghiệm)', value: 'new' },
               ]"
               @update:model-value="onClickAction(item)"
             />
