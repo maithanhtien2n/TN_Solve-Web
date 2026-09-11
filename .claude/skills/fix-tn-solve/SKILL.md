@@ -164,6 +164,52 @@ Finishing the #1 issue is not a stopping point; it's one item off the queue.
 A run that fixes 1 big bug and never looks at the 5 smaller ones sitting in
 the same logs is an incomplete run, not a successful one.
 
+### Zero-th check — has this EXACT error already been addressed?
+
+[2026-09-11] Explicit user requirement, before spending a single minute of
+the confidence loop below on an error: check whether it's already been
+fixed in a past commit sitting in the local repo, and if so, whether that
+fix has actually reached production yet. Skipping this check risks two real
+mistakes: re-investigating (or re-fixing, possibly in a conflicting way)
+something already solved but not yet deployed, OR — worse — silently
+crediting a fix that was deployed but didn't actually work, and moving on
+without noticing the bug is still alive.
+
+1. Search for prior work on this exact failure: `git log --oneline` and grep
+   the relevant source file's comments for the error's distinctive
+   substrings. This codebase has a strong habit of documenting past
+   investigations directly in code comments (date, root cause, what was
+   tried, sometimes an explicit "why NOT fixed this way" decision) — a
+   matching comment or commit is the common case, not the rare one. Check
+   ALL 3 repos, not just the one the error superficially "belongs to" — a
+   fix can live on the other side of a client/server boundary.
+2. If a plausible past fix is found, determine whether it's actually live on
+   production: SSH in and compare `git log -1` on the relevant app's
+   production path against the commit that introduced the fix. A reliable
+   way to place the log evidence in time relative to that: `deploy-tn-solve`
+   ALWAYS flushes the 4 apps' PM2 logs as part of its own run (Step 2c) —
+   so if the app has been deployed even once since the fix, and the log
+   still shows the failure, that log line is guaranteed to be FROM AFTER
+   the fix (the flush erased everything older); if the app's `pm2 jlist`
+   restart time predates the fix commit entirely, the app hasn't picked up
+   the fix yet regardless of what the log shows.
+   - **Fixed locally, not yet deployed**: the log entries are almost
+     certainly stale evidence from before the fix, not proof the system is
+     still broken. Do NOT re-investigate or re-fix it. Note it in Step 5's
+     report as "already fixed locally (commit X), pending deploy" and move
+     to the next item in the queue — this is not a fresh bug needing a new
+     fix, just an unshipped one.
+   - **Deployed, and the failure still recurs in logs that postdate that
+     deploy**: the earlier fix did not actually work. This is MORE serious
+     than an untouched fresh bug of the same shape, not less — a fix that
+     silently failed already burned one investigation cycle and gave false
+     confidence. Bump it up the severity queue. Do not just re-confirm the
+     old hypothesis or reapply the same fix harder — treat that hypothesis
+     as FALSIFIED by the fact it's still happening, and go into Step 3's
+     loop hunting for what the previous investigation actually missed.
+   - **No past fix found at all**: proceed to Step 3's loop as normal — this
+     one is genuinely fresh.
+
 ## Step 3 — investigate each non-Google, non-capacity error in a confidence loop
 
 For every distinct internal-error shape found: **do not edit any code below
