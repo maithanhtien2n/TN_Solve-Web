@@ -244,7 +244,29 @@ Loop:
    rather than forcing a change, then move on to the next bug in the queue
    (don't stop the whole run over one unresolved item).
 
-Once ≥90%: implement the smallest correct fix that addresses the root cause
+### HARD GATE — self-check before touching any code
+
+[2026-09-11] Explicit user requirement after a real violation: earlier in
+this same skill's life, a fix got implemented and reported as done at a
+confidence that, on honest re-examination, never actually cleared 90% for
+the problem it was meant to solve (a plausible-sounding root cause that live
+production data later showed wasn't the actual cause) — a direct violation
+of point 4 above, caught only because the user asked "are you sure this is
+really ≥90%" after the fact. That must not happen again.
+
+Immediately before calling Edit or Write on any fix for this bug, you MUST
+output the literal line `Confidence: NN%` (a real number, not "high" or
+"~90%ish") together with the one-sentence reason. If NN < 90, that message
+IS your stopping point — do not call Edit/Write in the same turn, go back to
+step 1 of the loop instead. Skipping this line, rounding up to clear the
+bar, or writing it AFTER the edit instead of before all count as violating
+this gate. If you later discover (your own re-check, a live test, or the
+user asking) that a shipped fix never actually cleared 90% for the problem
+it targeted, say so immediately and plainly in those exact terms — don't let
+it stand framed as a completed fix.
+
+Once ≥90% (and the Confidence line above is written): implement the smallest
+correct fix that addresses the root cause
 (in the right one of the 3 local repos, resolved per the path rule above),
 verify it doesn't break anything obvious (syntax check, re-run whatever
 reproduction you built in step 3 against the fix), and move to Step 4.
