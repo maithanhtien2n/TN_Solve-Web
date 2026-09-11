@@ -161,18 +161,43 @@ onMounted(async () => {
         return;
       }
 
+      // [2026-09-11] Xoá code/state/scope/authuser khỏi URL NGAY LẬP TỨC —
+      // giống hệt pattern "xoá URL trước khi xử lý" đã dùng cho resultCode
+      // thanh toán bên dưới. Authorization code của Google chỉ dùng được
+      // ĐÚNG 1 LẦN — để code còn nằm trong URL thì refresh trang/bấm quay lại
+      // sau khi trang này đã load xong sẽ gọi lại authService.login() với
+      // ĐÚNG code đã dùng, luôn nhận "invalid_grant" từ Google (log thật:
+      // "Login error: { error: 'invalid_grant', ... }" — 18 lần trong 5000
+      // dòng log gần nhất). Xoá trước khi gọi API để refresh/back sau mốc
+      // này không lặp lại request nữa. Chỉ xoá đúng 4 key OAuth, giữ nguyên
+      // các query khác (ref, action, redirect...) vì code phía dưới còn đọc.
+      const restQuery = { ...route.query };
+      delete restQuery.state;
+      delete restQuery.code;
+      delete restQuery.scope;
+      delete restQuery.authuser;
+      router.replace({ query: restQuery });
+
       let payload: any = {
         type: "google",
-        credential: route.query?.code,
+        credential: code,
         redirectUri: GOOGLE_REDIRECT_URI,
       };
 
       if (referralId.value) payload.ref = referralId.value;
-      if (!payload.ref && route.query?.code) payload.code = route.query.code;
+      if (!payload.ref && code) payload.code = code;
 
-      await authService.login(payload).then(() => {
-        router.replace(decodedState.redirect);
-      });
+      await authService
+        .login(payload)
+        .then(() => {
+          router.replace(decodedState.redirect);
+        })
+        .catch(() => {
+          useAppStore().onActionSetSystemPopup({
+            type: "error",
+            content: "❌ Đăng nhập Google thất bại, vui lòng thử lại!",
+          });
+        });
     }
 
     let params: any = {};
