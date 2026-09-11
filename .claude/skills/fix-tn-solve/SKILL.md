@@ -151,6 +151,19 @@ exception, a bad state transition, a race condition, a missing null check, a
 retry loop with no backoff hammering our own server, a UI bug, a wrong query,
 a capacity-accounting bug per above, etc.) — goes to Step 3.
 
+### Work the FULL list, most severe → least severe — never stop at the first one
+
+Before investigating anything, compile every distinct error shape that didn't
+get skipped in Step 2 into one queue, ordered by severity (crash/data-loss/
+mass-failure first) then by frequency. Then work through the ENTIRE queue,
+one at a time, via the Step 3 loop below — not just the loudest one.
+
+[2026-09-11] Explicit user requirement: check logs and fix from the most
+serious bug down to the smallest one — none get skipped, however minor.
+Finishing the #1 issue is not a stopping point; it's one item off the queue.
+A run that fixes 1 big bug and never looks at the 5 smaller ones sitting in
+the same logs is an incomplete run, not a successful one.
+
 ## Step 3 — investigate each non-Google, non-capacity error in a confidence loop
 
 For every distinct internal-error shape found: **do not edit any code below
@@ -178,6 +191,17 @@ handling for that specific condition. If the actual defect is a race
 condition, a stale/leaked resource, a wrong counter, a logic error, a missing
 state transition, etc., fix THAT — the thing that should never have happened
 — not just make the symptom happen less often or get silently swallowed.
+
+[2026-09-11] Explicit user requirement: cap the confidence-building loop below
+at **30 minutes of wall-clock investigation PER BUG** (note the mental/actual
+start time when you begin working a given bug from the queue). Inside that
+30 minutes, be exactly as persistent as the rest of this section demands —
+do not give up after 1-2 rounds, keep digging, keep verifying — the cap
+exists to bound a single hard bug from consuming the whole run, not to give
+permission to quit early. If you hit 90% before 30 minutes, fix it (normal
+flow). If 30 minutes elapses and you're still below 90%, stop THIS bug per
+point 5 below, record it as unresolved, and move to the next bug in the
+severity queue — don't let one stubborn bug block investigating the rest.
 
 Loop:
 1. Gather evidence: read the exact source lines the log/stack trace points
@@ -214,9 +238,11 @@ Loop:
    something outside this codebase like the client's machine/network (see
    the 2026-09-11 case where a "silent save button" bug turned out to be
    isolated to one user's UltraViewer setup, not the code, once tested
-   against a clean environment) — stop looping. Report it as unresolved with
-   your best hypothesis and precisely what's still uncertain, rather than
-   forcing a change.
+   against a clean environment) — OR the 30-minute cap on this bug is reached
+   first, whichever comes first — stop looping THIS bug. Record it as
+   unresolved with your best hypothesis and precisely what's still uncertain,
+   rather than forcing a change, then move on to the next bug in the queue
+   (don't stop the whole run over one unresolved item).
 
 Once ≥90%: implement the smallest correct fix that addresses the root cause
 (in the right one of the 3 local repos, resolved per the path rule above),
@@ -238,12 +264,14 @@ them at `deploy-tn-solve` if they say yes).
 
 ## Step 5 — report back
 
-Plainly summarize: which distinct errors were found and their frequency,
-which were classified Google-origin and skipped (with why), which were
-classified genuine capacity/infrastructure limits and skipped (with the real
-numbers that justified it), which were investigated and fixed (root cause +
-confidence + fix, per repo), and which stayed unresolved because confidence
-never cleared 90% (with the leading hypothesis and what evidence is still
-missing, and what you'd need from the user — e.g. cookies, more time — to
-close the gap). Don't bury a real finding in a wall of log noise — lead with
-what matters.
+Plainly summarize the FULL severity queue, not just the top item: which
+distinct errors were found and their frequency, which were classified
+Google-origin and skipped (with why), which were classified genuine capacity/
+infrastructure limits and skipped (with the real numbers that justified it),
+which were investigated and FIXED (root cause + confidence + fix, per repo,
+in severity order), and which stayed unresolved after hitting the 30-minute
+cap or exhausting avenues below 90% (with the leading hypothesis, what
+evidence is still missing, and what you'd need from the user — e.g. cookies,
+more time — to close the gap). Don't bury a real finding in a wall of log
+noise — lead with what matters, but don't let the big finding crowd out the
+smaller ones from the report either.
