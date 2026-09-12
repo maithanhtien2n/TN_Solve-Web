@@ -192,7 +192,7 @@ const onClickMenuItem = (value: string) => {
     aria-label="Mở menu điều hướng"
     @click="mobileNavOpen = true"
   >
-    <v-icon size="22" color="white">mdi-menu</v-icon>
+    <v-icon size="26" color="white">mdi-menu</v-icon>
   </button>
 
   <v-navigation-drawer
@@ -670,8 +670,11 @@ const onClickMenuItem = (value: string) => {
   top: 50%;
   transform: translateY(-50%);
   z-index: 998;
-  width: 40px;
-  height: 52px;
+  /* [2026-09-12] Nâng bằng đúng kích thước nút chat (.chat-fab trong
+     WebsiteChatWidget.vue, 60x60px) theo yêu cầu chủ ý — trước đây 40x52px
+     nhỏ hơn hẳn, lệch nhau khi 2 nút nổi cùng hiện trên màn hình mobile. */
+  width: 60px;
+  height: 60px;
   border: none;
   /* Bo tròn CHỈ 2 góc phải — nửa "ăn" vào mép trái màn hình, nửa nhô ra như
      1 cái tab, không phải hình tròn/pill đầy đủ như nút chat bên phải. */
@@ -685,7 +688,7 @@ const onClickMenuItem = (value: string) => {
   transition: width 0.18s ease, box-shadow 0.18s ease;
 }
 .mobile-nav-fab:active {
-  width: 36px;
+  width: 56px;
   box-shadow: 1px 2px 8px -2px rgba(21, 101, 192, 0.4);
 }
 
