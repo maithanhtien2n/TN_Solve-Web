@@ -150,7 +150,7 @@ useSeo({
             👋
           </h1>
           <p class="hero-sub">
-            Chỉ vài phút để biến ý tưởng <br v-if="isMobile" />thành video chuyên nghiệp
+            Chỉ vài phút để biến ý tưởng thành video chuyên nghiệp
           </p>
           <div class="hero-ctas" style="margin-top: 8px">
             <button
@@ -693,7 +693,8 @@ useSeo({
   .hero-inner {
     padding: 36px 16px;
   }
-  .hero-heading {
+  .hero-heading,
+  .hero-sub {
     text-align: center;
     width: 100%;
   }
