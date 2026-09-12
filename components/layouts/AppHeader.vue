@@ -71,12 +71,14 @@ watch(() => mobileNavOpen.value, (open) => {
 // [2026-09-12] Nút menu nổi (☰) trước đây luôn hiện rõ 100% liên tục —
 // theo phản hồi người dùng là che chắn khó chịu trên mobile. Đổi sang kiểu
 // chuyên nghiệp hơn: hiện rõ vài giây đầu, rồi tự MỜ ĐI (không ẩn hẳn — vẫn
-// bấm được, chỉ giảm độ tương phản) khi không ai thao tác gì; scroll hoặc
-// chạm vào màn hình sẽ sáng rõ lại ngay, rồi lại mờ dần sau khi ngừng thao
-// tác. Cố tình KHÔNG ẩn hẳn (opacity: 0) — đây là cách DUY NHẤT để mở menu
-// điều hướng trên mobile, ẩn hẳn dễ khiến khách lần đầu vào web không biết
-// nó tồn tại. Chỉ áp dụng cho nút menu — nút chat (WebsiteChatWidget.vue)
-// giữ nguyên, không đổi.
+// bấm được, chỉ giảm độ tương phản) khi không ai thao tác gì; SCROLL sẽ
+// sáng rõ lại ngay, rồi lại mờ dần sau khi ngừng scroll. [2026-09-12] Theo
+// yêu cầu chủ ý: CHỈ scroll mới đánh thức, các thao tác khác (chạm/click ở
+// chỗ khác trên trang) không kích hoạt — bỏ hẳn 2 listener touchstart/
+// pointerdown ban đầu. Cố tình KHÔNG ẩn hẳn (opacity: 0) — đây là cách DUY
+// NHẤT để mở menu điều hướng trên mobile, ẩn hẳn dễ khiến khách lần đầu vào
+// web không biết nó tồn tại. Chỉ áp dụng cho nút menu — nút chat
+// (WebsiteChatWidget.vue) giữ nguyên, không đổi.
 const menuFabIdle = ref(false);
 let menuFabIdleTimer: ReturnType<typeof setTimeout> | null = null;
 
@@ -91,15 +93,11 @@ function wakeMenuFab() {
 onMounted(() => {
   wakeMenuFab();
   window.addEventListener("scroll", wakeMenuFab, { passive: true });
-  window.addEventListener("touchstart", wakeMenuFab, { passive: true });
-  window.addEventListener("pointerdown", wakeMenuFab, { passive: true });
 });
 
 onBeforeUnmount(() => {
   if (menuFabIdleTimer) clearTimeout(menuFabIdleTimer);
   window.removeEventListener("scroll", wakeMenuFab);
-  window.removeEventListener("touchstart", wakeMenuFab);
-  window.removeEventListener("pointerdown", wakeMenuFab);
 });
 
 const navTrackRef = ref<HTMLElement | null>(null);
@@ -263,7 +261,7 @@ const onClickMenuItem = (value: string) => {
     </div>
   </v-navigation-drawer>
 
-  <header class="app-header">
+  <header class="app-header" :class="{ 'app-header-locked': mobileNavOpen }">
     <v-container max-width="1400">
       <div class="header-inner">
 
@@ -379,6 +377,20 @@ const onClickMenuItem = (value: string) => {
   background: linear-gradient(90deg, #d6eaf8 0%, #e3f2fd 45%, #bbdefb 100%);
   border-bottom: 1px solid rgba(30, 136, 229, 0.2);
   box-shadow: 0 2px 12px rgba(30, 136, 229, 0.15);
+}
+/* [2026-09-12] Bug thật: mở menu mobile khóa scroll trang nền bằng
+   `body { position: fixed; top: -Npx }` (xem watch(mobileNavOpen) ở
+   <script>) — kỹ thuật này giả lập đứng yên bằng cách DỊCH CHUYỂN body,
+   không phải scroll thật, nên header `position: sticky` (phụ thuộc scroll
+   thật của container) bị lệch tính toán và bị đẩy ra khỏi màn hình, trông
+   như "biến mất". Sửa: khi menu đang mở, ép header sang `position: fixed`
+   (ghim thẳng theo viewport thật, không bị ảnh hưởng bởi offset giả của
+   body) — đóng menu thì tự trả lại `sticky` như cũ. */
+.app-header-locked {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
 }
 
 .header-inner {
