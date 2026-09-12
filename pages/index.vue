@@ -150,7 +150,7 @@ useSeo({
             👋
           </h1>
           <p class="hero-sub">
-            Sẵn sàng tạo video AI chuyên nghiệp ngay hôm nay?
+            Chỉ vài phút để biến ý tưởng <br v-if="isMobile" />thành video chuyên nghiệp
           </p>
           <div class="hero-ctas" style="margin-top: 8px">
             <button
