@@ -68,6 +68,40 @@ watch(() => mobileNavOpen.value, (open) => {
   }
 });
 
+// [2026-09-12] Nút menu nổi (☰) trước đây luôn hiện rõ 100% liên tục —
+// theo phản hồi người dùng là che chắn khó chịu trên mobile. Đổi sang kiểu
+// chuyên nghiệp hơn: hiện rõ vài giây đầu, rồi tự MỜ ĐI (không ẩn hẳn — vẫn
+// bấm được, chỉ giảm độ tương phản) khi không ai thao tác gì; scroll hoặc
+// chạm vào màn hình sẽ sáng rõ lại ngay, rồi lại mờ dần sau khi ngừng thao
+// tác. Cố tình KHÔNG ẩn hẳn (opacity: 0) — đây là cách DUY NHẤT để mở menu
+// điều hướng trên mobile, ẩn hẳn dễ khiến khách lần đầu vào web không biết
+// nó tồn tại. Chỉ áp dụng cho nút menu — nút chat (WebsiteChatWidget.vue)
+// giữ nguyên, không đổi.
+const menuFabIdle = ref(false);
+let menuFabIdleTimer: ReturnType<typeof setTimeout> | null = null;
+
+function wakeMenuFab() {
+  menuFabIdle.value = false;
+  if (menuFabIdleTimer) clearTimeout(menuFabIdleTimer);
+  menuFabIdleTimer = setTimeout(() => {
+    menuFabIdle.value = true;
+  }, 2500);
+}
+
+onMounted(() => {
+  wakeMenuFab();
+  window.addEventListener("scroll", wakeMenuFab, { passive: true });
+  window.addEventListener("touchstart", wakeMenuFab, { passive: true });
+  window.addEventListener("pointerdown", wakeMenuFab, { passive: true });
+});
+
+onBeforeUnmount(() => {
+  if (menuFabIdleTimer) clearTimeout(menuFabIdleTimer);
+  window.removeEventListener("scroll", wakeMenuFab);
+  window.removeEventListener("touchstart", wakeMenuFab);
+  window.removeEventListener("pointerdown", wakeMenuFab);
+});
+
 const navTrackRef = ref<HTMLElement | null>(null);
 const pillStyle = ref({ left: "4px", width: "0px" });
 
@@ -189,6 +223,7 @@ const onClickMenuItem = (value: string) => {
   <button
     v-if="isMobile"
     class="mobile-nav-fab"
+    :class="{ 'mobile-nav-fab-idle': menuFabIdle }"
     aria-label="Mở menu điều hướng"
     @click="mobileNavOpen = true"
   >
@@ -685,11 +720,21 @@ const onClickMenuItem = (value: string) => {
   background: linear-gradient(160deg, #1e3a5f 0%, #1565c0 100%);
   box-shadow: 2px 4px 14px -2px rgba(21, 101, 192, 0.45);
   cursor: pointer;
-  transition: width 0.18s ease, box-shadow 0.18s ease;
+  opacity: 1;
+  transition: width 0.18s ease, box-shadow 0.18s ease, opacity 0.6s ease;
 }
 .mobile-nav-fab:active {
   width: 56px;
   box-shadow: 1px 2px 8px -2px rgba(21, 101, 192, 0.4);
+}
+/* [2026-09-12] Mờ đi (KHÔNG ẩn hẳn — vẫn bấm được bình thường) khi không ai
+   thao tác gì 1 lúc — xem ghi chú đầy đủ ở menuFabIdle trong <script>. */
+.mobile-nav-fab-idle {
+  opacity: 0.35;
+}
+.mobile-nav-fab-idle:hover,
+.mobile-nav-fab-idle:active {
+  opacity: 1;
 }
 
 /* ─── Mobile nav drawer ───────────────────────────────── */
