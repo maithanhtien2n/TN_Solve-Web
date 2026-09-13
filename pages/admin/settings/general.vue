@@ -245,6 +245,14 @@ definePageMeta({ layout: "admin", title: "Thông tin chung" });
         <span v-else class="text-red text-nowrap">Không cho phép</span>
       </template>
 
+      <template v-else-if="(item as any).title === 'Cập nhật cookies tự động'">
+        <span v-if="(item as any).value" class="text-green text-nowrap">
+          Worker tự báo cookie
+        </span>
+
+        <span v-else class="text-red text-nowrap">Hana tự quản lý cookie</span>
+      </template>
+
       <template v-else-if="(item as any).title === 'Hiển thị nút dùng thử'">
         <span v-if="(item as any).value" class="text-green text-nowrap">
           Cho phép
@@ -449,6 +457,16 @@ definePageMeta({ layout: "admin", title: "Thông tin chung" });
         </template>
 
         <template v-else-if="(item as any).title === 'Hiển thị nút chat website'">
+          <v-checkbox
+            readonly
+            hide-details
+            class="my-1"
+            :model-value="Boolean((item as any).value)"
+            @click="onClickAction(item)"
+          />
+        </template>
+
+        <template v-else-if="(item as any).title === 'Cập nhật cookies tự động'">
           <v-checkbox
             readonly
             hide-details
